@@ -1,0 +1,22 @@
+<div class="loader-container" ng-show="loading"><div class='loader loader--audioWave'></div></div>
+<content id="content">
+    <section>
+        <div class="sec_area">
+            <div class="con_area">
+
+                <div class="sec" ng-repeat="cell in cells">
+                    <div class="con_box">
+                        <h2>{{ cell.cellName }}<span style="padding-left:20px;font-size:14px;">{{ cell.ip }}</span></h2>
+                        <div class="box_area">
+                            <div class="box" ng-repeat="container in cell.containers">
+                                <p>{{ container.appName }} / {{ container.appIndex }}</p>
+                            </div>
+                            <p ng-show="cell.containers == null || cell.containers.length == 0">컨테이너 없음</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</content>

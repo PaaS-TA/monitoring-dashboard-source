@@ -1,0 +1,41 @@
+@charset "utf-8"; 
+
+/* Reset */
+::selection{
+	background-color: #fff;
+	color: #555;
+}
+
+html,body{width:100%;height:100%}
+html{overflow-y:scroll;font-size:10px}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,form,fieldset,p,button{margin:0;padding:0}
+body,h1,h2,h3,h4,input,button{font-family:'Raleway', sans-serif;font-size:12px;color:#f5f5f5;}
+body{background-color:#141414;text-align:left;*word-break:break-all;-ms-word-break:break-all}
+img,fieldset,iframe{border:0 none}
+li{list-style:none}
+input,select,button{vertical-align:middle;outline: none}
+img{vertical-align:top}
+i,em,address{font-style:normal}
+label,button{cursor:pointer}
+button{margin:0;padding:0;background: none;border: none;}
+a{color:#222;text-decoration:none}
+a:hover{color:#000;text-decoration:underline}
+button *{position:relative}
+button img{left:-3px;*left:auto}
+html:first-child select{height:20px;padding-right:6px}
+option{padding-right:6px}
+hr{display:none}
+legend{*width:0}
+table{border-collapse:collapse;border-spacing:0}
+input::-ms-clear{display:none}
+input[type="submit"]:hover{opacity: .7;}
+/* Skip */
+.skip a {position:absolute;left:0;top:-9999em;z-index:9999;display:block;width:100%;background-color:#fff;color:#eee;font:bold 1em/1.8 }
+.skip a:focus {top:0}
+
+/* Hidden */
+.blind {position:absolute;left:0;top:-9999em}
+
+/* Clearfix */
+.clearfix {*zoom:1}
+.clearfix:after {content:'';display:block;clear:both}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+    <title>PaaS-TA Monitor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/png" href="images/fav32.png"/>
+    <link rel="stylesheet" href="css/components/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/components/bootstrap-datetimepicker.css"/>
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/normalize.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/loader.css"/>
+</head>
+<body>
+
+<!------------------------------------------------------------------------------------------------------->
+<div class="wrapper" id="wrap">
+    <div ui-view="navigation"></div>
+    <div ui-view="body"></div>
+</div>
+<!------------------------------------------------------------------------------------------------------->
+
+
+<script src="js/components/jquery.min.js"></script>
+<script src="js/components/bootstrap.min.js"></script>
+<script src="js/components/angular.js"></script>
+<script src="js/components/ui-bootstrap-tpls.min.js"></script>
+<script src="js/components/angular-ui-router.min.js"></script>
+
+<script src="js/components/angular-local-storage.min.js"></script>
+<script src="js/components/angular-cookies.min.js"></script>
+<script src="js/components/moment.min.js"></script>
+<script src="js/components/angular-eonasdan-datetimepicker.js"></script>
+<script src="js/components/bootstrap-datetimepicker.js"></script>
+
+
+<script src="js/directives/xpert-angular-pagination.js"></script>
+
+<script src="js/app.js"></script>
+<script src="js/controllers/cmmCtrl.js"></script>
+<script src="js/controllers/almCtrl.js"></script>
+<script src="js/services/cmmSrvc.js"></script>
+<script src="js/services/almSrvc.js"></script>
+<script src="js/services/exceptionSrvc.js"></script>
+<script src="js/services/interceptorSrvc.js"></script>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="summaryListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="min-width:620px; overflow-x: auto">
+            <div class="loader-container" ng-show="loadingStatusListPop"><div class='loader loader--audioWave'></div></div>
+            <div class="modal-header error-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="glyphicon glyphicon-warning-sign"></i>&nbsp;&nbsp;{{ errorCode || 'Error' }}</h4>
+            </div>
+            <div class="modal-body error-body">
+                <dl>
+                    <dt>오류내용</dt>
+                    <dd id="errorMessage">{{ errorMessage }}</dd>
+                </dl>
+            </div>
+            <div class="modal-footer error-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
