@@ -1,0 +1,140 @@
+<div class="loader-container" ng-show="loading"><div class='loader loader--audioWave'></div></div>
+<content id="content">
+    <section>
+        <div class="sec_area">
+            <div class="row" style="margin-bottom: 10px;">
+                <form class="form-inline">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="type" style="width:60px;">Type</label>
+                            <select class="form-control" ng-change="setTypeObject()" ng-model="selType" id="type" style="height: 100%">
+                                <option value="pas">PaaS-TA</option>
+                                <option value="bos">Bosh</option>
+                                <option value="con">Container</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="mid_con">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <img src="images/ic_cpu.png" />CPU
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-inline">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cpuWarning"><span class="warning">경고</span>&nbsp;</label>
+                                    <input ng-model="origin.cpu.threshold.warning" type="number" class="form-control" id="cpuWarning" placeholder="Warning">&nbsp;% 이상
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cpuCritical"><span class="critical">심각</span>&nbsp;</label>
+                                    <input ng-model="origin.cpu.threshold.critical" type="number" class="form-control" id="cpuCritical" placeholder="Critical">&nbsp;% 이상
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cpuCritical">전송주기&nbsp;</label>
+                                    <input ng-model="origin.cpu.repeatTime" type="number" class="form-control" id="cpuRepeatTime" placeholder="Repeat Time">&nbsp;분
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <img src="images/ic_memory.png" />Memory
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-inline">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="memoryWarning"><span class="warning">경고</span>&nbsp;</label>
+                                    <input ng-model="origin.memory.threshold.warning" type="number" class="form-control" id="memoryWarning" placeholder="Warning">&nbsp;% 이상
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="memoryCritical"><span class="critical">심각</span>&nbsp;</label>
+                                    <input ng-model="origin.memory.threshold.critical" type="number" class="form-control" id="memoryCritical" placeholder="Critical">&nbsp;% 이상
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="memoryRepeatTime">전송주기&nbsp;</label>
+                                    <input ng-model="origin.memory.repeatTime" type="number" class="form-control" id="memoryRepeatTime" placeholder="Repeat Time">&nbsp;분
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <img src="images/ic_disk.png" />Disk
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-inline">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="diskWarning"><span class="warning">경고</span>&nbsp;</label>
+                                    <input ng-model="origin.disk.threshold.warning" type="number" class="form-control" id="diskWarning" placeholder="Warning">&nbsp;% 이상
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="diskCritical"><span class="critical">심각</span>&nbsp;</label>
+                                    <input ng-model="origin.disk.threshold.critical" type="number" class="form-control" id="diskCritical" placeholder="Critical">&nbsp;% 이상
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="diskRepeatTime">전송주기&nbsp;</label>
+                                    <input ng-model="origin.disk.repeatTime" type="number" class="form-control" id="diskRepeatTime" placeholder="Repeat Time">&nbsp;분
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Alram Receiver Address</div>
+                    <div class="panel-body">
+                        <form class="form-inline">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <input ng-model="origin.email.emailName" type="text" class="form-control" id="name" placeholder="Email Name">&nbsp;@
+                                    <input ng-model="origin.email.emailAddr" type="text" class="form-control" id="addr" placeholder="Email Address">&nbsp;
+                                    <select class="form-control" ng-change="setEmailAddr()" ng-model="origin.email.emailType" ng-options="mail.code as mail.name for mail in mailList " id=type" style="height:34px;">
+                                        <option value="">직접입력</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#saveModal">저장</button>
+            </div>
+        </div>
+    </section>
+</content>
+
+<!-- Modal -->
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" style="font-size: 15px">저장</h4>
+            </div>
+            <div class="modal-body">
+                저장하시겠습니까?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveSetup()">저장</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>

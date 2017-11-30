@@ -1,0 +1,11 @@
+---
+applications:
+  - name: MonitApi
+    memory: 256M
+    instances: 2
+#    buildpack: https://github.com/cloudfoundry/go-buildpack.git
+    buildpack: go_buildpack
+#    services:
+#      - monitoring-db
+#env:
+#    dbtype: mysql

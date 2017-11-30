@@ -1,0 +1,157 @@
+<div class="loader-container" ng-show="loading"><div class='loader loader--audioWave'></div></div>
+<content id="content">
+    <section>
+        <div class="sec_area">
+            <div class="top_con">
+                <ul>
+                    <li><button class="date" ng-class="{'':period!='d', 'selected':period=='d'}" ng-click="interval=1;stat('d')">일</button></li>
+                    <li><button class="date" ng-class="{'':period!='w', 'selected':period=='w'}" ng-click="interval=1;stat('w')">주</button></li>
+                    <li><button class="date" ng-class="{'':period!='m', 'selected':period=='m'}" ng-click="interval=1;stat('m')">월</button></li>
+                    <li><button class="term" ng-class="{'':period!='custom', 'selected':period=='custom'}" ng-click="period='custom'">기간지정</button></li>
+                </ul>
+                <div class="move" ng-show="period!='custom'">
+                    <p class="move_ic">
+                        <a class="back" ng-click="setInterval('+')"></a>
+                        <a class="front" ng-click="setInterval('-')" ng-disabled="interval<=1"></a>
+                    </p>
+                    <p class="date_box" ng-show="period!='custom'">{{ strPeriod }}</p>
+                </div>
+                <form class="form-inline">
+                    <div class="form-group time" ng-show="period=='custom'">
+                        <div class="form-group">
+                            <div class="input-group date" datetimepicker options="optionsFrom" ng-model="dateFrom" ng-change="updateTimeRange(dateFrom, dateTo)">
+                                <input class="form-control dateTime" placeholder="From Date">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        ~
+                        <div class="form-group">
+                            <div class="input-group date" datetimepicker options="optionsTo" ng-model="dateTo" ng-change="updateTimeRange(dateFrom, dateTo)">
+                                <input class="form-control dateTime" placeholder="To Date">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group"></div>
+                        <button ng-click="stat('custom');"></button>
+                    </div>
+                </form>
+            </div>
+            <div class="mid_con">
+                <div class="cf_01 sec">
+                    <h2>종합 알람 발생 건수</h2>
+                    <div class="con_box">
+                        <div class="box01 box">
+                            <p class="txt">전체</p>
+                            <p class="num">{{ stats.totalCnt }}</p>
+                        </div>
+                        <div class="box02 box">
+                            <p class="txt">경고</p>
+                            <p class="num">{{ stats.warningCnt }}</p>
+                        </div>
+                        <div class="box03 box">
+                            <p class="txt">심각</p>
+                            <p class="num">{{ stats.criticalCnt }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf_02 sec">
+                    <h2>서비스 별 알람 발생 건수</h2>
+                    <div class="con_box">
+                        <div class="con01 link">
+                            <h3 ng-click="goListOriginType('pas')">PaaS-TA</h3>
+                            <div ng-click="goListOriginType('pas', 'warning')" class="kan01 kan">
+                                <p class="lf">경고</p>
+                                <p class="rt">{{ stats.paastaWarningCnt }}</p>
+                            </div>
+                            <div ng-click="goListOriginType('pas', 'critical')" class="kan02 kan">
+                                <p class="lf">심각</p>
+                                <p class="rt">{{ stats.paastaCriticalCnt }}</p>
+                            </div>
+                        </div>
+                        <div class="con01 link">
+                            <h3 ng-click="goListOriginType('bos')">Bosh</h3>
+                            <div ng-click="goListOriginType('bos', 'warning')" class="kan01 kan">
+                                <p class="lf">경고</p>
+                                <p class="rt">{{ stats.boshWarningCnt }}</p>
+                            </div>
+                            <div ng-click="goListOriginType('bos', 'critical')" class="kan02 kan">
+                                <p class="lf">심각</p>
+                                <p class="rt">{{ stats.boshCriticalCnt }}</p>
+                            </div>
+                        </div>
+                        <div class="con01 link">
+                            <h3 ng-click="goListOriginType('con')">Container</h3>
+                            <div ng-click="goListOriginType('con', 'warning')" class="kan01 kan">
+                                <p class="lf">경고</p>
+                                <p class="rt">{{ stats.containerWarningCnt }}</p>
+                            </div>
+                            <div ng-click="goListOriginType('con', 'critical')" class="kan02 kan">
+                                <p class="lf">심각</p>
+                                <p class="rt">{{ stats.containerCriticalCnt }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf_03 sec">
+                    <h2>조치현황</h2>
+                    <div class="con_box">
+                        <div class="box01 box">
+                            <p class="txt">전체</p>
+                            <p class="num">{{ stats.warningResolveCnt + stats.criticalResolveCnt }} / {{ stats.totalCnt }}</p>
+                        </div>
+                        <div class="box02 box">
+                            <p class="txt">경고</p>
+                            <p class="num">{{ stats.warningResolveCnt }} / {{ stats.warningCnt }}</p>
+                        </div>
+                        <div class="box03 box">
+                            <p class="txt">심각</p>
+                            <p class="num">{{ stats.criticalResolveCnt }} / {{ stats.criticalCnt }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf_02 sec">
+                    <h2>메트릭스 별 알람 발생 건수</h2>
+                    <div class="con_box">
+                        <div class="con01 link">
+                            <h3 ng-click="goListAlarmType('cpu')">CPU</h3>
+                            <div ng-click="goListAlarmType('cpu', 'warning')" class="kan01 kan">
+                                <p class="lf">경고</p>
+                                <p class="rt">{{ stats.cpuWarningCnt }}</p>
+                            </div>
+                            <div ng-click="goListAlarmType('cpu', 'critical')" class="kan02 kan">
+                                <p class="lf">심각</p>
+                                <p class="rt">{{ stats.cpuCriticalCnt }}</p>
+                            </div>
+                        </div>
+                        <div class="con01 link">
+                            <h3 ng-click="goListAlarmType('memory')">Memory</h3>
+                            <div ng-click="goListAlarmType('memory', 'warning')" class="kan01 kan">
+                                <p class="lf">경고</p>
+                                <p class="rt">{{ stats.memoryWarningCnt }}</p>
+                            </div>
+                            <div ng-click="goListAlarmType('memory', 'critical')" class="kan02 kan">
+                                <p class="lf">심각</p>
+                                <p class="rt">{{ stats.memoryCriticalCnt }}</p>
+                            </div>
+                        </div>
+                        <div class="con01 link">
+                            <h3 ng-click="goListAlarmType('disk')">Disk</h3>
+                            <div ng-click="goListAlarmType('disk', 'warning')" class="kan01 kan">
+                                <p class="lf">경고</p>
+                                <p class="rt">{{ stats.diskWarningCnt }}</p>
+                            </div>
+                            <div ng-click="goListAlarmType('disk', 'critical')" class="kan02 kan">
+                                <p class="lf">심각</p>
+                                <p class="rt">{{ stats.diskCriticalCnt }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</content>
