@@ -150,7 +150,7 @@ src 디렉토리에 Dependencies 소스들이 다운로드 되어 있음을 확�
     metric.infra.db_name=bosh_metric_db
     metric.container.db_name=container_metric_db
     
-    gmt.time.hour.gap=9  
+    gmt.time.hour.gap=0         ⇒ Gmt 시간과 차이 표시, 실행환경의 시간이 Gmt 기준시 일때는 0 으로 해야함. 실행환경 시간이 한국일떄 -9 (Gmt Time Gap)  PaaS-TA는 GMT Time을 사용한다. 
 
 
 <br />
