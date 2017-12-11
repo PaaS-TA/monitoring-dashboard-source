@@ -5,8 +5,6 @@ coverage.out
 paasta-monitoring-management/bin
 paasta-monitoring-management/pkg
 paasta-monitoring-management/src/code.cloudfoundry.org
-paasta-monitoring-management/src/kr/paasta/monitoring/Godeps/
-paasta-monitoring-management/src/kr/paasta/monitoring/vendor/
 paasta-monitoring-management/src/github.com
 paasta-monitoring-management/src/golang.org/
 paasta-monitoring-management/src/gopkg.in
@@ -14,8 +12,6 @@ paasta-monitoring-management/src/kr/paasta/monitoring/controller/coverage.out
 paasta-monitoring-batch/bin
 paasta-monitoring-batch/pkg
 paasta-monitoring-batch/src/code.cloudfoundry.org
-paasta-monitoring-batch/src/kr/paasta/monitoring/Godeps/
-paasta-monitoring-batch/src/kr/paasta/monitoring/vendor/
 paasta-monitoring-batch/src/github.com
 paasta-monitoring-batch/src/golang.org
 paasta-monitoring-batch/src/kr/paasta/monitoring/monit-batch/.pid
