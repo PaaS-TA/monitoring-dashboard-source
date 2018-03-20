@@ -36,7 +36,12 @@ PaaS-TA-Monitoring-2.0_Management
 
 > Dos 창을 오픈한다.
 
-    $ cd \PaaS-TA-Monitoring\paasta-monitoring-batch
+    [OS : Ubuntu]
+    export GOPATH=$PWD
+    export PATH=$GOPATH/bin:$PATH
+
+    [OS : Windows]
+    $ cd \PaaS-TA-Monitoring\paasta-monitoring-management
     $ set GOPATH='현재 디렉토리 경로"
     $ set PATH=%PATH%;%GOPATH%bin;
 
