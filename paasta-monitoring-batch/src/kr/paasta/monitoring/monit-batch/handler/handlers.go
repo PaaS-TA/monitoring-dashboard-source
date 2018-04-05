@@ -53,7 +53,7 @@ func (n *backend_server) Run(signals <-chan os.Signal, ready chan<- struct{}) er
 	backend_service := services.NewBackendServices( n.gmtTimeGapHour, n.influxCon, n.configDbCon, n.portalDbCon, n.boshCon,  n.mailConfig,  n.config)
 
 	//최초 실행시 Bosh VM정보 동기화
-	//backend_service.CreateUpdateBoshData(*n.boshCon)
+	backend_service.CreateUpdateBoshData(*n.boshCon)
 
 	ticker := time.NewTicker(time.Duration(n.batchInterval) * time.Second)
 	var index int
@@ -63,7 +63,7 @@ func (n *backend_server) Run(signals <-chan os.Signal, ready chan<- struct{}) er
 		case <- ticker.C:
 
 			go func(){
-				//backend_service.CreateUpdateBoshData(*n.boshCon)
+				backend_service.CreateUpdateBoshData(*n.boshCon)
 			}()
 
 			var wg sync.WaitGroup
@@ -77,7 +77,7 @@ func (n *backend_server) Run(signals <-chan os.Signal, ready chan<- struct{}) er
 			//AutoScale
 			go func(wg *sync.WaitGroup){
 				defer wg.Done()
-				//backend_service.AutoScale()
+				backend_service.AutoScale()
 			}(&wg)
 
 			wg.Wait()
