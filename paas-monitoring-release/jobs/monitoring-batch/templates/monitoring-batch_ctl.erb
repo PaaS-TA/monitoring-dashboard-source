@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e -x
+
+RUN_DIR=/var/vcap/sys/run/monitoring-batch
+LOG_DIR=/var/vcap/sys/log/monitoring-batch
+PACKAGE_DIR=/var/vcap/packages/monitoring-batch
+PIDFILE=$RUN_DIR/monitoring-batch.pid
+
+source /var/vcap/packages/pidutils/pidutils.sh
+
+case $1 in
+
+  start)
+
+    mkdir -p $RUN_DIR
+
+    pid_guard $PIDFILE "monitoring-batch"
+
+    mkdir -p $LOG_DIR
+    sudo chown -R vcap:vcap $LOG_DIR
+
+    mkdir -p $PACKAGE_DIR
+    sudo cp /var/vcap/jobs/monitoring-batch/config/config.ini $PACKAGE_DIR
+    sudo chown -R vcap:vcap $PACKAGE_DIR
+
+    sudo chown -R vcap:vcap /var/vcap/packages/monitoring-batch/
+    export GOMAXPROCS=$(nproc)
+
+    #echo $$ > $PIDFILE
+    PID=$$
+    echo "current pid : $PID"
+    echo $PID > $PIDFILE
+
+    # change file mode to 0666
+    chmod 666 $PIDFILE
+
+    # Allowed number of open file descriptors
+    ulimit -n 100000
+
+    cd $PACKAGE_DIR
+    exec chpst -u vcap:vcap $PACKAGE_DIR/monitoring-batch \
+      1> $LOG_DIR/monitoring-batch.stdout.log \
+      2> $LOG_DIR/monitoring-batch.stderr.log
+;;
+
+  stop)
+    kill_and_wait $PIDFILE
+
+    ;;
+
+  *)
+echo "Usage: monitoring-batch_ctl {start|stop}"
+
+    ;;
+
+esac
+

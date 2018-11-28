@@ -1,0 +1,6 @@
+check process mariadb
+  with pidfile /var/vcap/sys/run/mysqld.pid
+  start program "/var/vcap/jobs/mariadb/bin/mariadb_ctl start" with timeout 20 seconds
+  stop program "/var/vcap/jobs/mariadb/bin/mariadb_ctl stop" with timeout 20 seconds
+  group vcap
+

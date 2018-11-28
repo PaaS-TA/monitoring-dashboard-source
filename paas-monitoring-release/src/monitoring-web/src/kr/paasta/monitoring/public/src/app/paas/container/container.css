@@ -1,0 +1,17 @@
+.summary-list-running {
+  color: #00aacc;
+}
+.summary-list-warning {
+  color: #e66b6b;
+}
+.summary-list-critical {
+  color: #ad6de8;
+}
+
+.overview {
+  padding: 5px 20px;
+  font-weight: 700;
+}
+.table_bottom {
+  border-top: 1px solid #cccccc;
+}

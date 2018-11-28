@@ -1,0 +1,126 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Alarm Status Detail
+        </div>
+
+        <div class="panel-body">
+          <section>
+            <div class="tb_area">
+              <table>
+                <tr>
+                  <th>Origin Type</th>
+                  <td>{{ pasu.common.getOriginTypeString(pasu.alarm.originType) }}</td>
+                </tr>
+                <tr>
+                  <th>Origin Name</th>
+                  <td>{{ pasu.alarm.originName }}</td>
+                </tr>
+                <tr>
+                  <th>IP</th>
+                  <td>{{ pasu.alarm.ip }}</td>
+                </tr>
+                <tr>
+                  <th>Alarm Type</th>
+                  <td>{{ pasu.common.getResourceTypeString(pasu.alarm.alarmType) }}</td>
+                </tr>
+                <tr>
+                  <th>Alarm Level</th>
+                  <td><span style="text-transform: uppercase;" ng-class="pasu.common.alarmLevelStyle(pasu.alarm.level)">{{ pasu.alarm.level }}</span></td>
+                </tr>
+                <tr>
+                  <th>Alarm Title</th>
+                  <td>{{ pasu.alarm.alarmTitle }}</td>
+                </tr>
+                <tr>
+                  <th>Alarm Message</th>
+                  <td>{{ pasu.alarm.alarmMessage }}</td>
+                </tr>
+                <tr>
+                  <th>Alarm Date</th>
+                  <td>{{ pasu.alarm.regDate }}</td>
+                </tr>
+              </table>
+              <div class="accept_box">
+                <div class="sub-btn" align="right" ng-if="pasu.alarm.resolveStatus == 1" >
+                  <button type="button" class="btn btn-primary small" data-toggle="modal" data-target="#confirmModal" ng-click="pasu.confirmReceipt()">Receipt</button>
+                  <button type="button" class="btn btn-default small" ng-click="pasu.cancel('/paas/alarm/status')" >Cancel</button>
+                </div>
+                <div class="sub-btn" align="right" ng-if="pasu.alarm.resolveStatus != 1" >
+                  <button type="button" class="btn btn-default small" ng-click="pasu.cancel('/paas/alarm/status')" >List</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="panel panel-default" ng-hide="pasu.alarm.resolveStatus == 1">
+        <div class="panel-heading">
+          Alarm Action History
+        </div>
+
+        <div class="panel-body">
+          <section>
+            <div class="bt_con">
+              <div class="re_box" ng-if="pasu.alarm.resolveStatus != 1 && pasu.alarm.data.length > 0">
+                <h2>Action History</h2>
+                <div class="con_box" ng-repeat="action in pasu.alarm.data">
+                  <div class="txt_box">
+                    <p class="date">{{ action.regDate }}</p>
+                    <pre ng-hide="pasu.updating==$index" class="info">{{ action.alarmActionDesc }}</pre>
+                    <div class="detail_box">
+                      <textarea ng-show="pasu.updating==$index" ng-model="action.alarmActionDesc"></textarea>
+                    </div>
+                  </div>
+                  <div class="btn">
+                    <button class="btn-success btn-xs" title="수정하기" ng-hide="pasu.updating==$index" ng-click="pasu.setUpdating($index)">Update</button>
+                    <button class="btn-danger btn-xs" title="삭제하기" ng-hide="pasu.updating==$index" data-toggle="modal" data-target="#confirmModal" ng-click="pasu.confirmActionDelete(action.id)">Delete</button>
+                    <button class="btn-info btn-xs" title="저장하기" ng-show="pasu.updating==$index" data-toggle="modal" data-target="#confirmModal" ng-click="pasu.confirmActionModify(action)">Save</button>
+                    <button class="btn-default btn-xs" title="취소하기" ng-show="pasu.updating==$index" ng-click="pasu.updating=-1">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <div class="content_box" ng-if="pasu.alarm.resolveStatus != 1" >
+                <h2>Action Contents</h2>
+                <div class="detail_con">
+                  <textarea ng-model="pasu.actionDesc"></textarea>
+                  <div class="sub-btn">
+                    <button class="btn btn-success small" ng-click="pasu.alarmActionCreate()">저장 (조치내용만 입력)</button>
+                    <button class="btn btn-primary small" ng-if="pasu.alarm.resolveStatus == 2" ng-click="pasu.alarmActionComplete()">조치완료 (조치내용도 함께 입력)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="font-size: 15px">{{ pasu.modalTitle }}</h4>
+      </div>
+      <div class="modal-body">
+        {{ pasu.modalMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="pasu.confirmCallback()">Accept</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="pasu.cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

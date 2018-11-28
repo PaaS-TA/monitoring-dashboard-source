@@ -1,0 +1,35 @@
+
+/* Contents Area 01 */
+.panel-body .event_box {
+  width: 100%;
+  float: left;
+  margin: 0 2% 0 0;
+}
+.panel-body .event_box .box {
+  width: 31.93%;
+  height: 100%;
+  float: left;
+  margin-right: 2.1%;
+  border: solid 1px #cccccc;
+  text-align: center;
+}
+.panel-body .event_box .box:last-child {
+  margin-right: 0;
+}
+.panel-body .event_box .box p.txt {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 20px 0 0 0;
+}
+.panel-body .event_box .box p.num {
+  font-size: 56px;
+  font-weight: 500;
+  padding: 10px 0 5px 0;
+  margin: 0;
+}
+.panel-body .event_box .box02 p.txt {
+  color: #f0a141;
+}
+.panel-body .event_box .box03 p.txt {
+  color: #e66b6b;
+}

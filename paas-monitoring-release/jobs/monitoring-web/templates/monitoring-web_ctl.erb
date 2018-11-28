@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -e -x
+
+RUN_DIR=/var/vcap/sys/run/monitoring-web
+LOG_DIR=/var/vcap/sys/log/monitoring-web
+PACKAGE_DIR=/var/vcap/packages/monitoring-web
+PIDFILE=$RUN_DIR/monitoring-web.pid
+
+source /var/vcap/packages/pidutils/pidutils.sh
+
+case $1 in
+
+start)
+
+mkdir -p $RUN_DIR
+
+pid_guard $PIDFILE "monitoring-web"
+
+mkdir -p $LOG_DIR
+sudo chown -R vcap:vcap $LOG_DIR/
+
+mkdir -p $PACKAGE_DIR
+sudo cp /var/vcap/jobs/monitoring-web/config/config.ini $PACKAGE_DIR
+sudo chown -R vcap:vcap $PACKAGE_DIR/
+
+export GOMAXPROCS=$(nproc)
+
+#echo $$ > $PIDFILE
+PID=$$
+echo "current pid : $PID"
+echo $PID > $PIDFILE
+
+# change file mode to 0666
+chmod 666 $PIDFILE
+
+# Allowed number of open file descriptors
+ulimit -n 100000
+
+cd $PACKAGE_DIR
+#sudo tar -zxvf $PACKAGE_DIR/public.tar.gz
+#sudo chown -R vcap:vcap $PACKAGE_DIR/public
+
+cd $PACKAGE_DIR
+exec chpst -u vcap:vcap $PACKAGE_DIR/monitoring-web \
+1> $LOG_DIR/monitoring-web.stdout.log \
+2> $LOG_DIR/monitoring-web.stderr.log
+
+;;
+
+stop)
+kill_and_wait $PIDFILE
+
+;;
+
+*)
+echo "Usage: monitoring-web_ctl {start|stop}"
+
+;;
+
+esac
+

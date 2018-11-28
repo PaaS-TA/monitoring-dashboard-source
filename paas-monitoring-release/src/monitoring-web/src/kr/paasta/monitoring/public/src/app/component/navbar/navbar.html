@@ -1,0 +1,136 @@
+<nav class="navbar navbar-static-top navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{ brandUrl }}">
+        <img src="assets/images/logo.png" />
+      </a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li ng-class="{'active':selected === 'iaas'}" ng-show="(sysType == 'ALL' || sysType == 'IaaS') && iaasMenuAuth == 'S'" ng-click="eventHandler($event)">
+          <a href="#/iaas/main">IaaS-Monitoring</a>
+        </li>
+        <li ng-class="{'active':selected === 'paas'}" ng-show="(sysType == 'ALL' || sysType == 'PaaS') && paasMenuAuth == 'S'" ng-click="eventHandler($event)">
+          <a href="#/paas/main">PaaS-Monitoring</a>
+        </li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-icon">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-bell fa-lg"></i>
+            <span ng-show="alarms" class="navbar-badge">{{ alarms }}</span>
+          </a>
+          <ul class="dropdown-menu alram">
+            <li ng-class="{'alarmRed':iaasAlarms > 0}" ng-show="(sysType == 'ALL' || sysType == 'IaaS') && iaasMenuAuth == 'S'">
+              <i class="fa fa-bell fa-sm"></i>
+              <a href="#/iaas/alarm/status" ng-class="{'alarmRed':iaasAlarms > 0}" >IaaS <span ng-show="iaasAlarms" >({{ iaasAlarms }})</span></a>
+            </li>
+            <li ng-class="{'alarmRed':paasAlarms > 0}" ng-show="(sysType == 'ALL' || sysType == 'PaaS') && paasMenuAuth == 'S'">
+              <i class="fa fa-bell fa-sm"></i>
+              <a href="#/paas/alarm/status" ng-class="{'alarmRed':paasAlarms > 0}" >PaaS <span ng-show="paasAlarms" >({{ paasAlarms }})</span></a>
+            </li>
+          </ul>
+        </li>
+        <li class="navbar-icon">
+          <a href data-toggle="modal" data-target="#timeRange" ng-click="timeRangeTop($event)">
+            <i class="fa fa-calendar fa-lg"></i>&nbsp;
+            {{ timeRangeString || '조회주기' }}
+          </a>
+        </li>
+        <li class="navbar-icon">
+          <a href ng-click="reload()"><i class="fa fa-refresh fa-lg" ng-class="{'fa-spin': spin}"></i></a>
+        </li>
+        <li class="dropdown">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-user fa-lg"></i>&nbsp;&nbsp;{{ username }}<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li style="padding-bottom:96px;border-bottom:1px solid;">
+              <div class="user-info">
+                <i class="fa fa-user"></i>
+                <div class="info">
+                  <p>{{ username }}</p>
+                  <span>{{ email }} </span>
+                </div>
+              </div>
+            </li>
+            <li style=""><a href="#/member/info">User Info</a></li>
+            <li><a href="" ng-click="logout()">Log Out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Modal -->
+<div class="modal fade" id="timeRange" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Time Range</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="15m">최근 15분</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="30m">최근 30분</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="1h">최근 1시간</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="3h">최근 3시간</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="6h">최근 6시간</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="12h">최근 12시간</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="1d">최근 1일</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="7d">이번 주</label></div>
+          <div class="col-xs-4 col-md-4"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="30d">이번 달</label></div>
+        </div>
+        <div class="row">
+          <div class="col-md-12" style="margin-bottom: 5px;"><label class="checkbox-inline"><input type="radio" name="radioTimeRange" ng-model="selTimeRange" ng-change="selectGroupBy()" value="custom">수동설정</label></div>
+          <div class="col-md-12">
+            <div class="form-inline">
+              <div class="input-group date" datetimepicker options="optionsFrom" ng-model="timeRangeTo" ng-change="updateTimeRange(timeRangeTo, timeRangeFrom)">
+                <input class="form-control" ng-disabled="selTimeRange != 'custom'"/>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+              </div>
+              ~
+              <div class="input-group date" datetimepicker options="optionsTo" ng-model="timeRangeFrom" ng-change="updateTimeRange(timeRangeTo, timeRangeFrom)">
+                <input class="form-control" ng-disabled="selTimeRange != 'custom'"/>
+                <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel2">Refreshing Time</h4>
+      </div>
+      <div class="modal-body">
+        <select class="form-control" ng-model="selRefreshTime">
+          <option>off</option>
+          <option>1m</option>
+          <option>5m</option>
+          <option>15m</option>
+          <option>30m</option>
+          <option>1h</option>
+          <option>2h</option>
+          <option>1d</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveTimeRange()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

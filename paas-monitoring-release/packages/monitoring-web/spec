@@ -1,0 +1,10 @@
+---
+name: monitoring-web
+
+dependencies:
+- golang
+- monitoring-batch
+
+
+files:
+- monitoring-web/**/*

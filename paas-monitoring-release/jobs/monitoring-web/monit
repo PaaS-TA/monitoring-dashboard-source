@@ -1,0 +1,5 @@
+check process monitoring-web
+  with pidfile /var/vcap/sys/run/monitoring-web/monitoring-web.pid
+  start program "/var/vcap/jobs/monitoring-web/bin/monitoring-web_ctl start"
+  stop program "/var/vcap/jobs/monitoring-web/bin/monitoring-web_ctl stop"
+  group vcap

@@ -1,0 +1,32 @@
+<div class="nav-side-menu">
+  <div class="menu-list">
+
+    <div class="brand">PaaS-Monitoring</div>
+    <ul id="menu-content" class="menu-content out">
+      <li ng-class="{'active':selected === 'pbs'}" ng-click="goPage('/paas/bosh')">
+        <a href="#/paas/bosh"><i class="fa fa-cogs fa-lg"></i> bosh </a>
+      </li>
+      <li ng-class="{'active':selected === 'ppt'}" ng-click="goPage('/paas/paasta')">
+        <a href="#/paas/paasta"><i class="fa fa-cloud-upload fa-lg"></i> PaaS-TA </a>
+      </li>
+      <li ng-class="{'active':selected === 'pct'}" ng-click="goPage('/paas/container')">
+        <a href="#/paas/container"><i class="fa fa-cubes fa-lg"></i> Container </a>
+      </li>
+      <li ng-class="{'active':selected === 'pal'}" data-toggle="collapse" data-target="#almSub" aria-expanded="{{ alarmSelected }}">
+        <a><i class="fa fa-bell fa-lg"></i> Alarm <span class="arrow"></span></a>
+      </li>
+      <ul class="sub-menu collapse" ng-class="{'in':alarmSelected === true}" id="almSub" aria-expanded="{{ alarmSelected }}">
+        <li ng-class="{'active':subSelected === 'papc'}" ng-click="goPage('/paas/alarm/policy')">
+          <a href="#/paas/alarm/policy"> Policy </a>
+        </li>
+        <li ng-class="{'active':subSelected === 'pasu'}" ng-click="goPage('/paas/alarm/status')">
+          <a href="#/paas/alarm/status"> Status </a>
+        </li>
+        <li ng-class="{'active':subSelected === 'past'}" ng-click="goPage('/paas/alarm/statistics')">
+          <a href="#/paas/alarm/statistics"> Statistics </a>
+        </li>
+      </ul>
+    </ul>
+
+  </div>
+</div>

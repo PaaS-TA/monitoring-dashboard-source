@@ -1,0 +1,152 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<!--<div class="container">-->
+<div class="contents">
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      IaaS Summary
+    </div>
+    <div class="panel-body">
+      <div class="col-xs-6 col-sm-6 col-md-3">
+        <div class="gauge-div">
+          <div class="gauge-title">VCPU 사용량</div>
+          <liquid seq="1" percentage="cpuPercent"></liquid>
+        </div>
+        <div class="gauge-usage">사용 {{ dashboard.summary.vcpuUsed || 0 | number }}개 / 전체 {{ dashboard.summary.vcpuTotal || 0 | number }}개</div>
+      </div>
+      <div class="col-xs-6 col-sm-6 col-md-3">
+        <div class="gauge-div">
+          <div class="gauge-title">Memory 사용량</div>
+          <liquid seq="2" percentage="memPercent"></liquid>
+        </div>
+        <div class="gauge-usage">
+          <div>사용 {{ dashboard.summary.memoryMbUsed || 0 | number }}MB / 전체 {{ dashboard.summary.memoryMbTotal || 0 | number }}MB</div>
+          <div>{{ dashboard.summary.memoryMbFree || 0 | number }}MB 사용가능</div>
+        </div>
+      </div>
+      <div class="col-xs-6 col-sm-6 col-md-3">
+        <div class="gauge-div">
+          <div class="gauge-title">Disk 사용량</div>
+          <liquid seq="3" percentage="diskPercent"></liquid>
+        </div>
+        <div class="gauge-usage">
+          <div>사용 {{ dashboard.summary.diskGbUsed || 0 | number }}GB / 전체 {{ dashboard.summary.diskGbTotal || 0 | number }}GB</div>
+          <div>{{ dashboard.summary.diskGbLeastAvailable || 0 | number }}GB 사용가능</div>
+        </div>
+      </div>
+      <div class="col-xs-6 col-sm-6 col-md-3">
+        <div class="gauge-div">
+          <div class="gauge-title">인스턴스</div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Max Instance</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmTotalLimit || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Running / OK</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[1].vmCount || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">No Status</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[0].vmCount || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Idle / Blocked</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[2].vmCount || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Paused</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[3].vmCount || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Shutting down</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[4].vmCount || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Shut Off</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[5].vmCount || 0 | number }} 개</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-7 pull-left"><span class="main-count pull-right">Crashed</span></div>
+          <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ dashboard.summary.vmState[6].vmCount || 0 | number }} 개</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      PaaS Summary
+    </div>
+    <div class="panel-body">
+      <div class="row summary-row">
+        <div class="loader-container no-panel" ng-show="loadingSummary"><div class='loader loader--audioWave'></div></div>
+        <div class="summary-box">
+          <div class="fa-spinner-container"><i class="fa fa-spinner fa-pulse fa-fw" ng-show="loadingSummaryBosh"></i></div>
+          <nvd3 options="bosh.chart.options" data="bosh.chart.data" api="bosh.chart.api" config="config" events="events"></nvd3>
+        </div>
+        <div class="summary-box">
+          <div class="fa-spinner-container"><i class="fa fa-spinner fa-pulse fa-fw" ng-show="loadingSummaryPaasta"></i></div>
+          <nvd3 options="paasta.chart.options" data="paasta.chart.data" api="paasta.chart.api" config="config" events="events"></nvd3>
+        </div>
+        <div class="summary-box">
+          <div class="fa-spinner-container"><i class="fa fa-spinner fa-pulse fa-fw" ng-show="loadingSummaryContainer"></i></div>
+          <nvd3 options="container.chart.options" data="container.chart.data" api="container.chart.api" config="config" events="events"></nvd3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          IaaS Alarm View
+        </div>
+        <div class="panel-body">
+          <div class="event_box">
+            <div class="box01 box" ng-click="goAlarmPage('iaas', 'total'); ">
+              <p class="txt">Total</p>
+              <p class="num">{{ dashboard.iaasAlarmView.totalCnt }}</p>
+            </div>
+            <div class="box02 box" ng-click="goAlarmPage('iaas', 'HIGH'); ">
+              <p class="txt">Warning</p>
+              <p class="num">{{ dashboard.iaasAlarmView.warningCnt }}</p>
+            </div>
+            <div class="box03 box" ng-click="goAlarmPage('iaas', 'CRITICAL'); ">
+              <p class="txt">Critical</p>
+              <p class="num">{{ dashboard.iaasAlarmView.criticalCnt }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          PaaS Alarm View
+        </div>
+        <div class="panel-body">
+          <div class="event_box">
+            <div class="box01 box" ng-click="goAlarmPage('paas', 'total'); ">
+              <p class="txt">Total</p>
+              <p class="num">{{ dashboard.paasAlarmView.totalCnt }}</p>
+            </div>
+            <div class="box02 box" ng-click="goAlarmPage('paas', 'warning'); ">
+              <p class="txt">Warning</p>
+              <p class="num">{{ dashboard.paasAlarmView.warningCnt }}</p>
+            </div>
+            <div class="box03 box" ng-click="goAlarmPage('paas', 'critical'); ">
+              <p class="txt">Critical</p>
+              <p class="num">{{ dashboard.paasAlarmView.criticalCnt }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

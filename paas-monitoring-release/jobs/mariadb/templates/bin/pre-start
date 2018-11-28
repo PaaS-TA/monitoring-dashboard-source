@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+DATA_DIR=/var/vcap/store/mariadb-data
+
+if [ ! -d "$DATA_DIR" ]; then
+
+  JOB_NAME=mariadb
+  BASE_DIR=/var/vcap/store/$JOB_NAME
+  PKG_NAME=mariadb
+  CONF_FILE=$BASE_DIR/mariadb.cnf
+
+  tar zxvf /var/vcap/packages/$PKG_NAME/mariadb-10.1.36-linux-x86_64.tar.gz -C /var/vcap/store/
+
+  ln -s /var/vcap/store/mariadb-10.1.36-linux-x86_64 $BASE_DIR
+  sudo chmod 777 /tmp
+  sudo chown vcap:vcap /var/vcap/sys/log/mariadb
+
+  mkdir -p /var/vcap/store/mariadb-data
+  sudo chown -R vcap /var/vcap/store/mariadb-data
+
+  cd $BASE_DIR
+  cp /var/vcap/jobs/$JOB_NAME/conf/mariadb.cnf mariadb.cnf
+  sudo chown -R root .
+  sudo ./scripts/mysql_install_db --defaults-file=$CONF_FILE --user=vcap
+  echo 'export PATH=$PATH:/'$BASE_DIR'/bin/' >> /home/vcap/.bashrc
+
+fi

@@ -1,0 +1,142 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Summary
+        </div>
+        <div class="panel-body">
+          <div class="loader-container no-panel" ng-show="loadingSummary"><div class='loader loader--audioWave'></div></div>
+          <div class="summary-box">
+            <div class="fa-spinner-container"><i class="fa fa-spinner fa-pulse fa-fw" ng-show="loadingSummaryBosh"></i></div>
+            <nvd3 options="bosh.chart.options" data="bosh.chart.data" api="bosh.chart.api" config="config" events="events"></nvd3>
+          </div>
+          <div class="summary-box">
+            <div class="fa-s3pinner-container"><i class="fa fa-spinner fa-pulse fa-fw" ng-show="loadingSummaryPaasta"></i></div>
+            <nvd3 options="paasta.chart.options" data="paasta.chart.data" api="paasta.chart.api" config="config" events="events"></nvd3>
+          </div>
+          <div class="summary-box">
+            <div class="fa-spinner-container"><i class="fa fa-spinner fa-pulse fa-fw" ng-show="loadingSummaryContainer"></i></div>
+            <nvd3 options="container.chart.options" data="container.chart.data" api="container.chart.api" config="config" events="events"></nvd3>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-7">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              PaaS-TA VM List
+            </div>
+            <div class="panel-body main_bosh">
+              <table class="table process">
+                <colgroup>
+                  <col style="" />
+                  <col style="" />
+                  <col style="" />
+                  <col style="" />
+                  <col style="" />
+                  <!--<col style="" />-->
+                </colgroup>
+                <thead>
+                <tr>
+                  <th rowspan="2" class="text-center">Name</th>
+                  <th rowspan="2" class="text-center">State</th>
+                  <th rowspan="2" class="text-center">CPU<br />(%)</th>
+                  <th rowspan="2" class="text-center">Memory<br />(%)</th>
+                  <th colspan="2" class="text-center">Total Disk(MB)</th>
+                  <!--<th rowspan="2" class="text-center">Disk Status</th>-->
+                </tr>
+                <tr>
+                  <th class="text-center">/</th>
+                  <th class="text-center">Data</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="text-center" ng-repeat="item in paasMain.paastaSummary" ng-class="item.select" >
+                  <td class="link"><a ng-href="#/paas/paasta/{{ item.id }}?name={{ item.name }}">{{ item.name }}</a></td>
+                  <td><span ng-class="paasMain.common.alarmLevelStyle(item.state)">{{ item.state }}</span></td>
+                  <td><span ng-style="cpuUsageStyle(Math.floor(item.cpuUsage))">{{ (item.cpuUsage).toFixed(2) | number }} %</span></td>
+                  <td><span ng-style="memoryUsageStyle(Math.floor(item.memoryUsage))">{{ (item.memoryUsage).toFixed(2) | number }} %</span></td>
+                  <td>{{ paasMain.Math.round(item.totalDisk) | number }}</td>
+                  <td>{{ paasMain.Math.round(item.dataDisk) | number }}</td>
+                  <!--<td><span ng-class="paasMain.common.alarmLevelStyle(item.diskStatus)">{{ item.diskStatus }}</span></td>-->
+                </tr>
+                <tr ng-show="paasMain.paastaSummary == null" class="text-center">
+                  <td colspan="5">No Data Available.</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-5">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              Zone-Container View
+            </div>
+            <div class="panel-body main_zone">
+              <table class="tile-grid">
+                <colgroup>
+                  <col style="width:25%;" />
+                  <col style="" />
+                </colgroup>
+                <tbody>
+                  <tr ng-repeat="cell in paasMain.relationshipList">
+                    <th>{{ cell.cellName }}</th>
+                    <td>
+                      <div class="tile" uib-tooltip-template="'app/paas/container/container_tooltip.html'" tooltip-class="uibTooltipCustom"
+                           ng-style="{'cursor': (container.status == 'fail') && 'initial' }"
+                           ng-repeat="container in cell.containers" ng-class="paasMain.getTileColor(container.status)"
+                           ng-click="paasMain.goContainerDetail(container)">
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              Alarm View
+            </div>
+            <div class="panel-body main_alarm">
+              <table class="table process ">
+                <colgroup>
+                  <col style="" />
+                  <col style="" />
+                  <col style="" />
+                  <col style="" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th class="text-center">Time</th>
+                    <th class="text-center">Type</th>
+                    <th class="text-center">Level</th>
+                    <th class="text-center">Title</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-show="paasMain.alarmViewList" ng-repeat="item in paasMain.alarmViewList" class="text-center">
+                    <td class="link"><a ng-href="#/paas/alarm/status/{{ item.id }}">{{ item.regDate }}</a></td>
+                    <td>{{ paasMain.common.getOriginTypeString(item.originType) }}</td>
+                    <td><span ng-class="paasMain.common.alarmLevelStyle(item.level)">{{ item.level }}</span></td>
+                    <td>{{ item.alarmTitle }}</td>
+                  </tr>
+                  <tr ng-show="paasMain.alarmViewList == null" class="text-center">
+                    <td colspan="4">No Data Available.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

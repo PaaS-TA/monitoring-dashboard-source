@@ -1,0 +1,252 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<!--<div class="container">-->
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Summary
+        </div>
+        <div class="panel-body">
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">VCPU 사용량</div>
+              <liquid seq="1" percentage="cpuPercent"></liquid>
+            </div>
+            <div class="gauge-usage">사용 {{ iaasMain.summary.vcpuUsed || 0 | number }}개 / 전체 {{ iaasMain.summary.vcpuTotal || 0 | number }}개</div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">Memory 사용량</div>
+              <liquid seq="2" percentage="memPercent"></liquid>
+            </div>
+            <div class="gauge-usage">
+              <div>사용 {{ iaasMain.summary.memoryMbUsed || 0 | number }}MB / 전체 {{ iaasMain.summary.memoryMbTotal || 0 | number }}MB</div>
+              <div>{{ iaasMain.summary.memoryMbFree || 0 | number }}MB 사용가능</div>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">Disk 사용량</div>
+              <liquid seq="3" percentage="diskPercent"></liquid>
+            </div>
+            <div class="gauge-usage">
+              <div>사용 {{ iaasMain.summary.diskGbUsed || 0 | number }}GB / 전체 {{ iaasMain.summary.diskGbTotal || 0 | number }}GB</div>
+              <div>{{ iaasMain.summary.diskGbLeastAvailable || 0 | number }}GB 사용가능</div>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">인스턴스</div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Max Instance</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmTotalLimit || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Running / OK</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[1].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">No Status</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[0].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Idle / Blocked</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[2].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Paused</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[3].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Shutting down</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[4].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Shut Off</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[5].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 pull-left"><span class="main-count pull-right">Crashed</span></div>
+              <div class="col-md-5 pull-right"><span class="main-count pull-left">{{ iaasMain.summary.vmState[6].vmCount || 0 | number }} 개</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Node</div>
+        <div class="panel-body">
+          <ul class="nav nav-tabs main">
+            <li class="active"><a data-toggle="tab" data-target="#computeNode">Compute Node</a></li>
+            <li><a data-toggle="tab" data-target="#manageNode">Manage Node</a></li>
+          </ul>
+          <div class="tab-content">
+            <div id="computeNode" class="tab-pane fade in active">
+              <table class="table">
+                <colgroup>
+                  <col style="width:10%;">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                </colgroup>
+                <thead>
+                <tr>
+                  <th class="text-center">Host Name</th>
+                  <th class="text-center">IP</th>
+                  <th class="text-center">CPU</th>
+                  <th class="text-center">Memory (MB)</th>
+                  <th class="text-center">Disk (GB)</th>
+                  <th class="text-center">Instances</th>
+                  <th class="text-center">CPU Usage</th>
+                  <th class="text-center">Memory Usage</th>
+                  <th class="text-center">Status</th>
+                  <th class="text-center">Agent Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in iaasMain.computeNodeSummary" class="text-center">
+                  <td class="text-left link" ng-click=""><a ng-href="#/iaas/compute_node/{{ item.hostname }}">{{ item.hostname }}</a></td>
+                  <td>{{ item.hostIp }}</td>
+                  <td>{{ iaasMain.Math.round(item.vcpusUsed) | number }} / {{ iaasMain.Math.round(item.vcpusMax) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.memoryMbUsed) | number }} / {{ iaasMain.Math.round(item.memoryMbMax) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.diskGbUsed) | number }} / {{ iaasMain.Math.round(item.diskGbMax) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.runningVms) | number }} / {{ iaasMain.Math.round(item.totalVms) | number }}</td>
+                  <td><span ng-style="cpuUsageStyle(Math.floor(item.cpuUsage))">{{ (item.cpuUsage).toFixed(2) | number }}%</span></td>
+                  <td><span ng-style="memoryUsageStyle(Math.floor(item.memUsage))">{{ (item.memUsage).toFixed(2) | number }}%</span></td>
+                  <td><span ng-style="textStatusStyle(item.state)">{{ item.state }} ({{ item.status }})</span></td>
+                  <td><span ng-style="textStatusStyle(item.agentStatus)">{{ item.agentStatus }}</span></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="manageNode" class="tab-pane fade">
+              <table class="table">
+                <colgroup>
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                </colgroup>
+                <thead>
+                <tr>
+                  <th class="text-center">Host Name</th>
+                  <th class="text-center">Memory (MB)</th>
+                  <th class="text-center">Disk (GB)</th>
+                  <th class="text-center">CPU Usage</th>
+                  <th class="text-center">Memory Usage</th>
+                  <th class="text-center">Agent Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in iaasMain.manageNodeSummary" class="text-center">
+                  <td class="text-left link"><a ng-href="#/iaas/manage_node/{{ item.hostname }}">{{ item.hostname }}</a></td>
+                  <td>{{ iaasMain.Math.round(item.memoryUsedMb) | number }} / {{ iaasMain.Math.round(item.memoryMbMax) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.diskGbUsed) | number }} / {{ iaasMain.Math.round(item.diskGbMax) | number }}</td>
+                  <td><span ng-style="cpuUsageStyle(Math.floor(item.cpuUsage))">{{ (item.cpuUsage).toFixed(2) | number }}%</span></td>
+                  <td><span ng-style="memoryUsageStyle(Math.floor(item.memoryUsage))">{{ (item.memoryUsage).toFixed(2) | number }}%</span></td>
+                  <td><span ng-style="textStatusStyle(item.agentStatus)">{{ item.agentStatus }}</span></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Tenant</div>
+        <div class="panel-body">
+          <div class="tab-content">
+            <div id="tenant" class="tab-pane fade in active">
+              <table class="table">
+                <colgroup>
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                </colgroup>
+                <thead>
+                <tr>
+                  <th class="text-center">Name</th>
+                  <th class="text-center">VCPU</th>
+                  <th class="text-center">Memory (MB)</th>
+                  <th class="text-center">Instances</th>
+                  <th class="text-center">Floating IP</th>
+                  <th class="text-center">Security Group</th>
+                  <th class="text-center">Volumes</th>
+                  <th class="text-center">Volume Storage(GB)</th>
+                  <th class="text-center">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in iaasMain.tenantSummary" class="text-center">
+                  <td class="text-left link"><a ng-href="#/iaas/tenant#{{ item.name }}">{{ item.name }}</a></td>
+                  <td>{{ iaasMain.Math.round(item.vcpusUsed) | number }} / {{ iaasMain.Math.round(item.vcpusLimit) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.memoryMbUsed) | number }} / {{ iaasMain.Math.round(item.memoryMbLimit) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.instancesUsed) | number }} / {{ iaasMain.Math.round(item.instancesLimit) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.floatingIpsUsed) | number }} / {{ iaasMain.Math.round(item.floatingIpsLimit) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.securityGroupsUsed) | number }} / {{ iaasMain.Math.round(item.securityGroupsLimit) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.volumeStorageUsed) | number }} / {{ iaasMain.Math.round(item.volumeStorageLimit) | number }}</td>
+                  <td>{{ iaasMain.Math.round(item.volumeStorageUsedGb) | number }} / {{ iaasMain.Math.round(item.volumeStorageLimitGb) | number }}</td>
+                  <td><span ng-style="textStatusStyle(item.enabled)">{{ item.enabled }}</span></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Alarm View
+        </div>
+        <div class="panel-body">
+          <table class="table process">
+            <colgroup>
+              <col style="" />
+              <col style="" />
+              <col style="" />
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="text-center">Time</th>
+              <th class="text-center">Type</th>
+              <th class="text-center">Level</th>
+              <th class="text-center">Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-show="iaasMain.alarmViewList" ng-repeat="item in iaasMain.alarmViewList" class="text-center">
+              <td class="link"><a ng-href="#/iaas/alarm/status/{{ item.id }}">{{ item.regDate }}</a></td>
+              <td>{{ iaasMain.common.getOriginTypeString(item.originType) }}</td>
+              <td><span ng-class="paasMain.common.alarmLevelStyle(item.level)">{{ item.level }}</span></td>
+              <td>{{ item.alarmTitle }}</td>
+            </tr>
+            <tr ng-show="iaasMain.alarmViewList == null" class="text-center">
+              <td colspan="4">No Data Available.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+server.url = http://127.0.0.1:8080
+server.port = 8080
+
+#모니터링 시스템 사용 옵션 정보
+#( IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용, ALL : IaaS, PaaS 모두 사용)
+system.monitoring.type=PaaS
+
+# PaaS RDB 접속 정보
+paas.monitoring.db.type=mysql
+paas.monitoring.db.dbname=PaastaMonitoring
+paas.monitoring.db.username=<%= p("monitoring-web.db.username") %>
+paas.monitoring.db.password=<%= p("monitoring-web.db.password") %>
+paas.monitoring.db.host=<%= p("monitoring-web.db.ip") %>
+paas.monitoring.db.port=<%= p("monitoring-web.db.port") %>
+
+paas.metric.db.username=
+paas.metric.db.password=
+paas.metric.db.url=<%= p("monitoring-web.influxdb.url") %>
+paas.metric.db.name.paasta=cf_metric_db
+paas.metric.db.name.bosh=bosh_metric_db
+paas.metric.db.name.container=container_metric_db
+
+
+paas.elastic.url=logs.<%= p("monitoring-web.paasta.system_domain") %>
+
+# Bosh Info
+bosh.count=1
+bosh.0.name=<%= p("monitoring-web.bosh.director_name") %>
+bosh.0.ip=<%= p("monitoring-web.bosh.ip") %>
+bosh.0.deployname=bosh
+
+# BOSH client
+bosh.client.api.address=https://<%= p("monitoring-web.bosh.ip") %>:<%= p("monitoring-web.bosh.port") %>
+bosh.client.api.username=<%= p("monitoring-web.bosh.user") %>
+bosh.client.api.password=<%= p("monitoring-web.bosh.password") %>
+
+#disk mount point
+disk.mount.point=/,/var/vcap/data
+disk./.resp.json.name=/
+disk./var/vcap/data.resp.json.name=data
+
+#disk io mount point
+disk.io.mount.point=/,/var/vcap/data
+disk.io./.read.json.name=/-read
+disk.io./.write.json.name=/-write
+disk.io./var/vcap/data.read.json.name=data-read
+disk.io./var/vcap/data.write.json.name=data-write
+
+#network monitor item
+network.monitor.item=eth0
+
+# Time difference(hour)
+gmt.time.gap=<%= p("monitoring-web.time.gap") %>
+
+#cfProvider
+paas.cf.client.apiaddress=https://api.<%= p("monitoring-web.paasta.system_domain") %>
+paas.cf.client.skipsslvalidation=true
+
+#redis
+redis.addr=<%= p("monitoring-web.redis.url") %>
+redis.password=<%= p("monitoring-web.redis.password") %>
+redis.db=0

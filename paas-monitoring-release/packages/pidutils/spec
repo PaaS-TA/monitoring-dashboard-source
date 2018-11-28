@@ -1,0 +1,5 @@
+---
+name: pidutils
+
+files:
+  - pidutils.sh

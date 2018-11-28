@@ -1,0 +1,25 @@
+bosh -d paasta-monitoring deploy paasta-monitoring.yml  \
+     -v mariadb_ip=10.244.1.120 \
+     -v mariadb_port=3306 \
+     -v mariadb_username=root \
+     -v mariadb_password=password \
+     -v influxdb_url='10.244.0.129:8086' \
+     -v bosh_url=192.168.150.4 \
+     -v bosh_password=ibwvrfci2i53hsh108r1 \
+     -v director_name=vbox \
+     -v paasta_deploy_name=cf \
+     -v paasta_cell_prefix=cell\
+     -v paasta_username=admin\
+     -v paasta_password=admin\
+     -v smtp_url=127.0.0.1 \
+     -v smtp_port=25 \
+     -v mail_sender=csupshin\
+     -v mail_password=xxxx\
+     -v resource_url=10.244.0.34 \
+     -v mail_enable=flase \
+     -v mail_tls_enable=false \
+     -v redis_url=10.244.0.128:6379 \
+     -v redis_password=password \
+     -v utc_time_gap=0 \
+     -v system_domain=10.244.0.34.xip.io
+

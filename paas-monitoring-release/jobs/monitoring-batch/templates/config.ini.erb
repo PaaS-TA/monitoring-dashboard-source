@@ -1,0 +1,65 @@
+#Web Server Port
+server.port = 9999
+running.env=running
+#InfluxDB
+influx.user =
+influx.pass =
+influx.cf_measurement = cf_metrics
+influx.cf_process_measurement = cf_process_metrics
+influx.url=http://<%= p("monitoring-batch.influxdb.url") %>
+
+#Metric DB Name
+influx.paasta.db_name=cf_metric_db
+influx.bosh.db_name=bosh_metric_db
+influx.container.db_name=container_metric_db
+
+influx.defaultTimeRange = 130s
+
+#MonitoringDB 접속 정보
+monitoring.db.type=mysql
+#PaastaMonitoring 먼저 생성 해야함.
+monitoring.db.dbname=PaastaMonitoring
+monitoring.db.username=<%= p("monitoring-batch.db.username") %>
+monitoring.db.password=<%= p("monitoring-batch.db.password") %>
+monitoring.db.host=<%= p("monitoring-batch.db.ip") %>
+monitoring.db.port=<%= p("monitoring-batch.db.port") %>
+
+# bosh(new)
+bosh.api.url=<%= p("monitoring-batch.bosh.url") %>:<%= p("monitoring-batch.bosh.port") %>
+bosh.ip=<%= p("monitoring-batch.bosh.url") %>
+bosh.admin=<%= p("monitoring-batch.bosh.user") %>
+bosh.password=<%= p("monitoring-batch.bosh.password") %>
+bosh.service.name=<%= p("monitoring-batch.bosh.director_name") %>
+bosh.cf.deployment.name=<%= p("monitoring-batch.bosh.paasta.deployments") %>
+bosh.cell.name.prefix=<%= p("monitoring-batch.paasta.cell_prefix") %>
+
+
+#mail.smtp.host=smtp.gmail.com
+#mail.smtp.port=465
+mail.smtp.host=<%= p("monitoring-batch.mail.smtp.url") %>
+mail.smtp.port=<%= p("monitoring-batch.mail.smtp.port") %>
+mail.sender=<%= p("monitoring-batch.mail.sender.name") %>
+mail.sender.password=<%= p("monitoring-batch.mail.sender.password") %>
+mail.resource.url=<%= p("monitoring-batch.mail.resource.url") %>
+
+mail.alarm.send=<%= p("monitoring-batch.mail.send") %>
+mail.tls.send=<%= p("monitoring-batch.mail.tls") %>
+
+batch.interval.second=60
+gmt.time.hour.gap=0 #local에서는 9시간, PaaSta 에서는 9시간
+
+#portal api
+portal.api.url = 
+
+#redis
+redis.addr=<%= p("monitoring-batch.redis.url") %>
+redis.password=<%= p("monitoring-batch.redis.password") %>
+redis.db=0
+
+#사용자포털 알람 재발송 주기(분)
+user.portal.alarm.interval=60
+
+#cf-clien==
+cf.client.api_address=<%= p("monitoring-batch.paasta.url") %>
+cf.client.username=<%= p("monitoring-batch.paasta.username")%>
+cf.client.password=<%= p("monitoring-batch.paasta.password") %>

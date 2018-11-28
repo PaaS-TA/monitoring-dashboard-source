@@ -1,0 +1,99 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Bosh Summary
+        </div>
+        <div class="panel-body">
+          <table class="table paas">
+            <colgroup>
+              <col style="width:10%;">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="2" class="text-center">Name</th>
+                <th rowspan="2" class="text-center">Address</th>
+                <th rowspan="2" class="text-center">State</th>
+                <th rowspan="2" class="text-center">Core</th>
+                <th rowspan="2" class="text-center">CPU Used<br/>(%)</th>
+                <th rowspan="2" class="text-center">Total Memory<br/>(MB)</th>
+                <th rowspan="2" class="text-center">Memory Usage<br/>(%)</th>
+                <th colspan="2" class="text-center">Total Disk (MB)</th>
+                <th rowspan="2" class="text-center">Disk Status</th>
+              </tr>
+              <tr>
+                <th class="text-center">/</th>
+                <th class="text-center">Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center" ng-repeat="item in pbsh.boshSummary" ng-class="item.select" ng-click="pbsh.getTopProcessMemoryList(item)">
+                <td class="link"><a ng-href="#/paas/bosh/{{ item.id }}?name={{ item.name }}">{{ item.name }}</a></td>
+                <td>{{ item.address }}</td>
+                <td><span ng-class="pbsh.common.alarmLevelStyle(item.state)">{{ item.state }}</span></td>
+                <td>{{ item.core }}</td>
+                <td><span ng-style="errStateStyle(item.cpuErrStat)">{{ (item.cpuUsage).toFixed(2) | number }} %</span></td>
+                <td>{{ pbsh.Math.round(item.totalMemory) | number }}</td>
+                <td><span ng-style="errStateStyle(item.memErrStat)">{{ (item.memoryUsage).toFixed(2) | number }} %</span></td>
+                <td><span ng-style="errStateStyle(item.diskRootErrStat)">{{ pbsh.Math.round(item.totalDisk) | number }}</span></td>
+                <td><span ng-style="errStateStyle(item.diskDataErrStat)">{{ pbsh.Math.round(item.dataDisk) | number }}</span></td>
+                <td><span ng-class="pbsh.common.alarmLevelStyle(item.diskStatus)">{{ item.diskStatus }}</span></td>
+              </tr>
+              <tr ng-show="pbsh.boshSummary == null" class="text-center">
+                <td colspan="9">No Data Available.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Top Process <span ng-bind-html="pbsh.selectedBosh"></span>
+        </div>
+        <div class="panel-body">
+          <table class="table process">
+            <colgroup>
+              <col style="width:10%;">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="text-center">Index</th>
+                <th class="text-center">Time</th>
+                <th class="text-center">PID</th>
+                <th class="text-center">Process</th>
+                <th class="text-center">Memory (MB)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center" ng-repeat="item in pbsh.topProcessMemoryList">
+                <td>{{ item.index }}</td>
+                <td>{{ item.time }}</td>
+                <td>{{ item.pid }}</td>
+                <td>{{ item.process }}</td>
+                <td>{{ pbsh.Math.round(item.memory) | number }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

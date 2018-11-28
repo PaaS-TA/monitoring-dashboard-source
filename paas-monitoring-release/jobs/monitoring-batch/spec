@@ -1,0 +1,98 @@
+---
+name: monitoring-batch
+templates:
+  monitoring-batch_ctl.erb: bin/monitoring-batch_ctl
+  config.ini.erb: config/config.ini
+
+packages:
+  - golang
+  - pidutils
+  - monitoring-batch
+
+consumes:
+  - name: mariadb
+    type: database
+    optional: true
+
+properties:
+  monitoring-batch.influxdb.url:
+    description: "influx(MetricDB) database URL"
+
+  monitoring-batch.db.username:
+    default: root
+    description: "maria Database root user"
+
+  monitoring-batch.db.password:
+    default: password
+    description: "maria Database root user PWD"
+
+  monitoring-batch.db.ip:
+    description: "maria Database IP"
+
+  monitoring-batch.db.port:
+    default: 3306
+    description: "maria Database port"
+
+  monitoring-batch.bosh.url:
+    description: "Bosh URL"
+
+  monitoring-batch.bosh.port:
+    default: 25555
+    description: "Bosh port"
+
+  monitoring-batch.bosh.user:
+    default: admin
+    description: "bosh username"
+
+  monitoring-batch.bosh.password:
+    description: "bosh user password"
+
+  monitoring-batch.bosh.director_name:
+    description: "bosh director password"
+
+  monitoring-batch.bosh.paasta.deployments:
+    description: "paasta deployment name"
+
+  monitoring-batch.paasta.cell_prefix:
+    default: cell
+    description: "paasta cell prefix"
+
+  monitoring-batch.mail.smtp.url:
+    description: "smtp server url"
+
+  monitoring-batch.mail.smtp.port:
+    default: 25
+    description: "smtp server url"
+
+  monitoring-batch.mail.sender.name:
+    description: "smtp user name"
+
+  monitoring-batch.mail.sender.password:
+    description: "smtp server sender password"
+
+  monitoring-batch.mail.resource.url:
+    description: "mail resource(image) url"
+
+  monitoring-batch.mail.send:
+    default: true
+    description: "alarm send with email when alarm occured"
+
+  monitoring-batch.mail.tls:
+    default: true
+    description: "smtp server auth with tls"
+
+  monitoring-batch.redis.url:
+    description: "redis url"
+
+  monitoring-batch.redis.password:
+    description: "redis password"
+
+  monitoring-batch.paasta.url:
+    description: "paasta api url"
+
+  monitoring-batch.paasta.username:
+    default: admin
+    description: "paasta admin username"
+
+  monitoring-batch.paasta.password:
+    description: "paasta admin password"

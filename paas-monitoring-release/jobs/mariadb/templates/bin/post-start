@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+DATA_DIR=/var/vcap/store/mariadb-data
+
+
+JOB_NAME=mariadb
+JOB_PATH=/var/vcap/jobs/$JOB_NAME
+BASE_DIR=/var/vcap/store/$JOB_NAME
+
+$BASE_DIR/bin/mysql -u root < $JOB_PATH/conf/init.sql
+
