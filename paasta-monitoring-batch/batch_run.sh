@@ -2,5 +2,5 @@
 
 . .envrc
 
-cd src/kr/paasta/monitoring/monit-batch
+cd src/kr/paasta/monitoring-batch
 go run main.go

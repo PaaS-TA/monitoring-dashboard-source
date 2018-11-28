@@ -1,0 +1,364 @@
+/* ------------------- Alarm Common ------------------- */
+
+#content .sec_area {
+  clear:both;
+  margin-bottom: 20px;
+}
+
+/* ------------------- Alarm Policy ------------------- */
+.form-inline.top {
+  margin: 2px 20px;
+}
+.panel-default.inner {
+  border: 1px solid #409ab2;
+}
+.panel-default.inner > .panel-heading {
+  border-color: #409ab2;
+  height: 46px;
+  padding: 13px 20px;
+}
+.panel-default.inner > .panel-heading > img {
+  padding-right: 10px;
+}
+input.w100 {
+  width: 100px !important;
+  text-align: right;
+  margin-left: 15px;
+  padding-right: 5px;
+}
+input.w100.measure {
+  margin-left: 0px;
+}
+input.w200 {
+  width: 200px !important;
+}
+input.w240 {
+  width: 240px !important;
+}
+input.w95p {
+  width: 95% !important;
+}
+input.w300 {
+  width: 300px !important;
+  margin-left: 15px;
+}
+.mar_l {
+  margin-left:15px;
+}
+
+.pull-right > span.font {
+  font-size: 12px;
+  width: 24px;
+  height: 12px;
+  display: inline-block;
+  position: relative;
+  top: -8px;
+}
+
+.pull-right > span.font.right {
+  text-align: right;
+}
+
+.snsMsg {
+  font-size: 15px;
+  color: #ff6666;
+  margin-bottom: 20px;
+}
+.channel {
+  margin-top: 30px;
+  border-top: 1px solid #cccccc;
+}
+.channel .snsMsg {
+  margin-top: 20px;
+}
+
+
+/* ------------------- Alarm Status ------------------- */
+.form-group-date {
+  display: inline-block;
+}
+
+
+/* ------------------- Alarm Status Detail ------------------- */
+.tb_area table{
+  font-family: 'Noto Sans KR', sans-serif;
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  text-indent: 20px;
+  font-size: 14px;
+}
+.tb_area table tr{
+  height: 42px;
+}
+.tb_area table th {
+  font-weight: 500;
+  padding: 10px 0;
+  border-right: 1px solid #cccccc;
+}
+.tb_area table td {
+  padding: 10px 0;
+  color: #8a8c99;
+}
+
+/* Alarm Action */
+.bt_con .re_box {
+  padding: 10px 20px;
+}
+.bt_con h2 {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0px 0 12px 0;
+}
+.bt_con .con_box {
+  position: relative;
+  margin-bottom: 5px;
+  padding: 15px 20px;
+  border: 1px solid #409ab2;
+}
+.bt_con .con_box p {
+  font-size: 14px;
+  /*color: #c1c1c1;*/
+  line-height: 22px;
+  padding: 3px 0 10px 0;
+}
+.bt_con .con_box p.date{
+  font-size: 15px;
+  padding: 0;
+  /*font-weight: 500;*/
+  /*color: #f9f9f9;*/
+}
+.bt_con .con_box p.txt{
+  color: #8a8c99;
+}
+.bt_con .con_box pre{
+  margin: 0px;
+  padding: 5px 10px;
+  color: #333440;
+  border: none;
+}
+.bt_con .con_box .btn{
+  position: absolute;
+  top: 8px;
+  left: 200px;
+}
+.detail_box textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+}
+.accept_box > .sub-btn {
+  padding-top: 10px;
+}
+.content_box {
+  padding: 10px 20px;
+}
+.content_box textarea {
+  width: 100%;
+  height: 180px;
+  border: 1px solid #409ab2;
+  padding: 10px;
+}
+.content_box .detail_con .sub-btn{
+  float: right;
+  margin-top: 5px;
+}
+
+
+/* ------------------- Alarm Statistics ------------------- */
+.form-inline.search {
+  margin: 2px 0;
+}
+.stats_area {
+  clear:both;
+  margin-bottom: 20px;
+}
+.stats_area .top_con{
+  height: 34px;
+}
+.stats_area .top_con ul{
+  padding: 0px;
+  margin: 0 8px 0 0;
+  width: 176px;
+  float: left;
+}
+.stats_area .top_con ul li {
+  display: inline-block;
+  padding-right: 1px;
+  color: #ffffff;
+}
+.stats_area .top_con ul li button {
+  width: 40px;
+  height: 34px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 4px;
+  background-color: #aaaaaa;
+  border: none;
+}
+.stats_area .top_con ul li button:hover {
+  background-color: #cccccc;
+}
+.stats_area .top_con ul li button.selected{
+  background-color: #40c294;
+}
+.stats_area .top_con ul li:last-child{
+  padding-right: 0;
+}
+.stats_area .top_con ul li button.term{
+  width: 95px;
+  background-color: #40c294;
+}
+.stats_area .top_con .move{
+  float: left;
+  width: 355px;
+  height: 34px;
+}
+.stats_area .top_con p.move_ic{
+  float: left;
+  width: 98px;
+  height: 34px;
+  margin: 0 15px 0 0;
+  border: 1px solid #cccccc;
+}
+.stats_area .top_con p.move_ic a{
+  display: inline-block;
+  height: 32px;
+  border-right: 1px solid #cccccc;
+  cursor: pointer;
+}
+.stats_area .top_con p.move_ic a.back{
+  width: 48px;
+  background: url(/assets/images/alarm/arrow_rt.png) center center no-repeat;
+}
+.stats_area .top_con p.move_ic a.front{
+  width: 44px;
+  background: url(/assets/images/alarm/arrow_lf.png) center center no-repeat;
+  border-right: none;
+}
+.stats_area .top_con p.date_box{
+  float: left;
+  width: 220px;
+  height: 34px;
+  font-size: 14px;
+  padding: 6px 0;
+  text-align: center;
+  border: 1px solid #cccccc;
+}
+.stats_area .top_con:after{
+  content: '';
+  display: block;
+  clear: both;
+}
+
+
+/* Contents Area 01 */
+.panel-body .stats_box {
+  width: 64%;
+  float: left;
+  margin: 0 2% 0 0;
+}
+.panel-body .stats_box .box {
+  width: 31%;
+  /*height: 100%;*/
+  float: left;
+  margin-right: 2.1%;
+  border: solid 1px #cccccc;
+  text-align: center;
+}
+.panel-body .stats_box .box p.txt {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 30px 0 22px 0;
+}
+.panel-body .stats_box .box p.num {
+  font-size: 56px;
+  font-weight: 500;
+  padding: 10px 0 5px 0;
+}
+.panel-body .stats_box .box02 p.txt {
+  color: #f0a141;
+}
+.panel-body .stats_box .box03 p.txt {
+  color: #ad6de8;
+}
+
+/* Contents Area 02, 03 */
+.panel-body .stats_box .con_box {
+  width: 31%;
+  margin-right: 2.1%;
+  float: left;
+  border: solid 1px #cccccc;
+}
+.panel-body .stats_box .con_box h3 {
+  color: #293133;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  height: 50px;
+  line-height: 3.0;
+  margin: 0px;
+  border-bottom: solid 1px #cccccc;
+  letter-spacing: 0.5px;
+}
+.panel-body .stats_box .con_box .kan {
+  height: 70px;
+  margin: 0;
+}
+.panel-body .stats_box .con_box .kan{
+  margin-right: 0;
+}
+.panel-body .stats_box .con_box .kan p{
+  display: inline-block;
+  width: 45%;
+  text-align: center;
+  font-weight: 500;
+  margin: 0;
+  padding: 11px 0;
+  vertical-align: middle;
+}
+.panel-body .stats_box .con_box .kan p.lf{
+  font-size: 14px;
+  color: #f0a141;
+}
+.panel-body .stats_box .con_box .kan02 p.lf{
+  color: #ad6de8;
+}
+.panel-body .stats_box .con_box .kan p.rt{
+  font-size: 34px;
+  color: #293133;
+}
+.link h3, .link div{
+  cursor: pointer;
+}
+
+/* Contents Area 04 */
+.panel-body .stats_box.wide{
+  width: 100%;
+}
+.panel-body .stats_box.wide .box {
+  width: 31.93%
+}
+.panel-body .stats_box.wide .box:last-child {
+  margin-right: 0;
+}
+.panel-body .stats_box.wide .box p.txt {
+  padding: 22px 0 0px 0;
+}
+.panel-body .stats_box.wide .box p.num {
+  padding: 0;
+}
+
+/* Graph */
+.panel-body .grp_box {
+  float: left;
+  width: 34%;
+  height: 190px;
+  margin: 0;
+  border: 1px solid #e0e0e0;
+}
+.grp_box .box-content{
+  height: 190px;
+  padding: 5px 10px;
+}

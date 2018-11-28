@@ -1,7 +1,0 @@
----
-applications:
-- name: MonitBatch
-  memory: 256M
-  instances: 1
-  random-route: true
-  health-check-type: process

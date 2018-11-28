@@ -1,0 +1,61 @@
+azs:
+- cloud_properties:
+    availability_zone: ap-northeast-2a
+  name: z1
+- cloud_properties:
+    availability_zone: ap-northeast-2a
+  name: z2
+- cloud_properties:
+    availability_zone: ap-northeast-2a
+  name: z3
+compilation:
+  az: z1
+  network: default
+  reuse_compilation_vms: true
+  vm_type: worker
+  workers: 3
+disk_types:
+- cloud_properties:
+    encrypted: true
+    type: gp2
+  disk_size: 5120
+  name: 5120
+- cloud_properties:
+    encrypted: true
+    type: gp2
+  disk_size: 10240
+  name: 10240
+networks:
+- name: default
+  subnets:
+  - azs:
+    - z1
+    - z2
+    - z3
+    cloud_properties:
+      subnet: subnet-c45451ac
+    dns:
+    - 10.0.1.1
+    gateway: 10.0.1.1
+    range: 10.0.1.0/24
+    reserved:
+    - 10.0.1.1/30
+  type: manual
+vm_types:
+- cloud_properties:
+    ephemeral_disk:
+      size: 25000
+    instance_type: t2.small
+  name: minimal
+- cloud_properties:
+    elbs:
+    - cfcr-cfcr-api
+    ephemeral_disk:
+      size: 25000    
+    instance_type: t2.small
+  name: small
+- cloud_properties:
+    ephemeral_disk:
+      size: 60000    
+    instance_type: t2.medium
+  name: small-highmem

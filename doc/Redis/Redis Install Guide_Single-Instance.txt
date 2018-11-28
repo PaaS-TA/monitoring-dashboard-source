@@ -1,0 +1,128 @@
+[Master]
+
+ssh -i ~/.ssh/mapo-rnd.pem ubuntu@13.124.175.0
+
+==============================================================================================
+
+[# Install the dependencies]
+
+$ sudo apt-get update
+
+$ sudo apt-get upgrade
+
+$ sudo apt-get install build-essential
+
+$ sudo apt install make gcc libc6-dev tcl
+
+$ sudo apt-get install tcl8.6
+
+==============================================================================================
+
+[# Ruby Install]
+
+$ cd ~/
+
+$ \curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+
+$ \curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
+
+$ echo 'source ~/.rvm/scripts/rvm' > ~/.bash_profile
+
+$ echo 'source ~/.rvm/scripts/rvm' >> ~/.bashrc
+
+$ source ~/.rvm/scripts/rvm
+
+$ rvm install ruby-2.3.3
+
+$ rvm rubygems current
+
+$ gem install bundle --no-document
+
+$ gem install rake
+
+================================================================================
+
+[# Redis Download]
+
+$ wget http://download.redis.io/releases/redis-4.0.2.tar.gz
+
+$ tar xzf redis-4.0.2.tar.gz
+
+$ sudo make install
+
+
+[# Make - install]
+
+$ cd redis-4.0.2
+
+$ sudo apt install make
+
+$ sudo apt install make-guile
+
+$ make distclean
+
+$ make
+
+// make 가 실행 되지 않을 경우 root에서 ruby 재설치 후 진행
+
+$ make test
+
+// make test가 실행 되지 않을 경우 root에서 tcl 재설치 후 진행
+
+$ sudo apt-get install redis-tools
+
+================================================================================
+
+[# Cluster Setting]
+
+$ cd redis-4.0.2
+
+$ cp redis.conf 7001.conf
+$ cp redis.conf 7002.conf
+$ cp redis.conf 7003.conf
+$ cp redis.conf 7004.conf
+$ cp redis.conf 7005.conf
+$ mv redis.conf 7000.conf
+
+$ sudo vi conf/7000.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no
+port 7000
+
+#### GENERAL ####
+pidfile /var/run/redis_7000.pid
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-7000.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+7001.conf ~ 7005.conf 동일하게 실시
+
+================================================================================
+
+[# Redis start]
+
+redis-server redis-4.0.2/7000.conf &
+redis-server redis-4.0.2/7001.conf &
+redis-server redis-4.0.2/7002.conf &
+redis-server redis-4.0.2/7003.conf &
+redis-server redis-4.0.2/7004.conf &
+redis-server redis-4.0.2/7005.conf &
+
+$ ./redis-trib.rb create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
+
+
+================================================================================
+
+[# Redis Start / Stop / Restart]
+
+$ sudo ./redis-4.0.2/src/redis-server restart
+
+$ sudo ./redis-4.0.2/src/redis-server stop
+$ sudo ./redis-4.0.2/src/redis-server start
+
+================================================================================

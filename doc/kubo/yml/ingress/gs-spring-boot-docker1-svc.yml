@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gs-spring-boot-docker-svc1
+spec:
+  selector:
+    app: gs-spring-boot-docker1
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+
+
+

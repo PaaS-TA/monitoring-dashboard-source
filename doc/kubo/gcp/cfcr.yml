@@ -1,0 +1,351 @@
+name: cfcr
+
+releases:
+- name: kubo
+  version: latest
+- name: cfcr-etcd
+  version: '1.3'
+- name: docker
+  version: 32.0.0
+- name: bosh-dns
+  version: 1.5.0
+- name: bpm
+  version: 0.6.0
+
+stemcells:
+- alias: trusty
+  os: ubuntu-trusty
+  version: "3586.16"
+
+addons:
+- name: bosh-dns
+  include:
+    stemcells:
+    - os: ubuntu-trusty
+  jobs:
+  - name: bosh-dns
+    release: bosh-dns
+    properties:
+      api:
+        server:
+          tls: ((/dns_api_server_tls))
+        client:
+          tls: ((/dns_api_client_tls))
+      cache:
+        enabled: true
+      health:
+        enabled: true
+        server:
+          tls: ((/dns_healthcheck_server_tls))
+        client:
+          tls: ((/dns_healthcheck_client_tls))
+- name: bosh-dns-aliases
+  jobs:
+  - name: kubo-dns-aliases
+    release: kubo
+
+instance_groups:
+- name: apply-addons
+  instances: 1
+  networks:
+  - name: default
+  azs: [z1]
+  lifecycle: errand
+  jobs:
+  - name: apply-specs
+    release: kubo
+    properties:
+      api-token: ((kubelet-password))
+      admin-username: admin
+      admin-password: ((kubo-admin-password))
+      authorization-mode: rbac
+      tls:
+        kubernetes: ((tls-kubernetes))
+        heapster: ((tls-heapster))
+        influxdb: ((tls-influxdb))
+        kubernetes-dashboard: ((tls-kubernetes-dashboard))
+  stemcell: trusty
+  vm_type: minimal
+- name: master
+  instances: 1
+  vm_extensions:
+  - kubo
+  networks:
+  - name: default    
+  azs: [z1]
+  jobs:
+  - name: bpm
+    release: bpm
+  - name: secure-var-vcap
+    release: kubo
+  - name: flanneld
+    release: kubo
+  - name: kube-apiserver
+    release: kubo
+    properties:
+      admin-username: admin
+      admin-password: ((kubo-admin-password))
+      kubelet-password: ((kubelet-password))
+      kube-proxy-password: ((kube-proxy-password))
+      kube-controller-manager-password: ((kube-controller-manager-password))
+      kube-scheduler-password: ((kube-scheduler-password))
+      route-sync-password: ((route-sync-password))
+      kubelet-drain-password: ((kubelet-drain-password))
+      backend_port: 8443 # Bosh links hack
+      port: 8443
+      authorization-mode: rbac
+      service-account-public-key: ((service-account-key.public_key))
+      tls:
+        kubernetes:
+          ca: ((tls-kubernetes.ca))
+          certificate: ((tls-kubernetes.certificate))
+          private_key: ((tls-kubernetes.private_key))
+  - name: kube-controller-manager
+    release: kubo
+    properties:
+      api-token: ((kube-controller-manager-password))
+      cluster-signing: ((kubo_ca))
+      service-account-private-key: ((service-account-key.private_key))
+      tls:
+        kubernetes: ((tls-kubernetes))
+  - name: kube-scheduler
+    release: kubo
+    properties:
+      api-token: ((kube-scheduler-password))
+      tls:
+        kubernetes: ((tls-kubernetes))
+  - name: kubernetes-roles
+    release: kubo
+    properties:
+      admin-username: admin
+      admin-password: ((kubo-admin-password))
+      authorization-mode: rbac
+      tls:
+        kubernetes: ((tls-kubernetes))
+  - name: etcd
+    release: cfcr-etcd
+    properties:
+      etcd:
+        dns_suffix: etcd.cfcr.internal
+      tls:
+        etcd:
+          ca: ((tls-etcd-v0-17-0.ca))
+          certificate: ((tls-etcd-v0-17-0.certificate))
+          private_key: ((tls-etcd-v0-17-0.private_key))
+        etcdctl:
+          ca: ((tls-etcdctl.ca))
+          certificate: ((tls-etcdctl.certificate))
+          private_key: ((tls-etcdctl.private_key))
+        peer:
+          ca: ((tls-etcd-v0-17-0.ca))
+          certificate: ((tls-etcd-v0-17-0.certificate))
+          private_key: ((tls-etcd-v0-17-0.private_key))
+  - name: smoke-tests
+    release: kubo
+  stemcell: trusty
+  vm_type: small
+  persistent_disk: 5120
+
+- name: worker
+  instances: 2
+  networks:
+  - name: default    
+  azs: [z1]
+  jobs:
+  - name: secure-var-vcap
+    release: kubo
+  - name: flanneld
+    release: kubo
+  - name: docker
+    release: docker
+    properties:
+      bridge: cni0
+      flannel: true
+      iptables: false
+      ip_masq: false
+      log_level: error
+      log_options: [ "max-size=128m", "max-file=2" ]
+      store_dir: /var/vcap/data
+      storage_driver: overlay
+      default_ulimits: [ "nofile=65536" ]
+      tls_cacert: ((tls-docker.ca))
+      tls_cert:  ((tls-docker.certificate))
+      tls_key: ((tls-docker.private_key))
+      env: {}
+  - name: kubernetes-dependencies
+    release: kubo
+  - name: kubelet
+    release: kubo
+    properties:
+      api-token: ((kubelet-password))
+      drain-api-token: ((kubelet-drain-password))
+      tls:
+        kubernetes: ((tls-kubernetes))
+        kubelet: ((tls-kubelet))
+  - name: kube-proxy
+    release: kubo
+    properties:
+      tls:
+        kubernetes: ((tls-kubernetes))
+      api-token: ((kube-proxy-password))
+  stemcell: trusty
+  vm_type: small-highmem
+  persistent_disk: 10240
+
+update:
+  canaries: 1
+  max_in_flight: 1
+  canary_watch_time: 10000-300000
+  update_watch_time: 10000-300000
+
+variables:
+- name: kubo-admin-password
+  type: password
+- name: kubelet-password
+  type: password
+- name: kubelet-drain-password
+  type: password
+- name: kube-proxy-password
+  type: password
+- name: kube-controller-manager-password
+  type: password
+- name: kube-scheduler-password
+  type: password
+- name: route-sync-password
+  type: password
+
+- name: kubo_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: ca
+
+- name: tls-kubelet
+  type: certificate
+  options:
+    ca: kubo_ca
+    organization: "system:nodes"
+    common_name: kubelet.cfcr.internal
+    alternative_names: []
+
+- name: tls-kubernetes
+  type: certificate
+  options:
+    ca: kubo_ca
+    organization: "system:masters"
+    common_name: 35.194.107.82
+    alternative_names:
+    - 10.100.200.1
+    - kubernetes
+    - kubernetes.default
+    - kubernetes.default.svc
+    - kubernetes.default.svc.cluster.local
+    - master.cfcr.internal
+    - 35.194.107.82    
+
+- name: service-account-key
+  type: rsa
+
+- name: tls-docker
+  type: certificate
+  options:
+    ca: kubo_ca
+    common_name: docker.cfcr.internal
+
+- name: tls-etcd-v0-17-0
+  type: certificate
+  options:
+    ca: kubo_ca
+    common_name: "*.etcd.cfcr.internal"
+    extended_key_usage:
+    - client_auth
+    - server_auth
+
+- name: tls-etcdctl
+  type: certificate
+  options:
+    ca: kubo_ca
+    common_name: etcdClient
+    extended_key_usage:
+    - client_auth
+
+- name: tls-heapster
+  type: certificate
+  options:
+    ca: kubo_ca
+    common_name: heapster
+    alternative_names:
+    - "heapster.kube-system.svc.cluster.local"
+
+- name: tls-influxdb
+  type: certificate
+  options:
+    ca: kubo_ca
+    common_name: monitoring-influxdb
+    alternative_names: []
+
+- name: kubernetes-dashboard-ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: ca
+
+- name: tls-kubernetes-dashboard
+  type: certificate
+  options:
+    ca: kubernetes-dashboard-ca
+    common_name: kubernetesdashboard.cfcr.internal
+    alternative_names: []
+
+- name: /dns_healthcheck_tls_ca
+  opsname: global_dns_healthcheck_tls_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: dns-healthcheck-tls-ca
+
+- name: /dns_healthcheck_server_tls
+  opsname: global_dns_healthcheck_server_tls
+  type: certificate
+  options:
+    ca: /dns_healthcheck_tls_ca
+    common_name: health.bosh-dns
+    extended_key_usage:
+    - server_auth
+
+- name: /dns_healthcheck_client_tls
+  opsname: global_dns_healthcheck_client_tls
+  type: certificate
+  options:
+    ca: /dns_healthcheck_tls_ca
+    common_name: health.bosh-dns
+    extended_key_usage:
+    - client_auth
+
+- name: /dns_api_tls_ca
+  opsname: global_dns_api_tls_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: dns-api-tls-ca
+
+- name: /dns_api_server_tls
+  opsname: global_dns_api_server_tls
+  type: certificate
+  options:
+    ca: /dns_api_tls_ca
+    common_name: api.bosh-dns
+    extended_key_usage:
+    - server_auth
+
+- name: /dns_api_client_tls
+  opsname: global_dns_api_client_tls
+  type: certificate
+  options:
+    ca: /dns_api_tls_ca
+    common_name: api.bosh-dns
+    extended_key_usage:
+    - client_auth
+
+features:
+  use_dns_addresses: true

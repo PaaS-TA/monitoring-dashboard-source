@@ -1,0 +1,136 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<!--<div class="container">-->
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default" ng-show="name" >
+        <div class="panel-heading">
+          <span ng-show="name" font-weight="bold" style="color:#007787">[ {{ name }} ]</span>
+        </div>
+      </div>
+
+      <div class="dashboard">
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" data-target="#chart" ng-click="selTab('chart')">Chart</a></li>
+          <li><a data-toggle="tab" data-target="#logs" ng-click="selTab('logs')">Logs</a></li>
+        </ul>
+        <div class="tab-content">
+          <div id="chart" class="tab-pane fade in active">
+            <div gridster="gridsterOpts" style="min-width:1000px;">
+              <ul>
+                <li gridster-item="widget" ng-repeat="widget in dashboard.widgets">
+                  <div class="box">
+                    <div class="box-header">
+                      <h4>{{ widget.name }}</h4>
+                      <div class="box-header-btns pull-right" ng-show="widget.loading">
+                        <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                      </div>
+                      <div class="box-header-btns pull-right" ng-hide="widget.loading">
+                        <!--<a title="Zoom In" ng-click="expand(widget)" ng-hide="expanded==widget"><i class="glyphicon glyphicon-zoom-in"></i></a>
+                        <a title="Zoom Out" ng-click="reduction(widget)" ng-show="expanded==widget"><i class="glyphicon glyphicon-zoom-out"></i></a>
+                        <a title="Remove widget" ng-click="removeOneWidget(widget)"><i class="glyphicon glyphicon-trash"></i></a>-->
+                      </div>
+                    </div>
+                    <div class="box-content">
+                      <nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="logs" class="tab-pane fade">
+            <div class="log-row search-box">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label class="col-sm-1 control-label">Time</label>
+                  <div class="col-sm-2">
+                    <div class="input-group date" datetimepicker options="targetDateOptions" ng-model="targetDate">
+                      <input class="form-control">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <div class="input-group date" datetimepicker options="timeOptions" ng-model="startTime">
+                      <input class="form-control">
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-time"></span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <div class="input-group date" datetimepicker options="timeOptions" ng-model="endTime">
+                      <input class="form-control">
+                      <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-time"></span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-sm-1">
+                    <button type="button" class="btn btn-default small" ng-click="searchReset()">초기화</button>
+                  </div>
+                </div>
+                <!--<div class="form-group">-->
+                  <!--<label for="inputHost" class="col-sm-1 control-label">Host</label>-->
+                  <!--<div class="col-sm-2">-->
+                    <!--<input type="text" class="form-control" id="inputHost" placeholder="Host" ng-model="hostname">-->
+                  <!--</div>-->
+                <!--</div>-->
+                <div class="form-group">
+                  <label for="inputMessage" class="col-sm-1 control-label">Message</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputMessage" placeholder="Message" ng-model="message">
+                  </div>
+                </div>
+                <div class="form-group row-centered">
+                  <div class="col-sm-12">
+                    <button type="submit" class="btn btn-primary" ng-click="logSearch()" style="width:80px;">검색</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="log-row list">
+              <table class="table logs">
+                <colgroup>
+                  <col style="width:20%;" />
+                  <col style="" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th class="text-center">Time</th>
+                    <th class="text-center">Message</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <tr class="text-center" ng-repeat="item in recentLogs track by $index">
+                    <td>{{ item.time }}</td>
+                    <td class="left">{{ item.message }}</td>
+                  </tr>
+                  <tr ng-show="recentLogs == null" class="text-center">
+                    <td colspan="2">No Data Available.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination-row logs">
+              <ul uib-pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" items-per-page="pageItems" class="pagination-md"
+                  direction-links="false" boundary-links="false" boundary-link-numbers="true" force-ellipses="true" ng-change="pageChanged()"
+                  previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row" style="margin: 20px 0;">
+      <div class="col-sm-12">
+        <button type="button" class="btn btn-default pull-right medium" data-dismiss="modal" ng-click="goMovePage()">Move Overview</button>
+      </div>
+    </div>
+
+  </div>
+</div>

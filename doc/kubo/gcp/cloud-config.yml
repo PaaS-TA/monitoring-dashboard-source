@@ -1,0 +1,66 @@
+azs:
+- name: z1
+  cloud_properties:
+    zone: asia-northeast1-a
+vm_types:
+- name: minimal
+  cloud_properties:
+    machine_type: n1-standard-1
+    root_disk_size_gb: 20
+    root_disk_type: pd-standard
+    service_account: paastakubo@kubernetes-207123.iam.gserviceaccount.com
+    tags:
+    - no-ip
+    - internal
+- name: small
+  cloud_properties:
+    machine_type: n1-standard-1
+    root_disk_size_gb: 30
+    root_disk_type: pd-standard
+    service_account: paastakubo@kubernetes-207123.iam.gserviceaccount.com
+    tags: 
+    - no-ip
+    - internal
+- name: small-highmem
+  cloud_properties:
+    machine_type: n1-standard-2
+    root_disk_size_gb: 60
+    root_disk_type: pd-standard
+    service_account: paastakubo@kubernetes-207123.iam.gserviceaccount.com
+    tags: 
+    - no-ip
+    - internal
+disk_types:
+- name: 5120
+  disk_size: 3000
+- name: 10240
+  disk_size: 50_000
+vm_extensions:
+- name: kubo
+  cloud_properties:
+    target_pool: cfcr-cfcr-tcp-public
+networks:
+- name: default
+  type: manual
+  subnets:
+  - range: 10.0.1.0/24
+    gateway: 10.0.1.1
+    reserved:
+    - 10.0.1.2 - 10.0.1.100
+    - 10.0.1.200 - 10.0.1.254
+    static:
+    - 10.0.1.150 - 10.0.1.190
+    azs: [z1]
+    dns: [10.0.1.1]
+    cloud_properties:
+      network_name: kubo-vpc
+      subnetwork_name: cfcr-cfcr-asia-northeast1
+      ephemeral_external_ip: false      
+- name: vip
+  type: vip
+compilation:
+  workers: 3
+  reuse_compilation_vms: true
+  az: z1
+  vm_type: small-highmem
+  network: default

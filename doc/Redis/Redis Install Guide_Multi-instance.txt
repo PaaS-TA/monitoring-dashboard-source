@@ -1,0 +1,242 @@
+[# Server Connect Info]
+
+<Server1>
+ssh -i ~/.ssh/mapo-rnd.pem ubuntu@13.124.146.93
+
+<Server2>
+ssh -i ~/.ssh/mapo-rnd.pem ubuntu@13.124.85.246
+
+<Server3>
+ssh -i ~/.ssh/mapo-rnd.pem ubuntu@13.125.18.89
+
+==============================================================================================
+
+[# Install the dependencies]
+
+$ sudo apt-get update
+
+$ sudo apt-get upgrade
+
+$ sudo apt-get install build-essential
+
+$ sudo apt install make gcc libc6-dev tcl
+
+$ sudo apt-get install tcl8.6
+
+==============================================================================================
+
+[# Ruby Install]
+
+$ cd ~/
+
+$ \curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+
+$ \curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
+
+$ echo 'source ~/.rvm/scripts/rvm' > ~/.bash_profile
+
+$ echo 'source ~/.rvm/scripts/rvm' >> ~/.bashrc
+
+$ source ~/.rvm/scripts/rvm
+
+$ rvm install ruby-2.3.3
+
+$ rvm rubygems current
+
+$ gem install bundle --no-document
+
+$ gem install rake
+
+==============================================================================================
+
+[# Redis Download & Install]
+
+$ wget http://download.redis.io/redis-stable.tar.gz
+
+$ tar xvzf redis-stable.tar.gz
+
+$ sudo make install
+
+
+[# Make - install]
+
+$ cd redis-stable
+
+$ sudo apt install make
+
+$ sudo apt install make-guile
+
+$ cd redis-stable
+
+$ make distclean
+
+$ make
+
+// make 가 실행 되지 않을 경우 root에서 ruby 재설치 후 진행
+
+$ make test
+
+// make test가 실행 되지 않을 경우 root에서 tcl 재설치 후 진행
+
+$ sudo apt-get install redis-tools
+
+==============================================================================================
+
+[# Cluster Setting]
+
+<Server 1>
+
+$ cp redis.conf c_slave.conf
+$ mv redis.conf a_master.conf
+
+$ sudo vi a_master.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no
+port 6379
+
+#### GENERAL ####
+pidfile /var/run/redis_6379.pid
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-6379.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+$ sudo vi c_slave.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no
+port 6381
+
+#### GENERAL ####
+pidfile /var/run/redis_6381.pid
+
+#### REPLICATION ####
+slaveof <Master Host IP> <Master Port>
+ex> sslaveof 127.0.0.1 6381
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-6381.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+sudo ufw allow 6379
+sudo ufw allow 16379
+
+$ redis-server redis-stable/a_master.conf &
+$ redis-server redis-stable/c_slave.conf &
+
+
+<Server 2>
+
+$ cp redis.conf a_slave.conf
+$ mv redis.conf b_master.conf
+
+$ sudo vi b_master.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no??
+port 6380
+
+#### GENERAL ####
+pidfile /var/run/redis_6380.pid
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-6380.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+$ sudo vi a_slave.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no
+port 6379
+
+#### GENERAL ####
+pidfile /var/run/redis_6381.pid
+
+#### REPLICATION ####
+slaveof <Master Host IP> <Master Port>
+ex> sslaveof 127.0.0.1 6379
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-6379.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+sudo ufw allow 6380
+sudo ufw allow 16380
+
+$ redis-server redis-stable/b_master.conf &
+$ redis-server redis-stable/a_slave.conf &
+
+
+<Server 3>
+
+cp redis.conf b_slave.conf
+mv redis.conf c_master.conf
+
+$ sudo vi c_master.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no??
+port 6381
+
+#### GENERAL ####
+pidfile /var/run/redis_6381.pid
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-6381.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+$ sudo vi b_slave.conf
+-----------------------------------------------------------
+#### NETWORK ####
+# bind 127.0.0.1
+protected-mode no
+port 6380
+
+#### GENERAL ####
+pidfile /var/run/redis_6381.pid
+
+#### REDIS CLUSTER ####
+cluster-enabled yes
+cluster-config-file nodes-6380.conf
+cluster-node-timeout 15000
+---------------------------------------------------------
+
+sudo ufw allow 6381
+sudo ufw allow 16381
+
+$ redis-server redis-stable/c_master.conf &
+$ redis-server redis-stable/b_slave.conf &
+
+
+[# Cluster Start]
+
+$ ./redis-trib.rb create 127.0.0.1:6379 13.124.85.246:6380 13.125.18.89:6381
+
+
+d
+==============================================================================================
+
+[# Redis Start / Stop / Restart]
+
+$ sudo ./redis-4.0.2/src/redis-server restart
+
+$ sudo ./redis-4.0.2/src/redis-server stop
+$ sudo ./redis-4.0.2/src/redis-server start
+
+==============================================================================================

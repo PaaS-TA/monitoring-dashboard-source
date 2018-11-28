@@ -1,0 +1,202 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<div class="contents">
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      Member Info
+    </div>
+
+    <div class="panel-body">
+      <form class="form-horizontal" name="signUpForm" id="signUpForm" role="form">
+
+        <div class="form-group">
+          <label for="userId" class="col-sm-2 control-label">ID</label>
+          <div class="col-sm-5">
+            <input type="text" class="form-control" id="userId" name="userId" placeholder="ID" ng-model="member.memberInfo.userId"
+                   ng-required="true" ng-minlength="4" ng-maxlength="15" ng-blur="member.duplicateConfirm('userId')"
+                   ng-readonly="type" >
+          </div>
+          <div class="col-sm-3 alert-warning" ng-show="signUpForm.userId.$error.minlength" role="alert">
+            아이디는 4글자 이상 15자 미만이어야 합니다.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="userNm" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-5">
+            <input type="text" class="form-control" id="userNm" name="userNm" placeholder="Name" ng-model="member.memberInfo.userNm" ng-required="true">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="userPw" class="col-sm-2 control-label">Password</label>
+          <div class="col-sm-5">
+            <input type="password" class="form-control" id="userPw" name="userPw" placeholder="Password" ng-model="member.memberInfo.userPw"
+                   ng-required="member.pwShow"
+                   ng-minlength="4"
+                   ng-maxlength="15"
+                    />
+          </div>
+          <div class="col-sm-3 alert-warning" ng-show="signUpForm.userPw.$error.pattern" role="alert">
+            패스워드는 최소 4글자, 최대 15글자이고 적어도 나의 소문자, 대문자, 숫자를 포함해야합니다.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="userPwConfirm" class="col-sm-2 control-label">Password Confirm</label>
+          <div class="col-sm-5">
+            <input type="password" class="form-control" id="userPwConfirm" placeholder="Password Confirm" ng-model="member.memberInfo.userPwConfirm"
+                   ng-required="member.pwShow">
+          </div>
+          <div class="col-sm-3 alert-warning" ng-show="member.memberInfo.userPw != member.memberInfo.userPwConfirm" role="alert">
+            패스워드가 일치하지 않습니다.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="userEmail" class="col-sm-2 control-label">e-mail</label>
+          <div class="col-sm-5">
+            <input type="text" class="form-control" id="userEmail" name="userEmail" placeholder="Email Name"
+                   ng-model="member.memberInfo.userEmail"
+                   ng-pattern="/^[\w-]+(\.[\w-]+)*@([a-z0-9-]+(\.[a-z0-9-]+)*?\.[a-z]{2,6}|(\d{1,3}\.){3}\d{1,3})(:\d{4})?$/" noncapitalize required
+                   ng-blur="blur('userEmail')">
+          </div>
+          <div class="col-sm-3 alert-warning" ng-show="signUpForm.userEmail.$error.pattern" role="alert">
+            이메일 형식에 맞춰 작업해야 합니다.
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div ng-class="member.leftClass" ng-show="member.leftShow">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          IaaS Info
+        </div>
+        <div class="panel-body">
+          <div class="col-md-3" style="border-right: 1px solid #cccccc;">
+            <div class="check-area">
+              <input type="checkbox" id="iaasUserUseYn" ng-model="member.memberInfo.iaasUserUseYn" ng-true-value="'Y'" ng-false-value="'N'" ng-click="member.userUseConfirm('iaas');" />
+              <label for="iaasUserUseYn">IaaS</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <form class="form-horizontal" id="iaasUSer">
+              <div class="form-group">
+                <label for="iaasUserId" class="col-sm-2 control-label">ID</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="iaasUserId" placeholder="IaaS User ID" ng-model="member.memberInfo.iaasUserId"
+                         ng-keypress="member.certifyChange('IaaS')" ng-blur="member.duplicateConfirm('iaasUser')">
+                  <input type="hidden" class="form-control" id="iaasUserChck" name="iaasUserChck" ng-model="member.memberInfo.iaasUserChck" >
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="iaasUserPw" class="col-sm-2 control-label">PW</label>
+                <div class="col-sm-10">
+                  <input type="password" class="form-control" id="iaasUserPw" placeholder="IaaS User PW" ng-model="member.memberInfo.iaasUserPw">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-info btn-certi" ng-click="member.certificationConfirm('IaaS', false)"  data-ng-disabled="member.memberInfo.iaasUserId==''" >인증<br />하기</button>
+          </div>
+        </div>
+        <div ng-show="member.memberInfo.iaasUserChck" class="alert-success" role="alert">IaaS 계정이 인증 되었습니다.</div>
+        <div ng-show="!member.memberInfo.iaasUserChck && member.memberInfo.iaasUserUseYn == 'Y'" class="alert-danger" role="alert">IaaS {{ member.iaasCertificationMsg }}</div>
+      </div>
+    </div>
+
+    <div ng-class="member.rightClass" ng-show="member.rightShow">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          PaaS Info
+        </div>
+        <div class="panel-body">
+          <div class="col-md-3" style="border-right: 1px solid #cccccc;">
+            <div class="check-area">
+              <input type="checkbox" id="paasUserUseYn" ng-model="member.memberInfo.paasUserUseYn" ng-true-value="'Y'" ng-false-value="'N'" ng-click="member.userUseConfirm('paas');">
+              <label for="paasUserUseYn">PaaS</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <form class="form-horizontal" id="paasUSer">
+              <div class="form-group">
+                <label for="paasUserId" class="col-sm-2 control-label">ID</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="paasUserId" placeholder="PaaS User ID" ng-model="member.memberInfo.paasUserId"
+                         ng-keypress="member.certifyChange('PaaS')"  ng-blur="member.duplicateConfirm('paasUser')">
+                  <input type="hidden" class="form-control" id="paasUserChck" ng-model="member.memberInfo.paasUserChck" >
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="paasUserPw" class="col-sm-2 control-label">PW</label>
+                <div class="col-sm-10">
+                  <input type="password" class="form-control" id="paasUserPw" placeholder="PaaS User PW" ng-model="member.memberInfo.paasUserPw">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-info btn-certi" ng-click="member.certificationConfirm('PaaS', false)" >인증<br />하기</button>
+          </div>
+        </div>
+        <div ng-show="member.memberInfo.paasUserChck && member.memberInfo.paasUserUseYn == 'Y'" class="alert-success" role="alert">PaaS 계정이 인증 되었습니다.</div>
+        <div ng-show="!member.memberInfo.paasUserChck && member.memberInfo.paasUserUseYn == 'Y'" class="alert-danger" role="alert">PaaS {{ member.paasCertificationMsg }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="accept_box">
+    <div class="sub-btn" align="right" ng-if="!type">
+      <button type="button" class="btn btn-primary medium" ng-disabled="!signUpForm.$valid" data-toggle="modal" data-target="#confirmModal" ng-click="member.confirmJoin()">Join</button>
+      <button type="button" class="btn btn-default medium" ng-click="member.movePage('/login')" >Cancel</button>
+    </div>
+    <div class="sub-btn" align="right" ng-if="type" >
+      <button type="button" class="btn btn-primary medium" ng-disabled="!signUpForm.$valid" data-toggle="modal" data-target="#confirmModal" ng-click="member.confirmSave()">Save</button>
+      <button type="button" class="btn btn-default medium" ng-click="member.movePage(member.cancelUrl)" >Cancel</button>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="font-size: 15px">{{ member.modalTitle }}</h4>
+      </div>
+      <div class="modal-body">
+        {{ member.modalMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="member.confirmCallback()" ng-show="member.confirmShow" >Accept</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" >Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="alertModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="font-size: 15px">{{ member.modalTitle }}</h4>
+      </div>
+      <div class="modal-body">
+        {{ member.modalMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="member.confirmCallback()" ng-show="member.alertShow">Confirm</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-show="member.closeShow">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

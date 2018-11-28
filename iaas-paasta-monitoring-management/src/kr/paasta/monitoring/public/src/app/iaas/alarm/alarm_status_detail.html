@@ -1,0 +1,123 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<!--<div class="container">-->
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">Alarm Status Detail</div>
+          <div class="panel-body alarmDetail">
+            <form class="form-horizontal">
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Host Name</label>
+                <div class="col-sm-8 control-span">
+                  <span>{{ ast.detail.hostname }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Type</label>
+                <div class="col-sm-8 control-span">
+                  <span>{{ ast.detail.type }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Zone</label>
+                <div class="col-sm-8 control-span">
+                  <span>{{ ast.detail.zone }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">State</label>
+                <div class="col-sm-8 control-span">
+                  <span ng-style="{color: ast.detail.state == 'ALARM' ? 'red' : ''}">{{ ast.detail.state }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Severity</label>
+                <div class="col-sm-8 control-span">
+                  <span>{{ ast.detail.severity }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Time</label>
+                <div class="col-sm-8 control-span">
+                  <span>{{ ast.detail.updateTime }}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Expression</label>
+                <div class="col-sm-8 control-span">
+                  <span>{{ ast.detail.expression }}</span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            Alarm History
+            <button class="btn btn-default pull-right margin-horizontal-2" ng-class="{active:ast.timeRange=='30d'}" ng-click="ast.getAlarmStatusHistory('30d')">월</button>
+            <button class="btn btn-default pull-right margin-horizontal-2" ng-class="{active:ast.timeRange=='1w'}" ng-click="ast.getAlarmStatusHistory('1w')">주</button>
+            <button class="btn btn-default pull-right margin-horizontal-2" ng-class="{active:ast.timeRange=='1d'}" ng-click="ast.getAlarmStatusHistory('1d')">일</button>
+          </div>
+          <div class="panel-body alarmHistory" ng-show="ast.alarmStatusHistoryList">
+            <ul class="list-group">
+              <li class="list-group-item" ng-class="{warning: item.newState == 'ALARM' && $index == 0}" ng-repeat="item in ast.alarmStatusHistoryList">
+                <h5 class="list-group-item-heading">[{{ item.time }}] <strong>현재: {{ item.newState }}</strong> / 이전: {{ item.oldState }}</h5>
+                사유: {{ item.reason }}
+              </li>
+            </ul>
+          </div>
+          <div class="panel-body alarmHistory text-center" ng-show="ast.alarmStatusHistoryList == null">
+            <span>No Data Available.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            Alarm Action History
+          </div>
+          <div class="panel-body">
+            <div class="bt_con">
+              <div class="re_box" ng-show="ast.alarmActionList!=null">
+                <h2>Action History</h2>
+                <div class="con_box" ng-repeat="item in ast.alarmActionList">
+                  <div class="txt_box">
+                    <p class="date">{{ item.regDate }}&nbsp;( {{ item.regUser }} )</p>
+                    <pre ng-hide="ast.modifying==$index" class="info">{{ item.alarmActionDesc }}</pre>
+                    <div class="detail_box">
+                      <textarea ng-show="ast.modifying==$index" ng-model="item.alarmActionDesc"></textarea>
+                    </div>
+                  </div>
+                  <div class="btn" style="left:300px;">
+                    <button class="btn-success btn-xs" title="수정하기" ng-hide="ast.modifying==$index" ng-click="ast.setModifying($index)">Update</button>
+                    <button class="btn-danger btn-xs" title="삭제하기" ng-hide="ast.modifying==$index" data-toggle="modal" data-target="#confirmModal" ng-click="ast.deleteAction(item.id)">Delete</button>
+                    <button class="btn-info btn-xs" title="저장하기" ng-show="ast.modifying==$index" data-toggle="modal" data-target="#confirmModal" ng-click="ast.updateAction(item)">Save</button>
+                    <button class="btn-default btn-xs" title="취소하기" ng-show="ast.modifying==$index" ng-click="ast.modifying=-1">Cancel</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="content_box" ng-if="pasu.alarm.resolveStatus != 1" >
+                <h2>Action Contents</h2>
+                <div class="detail_con">
+                  <textarea id="resolve" ng-model="ast.alarmActionDesc"></textarea>
+                  <div class="sub-btn">
+                    <button class="btn btn-success small" ng-click="ast.insertAlarmAction()">저장</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

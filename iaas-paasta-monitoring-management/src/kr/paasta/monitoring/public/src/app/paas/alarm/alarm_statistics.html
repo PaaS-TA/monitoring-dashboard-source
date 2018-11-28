@@ -1,0 +1,371 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Alarm Statistics
+        </div>
+
+        <div class="panel-body">
+          <div class="stats_area">
+            <div class="top_con">
+              <div class="form-inline search">
+                <ul>
+                  <li><button class="date" ng-class="{'':past.period!='d', 'selected':past.period=='d'}" ng-click="past.interval=1;past.getAlarmStatistics('d')">일</button></li>
+                  <li><button class="date" ng-class="{'':past.period!='w', 'selected':past.period=='w'}" ng-click="past.interval=1;past.getAlarmStatistics('w')">주</button></li>
+                  <li><button class="date" ng-class="{'':past.period!='m', 'selected':past.period=='m'}" ng-click="past.interval=1;past.getAlarmStatistics('m')">월</button></li>
+                  <li><button class="date" ng-class="{'':past.period!='y', 'selected':past.period=='y'}" ng-click="past.interval=1;past.getAlarmStatistics('y')">년</button></li>
+                </ul>
+                <div class="move">
+                  <p class="move_ic">
+                    <a class="back" ng-click="past.setInterval('+')"></a>
+                    <a class="front" ng-click="past.setInterval('-')" ng-disabled="interval<=1"></a>
+                  </p>
+                  <p class="date_box">{{ past.strPeriod }}</p>
+                </div>
+                <div class="pull-right">
+                  <button type="button" class="btn btn-default small" ng-click="past.statisticsPrint('printSectionId');">출력</button>
+                  <button type="button" class="btn btn-default small" ng-click="past.excelDownload('excelTable');">엑셀다운로드</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="printSectionId">
+            <div class="panel panel-default inner">
+              <div class="panel-heading">Total</div>
+              <div class="panel-body">
+                <div class="stats_box">
+                  <div class="box01 box">
+                    <p class="txt">Total</p>
+                    <p class="num">{{ past.stats.totalCnt }}</p>
+                  </div>
+                  <div class="box02 box">
+                    <p class="txt">Warning</p>
+                    <p class="num">{{ past.stats.warningCnt }}</p>
+                  </div>
+                  <div class="box03 box">
+                    <p class="txt">Critical</p>
+                    <p class="num">{{ past.stats.criticalCnt }}</p>
+                  </div>
+                </div>
+                <div class="grp_box">
+                  <div class="box">
+                    <div class="box-content">
+                      <nvd3 options="totalWidgets.chart.options" data="totalWidgets.chart.data" config="config"></nvd3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel-default inner">
+              <div class="panel-heading">Service</div>
+              <div class="panel-body">
+                <div class="stats_box">
+                  <div class="con_box link">
+                    <h3 ng-click="past.goListOriginType('bos')">Bosh</h3>
+                    <div ng-click="past.goListOriginType('bos', 'warning')" class="kan01 kan">
+                      <p class="lf">Warning</p>
+                      <p class="rt">{{ past.stats.boshWarningCnt }}</p>
+                    </div>
+                    <div ng-click="past.goListOriginType('bos', 'critical')" class="kan02 kan">
+                      <p class="lf">Critical</p>
+                      <p class="rt">{{ past.stats.boshCriticalCnt }}</p>
+                    </div>
+                  </div>
+                  <div class="con_box link">
+                    <h3 ng-click="past.goListOriginType('pas')">PaaS-TA</h3>
+                    <div ng-click="past.goListOriginType('pas', 'warning')" class="kan01 kan">
+                      <p class="lf">Warning</p>
+                      <p class="rt">{{ past.stats.paastaWarningCnt }}</p>
+                    </div>
+                    <div ng-click="past.goListOriginType('pas', 'critical')" class="kan02 kan">
+                      <p class="lf">Critical</p>
+                      <p class="rt">{{ past.stats.paastaCriticalCnt }}</p>
+                    </div>
+                  </div>
+                  <div class="con_box link">
+                    <h3 ng-click="past.goListOriginType('con')">Container</h3>
+                    <div ng-click="past.goListOriginType('con', 'warning')" class="kan01 kan">
+                      <p class="lf">Warning</p>
+                      <p class="rt">{{ past.stats.containerWarningCnt }}</p>
+                    </div>
+                    <div ng-click="past.goListOriginType('con', 'critical')" class="kan02 kan">
+                      <p class="lf">Critical</p>
+                      <p class="rt">{{ past.stats.containerCriticalCnt }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="grp_box">
+                  <div class="box">
+                    <div class="box-content">
+                      <nvd3 options="servieWidgets.chart.options" data="servieWidgets.chart.data" config="config"></nvd3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel-default inner">
+              <div class="panel-heading">Matrix</div>
+              <div class="panel-body">
+                <div class="stats_box">
+                  <div class="con_box link">
+                    <h3 ng-click="past.goListAlarmType('cpu')">CPU</h3>
+                    <div ng-click="past.goListAlarmType('cpu', 'warning')" class="kan01 kan">
+                      <p class="lf">Warning</p>
+                      <p class="rt">{{ past.stats.cpuWarningCnt }}</p>
+                    </div>
+                    <div ng-click="past.goListAlarmType('cpu', 'critical')" class="kan02 kan">
+                      <p class="lf">Critical</p>
+                      <p class="rt">{{ past.stats.cpuCriticalCnt }}</p>
+                    </div>
+                  </div>
+                  <div class="con_box link">
+                    <h3 ng-click="past.goListAlarmType('memory')">Memory</h3>
+                    <div ng-click="past.goListAlarmType('memory', 'warning')" class="kan01 kan">
+                      <p class="lf">Warning</p>
+                      <p class="rt">{{ past.stats.memoryWarningCnt }}</p>
+                    </div>
+                    <div ng-click="past.goListAlarmType('memory', 'critical')" class="kan02 kan">
+                      <p class="lf">Critical</p>
+                      <p class="rt">{{ past.stats.memoryCriticalCnt }}</p>
+                    </div>
+                  </div>
+                  <div class="con_box link">
+                    <h3 ng-click="past.goListAlarmType('disk')">Disk</h3>
+                    <div ng-click="past.goListAlarmType('disk', 'warning')" class="kan01 kan">
+                      <p class="lf">Warning</p>
+                      <p class="rt">{{ past.stats.diskWarningCnt }}</p>
+                    </div>
+                    <div ng-click="past.goListAlarmType('disk', 'critical')" class="kan02 kan">
+                      <p class="lf">Critical</p>
+                      <p class="rt">{{ past.stats.diskCriticalCnt }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="grp_box">
+                  <div class="box">
+                    <div class="box-content">
+                      <nvd3 options="matrixWidgets.chart.options" data="matrixWidgets.chart.data" config="config"></nvd3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel-default inner">
+              <div class="panel-heading">
+                Processing history
+              </div>
+              <div class="panel-body">
+                <div class="stats_box wide">
+                  <div class="box01 box">
+                    <p class="txt">Total</p>
+                    <p class="num">{{ past.stats.warningResolveCnt + past.stats.criticalResolveCnt }} / {{ past.stats.totalCnt }}</p>
+                  </div>
+                  <div class="box02 box">
+                    <p class="txt">Warning</p>
+                    <p class="num">{{ past.stats.warningResolveCnt }} / {{ past.stats.warningCnt }}</p>
+                  </div>
+                  <div class="box03 box">
+                    <p class="txt">Critical</p>
+                    <p class="num">{{ past.stats.criticalResolveCnt }} / {{ past.stats.criticalCnt }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="excelTable" style="display:none;">
+        <table cellspacing="0" border="0">
+          <colgroup span="6" width="85"></colgroup>
+          <tr>
+            <td colspan="6" height="42" align="center" valign="middle" border="1px solid #000000;">
+              <b><font size=4>Alarm Statistics ({{ past.strPeriod }})</font><b>
+            </td>
+          </tr>
+          <tr><td colspan="6"></td></tr>
+          <tr>
+            <th colspan="6" height="42" align="center" valign="middle" border="1px solid #000000;">
+              <b><font size=3>Total</font></b>
+            </th>
+          </tr>
+          <tr>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>Total</b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" height="60" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.totalCnt }}</font></b>
+            </td>
+            <td colspan="2" height="60" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.warningCnt }}</font></b>
+            </td>
+            <td colspan="2" height="60" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.criticalCnt }}</font></b>
+            </td>
+          </tr>
+          <tr><td colspan="6"></td></tr>
+          <tr>
+            <th colspan="6" height="42" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=3>Service</font></b>
+            </th>
+          </tr>
+          <tr>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>Total</b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>PaaS-TA</b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>Container</b>
+            </td>
+          </tr>
+          <tr>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.boshWarningCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.paastaWarningCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.containerWarningCnt }}</font></b>
+            </td>
+          </tr>
+          <tr>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.boshCriticalCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.paastaCriticalCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.containerCriticalCnt }}</font></b>
+            </td>
+          </tr>
+          <tr><td colspan="6"></td></tr>
+          <tr>
+            <th colspan="6" height="42" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=3>Matrix</font></b>
+            </th>
+          </tr>
+          <tr>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>CPU</b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>Memory</b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>Disk</b>
+            </td>
+          </tr>
+          <tr>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.cpuWarningCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.memoryWarningCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.diskWarningCnt }}</font></b>
+            </td>
+          </tr>
+          <tr>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.cpuCriticalCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.memoryCriticalCnt }}</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+            <td height="50" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.diskCriticalCnt }}</font></b>
+            </td>
+          </tr>
+          <tr><td colspan="6"> </td></tr>
+          <tr>
+            <th colspan="6" height="42" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=3>Processing history</font></b>
+            </th>
+          </tr>
+          <tr>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b>Total</b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#F0A141">Warning</font></b>
+            </td>
+            <td colspan="2" height="38" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font color="#AD6DE8">Critical</font></b>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" height="60" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.warningResolveCnt +  past.stats.criticalResolveCnt}} / {{ past.stats.totalCnt }}</font></b>
+            </td>
+            <td colspan="2" height="60" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.warningResolveCnt }} / {{ past.stats.warningCnt }}</font></b>
+            </td>
+            <td colspan="2" height="60" align="center" valign="middle" style="border: 1px solid #000000;">
+              <b><font size=4>{{ past.stats.criticalResolveCnt }} / {{ past.stats.criticalCnt }}</font></b>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+

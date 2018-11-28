@@ -1,0 +1,382 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Alarm Policy
+        </div>
+
+        <div class="panel-body">
+
+          <content id="content">
+            <div class="sec_area">
+              <div class="row">
+                <form class="form-inline top">
+                  <div class="form-group">
+                    <label for="type" style="width:60px;">Type</label>
+                    <select class="form-control" ng-change="papc.setTypeObject()" ng-model="papc.selType" id="type" style="width:160px;">
+                      <option value="bos">Bosh</option>
+                      <option value="pas">PaaS-TA</option>
+                      <option value="con">Container</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </content>
+
+          <div class="panel panel-default inner">
+            <div class="panel-heading">
+              <img src="assets/images/alarm/ic_cpu.png" />CPU
+            </div>
+            <div class="panel-body">
+              <form class="form-inline">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="cpuWarning"><span class="warning">Warning</span>&nbsp;</label>
+                    <input ng-model="papc.origin.cpu.threshold.warning" type="number" class="form-control w100" id="cpuWarning" placeholder="Warning">&nbsp;% 이상
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="cpuCritical"><span class="critical">Critical</span>&nbsp;</label>
+                    <input ng-model="papc.origin.cpu.threshold.critical" type="number" class="form-control w100" id="cpuCritical" placeholder="Critical">&nbsp;% 이상
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="cpuRepeatTime">Repeat Time&nbsp;</label>
+                    <input ng-model="papc.origin.cpu.repeatTime" type="number" class="form-control w100" id="cpuRepeatTime" placeholder="Repeat Time">&nbsp;분
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel panel-default inner">
+            <div class="panel-heading">
+              <img src="assets/images/alarm/ic_memory.png" />Memory
+            </div>
+            <div class="panel-body">
+              <form class="form-inline">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="memoryWarning"><span class="warning">Warning</span>&nbsp;</label>
+                    <input ng-model="papc.origin.memory.threshold.warning" type="number" class="form-control w100" id="memoryWarning" placeholder="Warning">&nbsp;% 이상
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="memoryCritical"><span class="critical">Critical</span>&nbsp;</label>
+                    <input ng-model="papc.origin.memory.threshold.critical" type="number" class="form-control w100" id="memoryCritical" placeholder="Critical">&nbsp;% 이상
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="memoryRepeatTime">Repeat Time&nbsp;</label>
+                    <input ng-model="papc.origin.memory.repeatTime" type="number" class="form-control w100" id="memoryRepeatTime" placeholder="Repeat Time">&nbsp;분
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel panel-default inner">
+            <div class="panel-heading">
+              <img src="assets/images/alarm/ic_disk.png" />Disk
+            </div>
+            <div class="panel-body">
+              <form class="form-inline">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="diskWarning"><span class="warning">Warning</span>&nbsp;</label>
+                    <input ng-model="papc.origin.disk.threshold.warning" type="number" class="form-control w100" id="diskWarning" placeholder="Warning">&nbsp;% 이상
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="diskCritical"><span class="critical">Critical</span>&nbsp;</label>
+                    <input ng-model="papc.origin.disk.threshold.critical" type="number" class="form-control w100" id="diskCritical" placeholder="Critical">&nbsp;% 이상
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="diskRepeatTime">Repeat Time&nbsp;</label>
+                    <input ng-model="papc.origin.disk.repeatTime" type="number" class="form-control w100" id="diskRepeatTime" placeholder="Repeat Time">&nbsp;분
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3">
+              <div class="panel panel-default inner">
+                <div class="panel-heading">Measuring Time</div>
+                <div class="panel-body">
+                  <form class="form-inline">
+                    <div class="col-xs-12">
+                      <div class="form-group">
+                        <input ng-model="papc.origin.measureTime" type="number" step="30" class="form-control w100 measure" id="measureTime" placeholder="Time">&nbsp;초
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-9">
+              <div class="panel panel-default inner">
+                <div class="panel-heading">
+                  Alram Receiver Address
+                  <div class="pull-right">
+                    <span class="font">Off</span>
+                    <switch id="emailSendYn" name="emailSendYn" ng-model="papc.origin.email.emailSendYn" class="green"></switch>
+                    <span class="font right">On</span>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <form class="form-inline">
+                    <div class="col-xs-12">
+                      <div class="form-group">
+                        <input ng-model="papc.origin.email.emailName" type="text" class="form-control w200" id="name" placeholder="Email Name">&nbsp;@
+                        <input ng-model="papc.origin.email.emailAddr" type="text" class="form-control w200" id="addr" placeholder="Email Address">&nbsp;
+                        <select class="form-control" ng-change="papc.setEmailAddr()" ng-model="papc.origin.email.emailType"
+                                ng-options="mail.code as mail.name for mail in papc.mailList" id="email" style="height:34px;">
+                          <option value="">직접입력</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary pull-right small" data-toggle="modal" data-target="#saveModal">Save</button>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Alarm SNS Channel (Telegram)
+          <div class="pull-right">
+            <span class="font">Off</span>
+            <switch id="snsSendYn" name="snsSendYn" ng-model="papc.snsSendYn" class="green"></switch>
+            <span class="font right">On</span>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="snsMsg" ng-show="!papc.alarmSnsChannelList">
+            Telegram 에 등록된 Bot 채널이 없습니다.
+          </div>
+          <div class="snsMsg" ng-show="papc.alarmSnsChannelList">
+            Telegram 메신져에서 아래 아이디를 검색 후 Bot 채널에 참여 하시면 알람 메세지를 받을 수 있습니다.
+          </div>
+
+          <table class="tile-grid" style="width:100%;">
+            <colgroup>
+              <col style="width:10%;" />
+              <col style="width:30%;" />
+              <col style="width:60%;" />
+              <col style="width:10%;" />
+            </colgroup>
+            <tbody ng-show="papc.alarmSnsChannelList">
+              <tr ng-repeat="channel in papc.alarmSnsChannelList" id="snsChannelList" >
+                <td>{{ channel.originType }}</td>
+                <td>@{{ channel.snsId }}</td>
+                <td style="color:#77ae33;">{{ channel.expl }}</td>
+                <td>
+                  <button class="btn btn-danger pull-right" style="padding:4px 20px;" ng-click="papc.channelDelete(channel.id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="channel">
+            <div class="snsMsg">
+              Telegram 메신저에서 @BotFather 채널에 참여 후 /newbot 명령으로 알람 Bot을 생성하여 아래 등록해주시기 바랍니다.
+              <a class="pull-right" ng-click="papc.snsRegistMethod();">
+                <i class="fa fa-info-circle fa-lg"></i>
+                <span style="font-size:12px;vertical-align:8%;margin-left:3px;">등록방법</span>
+              </a>
+            </div>
+            <table class="tile-grid" style="width:100%;">
+              <colgroup>
+                <col width="" />
+                <col width="" />
+                <col width="" />
+                <col width="" />
+                <col width="" />
+              </colgroup>
+              <thead>
+              <tr>
+                <th class="text-center">Type</th>
+                <th class="text-center">ID</th>
+                <th class="text-center">Token</th>
+                <th class="text-center">Description</th>
+                <th> </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>
+                  <select class="form-control w100p" ng-model="papc.channel.type" id="channelType" style="width:90%;">
+                    <option value="">Select</option>
+                    <option value="all">All</option>
+                    <option value="bos">Bosh</option>
+                    <option value="pas">PaaS-TA</option>
+                    <option value="con">Container</option>
+                  </select>
+                </td>
+                <td>
+                  <input ng-model="papc.channel.id" type="text" class="form-control w95p" id="channelId" placeholder="Bot ID">
+                </td>
+                <td>
+                  <input ng-model="papc.channel.token" type="text" class="form-control w95p" id="channelToken" placeholder="Token Value">
+                </td>
+                <td>
+                  <input ng-model="papc.channel.description" type="text" class="form-control w95p" id="channelDescription" placeholder="Description">
+                </td>
+                <td rowspan="2">
+                  <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#channelRegistModal" style="padding:6px 20px;">Regist</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="font-size: 15px">저장</h4>
+      </div>
+      <div class="modal-body">
+        저장하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="papc.saveSetup()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="channelDeleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="font-size: 15px">저장</h4>
+      </div>
+      <div class="modal-body">
+        삭제하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="channelRegistModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="font-size: 15px">저장</h4>
+      </div>
+      <div class="modal-body">
+        채널을 등록하시겠습니까?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="papc.channelRegist()">Regist</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup -->
+<div class="row" id="snsRegistMethod" style="display:none;padding:10px;">
+  <div style="border:1px solid #ddd;margin-bottom:30px;">
+    <h3 style="text-align:center;">Telegram Bot 생성</h3>
+  </div>
+  <div>
+    <div class="col-sm-12">
+      <div class="thumbnail">
+        <img src="assets/images/alarm/sns/sns_regist_step_1.png" width="100%"/>
+        <div class="caption">
+          <p><i class="fa fa-caret-right "></i>Telegram 에서 BotFather를 검색한다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 arrow"><i class="fa fa-arrow-circle-down fa-2x"></i></div>
+    <div class="col-sm-12">
+      <div class="thumbnail">
+        <img src="assets/images/alarm/sns/sns_regist_step_2.png" width="100%"/>
+        <div class="caption">
+          <p><i class="fa fa-caret-right"></i>하단에서 [시작하기]를 클릭하여 위 그림과 같이 나타낸다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 arrow"><i class="fa fa-arrow-circle-down fa-2x"></i></div>
+    <div class="col-sm-12">
+      <div class="thumbnail">
+        <img src="assets/images/alarm/sns/sns_regist_step_3.png" width="100%"/>
+        <div class="caption">
+          <p><i class="fa fa-caret-right"></i>채팅창에 명령어를 (/newbot)를 입력하여 봇을 생성한다.</p>
+          <p><i class="fa fa-caret-right"></i>Bot의 이름과 검색할 이름을 지정한다.</p>
+          <p><i class="fa fa-caret-right"></i>Bot API Token 정보를 확인한다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 arrow"><i class="fa fa-arrow-circle-down fa-2x"></i></div>
+    <div class="col-sm-12">
+      <div class="thumbnail">
+        <img src="assets/images/alarm/sns/sns_regist_step_4.png" width="100%"/>
+        <div class="caption">
+          <p><i class="fa fa-caret-right"></i>Bot을 통해 받은 정보를 입력 후 [Regist]를 클릭하여 저장한다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 arrow"><i class="fa fa-arrow-circle-down fa-2x"></i></div>
+    <div class="col-sm-12">
+      <div class="thumbnail">
+        <img src="assets/images/alarm/sns/sns_regist_step_5.png" width="100%"/>
+        <div class="caption">
+          <p><i class="fa fa-caret-right"></i>상단에 입력된 정보가 정상적으로 들어 갔는지 확인한다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 arrow"><i class="fa fa-arrow-circle-down fa-2x"></i></div>
+    <div class="col-sm-12">
+      <div class="thumbnail">
+        <img src="assets/images/alarm/sns/sns_regist_step_7.png" width="100%"/>
+        <div class="caption">
+          <p><i class="fa fa-caret-right"></i>Telegram에 등록한 Bot을 검색한다.</p>
+          <p><i class="fa fa-caret-right"></i>하단의 [시작]을 클릭하여 알람을 받을 수 있도록 준비한다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

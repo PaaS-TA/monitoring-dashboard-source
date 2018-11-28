@@ -1,0 +1,217 @@
+<div class="loading-container" ng-show="loading"><div loading is-shown="loading" class='loading loading--audioWave'></div></div>
+<!--<div class="container">-->
+<div class="sidebar-body">
+  <div class="row sidebar-row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Compute Node Summary
+        </div>
+        <div class="panel-body">
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">VCPU 사용량</div>
+              <liquid seq="1" percentage="cpuPercent"></liquid>
+            </div>
+            <div class="gauge-usage">사용 {{ cnd.summary.vcpuUsed || 0 | number }}개 / 전체 {{ cnd.summary.vcpuTotal || 0 | number }}개</div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">Memory 사용량</div>
+              <liquid seq="2" percentage="memPercent"></liquid>
+            </div>
+            <div class="gauge-usage">
+              <div>사용 {{ cnd.summary.memoryMbUsed || 0 | number }}MB / 전체 {{ cnd.summary.memoryMbTotal || 0 | number }}MB</div>
+              <div>{{ cnd.summary.memoryMbFree || 0 | number }}MB 사용가능</div>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">Disk 사용량</div>
+              <liquid seq="3" percentage="diskPercent"></liquid>
+            </div>
+            <div class="gauge-usage">
+              <div>사용 {{ cnd.summary.diskGbUsed || 0 | number }}GB / 전체 {{ cnd.summary.diskGbTotal || 0 | number }}GB</div>
+              <div>{{ cnd.summary.diskGbLeastAvailable || 0 | number }}GB 사용가능</div>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="gauge-div">
+              <div class="gauge-title">인스턴스</div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Max Instance</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmTotalLimit || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Running / OK</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[1].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">No Status</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[0].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Idle / Blocked</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[2].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Paused</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[3].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Shutting down</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[4].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Shut Off</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[5].vmCount || 0 | number }} 개</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7"><span class="main-count pull-right">Crashed</span></div>
+              <div class="col-md-5"><span class="main-count">{{ cnd.summary.vmState[6].vmCount || 0 | number }} 개</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Compute Node
+        </div>
+        <div class="panel-body">
+
+          <form class="form-inline">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Host Name" ng-model="cnd.searchCondition">
+            </div>
+            <div class="form-group time">
+              <button class="btn" ng-click="cnd.getComputeNodeSummary();"></button>
+            </div>
+          </form>
+
+          <table class="table">
+            <colgroup>
+              <col style="width:10%;">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+              <col style="">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="text-center">Host Name</th>
+              <th class="text-center">IP</th>
+              <th class="text-center">VCPU</th>
+              <th class="text-center">Memory (MB)</th>
+              <th class="text-center">Disk (GB)</th>
+              <th class="text-center">Instances</th>
+              <th class="text-center">CPU Usage</th>
+              <th class="text-center">Memory Usage</th>
+              <th class="text-center">Status</th>
+              <th class="text-center">Agent Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="text-center" ng-repeat="item in cnd.computeNodeSummary" ng-repeat="item in mnd.computeNodeSummary"
+                ng-click="getTopProcessByHostname(item)" ng-class="item.select">
+              <td class="text-left link"><a ng-href="#/iaas/compute_node/{{ item.hostname }}">{{ item.hostname }}</a></td>
+              <td>{{ item.hostIp }}</td>
+              <td>{{ cnd.Math.round(item.vcpusUsed) | number }} / {{ cnd.Math.round(item.vcpusMax) | number }}</td>
+              <td>{{ cnd.Math.round(item.memoryMbUsed) | number }} / {{ cnd.Math.round(item.memoryMbMax) | number }}</td>
+              <td>{{ cnd.Math.round(item.diskGbUsed) | number }} / {{ cnd.Math.round(item.diskGbMax) | number }}</td>
+              <td>{{ cnd.Math.round(item.runningVms) | number }} / {{ cnd.Math.round(item.totalVms) | number }}</td>
+              <td><span ng-style="cpuUsageStyle(Math.floor(item.cpuUsage))">{{ (item.cpuUsage).toFixed(2) | number }}%</span></td>
+              <td><span ng-style="memoryUsageStyle(Math.floor(item.memUsage))">{{ (item.memUsage).toFixed(2) | number }}%</span></td>
+              <td><span ng-style="textStatusStyle(item.state)">{{ item.state }} ({{ item.status }})</span></td>
+              <td><span ng-style="textStatusStyle(item.agentStatus)">{{ item.agentStatus }}</span></td>
+            </tr>
+            <tr ng-show="cnd.computeNodeSummary == null" class="text-center">
+              <td colspan="10">No Data Available.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              CPU Used by Process <span ng-bind-html="cnd.selectedComputeNode"></span>
+            </div>
+            <div class="panel-body">
+              <table class="table process">
+                <colgroup>
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th class="text-center">Index</th>
+                    <th class="text-center">Process Name</th>
+                    <th class="text-center">CPU Usage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-show="cnd.topProcessCpuList" ng-repeat="item in cnd.topProcessCpuList" class="text-center">
+                    <td>{{ item.index }}</td>
+                    <td>{{ item.processName }}</td>
+                    <td><span ng-style="memoryUsageStyle(Math.floor(item.usage))">{{ (item.usage).toFixed(2) | number }} %</span></td>
+                  </tr>
+                  <tr ng-show="cnd.topProcessCpuList == null" class="text-center">
+                    <td colspan="3">Please select the Compute node.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              Memory Used by Process <span ng-bind-html="cnd.selectedComputeNode"></span>
+            </div>
+            <div class="panel-body">
+              <table class="table process">
+                <colgroup>
+                  <col style="">
+                  <col style="">
+                  <col style="">
+                </colgroup>
+                <thead>
+                <tr>
+                  <th class="text-center">Index</th>
+                  <th class="text-center">Process Name</th>
+                  <th class="text-center">Memory Used</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-show="cnd.topProcessMemoryList" ng-repeat="item in cnd.topProcessMemoryList" class="text-center">
+                  <td>{{ item.index }}</td>
+                  <td>{{ item.processName }}</td>
+                  <td><span ng-style="memoryUsageStyle(Math.floor(item.usage))">{{ (item.usage).toFixed(2) | number }} MB</span></td>
+                </tr>
+                <tr ng-show="cnd.topProcessMemoryList == null" class="text-center">
+                  <td colspan="3">Please select the Compute node.</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
