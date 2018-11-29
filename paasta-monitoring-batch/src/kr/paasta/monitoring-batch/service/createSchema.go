@@ -37,18 +37,6 @@ func CreateAlarmPolicyInitialData(dbClient *gorm.DB) {
 	alarmTagetPassTa    := model.AlarmTarget{Id:2, OriginType: "pas", MailAddress: "adminUser@gmail.com", MailSendYn: "Y" }
 	alarmTagetContainer := model.AlarmTarget{Id:3, OriginType: "con", MailAddress: "adminUser@gmail.com", MailSendYn: "Y" }
 
-	memberInfo := model.MemberInfo {
-		UserId       		:"admin",
-		UserPw       		:"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
-		UserEmail       	:"amedio77@gmail.com",
-		UserNm       		:"admin",
-		IaasUserId       	:"admin",
-		IaasUserPw       	:"cfmonit",
-		PaasUserId       	:"admin",
-		PaasUserPw       	:"admin",
-		IaasUserUseYn       :"Y",
-		PaasUserUseYn       :"Y",
-	}
 
 	dbClient.FirstOrCreate(&paasTaCpuData)
 	dbClient.FirstOrCreate(&paasTaMemData)
@@ -66,7 +54,6 @@ func CreateAlarmPolicyInitialData(dbClient *gorm.DB) {
 	dbClient.FirstOrCreate(&alarmTagetPassTa)
 	dbClient.FirstOrCreate(&alarmTagetContainer)
 
-	dbClient.FirstOrCreate(&memberInfo)
 }
 
 func CreatePortalInitialData(dbClient *gorm.DB){
