@@ -23,6 +23,7 @@ import (
 type SaasController struct {
 	txn *gorm.DB
 	//config map[string]string
+
 }
 
 type ApplicationStat struct {
