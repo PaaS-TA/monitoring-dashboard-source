@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/thoas/go-funk"
 	"github.com/tidwall/gjson"
-	_ "github.com/tidwall/sjson"
 	"strconv"
 	"strings"
 	"sync"
