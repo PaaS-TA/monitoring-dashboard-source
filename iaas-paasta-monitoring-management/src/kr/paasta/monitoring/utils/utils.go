@@ -30,6 +30,7 @@ const (
 	SYS_TYPE_ALL  string = "ALL"
 	SYS_TYPE_IAAS string = "IaaS"
 	SYS_TYPE_PAAS string = "PaaS"
+	SYS_TYPE_CAAS string = "CaaS"
 )
 
 type Config map[string]string
