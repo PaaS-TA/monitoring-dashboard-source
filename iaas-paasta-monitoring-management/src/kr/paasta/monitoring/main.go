@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/alexedwards/scs"
 	"github.com/cihub/seelog"
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
@@ -56,9 +55,9 @@ type MemberInfo struct {
 
 func main() {
 
-	sessionCookie, _ := utils.GenerateRandomString(32)
-	model.SessionManager = *scs.NewCookieManager(sessionCookie) //("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
-	model.SessionManager.Lifetime(time.Minute * 30)
+	//sessionCookie, _ := utils.GenerateRandomString(32)
+	//model.SessionManager = *scs.NewCookieManager(sessionCookie) //("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
+	//model.SessionManager.Lifetime(time.Minute * 30)
 
 	//model.SessionManager.Secure()
 	//============================================
@@ -107,66 +106,75 @@ func main() {
 	var cfProvider cfclient.Config
 	var boshClient *gogobosh.Client
 
-	// Common MysqlDB
-	paasConfigDbCon := new(DBConfig)
-	paasConfigDbCon.DbType = config["paas.monitoring.db.type"]
-	paasConfigDbCon.DbName = config["paas.monitoring.db.dbname"]
-	paasConfigDbCon.UserName = config["paas.monitoring.db.username"]
-	paasConfigDbCon.UserPassword = config["paas.monitoring.db.password"]
-	paasConfigDbCon.Host = config["paas.monitoring.db.host"]
-	paasConfigDbCon.Port = config["paas.monitoring.db.port"]
+	//CAAS 모니터링 테스트를 위한 임시방편
+	sysType = utils.SYS_TYPE_CAAS
 
-	paasConnectionString := utils.GetConnectionString(paasConfigDbCon.Host, paasConfigDbCon.Port, paasConfigDbCon.UserName, paasConfigDbCon.UserPassword, paasConfigDbCon.DbName)
-	fmt.Println("String:", paasConnectionString)
-	paasDbAccessObj, paasDbErr := gorm.Open(paasConfigDbCon.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
-	if paasDbErr != nil {
-		fmt.Println("err::", paasDbErr)
-		return
-	}
+	var handler1 http.Handler
+	if sysType != utils.SYS_TYPE_CAAS {
+		// Common MysqlDB
+		paasConfigDbCon := new(DBConfig)
+		paasConfigDbCon.DbType = config["paas.monitoring.db.type"]
+		paasConfigDbCon.DbName = config["paas.monitoring.db.dbname"]
+		paasConfigDbCon.UserName = config["paas.monitoring.db.username"]
+		paasConfigDbCon.UserPassword = config["paas.monitoring.db.password"]
+		paasConfigDbCon.Host = config["paas.monitoring.db.host"]
+		paasConfigDbCon.Port = config["paas.monitoring.db.port"]
 
-	// memberInfo table (use common database table)
-	createTable(paasDbAccessObj)
-
-	// Redis Client
-	rdClient := redis.NewClient(&redis.Options{
-		Addr:     config["redis.addr"],
-		Password: config["redis.password"],
-	})
-
-	// IaaS Connection Info
-	if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_IAAS {
-		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
-		if err != nil {
-			log.Println(err)
-			os.Exit(-1)
+		paasConnectionString := utils.GetConnectionString(paasConfigDbCon.Host, paasConfigDbCon.Port, paasConfigDbCon.UserName, paasConfigDbCon.UserPassword, paasConfigDbCon.DbName)
+		fmt.Println("String:", paasConnectionString)
+		paasDbAccessObj, paasDbErr := gorm.Open(paasConfigDbCon.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
+		if paasDbErr != nil {
+			fmt.Println("err::", paasDbErr)
+			return
 		}
-	}
 
-	if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS {
-		paaSInfluxServerClient, paasElasticClient, databases, cfProvider, boshClient, err = getPaasClients(config)
-		if err != nil {
-			log.Println(err)
-			os.Exit(-1)
+		// memberInfo table (use common database table)
+		createTable(paasDbAccessObj)
+
+		// Redis Client
+		rdClient := redis.NewClient(&redis.Options{
+			Addr:     config["redis.addr"],
+			Password: config["redis.password"],
+		})
+
+		//IaaS Connection Info
+		if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_IAAS {
+			iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
+			if err != nil {
+				log.Println(err)
+				os.Exit(-1)
+			}
 		}
-	}
 
-	// Route Path 정보와 처리 서비스 연결
-	var handler http.Handler
-	if sysType == utils.SYS_TYPE_IAAS {
-		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, nil,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, nil, *monClient, auth, bm.Databases{},
-			cfclient.Config{}, rdClient, sysType, nil)
-	} else if sysType == utils.SYS_TYPE_PAAS {
-		handler = handlers.NewHandler(model.OpenstackProvider{}, nil, paaSInfluxServerClient,
-			nil, paasDbAccessObj, nil, paasElasticClient, monascaclient.Client{}, gophercloud.AuthOptions{}, databases,
-			cfProvider, rdClient, sysType, boshClient)
+		if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS {
+			paaSInfluxServerClient, paasElasticClient, databases, cfProvider, boshClient, err = getPaasClients(config)
+			if err != nil {
+				log.Println(err)
+				os.Exit(-1)
+			}
+		}
+
+		// Route Path 정보와 처리 서비스 연결
+		var handler http.Handler
+		_ = handler
+		if sysType == utils.SYS_TYPE_IAAS {
+			handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, nil,
+				iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, nil, *monClient, auth, bm.Databases{},
+				cfclient.Config{}, rdClient, sysType, nil)
+		} else if sysType == utils.SYS_TYPE_PAAS {
+			handler = handlers.NewHandler(model.OpenstackProvider{}, nil, paaSInfluxServerClient,
+				nil, paasDbAccessObj, nil, paasElasticClient, monascaclient.Client{}, gophercloud.AuthOptions{}, databases,
+				cfProvider, rdClient, sysType, boshClient)
+		} else {
+			handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
+				iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
+				cfProvider, rdClient, sysType, boshClient)
+		}
 	} else {
-		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
-			cfProvider, rdClient, sysType, boshClient)
+		handler1 = handlers.CaasHandler()
 	}
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler1); err != nil {
 		log.Fatalln(err)
 	}
 

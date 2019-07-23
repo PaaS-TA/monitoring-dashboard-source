@@ -14,6 +14,7 @@ import (
 	"github.com/tedsuo/rata"
 	"gopkg.in/olivere/elastic.v3"
 	"io"
+	caasContoller "kr/paasta/monitoring/caas/controller"
 	"kr/paasta/monitoring/common/controller"
 	iaasContoller "kr/paasta/monitoring/iaas/controller"
 	"kr/paasta/monitoring/iaas/model"
@@ -53,6 +54,8 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	var definitionController *iaasContoller.AlarmDefinitionController
 	var stautsController *iaasContoller.AlarmStatusController
 	var logController *iaasContoller.OpenstackLog
+	//caas add
+	var caasMetricsController *caasContoller.MetricController
 
 	var iaasActions rata.Handlers
 
@@ -291,6 +294,17 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routes.Static: route(StaticHandler),
 	}
 
+	// add caas 2019.07.23
+	caasActions := rata.Handlers{
+		routes.CAAS_K8S_CLUSTER_AVG: route(caasMetricsController.GetClusterAvg),
+		routes.CAAS_WORK_NODE_LIST:  route(caasMetricsController.GetWorkNodeList),
+		routes.CAAS_WORK_NODE_INFO:  route(caasMetricsController.GetWorkNodeInfo),
+		routes.CAAS_CONTIANER_LIST:  route(caasMetricsController.GetContainerList),
+		routes.CAAS_CONTIANER_INFO:  route(caasMetricsController.GetContainerInfo),
+		routes.CAAS_CONTIANER_LOG:   route(caasMetricsController.GetContainerLog),
+	}
+	///////////////// add caas end
+
 	var actions rata.Handlers
 	var actionlist []rata.Handlers
 
@@ -317,11 +331,16 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		actionlist = append(actionlist, commonActions)
 		actionlist = append(actionlist, iaasActions)
 		actionlist = append(actionlist, paasActions)
+		//add caas
+		actionlist = append(actionlist, caasActions)
+
 		actions = getActions(actionlist)
 
 		routeList = append(routeList, routes.Routes)
 		routeList = append(routeList, routes.PaasRoutes)
 		routeList = append(routeList, routes.IaasRoutes)
+		//add caas
+		routeList = append(routeList, routes.CaasRoutes)
 		route = getRoutes(routeList)
 	}
 
@@ -331,6 +350,42 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	}
 	fmt.Println("Monit Application Started")
 	return HttpWrap(handler, rdClient, openstack_provider, cfProvider)
+}
+
+//CAAS 모니터링 테스트를 위한 임시방편
+func CaasHandler() http.Handler {
+	var metricsController *caasContoller.MetricController
+
+	var caasActions rata.Handlers
+
+	caasActions = rata.Handlers{
+		routes.CAAS_K8S_CLUSTER_AVG: route(metricsController.GetClusterAvg),
+		routes.CAAS_WORK_NODE_LIST:  route(metricsController.GetWorkNodeList),
+		routes.CAAS_WORK_NODE_INFO:  route(metricsController.GetWorkNodeInfo),
+		routes.CAAS_CONTIANER_LIST:  route(metricsController.GetContainerList),
+		routes.CAAS_CONTIANER_INFO:  route(metricsController.GetContainerInfo),
+		routes.CAAS_CONTIANER_LOG:   route(metricsController.GetContainerLog),
+	}
+
+	var actions rata.Handlers
+	var actionlist []rata.Handlers
+
+	var route rata.Routes
+	var routeList []rata.Routes
+
+	actionlist = append(actionlist, caasActions)
+	actions = getActions(actionlist)
+
+	//routeList = append(routeList, routes.Routes)
+	routeList = append(routeList, routes.CaasRoutes)
+	route = getRoutes(routeList)
+
+	handler, err := rata.NewRouter(route, actions)
+	if err != nil {
+		panic("unable to create router: " + err.Error())
+	}
+	fmt.Println("Caas Monit Application Started")
+	return handler
 }
 
 func getActions(list []rata.Handlers) rata.Handlers {

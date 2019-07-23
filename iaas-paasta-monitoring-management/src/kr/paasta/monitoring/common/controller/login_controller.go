@@ -7,16 +7,15 @@ import (
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/monasca/golang-monascaclient/monascaclient"
 	//"github.com/rackspace/gophercloud"
+	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/go-redis/redis"
+	"github.com/jinzhu/gorm"
+	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/common/service"
 	"kr/paasta/monitoring/iaas/model"
-	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/utils"
 	"net/http"
-	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
-	"github.com/go-redis/redis"
 )
-
 
 //Compute Node Controller
 type LoginController struct {
@@ -24,42 +23,42 @@ type LoginController struct {
 	MonAuth           monascagopher.AuthOptions
 	MonClient         monascaclient.Client
 	CfProvider        cfclient.Config
-	txn *gorm.DB
-	RdClient *redis.Client
-	sysType string
+	txn               *gorm.DB
+	RdClient          *redis.Client
+	sysType           string
 }
 
-func NewLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client , sysType string) *LoginController {
+func NewLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, cfProvider cfclient.Config, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
 	return &LoginController{
 		OpenstackProvider: openstackProvider,
 		MonAuth:           auth,
 		MonClient:         monsClient,
-		CfProvider: cfProvider,
-		txn: txn,
-		RdClient: rdClient,
-		sysType :sysType,
+		CfProvider:        cfProvider,
+		txn:               txn,
+		RdClient:          rdClient,
+		sysType:           sysType,
 	}
 
 }
 
-func NewIaasLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, txn *gorm.DB,  rdClient *redis.Client , sysType string) *LoginController {
+func NewIaasLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
 	return &LoginController{
 		OpenstackProvider: openstackProvider,
-		MonAuth: auth,
-		MonClient: monsClient,
-		txn: txn,
-		RdClient: rdClient,
-		sysType :sysType,
+		MonAuth:           auth,
+		MonClient:         monsClient,
+		txn:               txn,
+		RdClient:          rdClient,
+		sysType:           sysType,
 	}
 
 }
 
-func NewPaasLoginController(cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client , sysType string) *LoginController {
+func NewPaasLoginController(cfProvider cfclient.Config, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
 	return &LoginController{
 		CfProvider: cfProvider,
-		txn: txn,
-		RdClient: rdClient,
-		sysType :sysType,
+		txn:        txn,
+		RdClient:   rdClient,
+		sysType:    sysType,
 	}
 
 }
@@ -67,14 +66,14 @@ func NewPaasLoginController(cfProvider  cfclient.Config, txn *gorm.DB,  rdClient
 func (s *LoginController) Ping(w http.ResponseWriter, r *http.Request) {
 
 	token, _ := utils.GenerateRandomString(32)
-	session := model.SessionManager.Load(r)
+	//	session := model.SessionManager.Load(r)
 
 	testToken := r.Header.Get(model.TEST_TOKEN_NAME)
 	if testToken != "" {
 		w.Header().Add(model.TEST_TOKEN_NAME, token)
 	} else {
 		//fmt.Println("pint Token::::", token)
-		session.PutString(w, token, token)
+		//		session.PutString(w, token, token)
 		w.Header().Add(model.CSRF_TOKEN_NAME, token)
 	}
 
@@ -83,7 +82,6 @@ func (s *LoginController) Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
-
 
 	reqCsrfToken := r.Header.Get(model.CSRF_TOKEN_NAME)
 
@@ -109,14 +107,14 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		var userInfo cm.UserInfo
 		var loginErr model.ErrMessage
 
-		if s.sysType == utils.SYS_TYPE_IAAS{
+		if s.sysType == utils.SYS_TYPE_IAAS {
 			userInfo, _, err = services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
 			loginErr = utils.GetError().GetCheckErrorMessage(err)
-		}else if s.sysType == utils.SYS_TYPE_PAAS{
-			userInfo, _, err = services.GetPaasLoginService( s.CfProvider , s.txn, s.RdClient, s.sysType).Login(apiRequest)
+		} else if s.sysType == utils.SYS_TYPE_PAAS {
+			userInfo, _, err = services.GetPaasLoginService(s.CfProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
 			loginErr = utils.GetError().GetCheckErrorMessage(err)
-		}else{
-			userInfo, _, err = services.GetLoginService(s.OpenstackProvider, s.CfProvider , s.txn, s.RdClient, s.sysType).Login(apiRequest)
+		} else {
+			userInfo, _, err = services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
 			loginErr = utils.GetError().GetCheckErrorMessage(err)
 		}
 
@@ -125,7 +123,7 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 
-			services.GetLoginService(s.OpenstackProvider, s.CfProvider , s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken)
+			services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken)
 			userInfo.SysType = s.sysType
 			utils.RenderJsonResponse(userInfo, w)
 			return
@@ -133,13 +131,11 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
 func (s *LoginController) Logout(w http.ResponseWriter, r *http.Request) {
 
 	reqCsrfToken := r.Header.Get(model.CSRF_TOKEN_NAME)
 
-	fmt.Println("logout reqCsrfToken=",reqCsrfToken)
+	fmt.Println("logout reqCsrfToken=", reqCsrfToken)
 
 	s.RdClient.Del(reqCsrfToken)
 
@@ -164,14 +160,13 @@ func loginValidate(apiRequest cm.UserInfo) error {
 
 func (s *LoginController) Join(w http.ResponseWriter, r *http.Request) {
 
-	if s.sysType == utils.SYS_TYPE_IAAS{
+	if s.sysType == utils.SYS_TYPE_IAAS {
 		services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
-	}else if s.sysType == utils.SYS_TYPE_PAAS{
+	} else if s.sysType == utils.SYS_TYPE_PAAS {
 		services.GetPaasLoginService(s.CfProvider, s.txn, s.RdClient, s.sysType)
-	}else{
+	} else {
 		services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType)
 	}
-
 
 	utils.RenderJsonLogoutResponse(nil, w)
 
