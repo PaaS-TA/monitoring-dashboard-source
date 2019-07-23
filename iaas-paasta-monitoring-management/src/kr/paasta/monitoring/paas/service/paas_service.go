@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/cihub/seelog"
 	"github.com/cloudfoundry-community/gogobosh"
-	"github.com/influxdata/influxdb/client/v2"
+	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring/paas/dao"
 	"kr/paasta/monitoring/paas/model"
@@ -139,16 +139,16 @@ func (p *PaasService) GetPaasVms(request model.PaasRequest) (paasSummary model.P
 							paasVms[vmIdx].TotalMemory = memoryTotal / model.MB
 							paasVms[vmIdx].Id = metric["id"].(string)
 						/*case model.METRIC_NAME_MEMORY_USAGE:
-							paasVms[vmIdx].MemoryUsage, _ = metric["value"].(json.Number).Float64()
-							if paasVms[vmIdx].MemoryUsage > thresholdCriticalMemory {
-								paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_CRITICAL, model.STATE_CRITICAL
-							} else if paasVms[vmIdx].MemoryUsage > thresholdWarningMemory {
-								paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_WARNING, model.STATE_WARNING
-							} else if paasVms[vmIdx].MemoryUsage == 0 {
-								paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_FAILED, model.STATE_FAILED
-							} else {
-								paasVms[vmIdx].MemoryState = model.STATE_RUNNING
-							}*/
+						paasVms[vmIdx].MemoryUsage, _ = metric["value"].(json.Number).Float64()
+						if paasVms[vmIdx].MemoryUsage > thresholdCriticalMemory {
+							paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_CRITICAL, model.STATE_CRITICAL
+						} else if paasVms[vmIdx].MemoryUsage > thresholdWarningMemory {
+							paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_WARNING, model.STATE_WARNING
+						} else if paasVms[vmIdx].MemoryUsage == 0 {
+							paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_FAILED, model.STATE_FAILED
+						} else {
+							paasVms[vmIdx].MemoryState = model.STATE_RUNNING
+						}*/
 						case model.METRIC_NAME_FREE_MEMORY:
 							memoryFree, _ = metric["value"].(json.Number).Int64()
 						case model.METRIC_NAME_TOTAL_DISK_ROOT:
@@ -190,7 +190,7 @@ func (p *PaasService) GetPaasVms(request model.PaasRequest) (paasSummary model.P
 				}
 				wg.Wait()
 
-				paasVms[vmIdx].MemoryUsage = 100.0 - (float64(memoryFree)/float64(memoryTotal)*100.0)
+				paasVms[vmIdx].MemoryUsage = 100.0 - (float64(memoryFree) / float64(memoryTotal) * 100.0)
 				if paasVms[vmIdx].MemoryUsage > thresholdCriticalMemory {
 					paasVms[vmIdx].MemoryState, paasVms[vmIdx].State = model.STATE_CRITICAL, model.STATE_CRITICAL
 				} else if paasVms[vmIdx].MemoryUsage > thresholdWarningMemory {

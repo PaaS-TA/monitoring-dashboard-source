@@ -1,64 +1,60 @@
 package utils
 
 import (
-	"strconv"
-	"fmt"
-	"net/http"
+	"bufio"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
-	"log"
-	"io/ioutil"
-	"kr/paasta/monitoring/iaas/model"
+	"fmt"
+	"github.com/go-redis/redis"
+	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/monasca/golang-monascaclient/monascaclient"
 	"github.com/rackspace/gophercloud"
 	"github.com/rackspace/gophercloud/openstack"
-	client "github.com/influxdata/influxdb/client/v2"
-	"math"
-	"strings"
-	"encoding/base64"
-	"crypto/rand"
-	"github.com/monasca/golang-monascaclient/monascaclient"
-	"github.com/go-redis/redis"
-	"os"
-	"bufio"
 	"io"
+	"io/ioutil"
+	"kr/paasta/monitoring/iaas/model"
+	"log"
+	"math"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
 	//tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"
 	"crypto/sha256"
 	"encoding/hex"
 	"github.com/cihub/seelog"
 )
 
-
 const (
-	SYS_TYPE_ALL    string = "ALL"
-	SYS_TYPE_IAAS    string = "IaaS"
-	SYS_TYPE_PAAS    string = "PaaS"
+	SYS_TYPE_ALL  string = "ALL"
+	SYS_TYPE_IAAS string = "IaaS"
+	SYS_TYPE_PAAS string = "PaaS"
 )
 
 type Config map[string]string
 
 var Logger seelog.LoggerInterface
 
-
-type errorMessage struct{
+type errorMessage struct {
 	model.ErrMessage
 }
 
-func GetError() *errorMessage{
+func GetError() *errorMessage {
 	return &errorMessage{}
 }
 
-func (e errorMessage) GetCheckErrorMessage(err error) (model.ErrMessage) {
+func (e errorMessage) GetCheckErrorMessage(err error) model.ErrMessage {
 
-	if err != nil{
+	if err != nil {
 		errMessage := model.ErrMessage{
-			"Message": err.Error() ,
+			"Message": err.Error(),
 		}
-		return  errMessage
-	}else{
+		return errMessage
+	} else {
 		return nil
 	}
 }
-
-
 
 func Round(num float64) int {
 	return int(num + math.Copysign(0.5, num))
@@ -66,18 +62,18 @@ func Round(num float64) int {
 
 func RoundFloat(num float64, precision int) float64 {
 	output := math.Pow(10, float64(precision))
-	return float64(Round(num * output)) / output
+	return float64(Round(num*output)) / output
 }
 
 func RoundFloatDigit2(num float64) float64 {
-	return RoundFloat(num , 2)
+	return RoundFloat(num, 2)
 }
 
 func FloattostrDigit2(fv float64) string {
 	return strconv.FormatFloat(RoundFloatDigit2(fv), 'f', 2, 64)
 }
 
-func GetConnectionString(host, port, user, pass , dbname string) string {
+func GetConnectionString(host, port, user, pass, dbname string) string {
 
 	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s",
 		user, pass, "tcp", host, port, dbname, "")
@@ -93,34 +89,29 @@ func StringArrayDistinct(a string, list []string) bool {
 	return false
 }
 
-
-
-
 //오류 체크 모듈로 오류 발생시 오류 메시지 리턴
 func (e errorMessage) CheckError(resp client.Response, err error) (client.Response, model.ErrMessage) {
 
-
 	if err != nil {
 		errMessage := model.ErrMessage{
-			"Message": err.Error() ,
-		}
-		return resp , errMessage
-
-	}else if resp.Error() != nil {
-		errMessage := model.ErrMessage{
-			"Message": resp.Err ,
+			"Message": err.Error(),
 		}
 		return resp, errMessage
-	}else {
+
+	} else if resp.Error() != nil {
+		errMessage := model.ErrMessage{
+			"Message": resp.Err,
+		}
+		return resp, errMessage
+	} else {
 
 		return resp, nil
 	}
 }
 
+func ResponseUnmarshal(response *http.Response, resErr error) (map[string]interface{}, error) {
 
-func ResponseUnmarshal(response *http.Response, resErr error) (map[string]interface{}, error ){
-
-	if resErr != nil{
+	if resErr != nil {
 		return nil, resErr
 	}
 	var data interface{}
@@ -135,7 +126,7 @@ func ResponseUnmarshal(response *http.Response, resErr error) (map[string]interf
 
 }
 
-func GetMonascaClient(r *http.Request, client monascaclient.Client) (monascaclient.Client,  error) {
+func GetMonascaClient(r *http.Request, client monascaclient.Client) (monascaclient.Client, error) {
 
 	var err error
 	//session := model.SessionManager.Load(r)
@@ -159,7 +150,7 @@ func GetMonascaClient(r *http.Request, client monascaclient.Client) (monascaclie
 
 	client.SetKeystoneConfig(&userSession.MonAuth)
 	err = client.SetKeystoneToken()
-	if ( err !=  nil ){
+	if err != nil {
 		model.MonitLogger.Error("GetMonascaClient SetKeystoneToken ::", err.Error())
 	}
 	return client, err
@@ -174,8 +165,7 @@ func NewIdentityV3(client *gophercloud.ProviderClient) *gophercloud.ServiceClien
 	}
 }
 
-
-func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient, username string ,  err error) {
+func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient, username string, err error) {
 
 	//config, err := ReadConfig(`../../config.ini`) // test
 	config, err := ReadConfig(`config.ini`) // real
@@ -192,13 +182,13 @@ func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient
 	opts := gophercloud.AuthOptions{
 		//IdentityEndpoint: config["keystone.url"],
 		IdentityEndpoint: config["identity.endpoint"],
-		Username: val["iaasUserId"],
-	//	Password: val["iaasUserPw"],
-		TenantName: config["default.tenant_name"],
-		DomainName: config["default.domain"],
-		TenantID: config["default.tenant_id"],
-		TokenID : val["iaasToken"],
-		AllowReauth : false,
+		Username:         val["iaasUserId"],
+		//	Password: val["iaasUserPw"],
+		TenantName:  config["default.tenant_name"],
+		DomainName:  config["default.domain"],
+		TenantID:    config["default.tenant_id"],
+		TokenID:     val["iaasToken"],
+		AllowReauth: false,
 	}
 
 	//Provider is the top-level client that all of your OpenStack services
@@ -208,62 +198,61 @@ func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient
 		fmt.Println(err.Error())
 		return nil, "", err
 	}
-	fmt.Println("GetOpenstackProvider providerClient.TokenID :::",providerClient.TokenID )
+	fmt.Println("GetOpenstackProvider providerClient.TokenID :::", providerClient.TokenID)
 
 	///////////////////////////////////////////////////////////////////////////
-/*
-	v3Client := NewIdentityV3(providerClient)
+	/*
+	   	v3Client := NewIdentityV3(providerClient)
 
-	v3Options := opts
+	   	v3Options := opts
 
-	var scope *tokens3.Scope
-fmt.Println(scope)
-	if opts.TenantID != "" {
-		scope = &tokens3.Scope{
-			ProjectID: opts.TenantID,
-		}
-		v3Options.TenantID = ""
-		v3Options.TenantName = ""
-	} else {
-		if opts.TenantName != "" {
-			scope = &tokens3.Scope{
-				ProjectName: opts.TenantName,
-				DomainID:    opts.DomainID,
-				DomainName:  opts.DomainName,
-			}
-			v3Options.TenantName = ""
-		}
-	}
+	   	var scope *tokens3.Scope
+	   fmt.Println(scope)
+	   	if opts.TenantID != "" {
+	   		scope = &tokens3.Scope{
+	   			ProjectID: opts.TenantID,
+	   		}
+	   		v3Options.TenantID = ""
+	   		v3Options.TenantName = ""
+	   	} else {
+	   		if opts.TenantName != "" {
+	   			scope = &tokens3.Scope{
+	   				ProjectName: opts.TenantName,
+	   				DomainID:    opts.DomainID,
+	   				DomainName:  opts.DomainName,
+	   			}
+	   			v3Options.TenantName = ""
+	   		}
+	   	}
 
-	result := tokens3.Create(v3Client, tokens3.AuthOptions{AuthOptions: v3Options}, scope)
+	   	result := tokens3.Create(v3Client, tokens3.AuthOptions{AuthOptions: v3Options}, scope)
 
-	token, err := result.ExtractToken()
-	if err != nil {
-		fmt.Println(err.Error())
-		return nil, "", err
-	}
+	   	token, err := result.ExtractToken()
+	   	if err != nil {
+	   		fmt.Println(err.Error())
+	   		return nil, "", err
+	   	}
 
-	fmt.Println("token.ID ======>",token.ID)
+	   	fmt.Println("token.ID ======>",token.ID)
 
 
-	//bool, err := tokens3.Validate(v3Client,providerClient.TokenID)
+	   	//bool, err := tokens3.Validate(v3Client,providerClient.TokenID)
 
-	result  := tokens3.Get(v3Client,providerClient.TokenID)
+	   	result  := tokens3.Get(v3Client,providerClient.TokenID)
 
-	if err != nil {
-		fmt.Println(err.Error())
-		return nil, "", err
-	}
-	fmt.Println("bool:::", result.Body)
-*/
+	   	if err != nil {
+	   		fmt.Println(err.Error())
+	   		return nil, "", err
+	   	}
+	   	fmt.Println("bool:::", result.Body)
+	*/
 	///////////////////////////////////////////////////////////////////////////
 
 	//새로 로그인 되었으므로 변경된 토큰으로 변경하여 저장
-	rclient.HSet(reqToken,"iaasToken",providerClient.TokenID)
+	rclient.HSet(reqToken, "iaasToken", providerClient.TokenID)
 
-	return providerClient, opts.Username , err
+	return providerClient, opts.Username, err
 }
-
 
 //Get Openstack Admin Token - based on Default Domain & Admin tenant
 func GetAdminToken(openstack_provider model.OpenstackProvider) (*gophercloud.ProviderClient, error) {
@@ -271,11 +260,11 @@ func GetAdminToken(openstack_provider model.OpenstackProvider) (*gophercloud.Pro
 	// Option 1: Pass in the values yourself
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: openstack_provider.IdentityEndpoint,
-		Username: openstack_provider.Username,
-		UserID: openstack_provider.UserId,
-		Password: openstack_provider.Password,
-		TenantName: openstack_provider.TenantName,
-		DomainName: openstack_provider.Domain,
+		Username:         openstack_provider.Username,
+		UserID:           openstack_provider.UserId,
+		Password:         openstack_provider.Password,
+		TenantName:       openstack_provider.TenantName,
+		DomainName:       openstack_provider.Domain,
 	}
 
 	//Provider is the top-level client that all of your OpenStack services
@@ -284,18 +273,17 @@ func GetAdminToken(openstack_provider model.OpenstackProvider) (*gophercloud.Pro
 	return provider, err
 }
 
-
 func GetAdminToken2(openstack_provider model.OpenstackProvider, tokenId string) (*gophercloud.ProviderClient, error) {
 
 	// Option 1: Pass in the values yourself
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: openstack_provider.IdentityEndpoint,
-		Username: openstack_provider.Username,
-		UserID: openstack_provider.UserId,
-		Password: openstack_provider.Password,
-		TenantName: openstack_provider.TenantName,
-		DomainName: openstack_provider.Domain,
-		TokenID: tokenId,
+		Username:         openstack_provider.Username,
+		UserID:           openstack_provider.UserId,
+		Password:         openstack_provider.Password,
+		TenantName:       openstack_provider.TenantName,
+		DomainName:       openstack_provider.Domain,
+		TokenID:          tokenId,
 	}
 
 	//Provider is the top-level client that all of your OpenStack services
@@ -305,7 +293,7 @@ func GetAdminToken2(openstack_provider model.OpenstackProvider, tokenId string) 
 	return provider, err
 }
 
-func TypeChecker_int(target interface{}) interface{}{
+func TypeChecker_int(target interface{}) interface{} {
 	switch target.(type) {
 	case int:
 		// v is an int here, so e.g. v + 1 is possible.
@@ -332,7 +320,7 @@ func TypeChecker_int(target interface{}) interface{}{
 	}
 }
 
-func TypeChecker_float64(target interface{}) interface{}{
+func TypeChecker_float64(target interface{}) interface{} {
 
 	switch target.(type) {
 	case int:
@@ -350,7 +338,7 @@ func TypeChecker_float64(target interface{}) interface{}{
 		return float64(0)
 	case json.Number:
 		jsonValue := target.(json.Number)
-		f, _ := strconv.ParseFloat(jsonValue.String(),64)
+		f, _ := strconv.ParseFloat(jsonValue.String(), 64)
 		return f
 
 	default:
@@ -359,7 +347,7 @@ func TypeChecker_float64(target interface{}) interface{}{
 	}
 }
 
-func TypeChecker_string(target interface{}) interface{}{
+func TypeChecker_string(target interface{}) interface{} {
 	switch target.(type) {
 	case int:
 		// v is an int here, so e.g. v + 1 is possible.
@@ -379,7 +367,7 @@ func TypeChecker_string(target interface{}) interface{}{
 	}
 }
 
-func GetVmStatusCount(noStatusList, runningList, idleList, pausedList, shutDownList, shutOffList, crashedList, powerOffList []string) []model.VmState{
+func GetVmStatusCount(noStatusList, runningList, idleList, pausedList, shutDownList, shutOffList, crashedList, powerOffList []string) []model.VmState {
 
 	var vmStatusList []model.VmState
 
@@ -461,10 +449,10 @@ func ErrRenderJsonResponse(data interface{}, w http.ResponseWriter) {
 		for _, v := range errorMsgJson {
 			errorDetail := v.(map[string]interface{})
 			errorStruct.HttpStatus = int(errorDetail["code"].(float64))
-			errorStruct.Message =  errorDetail["message"].(string)
+			errorStruct.Message = errorDetail["message"].(string)
 		}
 	} else {
-		errorStruct.Message =  errorMessage.(string)
+		errorStruct.Message = errorMessage.(string)
 		if errData["HttpStatus"] != nil {
 			errorStruct.HttpStatus = errData["HttpStatus"].(int)
 			errorCode = float64(errData["HttpStatus"].(int))
@@ -474,7 +462,7 @@ func ErrRenderJsonResponse(data interface{}, w http.ResponseWriter) {
 		}
 	}
 
-	fmt.Println("===>",errorCode)
+	fmt.Println("===>", errorCode)
 	js, err := json.Marshal(errorStruct)
 
 	if err != nil {
@@ -494,7 +482,7 @@ func RenderJsonUnAuthResponse(data interface{}, status int, w http.ResponseWrite
 
 	errData := data.(model.ErrMessage)
 	errorMessage := errData["Message"]
-	errorStruct.Message =  errorMessage.(string)
+	errorStruct.Message = errorMessage.(string)
 	if errData["HttpStatus"] != nil {
 		errorStruct.HttpStatus = errData["HttpStatus"].(int)
 		errorCode = float64(errData["HttpStatus"].(int))
@@ -541,7 +529,6 @@ func RenderJsonLogoutResponse(data interface{}, w http.ResponseWriter) {
 	return
 }
 
-
 func RenderJsonForbiddenResponse(data interface{}, w http.ResponseWriter) {
 
 	js, err := json.Marshal(data)
@@ -554,10 +541,6 @@ func RenderJsonForbiddenResponse(data interface{}, w http.ResponseWriter) {
 	w.Write(js)
 	return
 }
-
-
-
-
 
 func GenerateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
@@ -580,7 +563,7 @@ func GenerateRandomString(s int) (string, error) {
 	return base64.URLEncoding.EncodeToString(b), err
 }
 
-func GetSha256(reqMsg string) (string){
+func GetSha256(reqMsg string) string {
 	data := []byte(reqMsg)
 	hash1 := sha256.New()
 	hash1.Write(data)
@@ -594,8 +577,8 @@ func GetSha256(reqMsg string) (string){
 func ReadConfig(filename string) (Config, error) {
 	// init with some bogus data
 	config := Config{
-		"server.ip":     "127.0.0.1",
-		"server.port":   "8888",
+		"server.ip":   "127.0.0.1",
+		"server.port": "8888",
 	}
 
 	if len(filename) == 0 {

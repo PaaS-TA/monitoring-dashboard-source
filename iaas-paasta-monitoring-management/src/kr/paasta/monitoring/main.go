@@ -2,58 +2,57 @@ package main
 
 import (
 	"bufio"
-	"io"
-	"os"
-	"log"
-	"strings"
-	"strconv"
-	"net/http"
-	"github.com/influxdata/influxdb/client/v2"
+	"fmt"
+	"github.com/alexedwards/scs"
+	"github.com/cihub/seelog"
+	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/cloudfoundry-community/gogobosh"
+	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gophercloud/gophercloud"
+	"github.com/influxdata/influxdb1-client/v2"
+	"github.com/jinzhu/gorm"
+	"github.com/monasca/golang-monascaclient/monascaclient"
+	"gopkg.in/olivere/elastic.v3"
+	"io"
+	"io/ioutil"
+	"kr/paasta/monitoring/handlers"
 	"kr/paasta/monitoring/iaas/model"
 	bm "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/handlers"
 	"kr/paasta/monitoring/utils"
-	"fmt"
-	"github.com/jinzhu/gorm"
-	"io/ioutil"
-	"github.com/cihub/seelog"
-	"gopkg.in/olivere/elastic.v3"
-	"github.com/monasca/golang-monascaclient/monascaclient"
-	"github.com/gophercloud/gophercloud"
-	"github.com/alexedwards/scs"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
 	"time"
-	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/go-redis/redis"
-	"github.com/cloudfoundry-community/gogobosh"
 )
 
 type Config map[string]string
 
 type DBConfig struct {
-	DbType string
-	UserName string
+	DbType       string
+	UserName     string
 	UserPassword string
-	Host string
-	Port string
-	DbName string
+	Host         string
+	Port         string
+	DbName       string
 }
 
-type MemberInfo struct{
-	UserId       		string     `gorm:"type:varchar(50);primary_key"`
-	UserPw       		string     `gorm:"type:varchar(500);null;"`
-	UserEmail       	string     `gorm:"type:varchar(100);null;"`
-	UserNm       		string     `gorm:"type:varchar(100);null;"`
-	IaasUserId       	string     `gorm:"type:varchar(100);null;"`
-	IaasUserPw       	string     `gorm:"type:varchar(100);null;"`
-	PaasUserId       	string     `gorm:"type:varchar(100);null;"`
-	PaasUserPw       	string     `gorm:"type:varchar(100);null;"`
-	IaasUserUseYn    string     `gorm:"type:varchar(1);null;"`
-	PaasUserUseYn    string     `gorm:"type:varchar(1);null;"`
-	UpdatedAt       	time.Time  `gorm:"type:datetime;null;DEFAULT:null"`
-	CreatedAt       	time.Time  `gorm:"type:datetime;null;DEFAULT:CURRENT_TIMESTAMP"`
+type MemberInfo struct {
+	UserId        string    `gorm:"type:varchar(50);primary_key"`
+	UserPw        string    `gorm:"type:varchar(500);null;"`
+	UserEmail     string    `gorm:"type:varchar(100);null;"`
+	UserNm        string    `gorm:"type:varchar(100);null;"`
+	IaasUserId    string    `gorm:"type:varchar(100);null;"`
+	IaasUserPw    string    `gorm:"type:varchar(100);null;"`
+	PaasUserId    string    `gorm:"type:varchar(100);null;"`
+	PaasUserPw    string    `gorm:"type:varchar(100);null;"`
+	IaasUserUseYn string    `gorm:"type:varchar(1);null;"`
+	PaasUserUseYn string    `gorm:"type:varchar(1);null;"`
+	UpdatedAt     time.Time `gorm:"type:datetime;null;DEFAULT:null"`
+	CreatedAt     time.Time `gorm:"type:datetime;null;DEFAULT:CURRENT_TIMESTAMP"`
 }
-
 
 func main() {
 
@@ -120,8 +119,8 @@ func main() {
 	paasConnectionString := utils.GetConnectionString(paasConfigDbCon.Host, paasConfigDbCon.Port, paasConfigDbCon.UserName, paasConfigDbCon.UserPassword, paasConfigDbCon.DbName)
 	fmt.Println("String:", paasConnectionString)
 	paasDbAccessObj, paasDbErr := gorm.Open(paasConfigDbCon.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
-	if paasDbErr != nil{
-		fmt.Println("err::",paasDbErr)
+	if paasDbErr != nil {
+		fmt.Println("err::", paasDbErr)
 		return
 	}
 
@@ -136,13 +135,12 @@ func main() {
 
 	// IaaS Connection Info
 	if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_IAAS {
-		iaasDbAccessObj,iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
+		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
 		if err != nil {
 			log.Println(err)
 			os.Exit(-1)
 		}
 	}
-
 
 	if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS {
 		paaSInfluxServerClient, paasElasticClient, databases, cfProvider, boshClient, err = getPaasClients(config)
@@ -156,15 +154,15 @@ func main() {
 	var handler http.Handler
 	if sysType == utils.SYS_TYPE_IAAS {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, nil,
-			iaasDbAccessObj,  paasDbAccessObj, iaasElasticClient, nil, *monClient, auth, bm.Databases{},
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, nil, *monClient, auth, bm.Databases{},
 			cfclient.Config{}, rdClient, sysType, nil)
-	}else if sysType == utils.SYS_TYPE_PAAS {
+	} else if sysType == utils.SYS_TYPE_PAAS {
 		handler = handlers.NewHandler(model.OpenstackProvider{}, nil, paaSInfluxServerClient,
-			nil,  paasDbAccessObj, nil, paasElasticClient, monascaclient.Client{}, gophercloud.AuthOptions{}, databases,
+			nil, paasDbAccessObj, nil, paasElasticClient, monascaclient.Client{}, gophercloud.AuthOptions{}, databases,
 			cfProvider, rdClient, sysType, boshClient)
-	}else{
+	} else {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj,  paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
 			cfProvider, rdClient, sysType, boshClient)
 	}
 
@@ -174,26 +172,25 @@ func main() {
 
 }
 
-
 func UseLogger(newLogger seelog.LoggerInterface) {
 	utils.Logger = newLogger
 }
 
-func ReadXmlConfig (filename string) (string, error) {
+func ReadXmlConfig(filename string) (string, error) {
 	xmlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return "", err
 	}
-	return string(xmlFile),  nil
+	return string(xmlFile), nil
 }
 
 // Config 파일 읽어 오기
 func ReadConfig(filename string) (Config, error) {
 	// init with some bogus data
 	config := Config{
-		"server.ip":     "127.0.0.1",
-		"server.port":   "8888",
+		"server.ip":   "127.0.0.1",
+		"server.port": "8888",
 	}
 
 	if len(filename) == 0 {
@@ -230,12 +227,12 @@ func ReadConfig(filename string) (Config, error) {
 	return config, nil
 }
 
-func createTable(dbClient *gorm.DB){
+func createTable(dbClient *gorm.DB) {
 
 	dbClient.Debug().AutoMigrate(&MemberInfo{})
 }
 
-func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elastic.Client, openstackProvider model.OpenstackProvider, monClient *monascaclient.Client, auth gophercloud.AuthOptions, err error){
+func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elastic.Client, openstackProvider model.OpenstackProvider, monClient *monascaclient.Client, auth gophercloud.AuthOptions, err error) {
 
 	// Mysql
 	iaasConfigDbCon := new(DBConfig)
@@ -252,7 +249,6 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 
 	//Alarm 처리 내역 정보 Table 생성
 	iaasDbAccessObj.Debug().AutoMigrate(&model.AlarmActionHistory{})
-
 
 	// InfluxDB
 	iaasUrl, _ := config["iaas.metric.db.url"]
@@ -273,33 +269,33 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 	)
 
 	// Openstack Info
-	openstackProvider.Region, _ 			= config["default.region"]
-	openstackProvider.Username, _ 		    = config["default.username"]
-	openstackProvider.Password, _ 			= config["default.password"]
-	openstackProvider.Domain, _ 			= config["default.domain"]
-	openstackProvider.TenantName, _ 		= config["default.tenant_name"]
-	openstackProvider.AdminTenantId, _	 	= config["default.tenant_id"]
-	openstackProvider.KeystoneUrl, _ 		= config["keystone.url"]
-	openstackProvider.IdentityEndpoint, _ 	= config["identity.endpoint"]
-	openstackProvider.RabbitmqUser, _ 		= config["rabbitmq.user"]
-	openstackProvider.RabbitmqPass, _		= config["rabbitmq.pass"]
-	openstackProvider.RabbitmqTargetNode, _	= config["rabbitmq.target.node"]
+	openstackProvider.Region, _ = config["default.region"]
+	openstackProvider.Username, _ = config["default.username"]
+	openstackProvider.Password, _ = config["default.password"]
+	openstackProvider.Domain, _ = config["default.domain"]
+	openstackProvider.TenantName, _ = config["default.tenant_name"]
+	openstackProvider.AdminTenantId, _ = config["default.tenant_id"]
+	openstackProvider.KeystoneUrl, _ = config["keystone.url"]
+	openstackProvider.IdentityEndpoint, _ = config["identity.endpoint"]
+	openstackProvider.RabbitmqUser, _ = config["rabbitmq.user"]
+	openstackProvider.RabbitmqPass, _ = config["rabbitmq.pass"]
+	openstackProvider.RabbitmqTargetNode, _ = config["rabbitmq.target.node"]
 
-	model.MetricDBName, _ 		= config["iaas.metric.db.name"]
-	model.NovaUrl, _ 			= config["nova.target.url"]
-	model.NovaVersion, _ 		= config["nova.target.version"]
-	model.NeutronUrl, _ 		= config["neutron.target.url"]
-	model.NeutronVersion, _ 	= config["neutron.target.version"]
-	model.KeystoneUrl, _ 		= config["keystone.target.url"]
-	model.KeystoneVersion, _ 	= config["keystone.target.version"]
-	model.CinderUrl, _ 			= config["cinder.target.url"]
-	model.CinderVersion, _ 		= config["cinder.target.version"]
-	model.GlanceUrl, _ 			= config["glance.target.url"]
-	model.GlanceVersion,_ 		= config["glance.target.version"]
-	model.DefaultTenantId, _	= config["default.tenant_id"]
-	model.RabbitMqIp, _ 		= config["rabbitmq.ip"]
-	model.RabbitMqPort, _ 	    = config["rabbitmq.port"]
-	model.GMTTimeGap, _ 	    = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
+	model.MetricDBName, _ = config["iaas.metric.db.name"]
+	model.NovaUrl, _ = config["nova.target.url"]
+	model.NovaVersion, _ = config["nova.target.version"]
+	model.NeutronUrl, _ = config["neutron.target.url"]
+	model.NeutronVersion, _ = config["neutron.target.version"]
+	model.KeystoneUrl, _ = config["keystone.target.url"]
+	model.KeystoneVersion, _ = config["keystone.target.version"]
+	model.CinderUrl, _ = config["cinder.target.url"]
+	model.CinderVersion, _ = config["cinder.target.version"]
+	model.GlanceUrl, _ = config["glance.target.url"]
+	model.GlanceVersion, _ = config["glance.target.version"]
+	model.DefaultTenantId, _ = config["default.tenant_id"]
+	model.RabbitMqIp, _ = config["rabbitmq.ip"]
+	model.RabbitMqPort, _ = config["rabbitmq.port"]
+	model.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
 
 	monClient = monascaclient.New()
 	monClient.SetBaseURL(config["monasca.url"])
@@ -310,17 +306,17 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 	monClient.SetInsecure(tls)
 
 	auth = gophercloud.AuthOptions{
-		DomainName : config["default.domain"],
-		IdentityEndpoint : config["keystone.url"],
-		Username : config["default.username"],
-		Password : config["default.password"],
-		TenantID : config["default.tenant_id"],
+		DomainName:       config["default.domain"],
+		IdentityEndpoint: config["keystone.url"],
+		Username:         config["default.username"],
+		Password:         config["default.password"],
+		TenantID:         config["default.tenant_id"],
 	}
 
 	return
 }
 
-func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elastic.Client, databases bm.Databases,cfProvider cfclient.Config, boshClient *gogobosh.Client, err error ){
+func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elastic.Client, databases bm.Databases, cfProvider cfclient.Config, boshClient *gogobosh.Client, err error) {
 
 	// InfluxDB
 	paasUrl, _ := config["paas.metric.db.url"]
@@ -345,18 +341,16 @@ func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasEl
 	paasta_database, _ := config["paas.metric.db.name.paasta"]
 	container_database, _ := config["paas.metric.db.name.container"]
 
-
 	databases.BoshDatabase = bosh_database
 	databases.PaastaDatabase = paasta_database
 	databases.ContainerDatabase = container_database
-
 
 	// Cloud Foundry Client
 	cfProvider = cfclient.Config{
 		ApiAddress: config["paas.cf.client.apiaddress"],
 		//Username:     "admin",
 		//Password:     "admin",
-		SkipSslValidation : true,
+		SkipSslValidation: true,
 	}
 
 	// BOSH Client Config
@@ -366,7 +360,6 @@ func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasEl
 		Password:          config["bosh.client.api.password"],
 		HttpClient:        http.DefaultClient,
 		SkipSslValidation: true,
-
 	}
 	boshClient, err = gogobosh.NewClient(boshConfig)
 	if err != nil {

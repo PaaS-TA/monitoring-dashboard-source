@@ -1,16 +1,16 @@
 package services
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/rackspace/gophercloud"
-	"kr/paasta/monitoring/utils"
 	"kr/paasta/monitoring/iaas/dao"
 	"kr/paasta/monitoring/iaas/integration"
 	"kr/paasta/monitoring/iaas/model"
-	"sync"
+	"kr/paasta/monitoring/utils"
 	"reflect"
 	"sort"
 	"strings"
+	"sync"
 )
 
 type ManageNodeService struct {
@@ -19,29 +19,29 @@ type ManageNodeService struct {
 	influxClient      client.Client
 }
 
-func GetManageNodeService(openstackProvider model.OpenstackProvider, provider *gophercloud.ProviderClient,influxClient client.Client) *ManageNodeService {
+func GetManageNodeService(openstackProvider model.OpenstackProvider, provider *gophercloud.ProviderClient, influxClient client.Client) *ManageNodeService {
 	return &ManageNodeService{
 		openstackProvider: openstackProvider,
-		provider: provider,
-		influxClient: 	influxClient,
+		provider:          provider,
+		influxClient:      influxClient,
 	}
 }
 
-func (n ManageNodeService) GetNodeList()(result []string, err error) {
+func (n ManageNodeService) GetNodeList() (result []string, err error) {
 
-	manageNodeNameList := getManageNodeName(n.openstackProvider, n.provider,  n.influxClient)
-	computeInfoList, err := integration.GetNova(n.openstackProvider, n.provider ).GetComputeNodeResources()
+	manageNodeNameList := getManageNodeName(n.openstackProvider, n.provider, n.influxClient)
+	computeInfoList, err := integration.GetNova(n.openstackProvider, n.provider).GetComputeNodeResources()
 
 	if err != nil {
 		model.MonitLogger.Error(err)
 		return result, err
 	}
 
-	for _, data := range computeInfoList{
-		result = append(result , data.Hostname)
+	for _, data := range computeInfoList {
+		result = append(result, data.Hostname)
 	}
 
-	result = append(result , manageNodeNameList...)
+	result = append(result, manageNodeNameList...)
 
 	sort.Strings(result)
 
@@ -50,38 +50,36 @@ func (n ManageNodeService) GetNodeList()(result []string, err error) {
 }
 
 //CPU Top Process List
-func (n ManageNodeService) GetTopProcessListByCpu(request model.DetailReq)(result []model.TopProcess, _ model.ErrMessage){
+func (n ManageNodeService) GetTopProcessListByCpu(request model.DetailReq) (result []model.TopProcess, _ model.ErrMessage) {
 
 	var topProcessList []model.TopProcess
 	topProcess, err := dao.GetNodeDao(n.influxClient).GetNodeTopProcessByCpu(request)
 	if err != nil {
 		model.MonitLogger.Error(err)
 		return result, err
-	}else {
+	} else {
 
 		topProcessResult, _ := utils.GetResponseConverter().InfluxConverter4TopProcess(topProcess)
 		usage := []map[float64]string{}
 		var usageArr []float64
 
-		for _, value := range topProcessResult{
-			aa:= value.([]map[string]interface{})
+		for _, value := range topProcessResult {
+			aa := value.([]map[string]interface{})
 
-			for _, vv := range aa{
-				processData := map[float64]string{utils.TypeChecker_float64(vv["usage"]).(float64):
-				                   utils.TypeChecker_string(vv["process_name"]).(string)}
+			for _, vv := range aa {
+				processData := map[float64]string{utils.TypeChecker_float64(vv["usage"]).(float64): utils.TypeChecker_string(vv["process_name"]).(string)}
 
 				usage = append(usage, processData)
-				usageArr = append(usageArr , utils.TypeChecker_float64(vv["usage"]).(float64))
+				usageArr = append(usageArr, utils.TypeChecker_float64(vv["usage"]).(float64))
 			}
 		}
 
 		sort.Sort(sort.Reverse(sort.Float64Slice(usageArr)))
 
+		for idx := range usageArr {
 
-		for idx := range usageArr{
-
-			for _ , v := range usage{
-				if v[usageArr[idx]] != ""{
+			for _, v := range usage {
+				if v[usageArr[idx]] != "" {
 
 					var topProcess model.TopProcess
 
@@ -89,7 +87,7 @@ func (n ManageNodeService) GetTopProcessListByCpu(request model.DetailReq)(resul
 					topProcess.ProcessName = v[usageArr[idx]]
 					topProcess.Usage = usageArr[idx]
 
-					topProcessList = append(topProcessList,topProcess )
+					topProcessList = append(topProcessList, topProcess)
 
 				}
 			}
@@ -103,42 +101,39 @@ func (n ManageNodeService) GetTopProcessListByCpu(request model.DetailReq)(resul
 	}
 }
 
-
 //CPU Top Process List
-func (n ManageNodeService) GetTopProcessListByMemory(request model.DetailReq)(result []model.TopProcess, _ model.ErrMessage){
+func (n ManageNodeService) GetTopProcessListByMemory(request model.DetailReq) (result []model.TopProcess, _ model.ErrMessage) {
 
 	var topProcessList []model.TopProcess
 	topProcess, err := dao.GetNodeDao(n.influxClient).GetNodeTopProcessByMemory(request)
 	if err != nil {
 		model.MonitLogger.Error(err)
 		return result, err
-	}else {
+	} else {
 
 		topProcessResult, _ := utils.GetResponseConverter().InfluxConverter4TopProcess(topProcess)
 		usage := []map[float64]string{}
 		var usageArr []float64
 
-		for _, value := range topProcessResult{
-			aa:= value.([]map[string]interface{})
+		for _, value := range topProcessResult {
+			aa := value.([]map[string]interface{})
 
-			for _, vv := range aa{
-				processData := map[float64]string{utils.TypeChecker_float64(vv["usage"]).(float64):
-				utils.TypeChecker_string(vv["process_name"]).(string)}
+			for _, vv := range aa {
+				processData := map[float64]string{utils.TypeChecker_float64(vv["usage"]).(float64): utils.TypeChecker_string(vv["process_name"]).(string)}
 
 				usage = append(usage, processData)
 				//fmt.Println("processData:", processData)
 				//fmt.Println( reflect.TypeOf(utils.TypeChecker_float64(vv["usage"]).(float64)))
-				usageArr = append(usageArr , utils.TypeChecker_float64(vv["usage"]).(float64))
+				usageArr = append(usageArr, utils.TypeChecker_float64(vv["usage"]).(float64))
 			}
 		}
 
 		sort.Sort(sort.Reverse(sort.Float64Slice(usageArr)))
 
+		for idx := range usageArr {
 
-		for idx := range usageArr{
-
-			for _ , v := range usage{
-				if v[usageArr[idx]] != ""{
+			for _, v := range usage {
+				if v[usageArr[idx]] != "" {
 
 					var topProcess model.TopProcess
 
@@ -146,7 +141,7 @@ func (n ManageNodeService) GetTopProcessListByMemory(request model.DetailReq)(re
 					topProcess.ProcessName = v[usageArr[idx]]
 					topProcess.Usage = usageArr[idx]
 
-					topProcessList = append(topProcessList,topProcess )
+					topProcessList = append(topProcessList, topProcess)
 
 				}
 			}
@@ -160,25 +155,25 @@ func (n ManageNodeService) GetTopProcessListByMemory(request model.DetailReq)(re
 	}
 }
 
-func (n ManageNodeService) GetRabbitMqSummary()(result model.RabbitMQGlobalResource, err model.ErrMessage){
+func (n ManageNodeService) GetRabbitMqSummary() (result model.RabbitMQGlobalResource, err model.ErrMessage) {
 
 	result, _ = integration.GetRabbitMq(n.openstackProvider).GetRabbitMQOverview()
 
 	return result, nil
 }
 
-func (n ManageNodeService) GetManageNodeSummary(apiRequest model.NodeReq)([]model.ManageNodeResources, model.ErrMessage){
+func (n ManageNodeService) GetManageNodeSummary(apiRequest model.NodeReq) ([]model.ManageNodeResources, model.ErrMessage) {
 
 	manageNodeNameList := getManageNodeName(n.openstackProvider, n.provider, n.influxClient)
 
 	var manageNodeList []model.ManageNodeResources
 	var errs []model.ErrMessage
 
-	for _, hostname := range manageNodeNameList{
+	for _, hostname := range manageNodeNameList {
 
 		if apiRequest.HostName != "" {
 
-			if strings.Contains(hostname, apiRequest.HostName) == false{
+			if strings.Contains(hostname, apiRequest.HostName) == false {
 				continue
 			}
 		}
@@ -193,28 +188,28 @@ func (n ManageNodeService) GetManageNodeSummary(apiRequest model.NodeReq)([]mode
 			errs = append(errs, err)
 		}
 
-		cpuUsage  := utils.GetDataFloatFromInterfaceSingle(cpuData)
-		memTot    := utils.GetDataFloatFromInterfaceSingle(memTotData)
-		memFree   := utils.GetDataFloatFromInterfaceSingle(memFreeData)
-		memUsage  := utils.RoundFloatDigit2(100 - ((memFree/memTot)*100))
-		diskTotal   := utils.GetDataFloatFromInterfaceSingle(diskTotalData)
-		diskUsed    := utils.GetDataFloatFromInterfaceSingle(diskUsedData)
-		diskUsage   := utils.RoundFloatDigit2((diskUsed/diskTotal)*100)
-		agentForwarderStatus   := utils.GetDataFloatFromInterfaceSingle(agentForwarderData)
-		agentCollectorStatus   := utils.GetDataFloatFromInterfaceSingle(agentCollectorData)
+		cpuUsage := utils.GetDataFloatFromInterfaceSingle(cpuData)
+		memTot := utils.GetDataFloatFromInterfaceSingle(memTotData)
+		memFree := utils.GetDataFloatFromInterfaceSingle(memFreeData)
+		memUsage := utils.RoundFloatDigit2(100 - ((memFree / memTot) * 100))
+		diskTotal := utils.GetDataFloatFromInterfaceSingle(diskTotalData)
+		diskUsed := utils.GetDataFloatFromInterfaceSingle(diskUsedData)
+		diskUsage := utils.RoundFloatDigit2((diskUsed / diskTotal) * 100)
+		agentForwarderStatus := utils.GetDataFloatFromInterfaceSingle(agentForwarderData)
+		agentCollectorStatus := utils.GetDataFloatFromInterfaceSingle(agentCollectorData)
 
 		manageNodeResource.Hostname = hostname
 		manageNodeResource.CpuUsage = cpuUsage
 		manageNodeResource.MemUsage = memUsage
 		manageNodeResource.DiskUsage = diskUsage
 		manageNodeResource.MemoryMbMax = memTot
-		manageNodeResource.MemoryMbUsed  = memTot - memFree
-		manageNodeResource.DiskGbMax  = diskTotal/1024
-		manageNodeResource.DiskGbUsed = diskUsed/1024
+		manageNodeResource.MemoryMbUsed = memTot - memFree
+		manageNodeResource.DiskGbMax = diskTotal / 1024
+		manageNodeResource.DiskGbUsed = diskUsed / 1024
 
-		if agentForwarderStatus == 1 && agentCollectorStatus == 1{
+		if agentForwarderStatus == 1 && agentCollectorStatus == 1 {
 			manageNodeResource.AgentStatus = "OK"
-		}else{
+		} else {
 			manageNodeResource.AgentStatus = "UnKnown"
 		}
 
@@ -226,11 +221,11 @@ func (n ManageNodeService) GetManageNodeSummary(apiRequest model.NodeReq)([]mode
 	// Error가 여러건일 경우 대해 고려해야함.
 	if len(errs) > 0 {
 		var returnErrMessage string
-		for _, err := range errs{
+		for _, err := range errs {
 			returnErrMessage = returnErrMessage + " " + err["Message"].(string)
 		}
 		errMessage := model.ErrMessage{
-			"Message": returnErrMessage ,
+			"Message": returnErrMessage,
 		}
 		return nil, errMessage
 	}
@@ -239,21 +234,21 @@ func (n ManageNodeService) GetManageNodeSummary(apiRequest model.NodeReq)([]mode
 	return manageNodeList, nil
 
 }
-func getManageNodeName(opts model.OpenstackProvider, provider *gophercloud.ProviderClient ,client client.Client)([]string){
-	var computeNodeList , nodeList []string
+func getManageNodeName(opts model.OpenstackProvider, provider *gophercloud.ProviderClient, client client.Client) []string {
+	var computeNodeList, nodeList []string
 
-	computeNodeInfo , _ := integration.GetNova(opts, provider).GetComputeNodeResources()
+	computeNodeInfo, _ := integration.GetNova(opts, provider).GetComputeNodeResources()
 
-	for _, value  := range computeNodeInfo{
+	for _, value := range computeNodeInfo {
 		computeNodeList = append(computeNodeList, value.Hostname)
 	}
 
-	nodeListResp , _ := dao.GetMainDao(client).GetOpenstackNodeList()
+	nodeListResp, _ := dao.GetMainDao(client).GetOpenstackNodeList()
 	valueList, _ := utils.GetResponseConverter().InfluxConverterToMap(nodeListResp)
 
-	for _ , value := range valueList{
+	for _, value := range valueList {
 
-		hostname  := reflect.ValueOf(value["hostname"]).String()
+		hostname := reflect.ValueOf(value["hostname"]).String()
 		if utils.StringArrayDistinct(hostname, nodeList) == false && utils.StringArrayDistinct(hostname, computeNodeList) == false {
 
 			nodeList = append(nodeList, hostname)
@@ -265,9 +260,8 @@ func getManageNodeName(opts model.OpenstackProvider, provider *gophercloud.Provi
 	return nodeList
 }
 
-
-func  getManageNodeSummary_Sub(request model.NodeReq, f client.Client) (map[string]interface{}, map[string]interface{}, map[string]interface{},
-		map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, model.ErrMessage) {
+func getManageNodeSummary_Sub(request model.NodeReq, f client.Client) (map[string]interface{}, map[string]interface{}, map[string]interface{},
+	map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, model.ErrMessage) {
 	var cpuResp, memTotalResp, memFreeResp, diskTotalResp, diskUsedResp, agentForwarderResp, agentCollectorResp client.Response
 
 	var errs []model.ErrMessage
@@ -279,37 +273,37 @@ func  getManageNodeSummary_Sub(request model.NodeReq, f client.Client) (map[stri
 		go func(wg *sync.WaitGroup, index int) {
 
 			switch index {
-			case 0 :
+			case 0:
 				cpuResp, err = dao.GetMainDao(f).GetNodeCpuUsage(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 1 :
+			case 1:
 				memTotalResp, err = dao.GetMainDao(f).GetNodeTotalMemoryUsage(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 2 :
+			case 2:
 				memFreeResp, err = dao.GetMainDao(f).GetNodeFreeMemoryUsage(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 3 :
+			case 3:
 				agentForwarderResp, err = dao.GetMainDao(f).GetAgentProcessStatus(request, "forwarder")
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 4 :
-				agentCollectorResp, err = dao.GetMainDao(f).GetAgentProcessStatus(request,"collector")
+			case 4:
+				agentCollectorResp, err = dao.GetMainDao(f).GetAgentProcessStatus(request, "collector")
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 5 :
+			case 5:
 				diskTotalResp, err = dao.GetMainDao(f).GetNodeTotalDisk(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 6 :
+			case 6:
 				diskUsedResp, err = dao.GetMainDao(f).GetNodeUsedDisk(request)
 				if err != nil {
 					errs = append(errs, err)
@@ -326,24 +320,23 @@ func  getManageNodeSummary_Sub(request model.NodeReq, f client.Client) (map[stri
 	// Error가 여러건일 경우 대해 고려해야함.
 	if len(errs) > 0 {
 		var returnErrMessage string
-		for _, err := range errs{
+		for _, err := range errs {
 			returnErrMessage = returnErrMessage + " " + err["Message"].(string)
 		}
 		errMessage := model.ErrMessage{
-			"Message": returnErrMessage ,
+			"Message": returnErrMessage,
 		}
 		return nil, nil, nil, nil, nil, nil, nil, errMessage
 	}
 	//==========================================================================
-	cpuUsage, _   := utils.GetResponseConverter().InfluxConverter(cpuResp)
-	memTotal, _   := utils.GetResponseConverter().InfluxConverter(memTotalResp)
-	memFree,  _   := utils.GetResponseConverter().InfluxConverter(memFreeResp)
-	diskTotal, _   := utils.GetResponseConverter().InfluxConverter(diskTotalResp)
-	diskUsed,  _   := utils.GetResponseConverter().InfluxConverter(diskUsedResp)
+	cpuUsage, _ := utils.GetResponseConverter().InfluxConverter(cpuResp)
+	memTotal, _ := utils.GetResponseConverter().InfluxConverter(memTotalResp)
+	memFree, _ := utils.GetResponseConverter().InfluxConverter(memFreeResp)
+	diskTotal, _ := utils.GetResponseConverter().InfluxConverter(diskTotalResp)
+	diskUsed, _ := utils.GetResponseConverter().InfluxConverter(diskUsedResp)
 	agentForwarder, _ := utils.GetResponseConverter().InfluxConverter(agentForwarderResp)
 	agentCollector, _ := utils.GetResponseConverter().InfluxConverter(agentCollectorResp)
 
 	//return cpuUsage,memUsage, agentResp, nil
 	return cpuUsage, memTotal, memFree, diskTotal, diskUsed, agentForwarder, agentCollector, nil
 }
-

@@ -1,7 +1,7 @@
 package services
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/monasca/golang-monascaclient/monascaclient"
 	mod "github.com/monasca/golang-monascaclient/monascaclient/models"
 	"kr/paasta/monitoring/iaas/integration"
@@ -9,25 +9,25 @@ import (
 )
 
 type AlarmDefinitionService struct {
-	monClient     monascaclient.Client
-	influxClient 	client.Client
+	monClient    monascaclient.Client
+	influxClient client.Client
 }
 
-func GetAlarmDefinitionService( monClient    monascaclient.Client, influxClient client.Client) *AlarmDefinitionService {
+func GetAlarmDefinitionService(monClient monascaclient.Client, influxClient client.Client) *AlarmDefinitionService {
 	return &AlarmDefinitionService{
-		monClient: monClient,
-		influxClient: 	influxClient,
+		monClient:    monClient,
+		influxClient: influxClient,
 	}
 }
 
-func (a *AlarmDefinitionService)GetAlarmDefinitionList(query mod.AlarmDefinitionQuery) (map[string]interface{}, error){
+func (a *AlarmDefinitionService) GetAlarmDefinitionList(query mod.AlarmDefinitionQuery) (map[string]interface{}, error) {
 
 	var allQuery mod.AlarmDefinitionQuery
 
-	if query.Severity != nil{
+	if query.Severity != nil {
 		allQuery.Severity = query.Severity
 	}
-	if query.Name != nil{
+	if query.Name != nil {
 		allQuery.Name = query.Name
 	}
 
@@ -43,7 +43,7 @@ func (a *AlarmDefinitionService)GetAlarmDefinitionList(query mod.AlarmDefinition
 
 }
 
-func (a *AlarmDefinitionService)GetAlarmDefinition(id string) (result model.AlarmDefinitionDetail, err error){
+func (a *AlarmDefinitionService) GetAlarmDefinition(id string) (result model.AlarmDefinitionDetail, err error) {
 
 	definition, err := integration.GetMonasca(a.monClient).GetAlarmDefinition(id)
 	//var result models.AlarmDefinitionDetail
@@ -58,10 +58,10 @@ func (a *AlarmDefinitionService)GetAlarmDefinition(id string) (result model.Alar
 	result.Severity = definition.Severity
 	result.UndeterminedActions = definition.UndeterminedActions
 
-	for _, data := range definition.AlarmAction{
+	for _, data := range definition.AlarmAction {
 		//var notificationQuery mod.NotificationQuery
 
-		notifications , _ := integration.GetMonasca(a.monClient).GetAlarmNotification(data)
+		notifications, _ := integration.GetMonasca(a.monClient).GetAlarmNotification(data)
 		var noti model.AlarmNotification
 		noti.Name = notifications.Name
 		noti.Email = notifications.Address
@@ -73,23 +73,21 @@ func (a *AlarmDefinitionService)GetAlarmDefinition(id string) (result model.Alar
 	result.AlarmNotification = notiList
 	return result, err
 
-
 }
 
-func (a *AlarmDefinitionService)CreateAlarmDefinition(query mod.AlarmDefinitionRequestBody) error{
+func (a *AlarmDefinitionService) CreateAlarmDefinition(query mod.AlarmDefinitionRequestBody) error {
 
 	return integration.GetMonasca(a.monClient).CreateAlarmDefinitionList(query)
 
 }
 
-func (a *AlarmDefinitionService)UpdateAlarmDefinition(alarmDefinitionId string, alarmDefinitionRequestBody mod.AlarmDefinitionRequestBody) error{
+func (a *AlarmDefinitionService) UpdateAlarmDefinition(alarmDefinitionId string, alarmDefinitionRequestBody mod.AlarmDefinitionRequestBody) error {
 
 	return integration.GetMonasca(a.monClient).UpdateAlarmDefinitionList(alarmDefinitionId, alarmDefinitionRequestBody)
 
 }
 
-
-func (a *AlarmDefinitionService)DeleteAlarmDefinition(alarmDefinitionId string) error{
+func (a *AlarmDefinitionService) DeleteAlarmDefinition(alarmDefinitionId string) error {
 
 	return integration.GetMonasca(a.monClient).DeleteAlarmDefinitionList(alarmDefinitionId)
 

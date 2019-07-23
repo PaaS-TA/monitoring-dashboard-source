@@ -1,28 +1,28 @@
 package util
 
 import (
-	"kr/paasta/monitoring/paas/model"
-	client "github.com/influxdata/influxdb/client/v2"
-	"net/http"
-	"fmt"
-	"encoding/json"
-	"log"
-	"time"
-	"reflect"
-	"os"
 	"bufio"
-	"strings"
+	"encoding/json"
+	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"io"
+	"kr/paasta/monitoring/paas/model"
+	"log"
+	"net/http"
+	"os"
+	"reflect"
+	"strings"
+	"time"
 )
 
-const(
-	SERVICE_NAME  string  = "serviceName"
-	DATA_NAME     string = "data"
+const (
+	SERVICE_NAME string = "serviceName"
+	DATA_NAME    string = "data"
 )
 
 type Config map[string]string
 
-func GetConnectionString(host, port, user, pass , dbname string) string {
+func GetConnectionString(host, port, user, pass, dbname string) string {
 
 	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s",
 		user, pass, "tcp", host, port, dbname, "")
@@ -31,9 +31,9 @@ func GetConnectionString(host, port, user, pass , dbname string) string {
 
 func RenderJsonResponse(data interface{}, w http.ResponseWriter) {
 
-   /* NaN 데이터가 있는경우 json.Marshal 에서 panic 발행후 프로세스가 정지 되므로 사전에 체크하여 우회한다. */
+	/* NaN 데이터가 있는경우 json.Marshal 에서 panic 발행후 프로세스가 정지 되므로 사전에 체크하여 우회한다. */
 	str := fmt.Sprint(data)
-	if( strings.Contains(str,"NaN")){
+	if strings.Contains(str, "NaN") {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write([]byte(""))
@@ -51,21 +51,21 @@ func RenderJsonResponse(data interface{}, w http.ResponseWriter) {
 	return
 }
 
-type errorMessage struct{
+type errorMessage struct {
 	model.ErrMessage
 }
 
-func GetError() *errorMessage{
+func GetError() *errorMessage {
 	return &errorMessage{}
 }
 
-func (e errorMessage) DbCheckError(err error) (model.ErrMessage) {
-	if err != nil{
+func (e errorMessage) DbCheckError(err error) model.ErrMessage {
+	if err != nil {
 		errMessage := model.ErrMessage{
-			"Message": err.Error() ,
+			"Message": err.Error(),
 		}
-		return  errMessage
-	}else{
+		return errMessage
+	} else {
 		return nil
 	}
 }
@@ -73,77 +73,74 @@ func (e errorMessage) DbCheckError(err error) (model.ErrMessage) {
 //오류 체크 모듈로 오류 발생시 오류 메시지 리턴
 func (e errorMessage) CheckError(resp client.Response, err error) (client.Response, model.ErrMessage) {
 
-
 	if err != nil {
 		errMessage := model.ErrMessage{
-			"Message": err.Error() ,
-		}
-		return resp , errMessage
-
-	}else if resp.Error() != nil {
-		errMessage := model.ErrMessage{
-			"Message": resp.Err ,
+			"Message": err.Error(),
 		}
 		return resp, errMessage
-	}else {
+
+	} else if resp.Error() != nil {
+		errMessage := model.ErrMessage{
+			"Message": resp.Err,
+		}
+		return resp, errMessage
+	} else {
 
 		return resp, nil
 	}
 }
 
-
-func GetDBCurrentTime() time.Time{
+func GetDBCurrentTime() time.Time {
 	now := time.Now()
 	t := now.Format(model.DB_DATE_FORMAT)
-	currentTime, _ := time.Parse(time.RFC3339,t)
+	currentTime, _ := time.Parse(time.RFC3339, t)
 	return currentTime
 }
 
-type clientResponse struct{
+type clientResponse struct {
 	client.Response
 }
 
-func GetResponseConverter() *clientResponse{
+func GetResponseConverter() *clientResponse {
 	return &clientResponse{}
 }
 
-func rfc3339ToUnixTimestamp(metricDataTime string) int64{
+func rfc3339ToUnixTimestamp(metricDataTime string) int64 {
 	t, _ := time.Parse(time.RFC3339, metricDataTime)
 	return t.Unix()
 }
 
-
 //조회한 결과List를 Map으로 변환한다.
-func (r clientResponse) InfluxConverterToMap(resp client.Response) ([]map[string]interface{}, model.ErrMessage){
+func (r clientResponse) InfluxConverterToMap(resp client.Response) ([]map[string]interface{}, model.ErrMessage) {
 
 	if len(resp.Results) != 1 {
-		return nil , nil
-	}else{
+		return nil, nil
+	} else {
 		//UI로 Return할 결과값
 		var returnValues []map[string]interface{}
 		var columns []string
 
-		for _, v := range resp.Results[0].Series{
-			for _, vc :=range v.Columns{
+		for _, v := range resp.Results[0].Series {
+			for _, vc := range v.Columns {
 				columns = append(columns, vc)
 			}
 
-			for i :=0 ; i < len(v.Values); i++ {
+			for i := 0; i < len(v.Values); i++ {
 				row := make(map[string]interface{})
 
 				//InfluxDB에서 Value 값이 nil인 경우 해당 row는 값을 보내주지 않는다.
-				if v.Values[i][1] != nil{
-					for kv, vv := range v.Values[i]{
-						if vv != nil{
+				if v.Values[i][1] != nil {
+					for kv, vv := range v.Values[i] {
+						if vv != nil {
 							//Time Column Case convert to UnixTimestamp
 							if kv == 0 {
 								t := rfc3339ToUnixTimestamp(reflect.ValueOf(vv).String())
 								row[columns[kv]] = t
-							}else{
+							} else {
 								row[columns[kv]] = vv
 							}
 
-						}else{
+						} else {
 							row[columns[kv]] = ""
 						}
 					}
@@ -159,36 +156,36 @@ func (r clientResponse) InfluxConverterToMap(resp client.Response) ([]map[string
 }
 
 //조회한 결과List를 Map으로 변환한다.
-func (r clientResponse) InfluxConverter(resp client.Response, serviceName string) (map[string]interface{}, model.ErrMessage){
+func (r clientResponse) InfluxConverter(resp client.Response, serviceName string) (map[string]interface{}, model.ErrMessage) {
 
 	if len(resp.Results) != 1 {
-		return nil , nil
-	}else{
+		return nil, nil
+	} else {
 		//UI로 Return할 결과값
 		var returnValues []map[string]interface{}
 		var columns []string
 
-		for _, v := range resp.Results[0].Series{
-			for _, vc :=range v.Columns{
+		for _, v := range resp.Results[0].Series {
+			for _, vc := range v.Columns {
 				columns = append(columns, vc)
 			}
 
-			for i :=0 ; i < len(v.Values); i++ {
+			for i := 0; i < len(v.Values); i++ {
 				row := make(map[string]interface{})
 
 				//InfluxDB에서 Value 값이 nil인 경우 해당 row는 값을 보내주지 않는다.
-				if v.Values[i][1] != nil{
-					for kv, vv := range v.Values[i]{
-						if vv != nil{
+				if v.Values[i][1] != nil {
+					for kv, vv := range v.Values[i] {
+						if vv != nil {
 							//Time Column Case convert to UnixTimestamp
 							if kv == 0 {
 								t := rfc3339ToUnixTimestamp(reflect.ValueOf(vv).String())
 								row[columns[kv]] = t
-							}else{
+							} else {
 								row[columns[kv]] = vv
 							}
 
-						}else{
+						} else {
 							row[columns[kv]] = ""
 						}
 					}
@@ -198,11 +195,9 @@ func (r clientResponse) InfluxConverter(resp client.Response, serviceName string
 
 		}
 
-
-
 		result := map[string]interface{}{
-			SERVICE_NAME : serviceName,
-			DATA_NAME: returnValues,
+			SERVICE_NAME: serviceName,
+			DATA_NAME:    returnValues,
 		}
 
 		return result, nil
@@ -256,14 +251,14 @@ func ReadConfig(filename string) (Config, error) {
 	return config, nil
 }
 
-func GetMaxAlarmLevel(alarmLevels []string) string{
+func GetMaxAlarmLevel(alarmLevels []string) string {
 	var status string
 
-	for _, alarmLevel := range alarmLevels{
-		if alarmLevel == model.ALARM_LEVEL_CRITICAL{
+	for _, alarmLevel := range alarmLevels {
+		if alarmLevel == model.ALARM_LEVEL_CRITICAL {
 			status = alarmLevel
-		}else if alarmLevel == model.ALARM_LEVEL_WARNING{
-			if status != model.ALARM_LEVEL_CRITICAL{
+		} else if alarmLevel == model.ALARM_LEVEL_WARNING {
+			if status != model.ALARM_LEVEL_CRITICAL {
 				status = alarmLevel
 			}
 		}
@@ -272,13 +267,13 @@ func GetMaxAlarmLevel(alarmLevels []string) string{
 	return status
 }
 
-func GetAlarmStatusByServiceName(originType , alarmType string, usage float64, thresholds []model.AlarmPolicyResponse) string{
+func GetAlarmStatusByServiceName(originType, alarmType string, usage float64, thresholds []model.AlarmPolicyResponse) string {
 
-	for _, threshold := range thresholds{
-		if threshold.AlarmType == alarmType && threshold.OriginType == originType{
-			if usage >= float64(threshold.CriticalThreshold){
+	for _, threshold := range thresholds {
+		if threshold.AlarmType == alarmType && threshold.OriginType == originType {
+			if usage >= float64(threshold.CriticalThreshold) {
 				return model.ALARM_LEVEL_CRITICAL
-			}else if usage >= float64(threshold.WarningThreshold){
+			} else if usage >= float64(threshold.WarningThreshold) {
 				return model.ALARM_LEVEL_WARNING
 			}
 		}

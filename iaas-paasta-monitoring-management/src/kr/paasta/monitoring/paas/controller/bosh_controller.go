@@ -1,65 +1,64 @@
 package controller
 
 import (
-	"net/http"
-	client "github.com/influxdata/influxdb/client/v2"
-	"kr/paasta/monitoring/paas/util"
-	"kr/paasta/monitoring/paas/service"
+	client "github.com/influxdata/influxdb1-client/v2"
 	model "kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/paas/service"
+	"kr/paasta/monitoring/paas/util"
+	"net/http"
 	//models "kr/paasta/monitoring/iaas/model"
-	"strconv"
 	"github.com/jinzhu/gorm"
+	"strconv"
 )
 
 //Gorm Object Struct
 type BoshStatusService struct {
-	txn   *gorm.DB
-	influxClient 	client.Client
-	databases model.Databases
+	txn          *gorm.DB
+	influxClient client.Client
+	databases    model.Databases
 }
 
-func GetBoshStatusController(txn *gorm.DB,influxClient client.Client, databases model.Databases) *BoshStatusService {
+func GetBoshStatusController(txn *gorm.DB, influxClient client.Client, databases model.Databases) *BoshStatusService {
 	return &BoshStatusService{
-		txn:   txn,
-		influxClient: 	influxClient,
-		databases: databases,
+		txn:          txn,
+		influxClient: influxClient,
+		databases:    databases,
 	}
 }
 
-func (h *BoshStatusService) GetBoshStatusOverview(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshStatusOverview(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshSummaryReq
 	//Page 번호
-	apiRequest.PageIndex, _   = strconv.Atoi(r.FormValue("pageIndex"))
+	apiRequest.PageIndex, _ = strconv.Atoi(r.FormValue("pageIndex"))
 	//Page당 보여주는 갯수
-	apiRequest.PageItem, _    = strconv.Atoi(r.FormValue("pageItems"))
+	apiRequest.PageItem, _ = strconv.Atoi(r.FormValue("pageItems"))
 
 	boshOverview, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshStatusOverview(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else {
+	} else {
 		util.RenderJsonResponse(boshOverview, w)
 	}
 }
 
-func (h *BoshStatusService) GetBoshStatusSummary(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshStatusSummary(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshSummaryReq
 	//Page 번호
-	apiRequest.PageIndex, _   = strconv.Atoi(r.FormValue("pageIndex"))
+	apiRequest.PageIndex, _ = strconv.Atoi(r.FormValue("pageIndex"))
 	//Page당 보여주는 갯수
-	apiRequest.PageItem, _    = strconv.Atoi(r.FormValue("pageItems"))
+	apiRequest.PageItem, _ = strconv.Atoi(r.FormValue("pageItems"))
 
 	boshSummary, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshStatusSummary(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else {
+	} else {
 		util.RenderJsonResponse(boshSummary, w)
 	}
 }
 
-
-func (h *BoshStatusService)GetBoshStatusTopprocess(w http.ResponseWriter, r *http.Request) {
+func (h *BoshStatusService) GetBoshStatusTopprocess(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshSummaryReq
 	apiRequest.Id = r.FormValue(":id")
@@ -73,17 +72,16 @@ func (h *BoshStatusService)GetBoshStatusTopprocess(w http.ResponseWriter, r *htt
 	}
 }
 
-func (h *BoshStatusService)GetBoshCpuUsageList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshCpuUsageList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -92,22 +90,21 @@ func (h *BoshStatusService)GetBoshCpuUsageList(w http.ResponseWriter, r *http.Re
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshCpuUsageList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshCpuLoadList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshCpuLoadList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -116,22 +113,21 @@ func (h *BoshStatusService)GetBoshCpuLoadList(w http.ResponseWriter, r *http.Req
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshCpuLoadList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshMemoryUsageList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshMemoryUsageList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -140,22 +136,21 @@ func (h *BoshStatusService)GetBoshMemoryUsageList(w http.ResponseWriter, r *http
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshMemoryUsageList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshDiskUsageList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshDiskUsageList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -164,22 +159,21 @@ func (h *BoshStatusService)GetBoshDiskUsageList(w http.ResponseWriter, r *http.R
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshDiskUsageList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshDiskIoList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshDiskIoList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -188,22 +182,21 @@ func (h *BoshStatusService)GetBoshDiskIoList(w http.ResponseWriter, r *http.Requ
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshDiskIoList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshNetworkByteList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshNetworkByteList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -212,22 +205,21 @@ func (h *BoshStatusService)GetBoshNetworkByteList(w http.ResponseWriter, r *http
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshNetworkByteList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshNetworkPacketList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshNetworkPacketList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -236,22 +228,21 @@ func (h *BoshStatusService)GetBoshNetworkPacketList(w http.ResponseWriter, r *ht
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshNetworkPacketList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshNetworkDropList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshNetworkDropList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -260,22 +251,21 @@ func (h *BoshStatusService)GetBoshNetworkDropList(w http.ResponseWriter, r *http
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshNetworkDropList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }
 
-func (h *BoshStatusService)GetBoshNetworkErrorList(w http.ResponseWriter, r *http.Request){
+func (h *BoshStatusService) GetBoshNetworkErrorList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.BoshDetailReq
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
 	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo   = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy       = r.URL.Query().Get("groupBy")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 
-
-	validation :=  apiRequest.MetricRequestValidate(apiRequest )
+	validation := apiRequest.MetricRequestValidate(apiRequest)
 	if validation != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(validation.Error()))
@@ -284,7 +274,7 @@ func (h *BoshStatusService)GetBoshNetworkErrorList(w http.ResponseWriter, r *htt
 	resList, err := service.GetBoshStatusService(h.txn, h.influxClient, h.databases).GetBoshNetworkErrorList(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
-	}else{
+	} else {
 		util.RenderJsonResponse(resList, w)
 	}
 }

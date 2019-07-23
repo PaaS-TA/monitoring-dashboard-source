@@ -1,30 +1,30 @@
 package dao
 
 import (
+	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/util"
-	client "github.com/influxdata/influxdb/client/v2"
-	"fmt"
 	"strings"
 )
 
 type ContainerDao struct {
-	txn   *gorm.DB
-	influxClient 	client.Client
-	databases       model.Databases
+	txn          *gorm.DB
+	influxClient client.Client
+	databases    model.Databases
 }
 
 func GetContainerDao(txn *gorm.DB, influxClient client.Client, databases model.Databases) *ContainerDao {
 	return &ContainerDao{
-		txn:   txn,
-		influxClient: 	influxClient,
+		txn:          txn,
+		influxClient: influxClient,
 		databases:    databases,
 	}
 }
 
 //Cell 목록 조회
-func (b ContainerDao) GetCellList() ([]model.ZoneCellInfo, model.ErrMessage){
+func (b ContainerDao) GetCellList() ([]model.ZoneCellInfo, model.ErrMessage) {
 
 	cells := []model.ZoneCellInfo{}
 
@@ -33,7 +33,7 @@ func (b ContainerDao) GetCellList() ([]model.ZoneCellInfo, model.ErrMessage){
 		Joins("inner join vms on zones.id = vms.zone_id and vms.vm_type = 'Cel' ").Find(&cells)
 
 	err := util.GetError().DbCheckError(status.Error)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -41,7 +41,7 @@ func (b ContainerDao) GetCellList() ([]model.ZoneCellInfo, model.ErrMessage){
 }
 
 //zone 목록 조회
-func (b ContainerDao) GetZoneList() ([]model.ZoneCellInfo, model.ErrMessage){
+func (b ContainerDao) GetZoneList() ([]model.ZoneCellInfo, model.ErrMessage) {
 
 	zones := []model.ZoneCellInfo{}
 
@@ -49,52 +49,51 @@ func (b ContainerDao) GetZoneList() ([]model.ZoneCellInfo, model.ErrMessage){
 		Select("name as zone_name, id").Find(&zones)
 
 	err := util.GetError().DbCheckError(status.Error)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	return zones, err
 }
 
-
-func (b ContainerDao) GetCellContainersList(cellIp string) (_ client.Response, errMsg model.ErrMessage)  {
+func (b ContainerDao) GetCellContainersList(cellIp string) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	getContainerListSql := "select application_name, application_index, container_interface, value from container_metrics where cell_ip = '%s' and \"name\" = 'load_average'  and container_id <> '/' and time > now() - %s";
+	getContainerListSql := "select application_name, application_index, container_interface, value from container_metrics where cell_ip = '%s' and \"name\" = 'load_average'  and container_id <> '/' and time > now() - %s"
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( getContainerListSql,
+		Command: fmt.Sprintf(getContainerListSql,
 			cellIp, "60s"),
 		Database: b.databases.ContainerDatabase,
 	}
 
 	//fmt.Println("GetCellContainerList Sql======>", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (b ContainerDao) GetCellSummaryData(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage)  {
+func (b ContainerDao) GetCellSummaryData(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -104,26 +103,26 @@ func (b ContainerDao) GetCellSummaryData(request model.ContainerReq) (_ client.R
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( sql, request.CellIp, request.Time, request.MetricName),
+		Command:  fmt.Sprintf(sql, request.CellIp, request.Time, request.MetricName),
 		Database: b.databases.PaastaDatabase,
 	}
 
 	fmt.Println("GetCellSummaryData Sql======>", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (b ContainerDao) GetContainerUsage(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage)  {
+func (b ContainerDao) GetContainerUsage(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -143,7 +142,7 @@ func (b ContainerDao) GetContainerUsage(request model.ContainerReq) (_ client.Re
 
 	if request.Service == model.ALARM_TYPE_CPU {
 		sql += " and time > now() - 90s  group by time(1m) "
-	}else{
+	} else {
 		sql += " and time > now() - 90s "
 	}
 	sql += ");"
@@ -156,20 +155,20 @@ func (b ContainerDao) GetContainerUsage(request model.ContainerReq) (_ client.Re
 
 	fmt.Println("GetContainerUsage Sql======>", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (b ContainerDao) GetPaasContainerDetailUsages(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage)  {
+func (b ContainerDao) GetPaasContainerDetailUsages(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -205,42 +204,42 @@ func (b ContainerDao) GetPaasContainerDetailUsages(request model.ContainerReq) (
 	case model.CON_MTR_CPU_USAGE:
 		if request.DefaultTimeRange != "" {
 			sql += " and time > now() - %s  group by time(%s) );"
-			sql =  fmt.Sprintf( sql, request.MetricName, request.ContainerName, request.DefaultTimeRange, request.GroupBy)
+			sql = fmt.Sprintf(sql, request.MetricName, request.ContainerName, request.DefaultTimeRange, request.GroupBy)
 		} else {
 			sql += " and time < now() - %s and time > now() - %s  group by time(%s) );"
-			sql =   fmt.Sprintf( sql, request.MetricName, request.ContainerName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy)
+			sql = fmt.Sprintf(sql, request.MetricName, request.ContainerName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy)
 		}
 	default:
 		if request.DefaultTimeRange != "" {
 			sql += " and time > now() - %s ) where time > now() - %s group by time(%s) ;"
-			sql =  fmt.Sprintf( sql, request.MetricName, request.ContainerName, request.DefaultTimeRange, request.DefaultTimeRange, request.GroupBy)
+			sql = fmt.Sprintf(sql, request.MetricName, request.ContainerName, request.DefaultTimeRange, request.DefaultTimeRange, request.GroupBy)
 		} else {
 			sql += " and time < now() - %s and time > now() - %s ) where time < now() - %s and time > now() - %s group by time(%s) ;"
-			sql =   fmt.Sprintf( sql, request.MetricName, request.ContainerName, request.TimeRangeFrom, request.TimeRangeTo, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy)
+			sql = fmt.Sprintf(sql, request.MetricName, request.ContainerName, request.TimeRangeFrom, request.TimeRangeTo, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy)
 		}
 	}
 
-	var q = client.Query {
+	var q = client.Query{
 		Command:  sql,
 		Database: b.databases.ContainerDatabase,
 	}
 
 	fmt.Println("GetPaasContainerDetailUsages Sql======>", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (b ContainerDao) GetCellIdForDetail(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage)  {
+func (b ContainerDao) GetCellIdForDetail(request model.ContainerReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -250,13 +249,13 @@ func (b ContainerDao) GetCellIdForDetail(request model.ContainerReq) (_ client.R
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( sql, request.CellIp),
+		Command:  fmt.Sprintf(sql, request.CellIp),
 		Database: b.databases.PaastaDatabase,
 	}
 
 	//fmt.Println("GetCellIdForDetail Sql======>", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
