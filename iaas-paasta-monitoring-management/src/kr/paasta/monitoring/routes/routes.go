@@ -173,6 +173,10 @@ const (
 	PAAS_APP_ALARM_LIST                = "PAAS_APP_ALARM_LIST"
 	PAAS_APP_POLICY_DELETE             = "PAAS_APP_POLICY_DELETE"
 
+	// SAAS
+	SAAS_API_APPLICATION_LIST   = "SAAS_API_APPLICATION_LIST"
+	SAAS_API_APPLICATION_STATUS = "SAAS_API_APPLICATION_STATUS"
+
 	// CAAS_API
 	CAAS_K8S_CLUSTER_AVG = "CAAS_K8S_CLUSTER_AVG"
 	CAAS_WORK_NODE_LIST  = "CAAS_WORK_NODE_LIST"
@@ -180,6 +184,16 @@ const (
 	CAAS_CONTIANER_LIST  = "CAAS_CONTIANER_LIST"
 	CAAS_CONTIANER_INFO  = "CAAS_CONTIANER_INFO"
 	CAAS_CONTIANER_LOG   = "CAAS_CONTIANER_LOG"
+
+	CAAS_CLUSTER_OVERVIEW  = "CAAS_CLUSTER_OVERVIEW"
+	CAAS_WORKLOADS_STATUS  = "CAAS_WORKLOADS_STATUS"
+	CAAS_MASTER_NODE_USAGE = "CAAS_MASTER_NODE_USAGE"
+
+	CAAS_WORKLOADS_CONTI_SUMMARY = "CAAS_WORKLOADS_CONTI_SUMMARY"
+	CAAS_WORKLOADS_USAGE         = "CAAS_WORKLOADS_USAGE"
+	CAAS_POD_STAT                = "CAAS_POD_STAT"
+	CAAS_POD_LIST                = "CAAS_POD_LIST"
+	CAAS_POD_INFO                = "CAAS_POD_INFO"
 
 	// Web Resource
 	Main   = "Main"
@@ -383,4 +397,17 @@ var CaasRoutes = rata.Routes{
 	{Path: "/v2/caas/monitoring/contiList", Method: "GET", Name: CAAS_CONTIANER_LIST},
 	{Path: "/v2/caas/monitoring/contiInfo", Method: "GET", Name: CAAS_CONTIANER_INFO},
 	{Path: "/v2/caas/monitoring/contiInfoLog", Method: "GET", Name: CAAS_CONTIANER_LOG},
+	{Path: "/v2/caas/monitoring/clusterOverview", Method: "GET", Name: CAAS_CLUSTER_OVERVIEW},
+	{Path: "/v2/caas/monitoring/workloadsStatus", Method: "GET", Name: CAAS_WORKLOADS_STATUS},
+	{Path: "/v2/caas/monitoring/masterNodeUsage", Method: "GET", Name: CAAS_MASTER_NODE_USAGE},
+	{Path: "/v2/caas/monitoring/workerloadsConainerSummary", Method: "GET", Name: CAAS_WORKLOADS_CONTI_SUMMARY},
+	{Path: "/v2/caas/monitoring/workloadsUsage", Method: "GET", Name: CAAS_WORKLOADS_USAGE},
+	{Path: "/v2/caas/monitoring/podStat", Method: "GET", Name: CAAS_POD_STAT},
+	{Path: "/v2/caas/monitoring/podList", Method: "GET", Name: CAAS_POD_LIST},
+	{Path: "/v2/caas/monitoring/podInfo", Method: "GET", Name: CAAS_POD_INFO},
+}
+
+var SaasRoutes = rata.Routes{
+	{Path: "/v2/saas/app/application/list", Method: "GET", Name: SAAS_API_APPLICATION_LIST},
+	{Path: "/v2/saas/app/application/status", Method: "GET", Name: SAAS_API_APPLICATION_STATUS},
 }

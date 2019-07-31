@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/monasca/golang-monascaclient/monascaclient"
 	"github.com/rackspace/gophercloud"
-	tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"
+	/*tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"*/
 	"github.com/tedsuo/rata"
 	"gopkg.in/olivere/elastic.v3"
 	"io"
@@ -21,9 +21,10 @@ import (
 	paasContoller "kr/paasta/monitoring/paas/controller"
 	pm "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/routes"
+	saasContoller "kr/paasta/monitoring/saas/controller"
 	"kr/paasta/monitoring/utils"
 	"net/http"
-	"strings"
+	/*"strings"*/
 	"time"
 )
 
@@ -35,12 +36,17 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	var loginController *controller.LoginController
 	var memberController *controller.MemberController
 
+	// SaaS Metrics
+	var applicationController *saasContoller.SaasController
+
 	if sysType == utils.SYS_TYPE_IAAS {
 		loginController = controller.NewIaasLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType)
 		memberController = controller.NewIaasMemberController(openstack_provider, paasTxn, rdClient, sysType)
 	} else if sysType == utils.SYS_TYPE_PAAS {
 		loginController = controller.NewPaasLoginController(cfProvider, paasTxn, rdClient, sysType)
 		memberController = controller.NewPaasMemberController(cfProvider, paasTxn, rdClient, sysType)
+	} else if sysType == utils.SYS_TYPE_SAAS {
+		applicationController = saasContoller.GetSaasController(paasTxn)
 	} else {
 		loginController = controller.NewLoginController(openstack_provider, monsClient, auth, cfProvider, paasTxn, rdClient, sysType)
 		memberController = controller.NewMemberController(openstack_provider, cfProvider, paasTxn, rdClient, sysType)
@@ -54,7 +60,6 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	var definitionController *iaasContoller.AlarmDefinitionController
 	var stautsController *iaasContoller.AlarmStatusController
 	var logController *iaasContoller.OpenstackLog
-	//caas add
 	var caasMetricsController *caasContoller.MetricController
 
 	var iaasActions rata.Handlers
@@ -294,16 +299,36 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routes.Static: route(StaticHandler),
 	}
 
-	// add caas 2019.07.23
-	caasActions := rata.Handlers{
-		routes.CAAS_K8S_CLUSTER_AVG: route(caasMetricsController.GetClusterAvg),
-		routes.CAAS_WORK_NODE_LIST:  route(caasMetricsController.GetWorkNodeList),
-		routes.CAAS_WORK_NODE_INFO:  route(caasMetricsController.GetWorkNodeInfo),
-		routes.CAAS_CONTIANER_LIST:  route(caasMetricsController.GetContainerList),
-		routes.CAAS_CONTIANER_INFO:  route(caasMetricsController.GetContainerInfo),
-		routes.CAAS_CONTIANER_LOG:   route(caasMetricsController.GetContainerLog),
+	// =================================================
+	// SaaS Metrics
+	// =================================================
+	var saasActions rata.Handlers
+	if sysType == utils.SYS_TYPE_SAAS || sysType == utils.SYS_TYPE_ALL {
+		saasActions = rata.Handlers{
+			routes.SAAS_API_APPLICATION_LIST:   route(applicationController.GetApplicationList),
+			routes.SAAS_API_APPLICATION_STATUS: route(applicationController.GetAgentStatus),
+		}
 	}
-	///////////////// add caas end
+
+	// =================================================
+	// CaaS Metrics
+	// =================================================
+	caasActions := rata.Handlers{
+		routes.CAAS_K8S_CLUSTER_AVG:         route(caasMetricsController.GetClusterAvg),
+		routes.CAAS_WORK_NODE_LIST:          route(caasMetricsController.GetWorkNodeList),
+		routes.CAAS_WORK_NODE_INFO:          route(caasMetricsController.GetWorkNodeInfo),
+		routes.CAAS_CONTIANER_LIST:          route(caasMetricsController.GetContainerList),
+		routes.CAAS_CONTIANER_INFO:          route(caasMetricsController.GetContainerInfo),
+		routes.CAAS_CONTIANER_LOG:           route(caasMetricsController.GetContainerLog),
+		routes.CAAS_CLUSTER_OVERVIEW:        route(caasMetricsController.GetClusterOverView),
+		routes.CAAS_WORKLOADS_STATUS:        route(caasMetricsController.GetWorkloadsStatus),
+		routes.CAAS_MASTER_NODE_USAGE:       route(caasMetricsController.GetMasterNodeUsage),
+		routes.CAAS_WORKLOADS_CONTI_SUMMARY: route(caasMetricsController.GetWorkloadsContiSummary),
+		routes.CAAS_WORKLOADS_USAGE:         route(caasMetricsController.GetWorkloadsUsage),
+		routes.CAAS_POD_STAT:                route(caasMetricsController.GetPodStatList),
+		routes.CAAS_POD_LIST:                route(caasMetricsController.GetPodMetricList),
+		routes.CAAS_POD_INFO:                route(caasMetricsController.GetMasterNodeUsage),
+	}
 
 	var actions rata.Handlers
 	var actionlist []rata.Handlers
@@ -327,11 +352,27 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routeList = append(routeList, routes.Routes)
 		routeList = append(routeList, routes.PaasRoutes)
 		route = getRoutes(routeList)
+	} else if sysType == utils.SYS_TYPE_SAAS {
+		actionlist = append(actionlist, commonActions)
+		actionlist = append(actionlist, saasActions)
+		actions = getActions(actionlist)
+
+		routeList = append(routeList, routes.Routes)
+		routeList = append(routeList, routes.SaasRoutes)
+		route = getRoutes(routeList)
+	} else if sysType == utils.SYS_TYPE_CAAS {
+		actionlist = append(actionlist, commonActions)
+		actionlist = append(actionlist, caasActions)
+		actions = getActions(actionlist)
+
+		routeList = append(routeList, routes.Routes)
+		routeList = append(routeList, routes.CaasRoutes)
+		route = getRoutes(routeList)
 	} else {
 		actionlist = append(actionlist, commonActions)
 		actionlist = append(actionlist, iaasActions)
 		actionlist = append(actionlist, paasActions)
-		//add caas
+		actionlist = append(actionlist, saasActions)
 		actionlist = append(actionlist, caasActions)
 
 		actions = getActions(actionlist)
@@ -339,7 +380,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routeList = append(routeList, routes.Routes)
 		routeList = append(routeList, routes.PaasRoutes)
 		routeList = append(routeList, routes.IaasRoutes)
-		//add caas
+		routeList = append(routeList, routes.SaasRoutes)
 		routeList = append(routeList, routes.CaasRoutes)
 		route = getRoutes(routeList)
 	}
@@ -353,40 +394,40 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 }
 
 //CAAS 모니터링 테스트를 위한 임시방편
-func CaasHandler() http.Handler {
-	var metricsController *caasContoller.MetricController
-
-	var caasActions rata.Handlers
-
-	caasActions = rata.Handlers{
-		routes.CAAS_K8S_CLUSTER_AVG: route(metricsController.GetClusterAvg),
-		routes.CAAS_WORK_NODE_LIST:  route(metricsController.GetWorkNodeList),
-		routes.CAAS_WORK_NODE_INFO:  route(metricsController.GetWorkNodeInfo),
-		routes.CAAS_CONTIANER_LIST:  route(metricsController.GetContainerList),
-		routes.CAAS_CONTIANER_INFO:  route(metricsController.GetContainerInfo),
-		routes.CAAS_CONTIANER_LOG:   route(metricsController.GetContainerLog),
-	}
-
-	var actions rata.Handlers
-	var actionlist []rata.Handlers
-
-	var route rata.Routes
-	var routeList []rata.Routes
-
-	actionlist = append(actionlist, caasActions)
-	actions = getActions(actionlist)
-
-	//routeList = append(routeList, routes.Routes)
-	routeList = append(routeList, routes.CaasRoutes)
-	route = getRoutes(routeList)
-
-	handler, err := rata.NewRouter(route, actions)
-	if err != nil {
-		panic("unable to create router: " + err.Error())
-	}
-	fmt.Println("Caas Monit Application Started")
-	return handler
-}
+//func CaasHandler() http.Handler {
+//	var metricsController *caasContoller.MetricController
+//
+//	var caasActions rata.Handlers
+//
+//	caasActions = rata.Handlers{
+//		routes.CAAS_K8S_CLUSTER_AVG: route(metricsController.GetClusterAvg),
+//		routes.CAAS_WORK_NODE_LIST:  route(metricsController.GetWorkNodeList),
+//		routes.CAAS_WORK_NODE_INFO:  route(metricsController.GetWorkNodeInfo),
+//		routes.CAAS_CONTIANER_LIST:  route(metricsController.GetContainerList),
+//		routes.CAAS_CONTIANER_INFO:  route(metricsController.GetContainerInfo),
+//		routes.CAAS_CONTIANER_LOG:   route(metricsController.GetContainerLog),
+//	}
+//
+//	var actions rata.Handlers
+//	var actionlist []rata.Handlers
+//
+//	var route rata.Routes
+//	var routeList []rata.Routes
+//
+//	actionlist = append(actionlist, caasActions)
+//	actions = getActions(actionlist)
+//
+//	//routeList = append(routeList, routes.Routes)
+//	routeList = append(routeList, routes.CaasRoutes)
+//	route = getRoutes(routeList)
+//
+//	handler, err := rata.NewRouter(route, actions)
+//	if err != nil {
+//		panic("unable to create router: " + err.Error())
+//	}
+//	fmt.Println("Caas Monit Application Started")
+//	return handler
+//}
 
 func getActions(list []rata.Handlers) rata.Handlers {
 	actions := make(map[string]http.Handler)
@@ -426,92 +467,93 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 			return
 		}
 
-		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") {
-			fmt.Println("Request URI :: ", r.RequestURI)
-
-			reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)
-			if reqToken == "" || reqToken == "null" {
-				fmt.Println("HttpWrap Hander reqToken is null ")
-				errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-				utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-			} else {
-				//fmt.Println("HttpWrap Hander reqToken =",len(reqToken),":",reqToken)
-				//모든 경로의 redis 의 토큰 정보를 확인한다
-				val := rdClient.HGetAll(reqToken).Val()
-				if val == nil || len(val) == 0 { // redis 에서 token 정보가 expire 된경우 로그인 화면으로 돌아간다
-					//fmt.Println("HttpWrap Hander redis.iaas_userid is null ")
-					errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-					utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-				} else {
-
-					if strings.Contains(r.RequestURI, "/v2/member") && val["userId"] != "" {
-
-						handler.ServeHTTP(w, r)
-
-					} else if strings.Contains(r.RequestURI, "/v2/iaas") && val["iaasToken"] != "" && val["iaasUserId"] != "" { // IaaS 토큰 정보가 있는경우
-
-						provider1, _, err := utils.GetOpenstackProvider(r)
-						if err != nil || provider1 == nil {
-							errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-							utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-						} else {
-							v3Client := NewIdentityV3(provider1)
-
-							//IaaS, token 검증
-							bool, err := tokens3.Validate(v3Client, val["iaasToken"])
-							if err != nil || bool == false {
-								//errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-								//utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-								fmt.Println("iaas token validate error::", err)
-								handler.ServeHTTP(w, r)
-							} else {
-								//두개 token 이 없는 경우도 고려 해야함
-								rdClient.Expire(reqToken, 30*60*time.Second)
-								handler.ServeHTTP(w, r)
-							}
-						}
-
-					} else if strings.Contains(r.RequestURI, "/v2/paas") && val["paasToken"] != "" && val["paasUserId"] != "" { // PaaS 토큰 정보가 있는경우
-
-						// Pass token 검증 로직 추가
-						//get paas token
-						cfProvider.Token = val["paasToken"]
-						client_test, err := cfclient.NewClient(&cfProvider)
-						errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-						if err != nil {
-							utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-						} else {
-							_, err01 := client_test.GetToken() // cf token 을 refresh 함
-							if err01 != nil {
-								utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-								return
-							}
-							/*
-								fmt.Println("paas hander token ::: ",token)
-
-								token01, err02 := client_test.ListApps()
-								if err02 != nil {
-									fmt.Println("paas ListApps error::",token01,":::",err02.Error())
-								}else{
-									fmt.Println("paas ListApps info  ::",token01)
-								}
-							*/
-							rdClient.Expire(reqToken, 30*60*time.Second)
-							handler.ServeHTTP(w, r)
-						}
-
-					} else {
-						fmt.Println("URL Not All")
-						//rdClient.Expire(reqToken, 30*60*time.Second)
-						//handler.ServeHTTP(w, r)
-					}
-				}
-			}
-		} else {
-			fmt.Println("url pass ::", r.RequestURI)
-			handler.ServeHTTP(w, r)
-		}
-
+		// token Pass
+		//if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") {
+		//	fmt.Println("Request URI :: ", r.RequestURI)
+		//
+		//	reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)
+		//	if reqToken == "0" || reqToken == "null" {
+		//		fmt.Println("HttpWrap Hander reqToken is null ")
+		//		errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+		//		utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+		//	} else {
+		//		//fmt.Println("HttpWrap Hander reqToken =",len(reqToken),":",reqToken)
+		//		//모든 경로의 redis 의 토큰 정보를 확인한다
+		//		val := rdClient.HGetAll(reqToken).Val()
+		//		if val == nil || len(val) == 0 { // redis 에서 token 정보가 expire 된경우 로그인 화면으로 돌아간다
+		//			//fmt.Println("HttpWrap Hander redis.iaas_userid is null ")
+		//			errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+		//			utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+		//		} else {
+		//
+		//			if strings.Contains(r.RequestURI, "/v2/member") && val["userId"] != "" {
+		//
+		//				handler.ServeHTTP(w, r)
+		//
+		//			} else if strings.Contains(r.RequestURI, "/v2/iaas") && val["iaasToken"] != "" && val["iaasUserId"] != "" { // IaaS 토큰 정보가 있는경우
+		//
+		//				provider1, _, err := utils.GetOpenstackProvider(r)
+		//				if err != nil || provider1 == nil {
+		//					errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+		//					utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+		//				} else {
+		//					v3Client := NewIdentityV3(provider1)
+		//
+		//					//IaaS, token 검증
+		//					bool, err := tokens3.Validate(v3Client, val["iaasToken"])
+		//					if err != nil || bool == false {
+		//						//errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+		//						//utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+		//						fmt.Println("iaas token validate error::", err)
+		//						handler.ServeHTTP(w, r)
+		//					} else {
+		//						//두개 token 이 없는 경우도 고려 해야함
+		//						rdClient.Expire(reqToken, 30*60*time.Second)
+		//						handler.ServeHTTP(w, r)
+		//					}
+		//				}
+		//
+		//			} else if strings.Contains(r.RequestURI, "/v2/paas") && val["paasToken"] != "" && val["paasUserId"] != "" { // PaaS 토큰 정보가 있는경우
+		//
+		//				// Pass token 검증 로직 추가
+		//				//get paas token
+		//				cfProvider.Token = val["paasToken"]
+		//				client_test, err := cfclient.NewClient(&cfProvider)
+		//				errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+		//				if err != nil {
+		//					utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+		//				} else {
+		//					_, err01 := client_test.GetToken() // cf token 을 refresh 함
+		//					if err01 != nil {
+		//						utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+		//						return
+		//					}
+		//					/*
+		//						fmt.Println("paas hander token ::: ",token)
+		//
+		//						token01, err02 := client_test.ListApps()
+		//						if err02 != nil {
+		//							fmt.Println("paas ListApps error::",token01,":::",err02.Error())
+		//						}else{
+		//							fmt.Println("paas ListApps info  ::",token01)
+		//						}
+		//					*/
+		//					rdClient.Expire(reqToken, 30*60*time.Second)
+		//					handler.ServeHTTP(w, r)
+		//				}
+		//
+		//			} else {
+		//				fmt.Println("URL Not All")
+		//				//rdClient.Expire(reqToken, 30*60*time.Second)
+		//				//handler.ServeHTTP(w, r)
+		//			}
+		//		}
+		//	}
+		//} else {
+		//	fmt.Println("url pass ::", r.RequestURI)
+		//	handler.ServeHTTP(w, r)
+		//}
+		handler.ServeHTTP(w, r)
 	}
 
 }

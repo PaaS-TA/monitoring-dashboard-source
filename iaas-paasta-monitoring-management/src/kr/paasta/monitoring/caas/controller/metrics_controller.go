@@ -46,8 +46,12 @@ func (s *MetricController) GetWorkNodeInfo(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *MetricController) GetContainerList(w http.ResponseWriter, r *http.Request) {
+	var apiRequest model.MetricsRequest
+	apiRequest.WorkloadsName = r.URL.Query().Get("WorkloadsName")
+	apiRequest.PodName = r.URL.Query().Get("PodName")
+
 	//service호출
-	result, err := service.GetMetricsService().GetContainerList()
+	result, err := service.GetMetricsService().GetContainerList(apiRequest)
 
 	if err != nil {
 		util.RenderJsonResponse(err, w)
@@ -81,6 +85,73 @@ func (s *MetricController) GetContainerLog(w http.ResponseWriter, r *http.Reques
 
 	//service호출
 	result, err := service.GetMetricsService().GetContainerLog(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetClusterOverView(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetClusterOverView()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetWorkloadsStatus(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetWorkloadsStatus()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetMasterNodeUsage(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetWorkNodeList()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetWorkloadsContiSummary(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetWorkloadsContiSummary()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetWorkloadsUsage(w http.ResponseWriter, r *http.Request) {
+	var apiRequest model.MetricsRequest
+
+	apiRequest.WorkloadsName = r.URL.Query().Get("WorkloadsName")
+
+	//service호출
+	result, err := service.GetMetricsService().GetWorkloadsUsage(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetPodStatList(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetPodStatList()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetPodMetricList(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetPodMetricList()
 	if err != nil {
 		util.RenderJsonResponse(err, w)
 	}
