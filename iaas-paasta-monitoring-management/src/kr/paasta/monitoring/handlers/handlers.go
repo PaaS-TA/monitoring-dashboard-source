@@ -307,6 +307,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		saasActions = rata.Handlers{
 			routes.SAAS_API_APPLICATION_LIST:   route(applicationController.GetApplicationList),
 			routes.SAAS_API_APPLICATION_STATUS: route(applicationController.GetAgentStatus),
+			routes.SAAS_API_APPLICATION_GAUGE:  route(applicationController.GetAgentGaugeTot),
 		}
 	}
 
@@ -327,7 +328,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routes.CAAS_WORKLOADS_USAGE:         route(caasMetricsController.GetWorkloadsUsage),
 		routes.CAAS_POD_STAT:                route(caasMetricsController.GetPodStatList),
 		routes.CAAS_POD_LIST:                route(caasMetricsController.GetPodMetricList),
-		routes.CAAS_POD_INFO:                route(caasMetricsController.GetMasterNodeUsage),
+		routes.CAAS_POD_INFO:                route(caasMetricsController.GetPodInfo),
 	}
 
 	var actions rata.Handlers
