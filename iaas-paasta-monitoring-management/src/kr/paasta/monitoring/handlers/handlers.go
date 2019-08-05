@@ -329,6 +329,11 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routes.CAAS_POD_STAT:                route(caasMetricsController.GetPodStatList),
 		routes.CAAS_POD_LIST:                route(caasMetricsController.GetPodMetricList),
 		routes.CAAS_POD_INFO:                route(caasMetricsController.GetPodInfo),
+		routes.CAAS_WORK_NODE_GRAPH:         route(caasMetricsController.GetWorkNodeInfoGraph),
+		//routes.CAAS_WORKLOADS_GRAPH:         route(caasMetricsController.GetWorkNodeInfoGraph),
+		routes.CAAS_WORKLOADS_GRAPH: route(caasMetricsController.GetWorkloadsInfoGraph),
+		routes.CAAS_POD_GRAPH:       route(caasMetricsController.GetPodInfoGraph),
+		routes.CAAS_CONTIANER_GRAPH: route(caasMetricsController.GetContainerInfoGraph),
 	}
 
 	var actions rata.Handlers

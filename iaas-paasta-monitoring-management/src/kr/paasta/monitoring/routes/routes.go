@@ -196,6 +196,11 @@ const (
 	CAAS_POD_LIST                = "CAAS_POD_LIST"
 	CAAS_POD_INFO                = "CAAS_POD_INFO"
 
+	CAAS_WORK_NODE_GRAPH = "CAAS_WORK_NODE_GRAPH"
+	CAAS_WORKLOADS_GRAPH = "CAAS_WORKLOADS_GRAPH"
+	CAAS_POD_GRAPH       = "CAAS_POD_GRAPH"
+	CAAS_CONTIANER_GRAPH = "CAAS_CONTIANER_GRAPH"
+
 	// Web Resource
 	Main   = "Main"
 	Static = "Static"
@@ -390,7 +395,6 @@ var PaasRoutes = rata.Routes{
 	{Path: "/v2/paas/app/policy/:guid", Method: "DELETE", Name: PAAS_APP_POLICY_DELETE},
 }
 
-//jk 2019.07.15
 var CaasRoutes = rata.Routes{
 	{Path: "/v2/caas/monitoring/clusterAvg", Method: "GET", Name: CAAS_K8S_CLUSTER_AVG},
 	{Path: "/v2/caas/monitoring/workerNodeList", Method: "GET", Name: CAAS_WORK_NODE_LIST},
@@ -406,6 +410,10 @@ var CaasRoutes = rata.Routes{
 	{Path: "/v2/caas/monitoring/podStat", Method: "GET", Name: CAAS_POD_STAT},
 	{Path: "/v2/caas/monitoring/podList", Method: "GET", Name: CAAS_POD_LIST},
 	{Path: "/v2/caas/monitoring/podInfo", Method: "GET", Name: CAAS_POD_INFO},
+	{Path: "/v2/caas/monitoring/workerNodeGraph", Method: "GET", Name: CAAS_WORK_NODE_GRAPH},
+	{Path: "/v2/caas/monitoring/workloadsGraph", Method: "GET", Name: CAAS_WORKLOADS_GRAPH},
+	{Path: "/v2/caas/monitoring/podGraph", Method: "GET", Name: CAAS_POD_GRAPH},
+	{Path: "/v2/caas/monitoring/containerGraph", Method: "GET", Name: CAAS_CONTIANER_GRAPH},
 }
 
 var SaasRoutes = rata.Routes{

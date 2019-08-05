@@ -114,4 +114,9 @@ type (
 		CpuUsage    string `json:"CpuUsage"`
 		MemoryUsage string `json:"MemoryUsage"`
 	}
+
+	GraphMetric struct {
+		Metric []map[string]string `json:"Metric"`
+		Name   string              `json:"Name"`
+	}
 )

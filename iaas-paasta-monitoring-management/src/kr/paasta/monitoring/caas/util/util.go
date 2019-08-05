@@ -92,13 +92,6 @@ func (e errorMessage) CheckError(resp client.Response, err error) (client.Respon
 	}
 }
 
-func GetDBCurrentTime() time.Time {
-	now := time.Now()
-	t := now.Format(model.DB_DATE_FORMAT)
-	currentTime, _ := time.Parse(time.RFC3339, t)
-	return currentTime
-}
-
 type clientResponse struct {
 	client.Response
 }
@@ -280,4 +273,21 @@ func ConByteToTB(metric string) string {
 	Data := fmt.Sprintf("%.2f", size)
 
 	return Data
+}
+
+func GetUnixTimeFromTo(interval int64) (string, string) {
+	currentTime := time.Now().Unix()
+	previousTime := currentTime - interval
+
+	pTime := strconv.FormatInt(previousTime, 10)
+	cTime := strconv.FormatInt(currentTime, 10)
+
+	return pTime, cTime
+}
+
+func GetPromqlFromToParameter(interval int64, timeStep string) string {
+	fromTime, toTime := GetUnixTimeFromTo(interval)
+
+	parameter := "&start=" + fromTime + "&end=" + toTime + "&step=" + timeStep
+	return parameter
 }

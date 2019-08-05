@@ -157,3 +157,75 @@ func (s *MetricController) GetPodMetricList(w http.ResponseWriter, r *http.Reque
 	}
 	util.RenderJsonResponse(result, w)
 }
+
+func (s *MetricController) GetPodInfo(w http.ResponseWriter, r *http.Request) {
+	var apiRequest model.MetricsRequest
+
+	apiRequest.PodName = r.URL.Query().Get("PodName")
+
+	//service호출
+	result, err := service.GetMetricsService().GetPodInfo(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetWorkNodeInfoGraph(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.MetricsRequest
+
+	apiRequest.Nodename = r.URL.Query().Get("NodeName")
+	apiRequest.Instance = r.URL.Query().Get("Instance")
+
+	//service호출
+	result, err := service.GetMetricsService().GetWorkNodeInfoGraph(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetWorkloadsInfoGraph(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.MetricsRequest
+
+	apiRequest.WorkloadsName = r.URL.Query().Get("WorkloadsName")
+
+	//service호출
+	result, err := service.GetMetricsService().GetWorkloadsInfoGraph(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetPodInfoGraph(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.MetricsRequest
+
+	apiRequest.PodName = r.URL.Query().Get("PodName")
+
+	//service호출
+	result, err := service.GetMetricsService().GetPodInfoGraph(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetContainerInfoGraph(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.MetricsRequest
+
+	apiRequest.ContainerName = r.URL.Query().Get("ContainerName")
+	apiRequest.PodName = r.URL.Query().Get("PodName")
+	apiRequest.NameSpace = r.URL.Query().Get("NameSpace")
+
+	//service호출
+	result, err := service.GetMetricsService().GetContainerInfoGraph(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
