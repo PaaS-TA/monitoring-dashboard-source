@@ -118,6 +118,15 @@ func (s *MetricController) GetMasterNodeUsage(w http.ResponseWriter, r *http.Req
 	util.RenderJsonResponse(result, w)
 }
 
+func (s *MetricController) GetWorkNodeAvg(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetMetricsService().GetWorkNodeAvg()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
 func (s *MetricController) GetWorkloadsContiSummary(w http.ResponseWriter, r *http.Request) {
 	//service호출
 	result, err := service.GetMetricsService().GetWorkloadsContiSummary()
@@ -224,6 +233,41 @@ func (s *MetricController) GetContainerInfoGraph(w http.ResponseWriter, r *http.
 
 	//service호출
 	result, err := service.GetMetricsService().GetContainerInfoGraph(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+//Alarm Process
+func (s *MetricController) GetAlarmInfo(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetAlarmService().GetAlarmInfo()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetAlarmUpdate(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.MetricsRequest
+
+	apiRequest.ContainerName = r.URL.Query().Get("ContainerName")
+	apiRequest.PodName = r.URL.Query().Get("PodName")
+	apiRequest.NameSpace = r.URL.Query().Get("NameSpace")
+
+	//service호출
+	result, err := service.GetMetricsService().GetContainerInfoGraph(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (s *MetricController) GetAlarmLog(w http.ResponseWriter, r *http.Request) {
+	//service호출
+	result, err := service.GetAlarmService().GetAlarmLog()
 	if err != nil {
 		util.RenderJsonResponse(err, w)
 	}

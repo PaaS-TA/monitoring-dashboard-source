@@ -324,16 +324,19 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routes.CAAS_CLUSTER_OVERVIEW:        route(caasMetricsController.GetClusterOverView),
 		routes.CAAS_WORKLOADS_STATUS:        route(caasMetricsController.GetWorkloadsStatus),
 		routes.CAAS_MASTER_NODE_USAGE:       route(caasMetricsController.GetMasterNodeUsage),
+		routes.CAAS_WORK_NODE_AVG:           route(caasMetricsController.GetWorkNodeAvg),
 		routes.CAAS_WORKLOADS_CONTI_SUMMARY: route(caasMetricsController.GetWorkloadsContiSummary),
 		routes.CAAS_WORKLOADS_USAGE:         route(caasMetricsController.GetWorkloadsUsage),
 		routes.CAAS_POD_STAT:                route(caasMetricsController.GetPodStatList),
 		routes.CAAS_POD_LIST:                route(caasMetricsController.GetPodMetricList),
 		routes.CAAS_POD_INFO:                route(caasMetricsController.GetPodInfo),
 		routes.CAAS_WORK_NODE_GRAPH:         route(caasMetricsController.GetWorkNodeInfoGraph),
-		//routes.CAAS_WORKLOADS_GRAPH:         route(caasMetricsController.GetWorkNodeInfoGraph),
-		routes.CAAS_WORKLOADS_GRAPH: route(caasMetricsController.GetWorkloadsInfoGraph),
-		routes.CAAS_POD_GRAPH:       route(caasMetricsController.GetPodInfoGraph),
-		routes.CAAS_CONTIANER_GRAPH: route(caasMetricsController.GetContainerInfoGraph),
+		routes.CAAS_WORKLOADS_GRAPH:         route(caasMetricsController.GetWorkloadsInfoGraph),
+		routes.CAAS_POD_GRAPH:               route(caasMetricsController.GetPodInfoGraph),
+		routes.CAAS_CONTIANER_GRAPH:         route(caasMetricsController.GetContainerInfoGraph),
+		routes.CAAS_ALARM_INFO:              route(caasMetricsController.GetAlarmInfo),
+		routes.CAAS_ALARM_UPDATE:            route(caasMetricsController.GetAlarmUpdate),
+		routes.CAAS_ALARM_LOG:               route(caasMetricsController.GetAlarmLog),
 	}
 
 	var actions rata.Handlers

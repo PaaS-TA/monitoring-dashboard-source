@@ -36,7 +36,7 @@ const (
 	//(PromQl)
 	//Cluster Usage Metrics
 	PQ_POD_USAGE    = "sum(kube_pod_info)/sum(kube_node_status_allocatable_pods{node=~'.*'})"
-	PQ_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{id='/'}[10m]))/sum(machine_cpu_cores)*100"
+	PQ_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{id='/'}[2m]))/sum(machine_cpu_cores)*100"
 	PQ_MEMORY_USAGE = "sum(container_memory_working_set_bytes{id='/'})/sum(machine_memory_bytes)*100"
 	PQ_DISK_USAGE   = "sum(container_fs_usage_bytes{id='/'})/sum(container_fs_limit_bytes{id='/'})*100"
 
@@ -176,6 +176,45 @@ func (s *MetricsService) GetWorkNodeList() ([]model.WorkNodeList, model.ErrMessa
 		workNodeConditionList)
 
 	return workerNodeList, nil
+}
+
+func (s *MetricsService) GetWorkNodeAvg() (model.WorkNodeInfo, model.ErrMessage) {
+	/*
+		Make promQl
+
+	*/
+	// 1.cpuUsage
+	pqCpuUsage := "(avg(irate(node_cpu_seconds_total{mode!='idle',job='node-exporter'}[2m])))*100"
+
+	// 2.memoryUsage
+	pqMemoryUsage :=
+		"avg(((node_memory_MemTotal_bytes{job='node-exporter'}-" +
+			"node_memory_MemFree_bytes{job='node-exporter'}" +
+			"-node_memory_Buffers_bytes{job='node-exporter'}" +
+			"-node_memory_Cached_bytes{job='node-exporter'})" +
+			"/node_memory_MemTotal_bytes{job='node-exporter'})*100)"
+
+	// 3.diskUsage
+	pqDiskUsage :=
+		"avg(container_fs_usage_bytes{id='/'})" +
+			"/avg(container_fs_limit_bytes{id='/'})*100"
+
+	// Metrics Call func
+	cpuUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqCpuUsage, VALUE_1_DATA), 64)
+	memoryUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqMemoryUsage, VALUE_1_DATA), 64)
+	diskUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqDiskUsage, VALUE_1_DATA), 64)
+
+	// Struct Metrics Values Setting
+	cpuUsage := fmt.Sprintf("%.2f", cpuUsageData)
+	memoryUsage := fmt.Sprintf("%.2f", memoryUsageData)
+	diskUsage := fmt.Sprintf("%.2f", diskUsageData)
+
+	var workNodeInfo model.WorkNodeInfo
+	workNodeInfo.CpuUsage = cpuUsage
+	workNodeInfo.MemoryUsage = memoryUsage
+	workNodeInfo.DiskUsage = diskUsage
+
+	return workNodeInfo, nil
 }
 
 func (s *MetricsService) GetWorkNodeInfo(request model.MetricsRequest) (model.WorkNodeInfo, model.ErrMessage) {
