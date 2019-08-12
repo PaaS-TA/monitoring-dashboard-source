@@ -422,7 +422,7 @@ var CaasRoutes = rata.Routes{
 	{Path: "/v2/caas/monitoring/podGraph", Method: "GET", Name: CAAS_POD_GRAPH},
 	{Path: "/v2/caas/monitoring/containerGraph", Method: "GET", Name: CAAS_CONTIANER_GRAPH},
 	{Path: "/v2/caas/monitoring/alarmInfo", Method: "GET", Name: CAAS_ALARM_INFO},
-	{Path: "/v2/caas/monitoring/alarmUpdate", Method: "GET", Name: CAAS_ALARM_UPDATE},
+	{Path: "/v2/caas/monitoring/alarmUpdate", Method: "PUT", Name: CAAS_ALARM_UPDATE},
 	{Path: "/v2/caas/monitoring/alarmLog", Method: "GET", Name: CAAS_ALARM_LOG},
 }
 

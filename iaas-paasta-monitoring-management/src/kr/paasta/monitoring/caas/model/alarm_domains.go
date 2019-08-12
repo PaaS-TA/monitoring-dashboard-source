@@ -17,13 +17,15 @@ type (
 		Warning  int    `json:"Warning"`
 		Critical int    `json:"Critical"`
 		Delay    string `json:"Delay"`
+		AlarmId  int    `json:"AlarmId"`
 	}
 
 	ResultAlarmInfo struct {
-		Result        []AlarmInfo `json:"Metric"`
+		Result        []AlarmInfo `json:"Threshold"`
 		MeasuringTime int         `json:"MeasuringTime"`
 		AlarmMail     string      `json:"AlarmMail"`
 		AlarmTelegram int64       `json:"AlarmTelegram"`
+		ReceiverID    int         `json:"ReceiverID"`
 	}
 
 	AlarmLog struct {

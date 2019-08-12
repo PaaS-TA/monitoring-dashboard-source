@@ -1366,7 +1366,7 @@ func GetPodNameList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
+	fmt.Println(url)
 	//defer resp.Body.Close()
 
 	// 결과 출력

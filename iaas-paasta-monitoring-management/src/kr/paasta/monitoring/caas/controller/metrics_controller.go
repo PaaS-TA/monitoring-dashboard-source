@@ -250,19 +250,13 @@ func (s *MetricController) GetAlarmInfo(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *MetricController) GetAlarmUpdate(w http.ResponseWriter, r *http.Request) {
-
-	var apiRequest model.MetricsRequest
-
-	apiRequest.ContainerName = r.URL.Query().Get("ContainerName")
-	apiRequest.PodName = r.URL.Query().Get("PodName")
-	apiRequest.NameSpace = r.URL.Query().Get("NameSpace")
-
 	//service호출
-	result, err := service.GetMetricsService().GetContainerInfoGraph(apiRequest)
-	if err != nil {
-		util.RenderJsonResponse(err, w)
-	}
-	util.RenderJsonResponse(result, w)
+	//result, err := service.GetAlarmService().GetAlarmUpdate(r)
+	service.GetAlarmService().GetAlarmUpdate(r)
+	//if err != nil {
+	//	util.RenderJsonResponse(err, w)
+	//}
+	//util.RenderJsonResponse(result, w)
 }
 
 func (s *MetricController) GetAlarmLog(w http.ResponseWriter, r *http.Request) {

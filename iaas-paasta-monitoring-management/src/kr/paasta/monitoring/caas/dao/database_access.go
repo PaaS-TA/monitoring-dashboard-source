@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/tidwall/gjson"
 	"kr/paasta/monitoring/caas/model"
 	"kr/paasta/monitoring/caas/util"
 	//"github.com/thoas/go-funk"
@@ -105,6 +106,35 @@ func GetBatchAlarmLog(dbClient *gorm.DB) ([]model.BatchAlarmExecution, model.Err
 	}
 
 	return alarmLog, nil
+}
+
+func UpdateAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData string) model.ErrMessage {
+	var err model.ErrMessage
+
+	for _, data := range udateData {
+		tempMap := data.Map()
+		//make cron_expression
+		cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
+
+		status := dbClient.Debug().Table("batch_alarm_infos").Where("alarm_id = ? ", tempMap["AlarmId"].Int()).
+			Updates(map[string]interface{}{
+				"warning_value": tempMap["Warning"].String(), "critical_value": tempMap["Critical"].String(), "cron_expression": cronExpression, "measure_time": timeData})
+		err = util.GetError().DbCheckError(status.Error)
+	}
+
+	return err
+}
+
+func UpdateAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string, snsId string) model.ErrMessage {
+	var err model.ErrMessage
+
+	status := dbClient.Debug().Table("batch_alarm_receivers").Where("receiver_id = ? ", receiverId).
+		Updates(map[string]interface{}{
+			"email": emailData, "sns_id": snsId})
+
+	err = util.GetError().DbCheckError(status.Error)
+
+	return err
 }
 
 //func InsertBatchExecution(dbClient *gorm.DB, batchExection *model.BatchAlarmExecution) {
