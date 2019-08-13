@@ -113,6 +113,7 @@ type (
 		Disk        string `json:"Disk"`
 		CpuUsage    string `json:"CpuUsage"`
 		MemoryUsage string `json:"MemoryUsage"`
+		DiskUsage   string `json:"DiskUsage"`
 	}
 
 	GraphMetric struct {

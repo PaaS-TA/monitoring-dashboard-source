@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/tidwall/gjson"
-	"kr/paasta/monitoring/caas/model"
-	"kr/paasta/monitoring/caas/util"
+	"kr/paasta/monitoring/saas/model"
+	"kr/paasta/monitoring/saas/util"
 	"strconv"
 
 	//"github.com/thoas/go-funk"
@@ -55,7 +55,7 @@ func CreateTable(dbClient *gorm.DB) {
 func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMessage) {
 	var alarmInfos []model.BatchAlarmInfo
 	//status := dbClient.Debug().Find(&alarmInfos)
-	status := dbClient.Debug().Table("batch_alarm_infos").Where("service_type = 'CaaS'").Find(&alarmInfos)
+	status := dbClient.Debug().Table("batch_alarm_infos").Where("service_type = 'SaaS'").Find(&alarmInfos)
 
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -69,7 +69,7 @@ func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMess
 func GetBatchAlarmReceiver(dbClient *gorm.DB) ([]model.BatchAlarmReceiver, model.ErrMessage) {
 	var alarmReceiver []model.BatchAlarmReceiver
 
-	status := dbClient.Debug().Table("batch_alarm_receivers").Where("service_type = 'CaaS'").Find(&alarmReceiver)
+	status := dbClient.Debug().Table("batch_alarm_receivers").Where("service_type = 'SaaS'").Find(&alarmReceiver)
 
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -87,7 +87,7 @@ func GetBatchAlarmLog(dbClient *gorm.DB) ([]model.BatchAlarmExecution, model.Err
 
 	temp := dbClient.Debug().Table("batch_alarm_infos").
 		Select("alarm_id").
-		Where("service_type = 'CaaS'").Find(&tempAlarmDiv)
+		Where("service_type = 'SaaS'").Find(&tempAlarmDiv)
 
 	err1 := util.GetError().DbCheckError(temp.Error)
 	if err1 != nil {
@@ -130,25 +130,36 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 
 		//make cron_expression
 		cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
-		batchAlarmInfo.ServiceType = "CaaS"
+		batchAlarmInfo.ServiceType = "SaaS"
 		batchAlarmInfo.MetricType = tempMap["Name"].String()
 		batchAlarmInfo.WarningValue = tempWaring
 		batchAlarmInfo.CriticalValue = tempCritical
 		batchAlarmInfo.MeasureTime = timeData
 		batchAlarmInfo.CronExpression = cronExpression
-		batchAlarmInfo.ExecMsg = "CaaS PodName : ${PodName} 현재사용률 " + tempMap["NAME"].String() + " (${Currend_value}%)  ${value_kind}% 사용률 초과(${value}%)"
-		batchAlarmInfo.ParamData1 = ""
-		batchAlarmInfo.ParamData2 = ""
-		batchAlarmInfo.ParamData3 = ""
+		if tempMap["Name"].String() == "SYSTEM_CPU" {
+			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} System CPU 현재사용률 (${Currend_value}}%)"
+			batchAlarmInfo.ParamData1 = "/getAgentStat/cpuLoad/chart.pinpoint"
+			batchAlarmInfo.ParamData2 = "charts.y.CPU_LOAD_SYSTEM.#.2"
+			batchAlarmInfo.ParamData3 = ""
+		}
+
+		if tempMap["Name"].String() == "JVM_CPU" {
+			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} JVM CPU 현재사용률 (${Currend_value}%)"
+			batchAlarmInfo.ParamData1 = "/getAgentStat/cpuLoad/chart.pinpoint"
+			batchAlarmInfo.ParamData2 = "charts.y.CPU_LOAD_JVM.#.2"
+			batchAlarmInfo.ParamData3 = ""
+		}
+
+		if tempMap["Name"].String() == "HEAP_MEMORY" {
+			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} Heap Memory 현재사용률 (${Currend_value}%)"
+			batchAlarmInfo.ParamData1 = "/getAgentStat/jvmGc/chart.pinpoint"
+			batchAlarmInfo.ParamData2 = "charts.y.JVM_MEMORY_HEAP_USED.#.2"
+			batchAlarmInfo.ParamData3 = "charts.y.JVM_MEMORY_HEAP_MAX.#.2`"
+		}
 
 		status = dbClient.Debug().Create(&batchAlarmInfo)
 		err = util.GetError().DbCheckError(status.Error)
 
-		//
-		//status := dbClient.Debug().Table("batch_alarm_infos").Where("alarm_id = ? ", tempMap["AlarmId"].Int()).
-		//	Updates(map[string]interface{}{
-		//		"warning_value": tempMap["Warning"].String(), "critical_value": tempMap["Critical"].String(), "cron_expression": cronExpression, "measure_time": timeData})
-		//err = util.GetError().DbCheckError(status.Error)
 	}
 	return err
 }
@@ -167,7 +178,7 @@ func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string
 	err = util.GetError().DbCheckError(status.Error)
 
 	//batchAlarmReceiver.ReceiverId	= ""  autoincrement
-	batchAlarmReceiver.ServiceType = "CaaS"
+	batchAlarmReceiver.ServiceType = "SaaS"
 	batchAlarmReceiver.Name = "Admin"
 	batchAlarmReceiver.Email = emailData
 	batchAlarmReceiver.SnsId = snsId

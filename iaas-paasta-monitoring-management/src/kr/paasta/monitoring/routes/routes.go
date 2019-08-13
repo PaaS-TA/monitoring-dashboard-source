@@ -178,6 +178,10 @@ const (
 	SAAS_API_APPLICATION_STATUS = "SAAS_API_APPLICATION_STATUS"
 	SAAS_API_APPLICATION_GAUGE  = "SAAS_API_APPLICATION_GAUGE"
 
+	SAAS_ALARM_INFO   = "SAAS_ALARM_INFO"
+	SAAS_ALARM_UPDATE = "SAAS_ALARM_UPDATE"
+	SAAS_ALARM_LOG    = "SAAS_ALARM_LOG"
+
 	// CAAS_API
 	CAAS_K8S_CLUSTER_AVG = "CAAS_K8S_CLUSTER_AVG"
 	CAAS_WORK_NODE_LIST  = "CAAS_WORK_NODE_LIST"
@@ -430,4 +434,7 @@ var SaasRoutes = rata.Routes{
 	{Path: "/v2/saas/app/application/list", Method: "GET", Name: SAAS_API_APPLICATION_LIST},
 	{Path: "/v2/saas/app/application/status", Method: "GET", Name: SAAS_API_APPLICATION_STATUS},
 	{Path: "/v2/saas/app/application/gauge", Method: "GET", Name: SAAS_API_APPLICATION_GAUGE},
+	{Path: "/v2/saas/app/application/alarmInfo", Method: "GET", Name: SAAS_ALARM_INFO},
+	{Path: "/v2/saas/app/application/alarmUpdate", Method: "PUT", Name: SAAS_ALARM_UPDATE},
+	{Path: "/v2/saas/app/application/alarmLog", Method: "GET", Name: SAAS_ALARM_LOG},
 }

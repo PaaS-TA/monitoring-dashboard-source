@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
-	"kr/paasta/monitoring/caas/dao"
-	"kr/paasta/monitoring/caas/model"
-	"kr/paasta/monitoring/caas/util"
+	"kr/paasta/monitoring/saas/dao"
+	"kr/paasta/monitoring/saas/model"
+	//"kr/paasta/monitoring/caas/util"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,24 +25,7 @@ type AlarmService struct {
 }
 
 func GetAlarmService() *AlarmService {
-	config, err := util.ReadConfig(`config.ini`)
-	prometheusUrl, _ := config["prometheus.addr"]
-	url := prometheusUrl + SUB_URI
-
-	k8sApiUrl, _ := config["kubernetesApi.addr"]
-	k8sUrl := k8sApiUrl + K8S_SUB_URI
-
-	rangeUrl := prometheusUrl + SUB_URI_RANGE
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	return &AlarmService{
-		promethusUrl:      url,
-		k8sApiUrl:         k8sUrl,
-		promethusRangeUrl: rangeUrl,
-	}
+	return &AlarmService{}
 }
 
 func (s *AlarmService) GetAlarmInfo() (model.ResultAlarmInfo, model.ErrMessage) {

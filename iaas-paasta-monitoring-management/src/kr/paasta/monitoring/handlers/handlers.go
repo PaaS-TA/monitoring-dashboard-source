@@ -308,6 +308,9 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 			routes.SAAS_API_APPLICATION_LIST:   route(applicationController.GetApplicationList),
 			routes.SAAS_API_APPLICATION_STATUS: route(applicationController.GetAgentStatus),
 			routes.SAAS_API_APPLICATION_GAUGE:  route(applicationController.GetAgentGaugeTot),
+			routes.SAAS_ALARM_INFO:             route(applicationController.GetAlarmInfo),
+			routes.SAAS_ALARM_UPDATE:           route(applicationController.GetAlarmUpdate),
+			routes.SAAS_ALARM_LOG:              route(applicationController.GetAlarmLog),
 		}
 	}
 

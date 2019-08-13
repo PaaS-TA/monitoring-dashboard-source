@@ -90,6 +90,7 @@ const (
 	PQ_POD_CPU_USE    = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name)"  //(MS)
 	PQ_POD_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name)" //(MB)
 	PQ_POD_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)"
+	PQ_POD_DISK_USAGE = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)/avg(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name)"
 	//PQ_COTAINER_MEMORY_USAGE
 	//sum(container_memory_working_set_bytes{container_name!='POD',image!=''}/avg(machine_memory_bytes)*100"
 
@@ -519,6 +520,7 @@ func (s *MetricsService) GetPodMetricList() ([]model.PodMetricList, model.ErrMes
 	podMemUseList := GetPodMemUseList(s.promethusUrl + PQ_POD_MEMORY_USE)
 	podDiskUseList := GetPodDiskUseList(s.promethusUrl + PQ_POD_DISK_USE)
 	podMemUsageList := GetPodMemUsageList(s.promethusUrl)
+	podDiskUsageList := GetPodDiskUsageList(s.promethusUrl + PQ_POD_DISK_USAGE)
 
 	podList := PodMapMerge(
 		podNameList,
@@ -526,7 +528,8 @@ func (s *MetricsService) GetPodMetricList() ([]model.PodMetricList, model.ErrMes
 		podCpuUsageList,
 		podMemUseList,
 		podMemUsageList,
-		podDiskUseList)
+		podDiskUseList,
+		podDiskUsageList)
 
 	return podList, nil
 }
@@ -1366,7 +1369,6 @@ func GetPodNameList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(url)
 	//defer resp.Body.Close()
 
 	// 결과 출력
@@ -1619,6 +1621,39 @@ func GetPodPhaseList(url string) []map[string]string {
 		tempMap["phase"] = tempData1
 		tempMap["value"] = fmt.Sprintf("%.0f", tempData2)
 
+		jsonMap = append(jsonMap, tempMap)
+	}
+	return jsonMap
+}
+func GetPodDiskUsageList(url string) []map[string]string {
+	//var matricValue string
+	resp, err := http.Get(url)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	//defer resp.Body.Close()
+
+	// 결과 출력
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+	}
+
+	str2 := string(data)
+
+	jsonString1 := gjson.Get(str2, "data.result.#")
+
+	jsonMap := make([]map[string]string, 0)
+
+	for i := 0; i < int(jsonString1.Int()); i++ {
+		tempMap := make(map[string]string)
+		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
+		jsonDataMap := jsonData.Map()
+		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
+		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["value"] = util.ConByteToMB(jsonData1.String())
 		jsonMap = append(jsonMap, tempMap)
 	}
 	return jsonMap
@@ -2050,7 +2085,8 @@ func PodMapMerge(
 	podCpuUsageList []map[string]string,
 	podMemUseList []map[string]string,
 	podMemUsageList []map[string]string,
-	podDiskUseList []map[string]string) []model.PodMetricList {
+	podDiskUseList []map[string]string,
+	podDiskUsageList []map[string]string) []model.PodMetricList {
 
 	var podMetricList []model.PodMetricList
 
@@ -2090,6 +2126,12 @@ func PodMapMerge(
 		for _, data := range podDiskUseList {
 			if strings.Compare(podName, data["podname"]) == 0 {
 				podMetricList[i].Disk = data["value"]
+			}
+		}
+
+		for _, data := range podDiskUsageList {
+			if strings.Compare(podName, data["podname"]) == 0 {
+				podMetricList[i].DiskUsage = data["value"]
 			}
 		}
 	}
