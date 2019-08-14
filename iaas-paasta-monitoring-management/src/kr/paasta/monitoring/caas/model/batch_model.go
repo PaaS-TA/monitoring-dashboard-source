@@ -35,7 +35,7 @@ type BatchAlarmExecution struct {
 	ExcutionId      uint64    `gorm:"type:bigint(20) unsigned auto_increment;not null;primary_key"`
 	AlarmId         int       `gorm:"type:int;not null;"`
 	CriticalStatus  string    `gorm:"type:varchar(50);not null;"`
-	MeasureValue    int       `gorm:"type:int;not null;"`
+	MeasureValue    float64   `gorm:"type:float;not null;"`
 	MeasureName1    string    `gorm:"type:varchar(200);not null;"`
 	MeasureName2    string    `gorm:"type:varchar(200);not null;"`
 	MeasureName3    string    `gorm:"type:varchar(200);not null;"`

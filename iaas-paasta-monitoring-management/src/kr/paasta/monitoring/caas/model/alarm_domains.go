@@ -29,11 +29,10 @@ type (
 	}
 
 	AlarmLog struct {
-		WorkNode  string    `json:"WorkNode"`
-		NameSpace string    `json:"NameSpace"`
-		Pod       string    `json:"Pod"`
-		Status    string    `json:"Status"`
-		Issue     string    `json:"Issue"`
-		Time      time.Time `json:"Time"`
+		PodName string    `json:"PodName"`
+		Status  string    `json:"Status"`
+		Issue   string    `json:"Issue"`
+		Time    time.Time `json:"Time"`
+		Type    string    `json:"Type"`
 	}
 )

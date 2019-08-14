@@ -114,19 +114,20 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 	var err model.ErrMessage
 
 	// Delete And Insert
+	status := dbClient.Debug().Where("service_type = 'CaaS'").Delete(model.BatchAlarmInfo{})
 	for _, data := range udateData {
 		batchAlarmInfo := model.BatchAlarmInfo{}
 		tempMap := data.Map()
 		tempWaring, _ := strconv.Atoi(tempMap["Warning"].String())
 		tempCritical, _ := strconv.Atoi(tempMap["Critical"].String())
-		tempAlarmId, _ := strconv.Atoi(tempMap["AlarmId"].String())
-		//Delete
-		delAlarm := model.BatchAlarmInfo{
-			AlarmId: tempAlarmId,
-		}
+		//tempAlarmId, _ := strconv.Atoi(tempMap["AlarmId"].String())
+		//delAlarm := model.BatchAlarmInfo{
+		//	AlarmId: tempAlarmId,
+		//}
 
-		status := dbClient.Debug().Delete(&delAlarm)
-		err = util.GetError().DbCheckError(status.Error)
+		//
+		//status := dbClient.Debug().Delete(&delAlarm)
+		//err = util.GetError().DbCheckError(status.Error)
 
 		//make cron_expression
 		cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
@@ -136,7 +137,7 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 		batchAlarmInfo.CriticalValue = tempCritical
 		batchAlarmInfo.MeasureTime = timeData
 		batchAlarmInfo.CronExpression = cronExpression
-		batchAlarmInfo.ExecMsg = "CaaS PodName : ${PodName} 현재사용률 " + tempMap["NAME"].String() + " (${Currend_value}%)  ${value_kind}% 사용률 초과(${value}%)"
+		batchAlarmInfo.ExecMsg = "CaaS PodName : ${PodName} 현재사용률 " + tempMap["Name"].String() + " (${Currend_value}%)"
 		batchAlarmInfo.ParamData1 = ""
 		batchAlarmInfo.ParamData2 = ""
 		batchAlarmInfo.ParamData3 = ""
@@ -153,17 +154,11 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 	return err
 }
 
-func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string, snsId int64) model.ErrMessage {
+func InsertAlarmReceivers(dbClient *gorm.DB, emailData string, snsId int64) model.ErrMessage {
 	var err model.ErrMessage
 	batchAlarmReceiver := model.BatchAlarmReceiver{}
-	tempReceiverId, _ := strconv.Atoi(receiverId)
-
-	//Delete
-	delAlarmReceiver := model.BatchAlarmReceiver{
-		ReceiverId: tempReceiverId,
-	}
-
-	status := dbClient.Debug().Delete(&delAlarmReceiver)
+	// Delete And Insert
+	status := dbClient.Debug().Where("service_type = 'CaaS'").Delete(model.BatchAlarmReceiver{})
 	err = util.GetError().DbCheckError(status.Error)
 
 	//batchAlarmReceiver.ReceiverId	= ""  autoincrement
