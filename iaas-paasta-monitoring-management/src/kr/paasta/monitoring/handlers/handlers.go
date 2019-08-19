@@ -340,6 +340,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		routes.CAAS_ALARM_INFO:              route(caasMetricsController.GetAlarmInfo),
 		routes.CAAS_ALARM_UPDATE:            route(caasMetricsController.GetAlarmUpdate),
 		routes.CAAS_ALARM_LOG:               route(caasMetricsController.GetAlarmLog),
+		routes.CAAS_WORK_NODE_GRAPHLIST:     route(caasMetricsController.GetWorkNodeInfoGraphList),
 	}
 
 	var actions rata.Handlers

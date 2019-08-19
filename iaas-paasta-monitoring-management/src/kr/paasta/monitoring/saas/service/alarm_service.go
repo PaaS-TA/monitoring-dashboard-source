@@ -88,11 +88,13 @@ func (s *AlarmService) GetAlarmUpdate(r *http.Request) {
 	jsonString2 := gjson.Get(str2, "MeasuringTime")
 	jsonString3 := gjson.Get(str2, "AlarmMail")
 	jsonString4 := gjson.Get(str2, "AlarmTelegram")
+	jsonString5 := gjson.Get(str2, "ReceiverID")
 
 	temp := jsonString1.Array()
 	measuringTime, _ := strconv.Atoi(jsonString2.String())
 	alarmMail := jsonString3.String()
 	alarmTelegram := jsonString4.Int()
+	receiverID := jsonString5.String()
 
 	err1 := dao.InsertAlarmInfo(dbAccessObj, temp, measuringTime)
 
@@ -100,7 +102,7 @@ func (s *AlarmService) GetAlarmUpdate(r *http.Request) {
 		fmt.Println(err)
 	}
 
-	err2 := dao.InsertAlarmReceivers(dbAccessObj, alarmMail, alarmTelegram)
+	err2 := dao.InsertAlarmReceivers(dbAccessObj, receiverID, alarmMail, alarmTelegram)
 
 	if err2 != nil {
 		fmt.Println(err2)

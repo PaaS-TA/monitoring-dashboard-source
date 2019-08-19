@@ -12,9 +12,13 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 const (
+	// PLUS(+)
+	PLUS = "%2B"
+
 	// metricUrl
 	SUB_URI       = "/api/v1/query?query="
 	SUB_URI_RANGE = "/api/v1/query_range?query="
@@ -36,9 +40,9 @@ const (
 	//(PromQl)
 	//Cluster Usage Metrics
 	PQ_POD_USAGE    = "sum(kube_pod_info)/sum(kube_node_status_allocatable_pods{node=~'.*'})"
-	PQ_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{id='/'}[2m]))/sum(machine_cpu_cores)*100"
-	PQ_MEMORY_USAGE = "sum(container_memory_working_set_bytes{id='/'})/sum(machine_memory_bytes)*100"
-	PQ_DISK_USAGE   = "sum(container_fs_usage_bytes{id='/'})/sum(container_fs_limit_bytes{id='/'})*100"
+	PQ_CPU_USAGE    = "cluster:node_cpu:sum_rate5m"
+	PQ_MEMORY_USAGE = "(sum(node_memory_MemTotal_bytes)-sum(node_memory_MemFree_bytes" + PLUS + "node_memory_Buffers_bytes" + PLUS + "node_memory_Cached_bytes))/sum(node_memory_MemTotal_bytes)*100"
+	PQ_DISK_USAGE   = "(sum(node_filesystem_files)-sum(node_filesystem_files_free))/sum(node_filesystem_files)*100"
 
 	//Cluster Overview
 	PQ_CLUSTER_ALERTS            = "sum(ALERTS)"
@@ -67,13 +71,15 @@ const (
 
 	//Work Node Usage Metrics
 	PQ_WORK_NODE_NAME_LIST    = "count(node_uname_info)by(instance,nodename,namespace)"
-	PQ_WORK_NODE_CPU_USAGE    = "(sum(irate(node_cpu_seconds_total{mode!='idle',job='node-exporter'}[2m]))by(instance))*100"
+	PQ_WORK_NODE_CPU_USAGE    = "sum(instance:node_cpu:ratio)by(instance)*100"
 	PQ_WORK_NODE_MEMORY_USAGE = "max(((node_memory_MemTotal_bytes{job='node-exporter'}-" +
 		"node_memory_MemFree_bytes{job='node-exporter'}" +
 		"-node_memory_Buffers_bytes{job='node-exporter'}" +
 		"-node_memory_Cached_bytes{job='node-exporter'})" +
 		"/node_memory_MemTotal_bytes{job='node-exporter'})*100)by(instance)"
-	PQ_WORK_NODE_CPU_USE    = "avg(node_cpu_seconds_total{job='node-exporter',mode!='idle'})by(instance)"
+	//CHANGE METRIC CPU_USE => CPU ALLOC
+	//PQ_WORK_NODE_CPU_USE      = "avg(node_cpu_seconds_total{job='node-exporter',mode!='idle'})by(instance)"
+	PQ_WORK_NODE_CPU_ALLOC  = "sum(kube_node_status_allocatable_cpu_cores*100)by(node)"
 	PQ_WORK_NODE_MEMORY_USE = "sum(node_memory_MemTotal_bytes{job='node-exporter'})by(instance)"
 	PQ_WORK_NODE_DISK_USE   = "sum(node_filesystem_size_bytes{job='node-exporter'})by(instance)"
 	PQ_WORK_NODE_CONDITION  = "count(kube_node_status_condition{condition='Ready',status='true'})by(node)"
@@ -85,23 +91,20 @@ const (
 	*/
 
 	//Pod Usage Metrics
-	PQ_POD_LIST       = "count(container_cpu_usage_seconds_total{pod_name!='',container_name!='POD',image!=''})by(pod_name)"
-	PQ_POD_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[2m]))by(pod_name)*100"
-	PQ_POD_CPU_USE    = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name)"  //(MS)
-	PQ_POD_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name)" //(MB)
-	PQ_POD_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)"
-	PQ_POD_DISK_USAGE = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)/avg(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name)"
-	//PQ_COTAINER_MEMORY_USAGE
-	//sum(container_memory_working_set_bytes{container_name!='POD',image!=''}/avg(machine_memory_bytes)*100"
+	PQ_POD_LIST         = "count(container_cpu_usage_seconds_total{pod_name!='',container_name!='POD',image!=''})by(pod_name)"
+	PQ_POD_CPU_USAGE    = "avg(rate(container_cpu_usage_seconds_total{pod_name!=''}[5m]))by(pod_name)*100"
+	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{pod_name!=''})by(pod_name)/1024/1024"
+	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{pod_name!=''})by(pod_name)/1024/1024"
+	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{container_name!=''})by(pod_name)/avg(container_fs_limit_bytes{container_name!=''})by(pod_name)*100"
+	PQ_POD_MEMORY_USAGE = "(sum(container_memory_working_set_bytes{pod_name!=''})by(pod_name))/(sum(container_memory_usage_bytes{pod_name!=''})by(pod_name))*100"
 
 	//Container Usage Metrics
 	//	PQ_COTAINER_NAME_LIST  = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"
-	PQ_COTAINER_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[2m]))by(namespace,pod_name,container_name)*100"
-	PQ_COTAINER_CPU_USE    = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"  //(MS)
-	PQ_COTAINER_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)" //(MB)
-	PQ_COTAINER_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"
-	//PQ_COTAINER_MEMORY_USAGE
-	//sum(container_memory_working_set_bytes{container_name!='POD',image!=''}/avg(machine_memory_bytes)*100"
+	PQ_COTAINER_CPU_USE      = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)" //(MS)
+	PQ_COTAINER_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container_name!=''}[5m])*100)by(namespace,pod_name,container_name)"
+	PQ_COTAINER_MEMORY_USE   = "sum(container_memory_working_set_bytes{container_name!=''})by(namespace,pod_name,container_name)/1024/1024"
+	PQ_COTAINER_DISK_USE     = "sum(container_fs_usage_bytes{container_name!=''})by(namespace,pod_name,container_name)/1024/1024"
+	PQ_COTAINER_MEMORY_USAGE = "sum(container_memory_working_set_bytes{container_name!=''}/container_memory_usage_bytes{container_name!=''}*100)by(namespace,pod_name,container_name)"
 
 	//Pod Phase
 	PQ_POD_PHASE = "count(kube_pod_status_phase>0)by(phase)"
@@ -162,7 +165,7 @@ func (s *MetricsService) GetWorkNodeList() ([]model.WorkNodeList, model.ErrMessa
 	workNodeMemUsageList := GetWorkNodeMemUsageList(s.promethusUrl + PQ_WORK_NODE_MEMORY_USAGE)
 	workNodeCpuUsageList := GetWorkNodeCpuUsageList(s.promethusUrl + PQ_WORK_NODE_CPU_USAGE)
 	workNodeDiskUseList := GetWorkNodeDiskUseList(s.promethusUrl + PQ_WORK_NODE_DISK_USE)
-	workNodeCpuUseList := GetWorkNodeCpuUseList(s.promethusUrl + PQ_WORK_NODE_CPU_USE)
+	workNodeCpuUseList := GetWorkNodeCpuUseList(s.promethusUrl + PQ_WORK_NODE_CPU_ALLOC)
 	workNodeMemUseList := GetWorkNodeMemUseList(s.promethusUrl + PQ_WORK_NODE_MEMORY_USE)
 	workNodeConditionList := GetWorkNodeConditionList(s.promethusUrl + PQ_WORK_NODE_CONDITION)
 
@@ -184,26 +187,10 @@ func (s *MetricsService) GetWorkNodeAvg() (model.WorkNodeInfo, model.ErrMessage)
 		Make promQl
 
 	*/
-	// 1.cpuUsage
-	pqCpuUsage := "(avg(irate(node_cpu_seconds_total{mode!='idle',job='node-exporter'}[2m])))*100"
-
-	// 2.memoryUsage
-	pqMemoryUsage :=
-		"avg(((node_memory_MemTotal_bytes{job='node-exporter'}-" +
-			"node_memory_MemFree_bytes{job='node-exporter'}" +
-			"-node_memory_Buffers_bytes{job='node-exporter'}" +
-			"-node_memory_Cached_bytes{job='node-exporter'})" +
-			"/node_memory_MemTotal_bytes{job='node-exporter'})*100)"
-
-	// 3.diskUsage
-	pqDiskUsage :=
-		"avg(container_fs_usage_bytes{id='/'})" +
-			"/avg(container_fs_limit_bytes{id='/'})*100"
-
 	// Metrics Call func
-	cpuUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqCpuUsage, VALUE_1_DATA), 64)
-	memoryUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqMemoryUsage, VALUE_1_DATA), 64)
-	diskUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqDiskUsage, VALUE_1_DATA), 64)
+	cpuUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+PQ_CPU_USAGE, VALUE_1_DATA), 64)
+	memoryUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+PQ_MEMORY_USAGE, VALUE_1_DATA), 64)
+	diskUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+PQ_DISK_USAGE, VALUE_1_DATA), 64)
 
 	// Struct Metrics Values Setting
 	cpuUsage := fmt.Sprintf("%.2f", cpuUsageData)
@@ -231,22 +218,14 @@ func (s *MetricsService) GetWorkNodeInfo(request model.MetricsRequest) (model.Wo
 		"/sum(kube_node_status_allocatable_pods{node='" + nodeName + "'})"
 
 	// 2.cpuUsage (input:Instance)
-	pqCpuUsage := "(sum(irate(node_cpu_seconds_total{mode!='idle',job='node-exporter',instance='" + instance + "'}[2m])))*100"
+	pqCpuUsage := "instance:node_cpu:ratio{instance='" + instance + "'}*100"
 
 	// 3.memoryUsage (input:Instance)
-	pqMemoryUsage :=
-		"max(((node_memory_MemTotal_bytes{job='node-exporter',instance='" + instance + "'}-" +
-			"node_memory_MemFree_bytes{job='node-exporter',instance='" + instance + "'}" +
-			"-node_memory_Buffers_bytes{job='node-exporter',instance='" + instance + "'}" +
-			"-node_memory_Cached_bytes{job='node-exporter',instance='" + instance + "'})" +
-			"/node_memory_MemTotal_bytes{job='node-exporter',instance='" + instance + "'})*100)"
+	pqMemoryUsage := "(sum(node_memory_MemTotal_bytes{instance='" + instance + "'})-sum(node_memory_MemFree_bytes{instance='" + instance + "'}" + PLUS + "node_memory_Buffers_bytes{instance='" + instance + "'}" + PLUS + "node_memory_Cached_bytes{instance='" + instance + "'}))/sum(node_memory_MemTotal_bytes{instance='" + instance + "'})*100"
 
-	// 4.diskUsage (input:nodeName)
-	pqDiskUsage :=
-		"sum(container_fs_usage_bytes{id='/',node='" + nodeName + "'})" +
-			"/sum(container_fs_limit_bytes{id='/',node='" + nodeName + "'})*100"
+	// 4.diskUsage (input:Instance)
+	var pqDiskUsage = "(sum(node_filesystem_files{instance='" + instance + "'})-sum(node_filesystem_files_free{instance='" + instance + "'}))/sum(node_filesystem_files{instance='" + instance + "'})*100"
 
-	// Metrics Call func
 	podUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqPodUsage, VALUE_1_DATA), 64)
 	cpuUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqCpuUsage, VALUE_1_DATA), 64)
 	memoryUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqMemoryUsage, VALUE_1_DATA), 64)
@@ -270,15 +249,15 @@ func (s *MetricsService) GetWorkNodeInfo(request model.MetricsRequest) (model.Wo
 func (s *MetricsService) GetContainerList(request model.MetricsRequest) ([]model.ContainerMetricList, model.ErrMessage) {
 	// Metrics Call func
 	containerNameList := GetContainerNameList(s.promethusUrl, request)
-	containerCpuUseList := GetContainerCpuUseList(s.promethusUrl + PQ_COTAINER_CPU_USE)
+	//containerCpuUseList := GetContainerCpuUseList(s.promethusUrl + PQ_COTAINER_CPU_USE)
 	containerCpuUsageList := GetContainerCpuUsageList(s.promethusUrl + PQ_COTAINER_CPU_USAGE)
 	containerMemUseList := GetContainerMemUseList(s.promethusUrl + PQ_COTAINER_MEMORY_USE)
-	containerMemUsageList := GetContainerMemUsageList(s.promethusUrl)
+	containerMemUsageList := GetContainerMemUsageList(s.promethusUrl + PQ_COTAINER_MEMORY_USAGE)
 	containerDiskUseList := GetContainerDiskUseList(s.promethusUrl + PQ_COTAINER_DISK_USE)
 
 	contanierList := ContainerMapMerge(
 		containerNameList,
-		containerCpuUseList,
+		//containerCpuUseList,
 		containerCpuUsageList,
 		containerMemUseList,
 		containerMemUsageList,
@@ -515,16 +494,16 @@ func (s *MetricsService) GetPodStatList() (model.PodPhase, model.ErrMessage) {
 func (s *MetricsService) GetPodMetricList() ([]model.PodMetricList, model.ErrMessage) {
 	// Metrics Call func
 	podNameList := GetPodNameList(s.promethusUrl + PQ_POD_LIST)
-	podCpuUseList := GetPodCpuUseList(s.promethusUrl + PQ_POD_CPU_USE)
+	//podCpuUseList := GetPodCpuUseList(s.promethusUrl + PQ_POD_CPU_USE)
 	podCpuUsageList := GetPodCpuUsageList(s.promethusUrl + PQ_POD_CPU_USAGE)
 	podMemUseList := GetPodMemUseList(s.promethusUrl + PQ_POD_MEMORY_USE)
 	podDiskUseList := GetPodDiskUseList(s.promethusUrl + PQ_POD_DISK_USE)
-	podMemUsageList := GetPodMemUsageList(s.promethusUrl)
+	podMemUsageList := GetPodMemUsageList(s.promethusUrl + PQ_POD_MEMORY_USAGE)
 	podDiskUsageList := GetPodDiskUsageList(s.promethusUrl + PQ_POD_DISK_USAGE)
 
 	podList := PodMapMerge(
 		podNameList,
-		podCpuUseList,
+		//podCpuUseList,
 		podCpuUsageList,
 		podMemUseList,
 		podMemUsageList,
@@ -611,6 +590,55 @@ func (s *MetricsService) GetWorkNodeInfoGraph(request model.MetricsRequest) ([]m
 	graphMetric[3].Name = "Disk"
 
 	return graphMetric, nil
+}
+
+func (s *MetricsService) GetWorkNodeInfoGraphList(request model.MetricsRequest) ([]model.GraphMetricList, model.ErrMessage) {
+	nodeName := request.Nodename
+	instance := request.Instance
+
+	//interval : currentTime between endTime(interval Time (sec))
+	//timeStep : timeSeries graph(timeStep Time (sec))
+	fromToTimeParmameter := util.GetPromqlFromToParameter(3600, "600")
+
+	/*
+	   Make promQl
+
+	*/
+	// 1.podUsage (input:nodeName)
+
+	pqPodUsage := "sum(kube_pod_info{node='" + nodeName + "'})" + fromToTimeParmameter
+
+	//// 2.cpuUsage (input:Instance)
+	pqCpuUsage := "node_cpu_seconds_total{mode!='idle',job='node-exporter',instance='" + instance + "'}" + fromToTimeParmameter
+	//
+	// 3.memoryUsage (input:Instance)
+	pqMemoryUsage := "max(((node_memory_MemTotal_bytes{job='node-exporter',instance='" + instance + "'})))" + fromToTimeParmameter
+	//
+	// 4.diskUsage (input:nodeName)
+	pqDiskUsage := "sum(container_fs_usage_bytes{id='/',node='" + nodeName + "'})" + fromToTimeParmameter
+
+	// Metrics Call func
+	podGraphData := GetGraphDataMap(s.promethusRangeUrl+pqPodUsage, POD)
+	cpuGraphData := GetGraphDataMap(s.promethusRangeUrl+pqCpuUsage, CPU)
+	memGraphData := GetGraphDataMap(s.promethusRangeUrl+pqMemoryUsage, MEMORY)
+	diskGraphData := GetGraphDataMap(s.promethusRangeUrl+pqDiskUsage, DISK)
+
+	//fmt.Println(podGraphData)
+
+	len := len(podGraphData)
+
+	graphMetricList := make([]model.GraphMetricList, len)
+
+	for i := 0; i < len; i++ {
+		time_date, _ := strconv.Atoi(podGraphData[i]["time"])
+		graphMetricList[i].Time = time.Unix(int64(time_date), 0).Format("2006-01-02 15:04:05")
+		graphMetricList[i].PodUsage = podGraphData[i]["usage"]
+		graphMetricList[i].CpuUsage = cpuGraphData[i]["usage"]
+		graphMetricList[i].MemoryUsage = memGraphData[i]["usage"]
+		graphMetricList[i].DiskUsage = diskGraphData[i]["usage"]
+	}
+
+	return graphMetricList, nil
 }
 
 func (s *MetricsService) GetWorkloadsInfoGraph(request model.MetricsRequest) ([]model.GraphMetric, model.ErrMessage) {
@@ -1005,12 +1033,12 @@ func GetWorkNodeCpuUseList(url string) []map[string]string {
 
 	for i := 0; i < int(jsonString1.Int()); i++ {
 		tempMap := make(map[string]string)
-		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.instance")
+		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.node")
 		tempData1 := jsonData1.String()
 		jsonData2 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempData2 := jsonData2.Float()
 
-		tempMap["instance"] = tempData1
+		tempMap["node"] = tempData1
 		tempMap["value"] = fmt.Sprintf("%.0f", tempData2)
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1146,7 +1174,6 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 	//Workloads(WL) Container PromQl
 	pqWLmetaDataList := "count(kube_" + workloadsName + "_metadata_generation)by(namespace," + workloadsName + ")"
 	resp, err := http.Get(url + pqWLmetaDataList)
-
 	if err != nil {
 		log.Println(err)
 	}
@@ -1162,7 +1189,7 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 
 	jsonString1 := gjson.Get(str2, "data.result.#")
 
-	var dataWLcpu float64
+	//var dataWLcpu float64
 	var dataWLcpuUsage float64
 	var dataWLmemory float64
 	var dataWLmemoryUsage float64
@@ -1180,7 +1207,7 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 
 		go func(url string, nameSpace string, workLoadName string) {
 			defer wm.Done()
-			dataWLcpu += GetDivsionContiCpuUse(url, nameSpace, workLoadName, WORKLOADS)
+			//dataWLcpu += GetDivsionContiCpuUse(url, nameSpace, workLoadName, WORKLOADS)
 			dataWLcpuUsage += GetDivsionContiCpuUsage(url, nameSpace, workLoadName, WORKLOADS)
 			dataWLmemory += GetDivsionContiMemoryUse(url, nameSpace, workLoadName, WORKLOADS)
 			dataWLmemoryUsage += GetDivsionContiMemoryUsage(url, nameSpace, workLoadName, WORKLOADS)
@@ -1190,11 +1217,11 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 	wm.Wait()
 
 	workloadsMetrics.Name = workloadsName
-	workloadsMetrics.Cpu = fmt.Sprintf("%.2f", dataWLcpu)
-	workloadsMetrics.CpuUsage = fmt.Sprintf("%.2f", dataWLcpuUsage)
-	workloadsMetrics.Memory = util.ConByteToMB(fmt.Sprintf("%.2f", dataWLmemory))
-	workloadsMetrics.Disk = util.ConByteToMB(fmt.Sprintf("%.2f", dataWLdisk))
-	workloadsMetrics.MemoryUsage = fmt.Sprintf("%.2f", dataWLmemoryUsage)
+	//workloadsMetrics.Cpu = fmt.Sprintf("%.2f", dataWLcpu)
+	workloadsMetrics.CpuUsage = fmt.Sprintf("%.2f", dataWLcpuUsage/float64(jsonString1.Int()))
+	workloadsMetrics.Memory = fmt.Sprintf("%.2f", dataWLmemory)
+	workloadsMetrics.Disk = fmt.Sprintf("%.2f", dataWLdisk)
+	workloadsMetrics.MemoryUsage = fmt.Sprintf("%.2f", dataWLmemoryUsage/float64(jsonString1.Int()))
 
 	dataDiskUsage := GetDivsionContiDiskUsage(url, dataWLdisk)
 	workloadsMetrics.DiskUsage = fmt.Sprintf("%.2f", dataDiskUsage)
@@ -1209,9 +1236,9 @@ func GetDivsionContiCpuUse(url string, namespace string, podname string, divisio
 func GetDivsionContiMemoryUse(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(container_memory_working_set_bytes{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})"
+		pqUrl = "sum(container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})"
 	} else if division == "pod" {
-		pqUrl = "sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name=~'" + podname + "'})"
+		pqUrl = "sum(container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "'})"
 	}
 
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
@@ -1220,55 +1247,31 @@ func GetDivsionContiMemoryUse(url string, namespace string, podname string, divi
 func GetDivsionContiCpuUsage(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}[2m]))"
+		pqUrl = "avg(rate(container_cpu_usage_seconds_total{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}[5m])*100)"
 	} else if division == "pod" {
-		pqUrl = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name=~'" + podname + "'}[2m]))"
+		pqUrl = "avg(rate(container_cpu_usage_seconds_total{container_name!='POD',pod_name=~'" + podname + "'}[5m])*100)"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 	return dataWL
 }
 func GetDivsionContiMemoryUsage(url string, namespace string, podname string, division string) float64 {
-	// 1.machineMem
-	var machineMem float64
-	machineMemUri := url + "avg(machine_memory_bytes)"
-
-	//var matricValue string
-	resp, err := http.Get(machineMemUri)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	//defer resp.Body.Close()
-
-	// 결과 출력
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-	}
-
-	str2 := string(data)
-
-	jsonString0 := gjson.Get(str2, "data.result.0.value.1")
-
-	machineMem = jsonString0.Float()
-
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(container_memory_working_set_bytes{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})"
+		pqUrl = "container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}/container_memory_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
 	} else if division == "pod" {
-		pqUrl = "sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name=~'" + podname + "'})"
+		pqUrl = "container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "-.*'}/container_memory_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 
-	return dataWL / machineMem * 100
+	return dataWL
 }
 func GetDivsionContiDiskUse(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(container_fs_usage_bytes{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})"
+		pqUrl = "sum(container_fs_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}/1024/1024)"
+		fmt.Println(pqUrl)
 	} else if division == "pod" {
-		pqUrl = "sum(container_fs_usage_bytes{container_name!='POD',image!='',pod_name=~'" + podname + "'})"
+		pqUrl = "sum(container_fs_usage_bytes{container_name!='',pod_name=~'" + podname + "-.*'}/1024/1024)"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 	return dataWL
@@ -1306,9 +1309,9 @@ func GetDivsionContiDiskUsage(url string, diskUse float64) float64 {
 func GetDivsionContiNameList(url string, namespace string, podname string, division string) []map[string]string {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "count(container_cpu_usage_seconds_total{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})by(namespace,pod_name,container_name)"
+		pqUrl = "count(kube_pod_container_info{namespace='" + namespace + "',pod=~'" + podname + "-.*'})by(namespace,pod,container)"
 	} else if division == "pod" {
-		pqUrl = "count(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name='" + podname + "'})by(namespace,pod_name,container_name)"
+		pqUrl = "count(kube_pod_container_info{pod='" + podname + "'})by(namespace,pod,container)"
 	}
 
 	resp, err := http.Get(url + pqUrl)
@@ -1336,8 +1339,8 @@ func GetDivsionContiNameList(url string, namespace string, podname string, divis
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["containername"] = jsonDataMap["container_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
+		tempMap["containername"] = jsonDataMap["container"].String()
 
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1489,18 +1492,14 @@ func GetPodMemUseList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["value"] = util.ConByteToMB(jsonData1.String())
+		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
 	return jsonMap
 }
 func GetPodMemUsageList(url string) []map[string]string {
-	// 1.machineMem
-	var machineMem float64
-	machineMemUri := url + "avg(machine_memory_bytes)"
-
 	//var matricValue string
-	resp, err := http.Get(machineMemUri)
+	resp, err := http.Get(url)
 
 	if err != nil {
 		log.Println(err)
@@ -1516,41 +1515,17 @@ func GetPodMemUsageList(url string) []map[string]string {
 
 	str2 := string(data)
 
-	jsonString0 := gjson.Get(str2, "data.result.0.value.1")
-
-	machineMem = jsonString0.Float()
-
-	// 2.memUsageUri
-	memUsageUri := url + "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name)"
-
-	//var matricValue string
-	resp1, err := http.Get(memUsageUri)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	//defer resp.Body.Close()
-
-	// 결과 출력
-	data1, err := ioutil.ReadAll(resp1.Body)
-	if err != nil {
-		log.Println(err)
-	}
-
-	str3 := string(data1)
-
-	jsonString1 := gjson.Get(str3, "data.result.#")
+	jsonString1 := gjson.Get(str2, "data.result.#")
 
 	jsonMap := make([]map[string]string, 0)
 
 	for i := 0; i < int(jsonString1.Int()); i++ {
 		tempMap := make(map[string]string)
-		jsonData := gjson.Get(str3, "data.result."+strconv.Itoa(i)+".metric")
+		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
-		jsonData1 := gjson.Get(str3, "data.result."+strconv.Itoa(i)+".value.1")
+		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["value"] = fmt.Sprintf("%.2f", (jsonData1.Float() / machineMem * 100))
+		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
 	return jsonMap
@@ -1583,7 +1558,7 @@ func GetPodDiskUseList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["value"] = util.ConByteToMB(jsonData1.String())
+		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1819,18 +1794,14 @@ func GetContainerMemUseList(url string) []map[string]string {
 		tempMap["podname"] = jsonDataMap["pod_name"].String()
 		tempMap["containername"] = jsonDataMap["container_name"].String()
 		//		tempMap["value"] =	jsonData1.String()
-		tempMap["value"] = util.ConByteToMB(jsonData1.String())
+		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
 	return jsonMap
 }
 func GetContainerMemUsageList(url string) []map[string]string {
-	// 1.machineMem
-	var machineMem float64
-	machineMemUri := url + "avg(machine_memory_bytes)"
-
 	//var matricValue string
-	resp, err := http.Get(machineMemUri)
+	resp, err := http.Get(url)
 
 	if err != nil {
 		log.Println(err)
@@ -1846,43 +1817,19 @@ func GetContainerMemUsageList(url string) []map[string]string {
 
 	str2 := string(data)
 
-	jsonString0 := gjson.Get(str2, "data.result.0.value.1")
-
-	machineMem = jsonString0.Float()
-
-	// 2.memUsageUri
-	memUsageUri := url + "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"
-
-	//var matricValue string
-	resp1, err := http.Get(memUsageUri)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	//defer resp.Body.Close()
-
-	// 결과 출력
-	data1, err := ioutil.ReadAll(resp1.Body)
-	if err != nil {
-		log.Println(err)
-	}
-
-	str3 := string(data1)
-
-	jsonString1 := gjson.Get(str3, "data.result.#")
+	jsonString1 := gjson.Get(str2, "data.result.#")
 
 	jsonMap := make([]map[string]string, 0)
 
 	for i := 0; i < int(jsonString1.Int()); i++ {
 		tempMap := make(map[string]string)
-		jsonData := gjson.Get(str3, "data.result."+strconv.Itoa(i)+".metric")
+		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
-		jsonData1 := gjson.Get(str3, "data.result."+strconv.Itoa(i)+".value.1")
+		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
 		tempMap["podname"] = jsonDataMap["pod_name"].String()
 		tempMap["containername"] = jsonDataMap["container_name"].String()
-		tempMap["value"] = fmt.Sprintf("%.2f", (jsonData1.Float() / machineMem * 100))
+		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
 	return jsonMap
@@ -1917,7 +1864,7 @@ func GetContainerDiskUseList(url string) []map[string]string {
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
 		tempMap["podname"] = jsonDataMap["pod_name"].String()
 		tempMap["containername"] = jsonDataMap["container_name"].String()
-		tempMap["value"] = util.ConByteToMB(jsonData1.String())
+		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1988,7 +1935,7 @@ func WorkNodeMapMerge(
 
 		//NodeCpuUse
 		for _, data := range workNodeCpuUseList {
-			if strings.Compare(dataInstance, data["instance"]) == 0 {
+			if strings.Compare(dataNodeName, data["node"]) == 0 {
 				workNodeList[i].Cpu = data["value"]
 			}
 		}
@@ -2018,7 +1965,7 @@ func WorkNodeMapMerge(
 
 func ContainerMapMerge(
 	containerNameList []map[string]string,
-	containerCpuUseList []map[string]string,
+	//	containerCpuUseList []map[string]string,
 	containerCpuUsageList []map[string]string,
 	containerMemUseList []map[string]string,
 	containerMemUsageList []map[string]string,
@@ -2039,12 +1986,12 @@ func ContainerMapMerge(
 		nameSpace := containerMetricList[i].NameSpace
 		podName := containerMetricList[i].PodName
 		containerName := containerMetricList[i].ContainerName
-
-		for _, data := range containerCpuUseList {
-			if (strings.Compare(nameSpace, data["namespace"]) == 0) && (strings.Compare(podName, data["podname"]) == 0) && (strings.Compare(containerName, data["containername"]) == 0) {
-				containerMetricList[i].Cpu = data["value"]
-			}
-		}
+		//
+		//for _, data := range containerCpuUseList {
+		//	if (strings.Compare(nameSpace, data["namespace"]) == 0) && (strings.Compare(podName, data["podname"]) == 0) && (strings.Compare(containerName, data["containername"]) == 0) {
+		//		containerMetricList[i].Cpu = data["value"]
+		//	}
+		//}
 
 		for _, data := range containerCpuUsageList {
 			if (strings.Compare(nameSpace, data["namespace"]) == 0) && (strings.Compare(podName, data["podname"]) == 0) && (strings.Compare(containerName, data["containername"]) == 0) {
@@ -2081,7 +2028,7 @@ func ContainerMapMerge(
 
 func PodMapMerge(
 	podNameList []map[string]string,
-	podCpuUseList []map[string]string,
+	//podCpuUseList []map[string]string,
 	podCpuUsageList []map[string]string,
 	podMemUseList []map[string]string,
 	podMemUsageList []map[string]string,
@@ -2099,11 +2046,11 @@ func PodMapMerge(
 	for i := 0; i < len(podMetricList); i++ {
 		podName := podMetricList[i].PodName
 
-		for _, data := range podCpuUseList {
-			if strings.Compare(podName, data["podname"]) == 0 {
-				podMetricList[i].Cpu = data["value"]
-			}
-		}
+		//for _, data := range podCpuUseList {
+		//	if strings.Compare(podName, data["podname"]) == 0 {
+		//		podMetricList[i].Cpu = data["value"]
+		//	}
+		//}
 
 		for _, data := range podCpuUsageList {
 			if strings.Compare(podName, data["podname"]) == 0 {

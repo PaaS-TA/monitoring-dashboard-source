@@ -239,6 +239,21 @@ func (s *MetricController) GetContainerInfoGraph(w http.ResponseWriter, r *http.
 	util.RenderJsonResponse(result, w)
 }
 
+func (s *MetricController) GetWorkNodeInfoGraphList(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.MetricsRequest
+
+	apiRequest.Nodename = r.URL.Query().Get("NodeName")
+	apiRequest.Instance = r.URL.Query().Get("Instance")
+
+	//service호출
+	result, err := service.GetMetricsService().GetWorkNodeInfoGraphList(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+	util.RenderJsonResponse(result, w)
+}
+
 //Alarm Process
 func (s *MetricController) GetAlarmInfo(w http.ResponseWriter, r *http.Request) {
 	//service호출

@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/monasca/golang-monascaclient/monascaclient"
@@ -66,14 +64,15 @@ func NewPaasLoginController(cfProvider cfclient.Config, txn *gorm.DB, rdClient *
 func (s *LoginController) Ping(w http.ResponseWriter, r *http.Request) {
 
 	token, _ := utils.GenerateRandomString(32)
-	//	session := model.SessionManager.Load(r)
+	//session := model.SessionManager.Load(r)
 
 	testToken := r.Header.Get(model.TEST_TOKEN_NAME)
 	if testToken != "" {
 		w.Header().Add(model.TEST_TOKEN_NAME, token)
 	} else {
 		//fmt.Println("pint Token::::", token)
-		//		session.PutString(w, token, token)
+		//session.PutString(w, token, token)
+		model.SessionManager.Load(r.Context(), token)
 		w.Header().Add(model.CSRF_TOKEN_NAME, token)
 	}
 
