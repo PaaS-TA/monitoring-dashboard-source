@@ -194,6 +194,7 @@ func isInt(s string) bool {
 	return true
 }
 
+//var SessionManager scs.Manager // = scs.NewCookieManager("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
 var SessionManager *scs.SessionManager = scs.New()
 
 func (bm DetailReq) MetricRequestValidate(req DetailReq) error {
