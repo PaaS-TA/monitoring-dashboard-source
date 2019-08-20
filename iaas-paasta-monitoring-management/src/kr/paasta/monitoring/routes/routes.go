@@ -13,13 +13,14 @@ const (
 	MEMBER_JOIN_CHECK_EMAIL               = "MEMBER_JOIN_CHECK_EMAIL"
 	MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID = "MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID"
 	MEMBER_JOIN_CHECK_DUPLICATION_PAAS_ID = "MEMBER_JOIN_CHECK_DUPLICATION_PAAS_ID"
+	MEMBER_JOIN_CHECK_DUPLICATION_CAAS_ID = "MEMBER_JOIN_CHECK_DUPLICATION_CAAS_ID"
 	MEMBER_JOIN_CHECK_IAAS                = "MEMBER_JOIN_CHECK_IAAS"
 	MEMBER_JOIN_CHECK_PAAS                = "MEMBER_JOIN_CHECK_PAAS"
-
-	MEMBER_AUTH_CHECK  = "MEMBER_AUTH_CHECK"
-	MEMBER_INFO_VIEW   = "MEMBER_INFO_VIEW"
-	MEMBER_INFO_UPDATE = "MEMBER_INFO_UPDATE"
-	MEMBER_INFO_DELETE = "MEMBER_INFO_DELETE"
+	MEMBER_JOIN_CHECK_CAAS                = "MEMBER_JOIN_CHECK_CAAS"
+	MEMBER_AUTH_CHECK                     = "MEMBER_AUTH_CHECK"
+	MEMBER_INFO_VIEW                      = "MEMBER_INFO_VIEW"
+	MEMBER_INFO_UPDATE                    = "MEMBER_INFO_UPDATE"
+	MEMBER_INFO_DELETE                    = "MEMBER_INFO_DELETE"
 
 	//DASHBOARD = "DASHBOARD"
 
@@ -408,6 +409,8 @@ var PaasRoutes = rata.Routes{
 }
 
 var CaasRoutes = rata.Routes{
+	{Path: "/v2/member/join/check/duplication/caas/:id", Method: "GET", Name: MEMBER_JOIN_CHECK_DUPLICATION_CAAS_ID},
+	{Path: "/v2/member/join/check/caas", Method: "POST", Name: MEMBER_JOIN_CHECK_CAAS},
 	{Path: "/v2/caas/monitoring/clusterAvg", Method: "GET", Name: CAAS_K8S_CLUSTER_AVG},
 	{Path: "/v2/caas/monitoring/workerNodeList", Method: "GET", Name: CAAS_WORK_NODE_LIST},
 	{Path: "/v2/caas/monitoring/workerNodeInfo", Method: "GET", Name: CAAS_WORK_NODE_INFO},

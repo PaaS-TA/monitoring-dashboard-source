@@ -1,57 +1,59 @@
 package services
 
 import (
+	"fmt"
+	//"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/go-redis/redis"
+	"github.com/jinzhu/gorm"
 	"github.com/rackspace/gophercloud"
 	"github.com/rackspace/gophercloud/openstack/identity/v3/tokens"
+	"kr/paasta/monitoring/common/dao"
+	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/iaas/integration"
 	"kr/paasta/monitoring/iaas/model"
-	cm "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/common/dao"
+	pm "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"
-	"github.com/cloudfoundry-community/go-cfclient"
-	"fmt"
-	"github.com/jinzhu/gorm"
+	ua "kr/paasta/monitoring/utils"
 	//"strings"
 	"strings"
-	"github.com/go-redis/redis"
 	"time"
 )
 
 type LoginService struct {
 	openstackProvider model.OpenstackProvider
-	CfProvider        cfclient.Config
-	txn *gorm.DB
+	//CfProvider        cfclient.Config
+	txn      *gorm.DB
 	RdClient *redis.Client
-	sysType string
+	sysType  string
 }
 
-func GetLoginService(openstackProvider model.OpenstackProvider, cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client, sysType string ) *LoginService {
+func GetLoginService(openstackProvider model.OpenstackProvider, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginService {
 	return &LoginService{
 		openstackProvider: openstackProvider,
-		CfProvider : cfProvider,
-		txn: txn,
+		//	CfProvider : cfProvider,
+		txn:      txn,
 		RdClient: rdClient,
-		sysType: sysType,
+		sysType:  sysType,
 	}
 }
 
-func GetIaasLoginService(openstackProvider model.OpenstackProvider, txn *gorm.DB,  rdClient *redis.Client, sysType string ) *LoginService {
-	return &LoginService{
-		openstackProvider: openstackProvider,
-		txn: txn,
-		RdClient: rdClient,
-		sysType: sysType,
-	}
-}
-
-func GetPaasLoginService(cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client, sysType string ) *LoginService {
-	return &LoginService{
-		CfProvider : cfProvider,
-		txn: txn,
-		RdClient: rdClient,
-		sysType: sysType,
-	}
-}
+//func GetIaasLoginService(openstackProvider model.OpenstackProvider, txn *gorm.DB,  rdClient *redis.Client, sysType string ) *LoginService {
+//	return &LoginService{
+//		openstackProvider: openstackProvider,
+//		txn: txn,
+//		RdClient: rdClient,
+//		sysType: sysType,
+//	}
+//}
+//
+//func GetPaasLoginService(cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client, sysType string ) *LoginService {
+//	return &LoginService{
+//		CfProvider : cfProvider,
+//		txn: txn,
+//		RdClient: rdClient,
+//		sysType: sysType,
+//	}
+//}
 
 func (n *LoginService) Logout(provider *gophercloud.ProviderClient, reqCsrfToken string) tokens.RevokeResult {
 	result := integration.GetKeystone(n.openstackProvider, provider).RevokeToken()
@@ -59,145 +61,87 @@ func (n *LoginService) Logout(provider *gophercloud.ProviderClient, reqCsrfToken
 	return result
 }
 
-func (n *LoginService) Login(req cm.UserInfo) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
+func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
 
 	//member info 로그인 아이디 패스워드를 회원디비에서 검색하여 iaas, paas 로그인 정보를 가지고 온다.
-	result, _ , dbErr := dao.GetLoginDao(n.txn).GetLoginMemberInfo(req, n.txn)
-
+	result, _, dbErr := dao.GetLoginDao(n.txn).GetLoginMemberInfo(req, n.txn)
+	resultString := ""
 	if dbErr != nil {
-		if strings.Contains(dbErr.Error(), "record not found"){
+		if strings.Contains(dbErr.Error(), "record not found") {
 			return result, provider, fmt.Errorf("Member certification information is invalid.")
-		}else{
+		} else {
 			return result, provider, dbErr
 		}
 	}
 
-	if n.sysType == utils.SYS_TYPE_IAAS {
-		if result.IaasUserUseYn == "Y"{
+	if strings.Contains(n.sysType, utils.SYS_TYPE_IAAS) || strings.Contains(n.sysType, utils.SYS_TYPE_ALL) {
+		if result.IaasUserUseYn == "Y" {
 			//get iaas token
 			n.openstackProvider.Username = result.IaasUserId
 			n.openstackProvider.Password = result.IaasUserPw
 			provider, err = utils.GetAdminToken(n.openstackProvider)
 			if err != nil {
-				fmt.Println("iaas error::",err.Error())
+				fmt.Println("iaas error::", err.Error())
 				//return req, provider, err
-			}else{
+			} else {
 				result.IaasToken = provider.TokenID
 				//fmt.Println("iaas token ::: ", result.IaasToken )
 			}
 
-			n.RdClient.HSet(req.Token,"iaasToken",result.IaasToken)
-			n.RdClient.HSet(req.Token,"iaasUserId",result.IaasUserId)
+			n.RdClient.HSet(req.Token, "iaasToken", result.IaasToken)
+			n.RdClient.HSet(req.Token, "iaasUserId", result.IaasUserId)
 		}
 
-		result.PaasAdminYn = "N"
-	}else if n.sysType == utils.SYS_TYPE_PAAS {
-		if result.PaasUserUseYn == "Y"{
-			//get paas token
-			n.CfProvider.Username = result.PaasUserId
-			n.CfProvider.Password = result.PaasUserPw
-			client, err := cfclient.NewClient(&n.CfProvider)
-			if err != nil {
-				fmt.Println("paas error::",err.Error())
-				//return req, provider, err
-			}else {
-				token, _ := client.GetToken()
-				result.PaasToken = strings.Replace(token, "bearer ", "", -1)
-				//result.PaasToken = token
-				//fmt.Println("paas token ::: ",result.PaasToken)
-				//fmt.Println("paas Scope ::: ",client.Config.Scope)
+		//result.PaasAdminYn = "N"
+	}
 
-				if len(client.Config.Scope) > 0{
-					cfChk := false
-					for _, value := range client.Config.Scope{
-						if(strings.Contains(value,"cloud_controller.admin")) {
-							cfChk = true
-						}
-					}
+	if strings.Contains(n.sysType, utils.SYS_TYPE_PAAS) || strings.Contains(n.sysType, utils.SYS_TYPE_ALL) {
+		if result.PaasUserUseYn == "Y" {
+			cfConfig.UserId = result.PaasUserId
+			cfConfig.UserPw = result.PaasUserPw
+			cfConfig.Type = "PAAS"
+			resultString = ua.GetUaaToken(req, reqCsrfToken, cfConfig, n.RdClient)
+			//resultString = GetMemberService(n.openstackProvider, n.CfProvider, n.txn, n.RdClient).GetUaaToken(req, reqCsrfToken, cfConfig)
+			fmt.Println("paas token ::", resultString)
 
-					if cfChk {
-						result.PaasAdminYn = "Y"
-					}else{
-						result.PaasAdminYn = "N"
-					}
-				}else{
-					result.PaasAdminYn = "N"
-				}
-			}
-
-			n.RdClient.HSet(req.Token,"paasToken",result.PaasToken)
-			n.RdClient.HSet(req.Token,"paasUserId",result.PaasUserId)
 		}
-	}else{
-		if result.IaasUserUseYn == "Y"{
-			//get iaas token
-			n.openstackProvider.Username = result.IaasUserId
-			n.openstackProvider.Password = result.IaasUserPw
-			provider, err = utils.GetAdminToken(n.openstackProvider)
-			if err != nil {
-				fmt.Println("iaas error::",err.Error())
-				//return req, provider, err
-			}else{
-				result.IaasToken = provider.TokenID
-				//fmt.Println("iaas token ::: ", result.IaasToken )
+	}
+
+	if strings.Contains(n.sysType, utils.SYS_TYPE_CAAS) || strings.Contains(n.sysType, utils.SYS_TYPE_ALL) {
+		if result.CaasUserUseYn == "Y" {
+			cfConfig.UserId = result.CaasUserId
+			cfConfig.UserPw = result.CaasUserPw
+			cfConfig.Type = "CAAS"
+			resultCaasString := ""
+			resultCaasString = GetMemberService(n.openstackProvider, n.txn, n.RdClient).CaasServiceCheck(req, reqCsrfToken, cfConfig)
+			if resultCaasString == "adm" {
+				resultString = ua.GetUaaToken(req, reqCsrfToken, cfConfig, n.RdClient)
+			} else {
+				fmt.Println("caas token get fail ::" + resultCaasString)
 			}
-
-			n.RdClient.HSet(req.Token,"iaasToken",result.IaasToken)
-			n.RdClient.HSet(req.Token,"iaasUserId",result.IaasUserId)
-		}
-
-		if result.PaasUserUseYn == "Y"{
-			//get paas token
-			n.CfProvider.Username = result.PaasUserId
-			n.CfProvider.Password = result.PaasUserPw
-			client, err := cfclient.NewClient(&n.CfProvider)
-			if err != nil {
-				fmt.Println("paas error::",err.Error())
-				//return req, provider, err
-			}else {
-				token, _ := client.GetToken()
-				result.PaasToken = strings.Replace(token, "bearer ", "", -1)
-				//result.PaasToken = token
-				//fmt.Println("paas token ::: ",result.PaasToken)
-				//fmt.Println("paas Scope ::: ",client.Config.Scope)
-
-				if len(client.Config.Scope) > 0{
-					cfChk := false
-					for _, value := range client.Config.Scope{
-						if(strings.Contains(value,"cloud_controller.admin")) {
-							cfChk = true
-						}
-					}
-
-					if cfChk {
-						result.PaasAdminYn = "Y"
-					}else{
-						result.PaasAdminYn = "N"
-					}
-				}else{
-					result.PaasAdminYn = "N"
-				}
-			}
-
-			n.RdClient.HSet(req.Token,"paasToken",result.PaasToken)
-			n.RdClient.HSet(req.Token,"paasUserId",result.PaasUserId)
+			//resultString = ua.GetUaaToken(req, reqCsrfToken, cfConfig,n.RdClient)
+			//resultString = GetMemberService(n.openstackProvider, n.CfProvider, n.txn, n.RdClient).GetUaaToken(req, reqCsrfToken, cfConfig)
+			//fmt.Println("caas token ::",resultString)
+			//get caas token
+			//n.CfProvider.Username = result.CaasUserId
+			//n.CfProvider.Password = result.CaasUserPw
+			//
+			//
+			//n.RdClient.HSet(req.Token,"caasToken",result.CaasToken)
+			//n.RdClient.HSet(req.Token,"caasUserId",result.CaasUserId)
 		}
 	}
 
 	//redis 에 사용자 정보를 저장한다.
-	n.RdClient.HSet(req.Token,"userId",result.UserId)
-	n.RdClient.HSet(req.Token,"userPw",result.UserPw)
-	n.RdClient.HSet(req.Token,"paasAdminYn",result.PaasAdminYn)
-	n.RdClient.Expire(req.Token, 30 * 60  * time.Second )
-
-	//if err != nil {
-	//	panic(err)
-	//}
+	n.RdClient.HSet(req.Token, "userId", result.UserId)
+	n.RdClient.HSet(req.Token, "userPw", result.UserPw)
+	n.RdClient.HSet(req.Token, "paasAdminYn", n.RdClient.HMGet(req.Token, "paasAdminYn"))
+	n.RdClient.Expire(req.Token, 30*60*time.Second)
 
 	return result, provider, dbErr
 }
 
-func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo,  reqCsrfToken string) {
+func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig) {
 
 	var strcd1 = ""
 	var strcd2 = ""
@@ -207,14 +151,14 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo,  reqCsrfToken str
 	userInfo.Username = userInfo.UserId
 
 	if s.sysType == utils.SYS_TYPE_IAAS {
-		if (userInfo.IaasUserUseYn == "Y") {
+		if userInfo.IaasUserUseYn == "Y" {
 			strcd1 = "I"
 			var tokenRequest cm.UserInfo
 			tokenRequest.IaasUserId = userInfo.IaasUserId
 			tokenRequest.IaasUserPw = userInfo.IaasUserPw
 			result := GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
 
-			if (result != "") {
+			if result != "" {
 				strcd2 = "S"
 			} else {
 				strcd2 = "F"
@@ -225,14 +169,16 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo,  reqCsrfToken str
 			strcd2 = "F"
 			GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
 		}
-	}else if s.sysType == utils.SYS_TYPE_PAAS {
-		if (userInfo.PaasUserUseYn == "Y") {
+	} else if s.sysType == utils.SYS_TYPE_PAAS {
+		if userInfo.PaasUserUseYn == "Y" {
 			strcd3 = "P"
 			var tokenRequest cm.UserInfo
 			tokenRequest.PaasUserId = userInfo.PaasUserId
 			tokenRequest.PaasUserPw = userInfo.PaasUserPw
-			result := GetPaasMemberService(s.CfProvider, s.txn, s.RdClient).GetPaasToken(tokenRequest, reqCsrfToken)
-			if (result != "") {
+			cfConfig.Type = "PAAS"
+			result := ua.GetUaaToken(tokenRequest, reqCsrfToken, cfConfig, s.RdClient)
+			//result := GetPaasMemberService(s.CfProvider, s.txn, s.RdClient).GetUaaToken(tokenRequest, reqCsrfToken, cfConfig)
+			if result != "" {
 				strcd4 = "S"
 			} else {
 				strcd4 = "F"
@@ -241,17 +187,17 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo,  reqCsrfToken str
 		} else {
 			strcd3 = "F"
 			strcd4 = "F"
-			GetPaasMemberService(s.CfProvider, s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
+			GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
-	}else{
-		if (userInfo.IaasUserUseYn == "Y") {
+	} else {
+		if userInfo.IaasUserUseYn == "Y" {
 			strcd1 = "I"
 			var tokenRequest cm.UserInfo
 			tokenRequest.IaasUserId = userInfo.IaasUserId
 			tokenRequest.IaasUserPw = userInfo.IaasUserPw
-			result := GetMemberService(s.openstackProvider, s.CfProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
+			result := GetMemberService(s.openstackProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
 
-			if (result != "") {
+			if result != "" {
 				strcd2 = "S"
 			} else {
 				strcd2 = "F"
@@ -260,16 +206,18 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo,  reqCsrfToken str
 		} else {
 			strcd1 = "F"
 			strcd2 = "F"
-			GetMemberService(s.openstackProvider, s.CfProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
+			GetMemberService(s.openstackProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
 		}
 
-		if (userInfo.PaasUserUseYn == "Y") {
+		if userInfo.PaasUserUseYn == "Y" {
 			strcd3 = "P"
 			var tokenRequest cm.UserInfo
 			tokenRequest.PaasUserId = userInfo.PaasUserId
 			tokenRequest.PaasUserPw = userInfo.PaasUserPw
-			result := GetMemberService(s.openstackProvider, s.CfProvider, s.txn, s.RdClient).GetPaasToken(tokenRequest, reqCsrfToken)
-			if (result != "") {
+			cfConfig.Type = "PAAS"
+			result := ua.GetUaaToken(tokenRequest, reqCsrfToken, cfConfig, s.RdClient)
+			//result := GetMemberService(s.openstackProvider, s.CfProvider, s.txn, s.RdClient).GetUaaToken(tokenRequest, reqCsrfToken,cfConfig)
+			if result != "" {
 				strcd4 = "S"
 			} else {
 				strcd4 = "F"
@@ -278,7 +226,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo,  reqCsrfToken str
 		} else {
 			strcd3 = "F"
 			strcd4 = "F"
-			GetMemberService(s.openstackProvider, s.CfProvider, s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
+			GetMemberService(s.openstackProvider, s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
 	}
 

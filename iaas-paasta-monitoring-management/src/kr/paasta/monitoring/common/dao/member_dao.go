@@ -5,8 +5,8 @@ import (
 	"github.com/jinzhu/gorm"
 	cm "kr/paasta/monitoring/common/model"
 	//"kr/paasta/monitoring/utils"
-	"time"
 	"kr/paasta/monitoring/utils"
+	"time"
 )
 
 type MemberDao struct {
@@ -19,34 +19,32 @@ func GetMemberDao(txn *gorm.DB) *MemberDao {
 	}
 }
 
-
-
-func (a *MemberDao) MemberJoinSave(request cm.UserInfo , txn *gorm.DB) error {
+func (a *MemberDao) MemberJoinSave(request cm.UserInfo, txn *gorm.DB) error {
 
 	pw := utils.GetSha256(request.UserPw)
 
 	actionData := cm.MemberInfo{
-		UserId: request.UserId,
-		UserPw: pw,
-		UserEmail: request.UserEmail,
-		UserNm  : request.UserNm,
-		IaasUserId: request.IaasUserId,
-		IaasUserPw: request.IaasUserPw,
-		PaasUserId: request.PaasUserId,
-		PaasUserPw: request.PaasUserPw,
+		UserId:        request.UserId,
+		UserPw:        pw,
+		UserEmail:     request.UserEmail,
+		UserNm:        request.UserNm,
+		IaasUserId:    request.IaasUserId,
+		IaasUserPw:    request.IaasUserPw,
+		PaasUserId:    request.PaasUserId,
+		PaasUserPw:    request.PaasUserPw,
 		PaasUserUseYn: request.PaasUserUseYn,
 		IaasUserUseYn: request.IaasUserUseYn,
 	}
 
 	status := a.txn.Debug().Create(&actionData)
 
-	if status.Error != nil{
-		return  status.Error
+	if status.Error != nil {
+		return status.Error
 	}
-	return  status.Error
+	return status.Error
 }
 
-func (h *MemberDao) MemberAuthCheck(request cm.UserInfo , txn *gorm.DB) (cm.UserInfo, int, error) {
+func (h *MemberDao) MemberAuthCheck(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, int, error) {
 
 	t := cm.UserInfo{}
 
@@ -61,8 +59,7 @@ func (h *MemberDao) MemberAuthCheck(request cm.UserInfo , txn *gorm.DB) (cm.User
 	return t, 1, nil
 }
 
-
-func (h *MemberDao) MemberInfoView(request cm.UserInfo , txn *gorm.DB) (cm.UserInfo, int, error) {
+func (h *MemberDao) MemberInfoView(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, int, error) {
 
 	t := cm.UserInfo{}
 
@@ -77,77 +74,75 @@ func (h *MemberDao) MemberInfoView(request cm.UserInfo , txn *gorm.DB) (cm.UserI
 	return t, 1, nil
 }
 
-func (h *MemberDao) MemberInfoCheck(request cm.UserInfo , txn *gorm.DB) (cm.UserInfo, int, error) {
+func (h *MemberDao) MemberInfoCheck(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, int, error) {
 
 	t := cm.UserInfo{}
 
 	status := txn.Debug().Table("member_infos").
 		Select(" * ")
 
-		if request.UserId !="" {
-			status = status.Where("user_id = ? ", request.UserId)
-		} else if request.UserEmail !="" {
-			status = status.Where("user_email = ? ", request.UserEmail)
-		}
+	if request.UserId != "" {
+		status = status.Where("user_id = ? ", request.UserId)
+	} else if request.UserEmail != "" {
+		status = status.Where("user_email = ? ", request.UserEmail)
+	}
 
 	status = status.Find(&t)
 
-    if status.RecordNotFound() {
+	if status.RecordNotFound() {
 		return t, 0, nil
-	}else if status.Error != nil {
+	} else if status.Error != nil {
 		return t, 0, status.Error
 	}
 
 	return t, 1, nil
 }
 
+func (h *MemberDao) MemberInfoUpdate(request cm.UserInfo, txn *gorm.DB) (int, error) {
 
-func (h *MemberDao) MemberInfoUpdate(request cm.UserInfo , txn *gorm.DB) ( int, error) {
-
-	if request.IaasUserUseYn !="Y" {
+	if request.IaasUserUseYn != "Y" {
 		request.IaasUserId = ""
 		request.IaasUserPw = ""
 	}
 
-	if request.PaasUserUseYn !="Y" {
+	if request.PaasUserUseYn != "Y" {
 		request.PaasUserId = ""
 		request.PaasUserPw = ""
 	}
 
 	status := txn.Debug().Table("member_infos").
 		Where("user_id = ?  ", request.UserId).
-			Updates(map[string]interface{}{
-					//"user_pw":     pw,
-					"user_email":  request.UserEmail,
-					"user_nm":  request.UserNm,
-					"iaas_user_id": request.IaasUserId,
-					"iaas_user_pw": request.IaasUserPw,
-					"paas_user_id": request.PaasUserId,
-					"paas_user_pw": request.PaasUserPw,
-					"iaas_user_use_yn": request.IaasUserUseYn,
-					"paas_user_use_yn": request.PaasUserUseYn,
-				    "updated_at": time.Now() })
+		Updates(map[string]interface{}{
+			//"user_pw":     pw,
+			"user_email":       request.UserEmail,
+			"user_nm":          request.UserNm,
+			"iaas_user_id":     request.IaasUserId,
+			"iaas_user_pw":     request.IaasUserPw,
+			"paas_user_id":     request.PaasUserId,
+			"paas_user_pw":     request.PaasUserPw,
+			"iaas_user_use_yn": request.IaasUserUseYn,
+			"paas_user_use_yn": request.PaasUserUseYn,
+			"updated_at":       time.Now()})
 	if status.Error != nil {
-		return  0, status.Error
+		return 0, status.Error
 	}
 
-    if request.UserPw != "" {
+	if request.UserPw != "" {
 		pw := utils.GetSha256(request.UserPw)
 		status := txn.Debug().Table("member_infos").
 			Where("user_id = ?  ", request.UserId).
 			Updates(map[string]interface{}{
-			"user_pw":     pw,
-			"updated_at": time.Now() })
+				"user_pw":    pw,
+				"updated_at": time.Now()})
 		if status.Error != nil {
-			return  0, status.Error
+			return 0, status.Error
 		}
 	}
 
-
-	return  1, nil
+	return 1, nil
 }
 
-func (h *MemberDao) MemberInfoDelete(request cm.UserInfo , txn *gorm.DB) ( int, error) {
+func (h *MemberDao) MemberInfoDelete(request cm.UserInfo, txn *gorm.DB) (int, error) {
 
 	fmt.Println("Get Call LoginDao Delete LoginMemberInfo =====")
 	//var rowCount int
@@ -157,10 +152,10 @@ func (h *MemberDao) MemberInfoDelete(request cm.UserInfo , txn *gorm.DB) ( int, 
 		return 0, status.Error
 	}
 
-	return  1, nil
+	return 1, nil
 }
 
-func (h *MemberDao) MemberJoinCheckDuplicationIaasId(request cm.UserInfo , txn *gorm.DB) (cm.UserInfo, error) {
+func (h *MemberDao) MemberJoinCheckDuplicationIaasId(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, error) {
 	var rows cm.UserInfo
 	status := txn.Debug().Table("member_infos").Where("iaas_user_id = ?", request.IaasUserId).Limit(1).Find(&rows)
 	if status.RecordNotFound() {
@@ -169,9 +164,17 @@ func (h *MemberDao) MemberJoinCheckDuplicationIaasId(request cm.UserInfo , txn *
 	return rows, status.Error
 }
 
-func (h *MemberDao) MemberJoinCheckDuplicationPaasId(request cm.UserInfo , txn *gorm.DB) (cm.UserInfo, error) {
+func (h *MemberDao) MemberJoinCheckDuplicationPaasId(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, error) {
 	var rows cm.UserInfo
 	status := txn.Debug().Table("member_infos").Where("paas_user_id = ?", request.PaasUserId).Limit(1).Find(&rows)
+	if status.RecordNotFound() {
+		return rows, nil
+	}
+	return rows, status.Error
+}
+func (h *MemberDao) MemberJoinCheckDuplicationCaasId(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, error) {
+	var rows cm.UserInfo
+	status := txn.Debug().Table("member_infos").Where("caas_user_id = ?", request.CaasUserId).Limit(1).Find(&rows)
 	if status.RecordNotFound() {
 		return rows, nil
 	}
