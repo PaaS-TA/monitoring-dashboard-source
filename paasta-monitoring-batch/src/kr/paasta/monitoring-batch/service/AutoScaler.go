@@ -2,13 +2,15 @@ package service
 
 import (
 	"fmt"
-	"kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"kr/paasta/monitoring-batch/dao"
-	"sync"
+	"kr/paasta/monitoring-batch/model"
+	"kr/paasta/monitoring-batch/model/base"
+	"kr/paasta/monitoring-batch/util"
 	"strconv"
-	"github.com/cloudfoundry-community/go-cfclient"
+	"sync"
+	//"github.com/cloudfoundry-community/go-cfclient"
+	md "kr/paasta/monitoring-batch/model"
 )
 
 type AutoScalerStruct struct {
@@ -22,7 +24,7 @@ func AutoScaler(backendServices *BackendServices) *AutoScalerStruct {
 	}
 }
 
-func (a *AutoScalerStruct) AutoScale(){
+func (a *AutoScalerStruct) AutoScale() {
 
 	a.p = PortalAppAlarm(a.b)
 
@@ -35,8 +37,18 @@ func (a *AutoScalerStruct) AutoScale(){
 	}
 	fmt.Println(">>>>> AUTO_SCALING_POLICY:", listAutoScalePolicy)
 
-	var listAutoScaleTarget []model.AutoScaleTarget
+	//cfApp, _ := util.GetAppByGuid(a.b.CfConfig,a.b.CfClientToken,"bf60a3b5-c937-4d9f-ae97-3f7a7ef81d24")
+	//
+	//var aur md.ScaleProcess
+	//aur.Instances = 1
+	//
+	//updateResp, _ := util.UpdateApp(a.b.CfConfig,a.b.CfClientToken,cfApp.Guid, aur)
+	//
+	//fmt.Println(">>>>>dfsfef:", updateResp)
 
+	var listAutoScaleTarget []model.AutoScaleTarget
+	cfToken := util.GetUaaToken(a.b.CfConfig)
+	fmt.Println(">>>>> cf token:", cfToken.Token)
 	//App 알람 정책 별 사용량 조회
 	var wg sync.WaitGroup
 	wg.Add(len(listAutoScalePolicy))
@@ -64,35 +76,35 @@ func (a *AutoScalerStruct) AutoScale(){
 
 func (a *AutoScalerStruct) requestAutoScale(target model.AutoScaleTarget) {
 
-	/*cfApp, cfErr := a.b.CfClient.GetAppByGuid(target.AppGuid)
-	if cfErr != nil {
-		fmt.Errorf(">>>>> cf API(GetAppByGuid) error:%v", cfErr)
-		return
-	}*/
+	//cfApp, cfErr := a.b.CfClient.GetAppByGuid(target.AppGuid)
+	//if cfErr != nil {
+	//	fmt.Errorf(">>>>> cf API(GetAppByGuid) error:%v", cfErr)
+	//	return
+	//}
 
 	fmt.Printf(">>>>> Request cf AutoScaling: guid=[%v], instances=[%v]\n", target.AppGuid, target.InstanceCnt)
 
-	var aur cfclient.AppUpdateResource
+	var aur md.ScaleProcess
 	aur.Instances, _ = strconv.Atoi(target.InstanceCnt)
 
-	updateResp, updateErr := a.b.CfClient.UpdateApp(target.AppGuid, aur)
+	updateResp, updateErr := util.UpdateApp(a.b.CfConfig, a.b.CfClientToken, target.AppGuid, aur)
 	if updateErr != nil {
 		fmt.Errorf(">>>>> cf API(UpdateApp) error:%v", updateErr)
 		return
 	}
 	fmt.Println(">>>>> cf API(UpdateApp) resp:", updateResp)
 
-/*
-	err := util.PortalExistCHeck()
-	if err != nil {
-		fmt.Errorf(">>>>> error:%v", err)
-		return
-	}
-	body, _ := json.Marshal(target)
-	fmt.Println(">>>>> AUTO_SCALE_REQUEST_BODY:", body)
-	resp, status, errMessage := util.HttpRequest(base.SCALE_API_URI,  "POST", nil,  body, *model.PortalClient)
-	fmt.Printf(">>>>> RESULT_AUTO_SCALE_API: http.status=[%v], err=[%v], resp=[%v]\n", status, errMessage, resp)
-*/
+	/*
+		err := util.PortalExistCHeck()
+		if err != nil {
+			fmt.Errorf(">>>>> error:%v", err)
+			return
+		}
+		body, _ := json.Marshal(target)
+		fmt.Println(">>>>> AUTO_SCALE_REQUEST_BODY:", body)
+		resp, status, errMessage := util.HttpRequest(base.SCALE_API_URI,  "POST", nil,  body, *model.PortalClient)
+		fmt.Printf(">>>>> RESULT_AUTO_SCALE_API: http.status=[%v], err=[%v], resp=[%v]\n", status, errMessage, resp)
+	*/
 }
 
 //1개의 App에서 n개의 오토스케일 조건이 발생 될 경우 1개의 조건에 대해서만 오토스케일링API를 호출한다.
@@ -101,7 +113,7 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 	//Scale-Out 조건: 복수개의 인스턴스 중 1개라도 임계치를 초과했을 경우
 	//Scale-In  조건: 복수개의 인스턴스 전체가 임계치 미만일 경우
 
-	cfApp, cfErr := a.b.CfClient.GetAppByGuid(appInfo.ApplicationId)
+	cfApp, cfErr := util.GetAppByGuid(a.b.CfConfig, a.b.CfClientToken, appInfo.ApplicationId)
 	if cfErr != nil {
 		fmt.Errorf(">>>>> cf API(GetAppByGuid) error:%v", cfErr)
 		return
@@ -127,7 +139,7 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 		//Append to Scale-Out List
 		if policy.AutoScalingOutYn == "Y" {
 
-			if cfApp.Instances + int(policy.InstanceScalingUnit) > int(policy.InstanceMaxCnt) {
+			if cfApp.Instances+int(policy.InstanceScalingUnit) > int(policy.InstanceMaxCnt) {
 				instanceCntAfterAutoScale = policy.InstanceMaxCnt
 			} else {
 				instanceCntAfterAutoScale = uint(cfApp.Instances) + policy.InstanceScalingUnit
@@ -138,7 +150,7 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 				*listAutoScaleTarget = append(*listAutoScaleTarget, generateAutoScaleTarget(container, instanceCntAfterAutoScale, base.SCALE_OUT, base.SCALE_RESOURCE_CPU))
 				isAppended = true
 			}
-			if container.MemoryUsage > float64(policy.MemoryMaxThreshold) && cfApp.Instances < int(policy.InstanceMaxCnt) &&  policy.AutoScalingMemoryYn == "Y" && !isAppended {
+			if container.MemoryUsage > float64(policy.MemoryMaxThreshold) && cfApp.Instances < int(policy.InstanceMaxCnt) && policy.AutoScalingMemoryYn == "Y" && !isAppended {
 				*listAutoScaleTarget = append(*listAutoScaleTarget, generateAutoScaleTarget(container, instanceCntAfterAutoScale, base.SCALE_OUT, base.SCALE_RESOURCE_MEM))
 				isAppended = true
 			}
@@ -147,7 +159,7 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 		//Append to Scale-In List
 		if policy.AutoScalingInYn == "Y" {
 
-			if cfApp.Instances - int(policy.InstanceScalingUnit) < int(policy.InstanceMinCnt) {
+			if cfApp.Instances-int(policy.InstanceScalingUnit) < int(policy.InstanceMinCnt) {
 				instanceCntAfterAutoScale = policy.InstanceMinCnt
 			} else {
 				instanceCntAfterAutoScale = uint(cfApp.Instances) - policy.InstanceScalingUnit
@@ -178,7 +190,7 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 
 }
 
-func generateAutoScaleTarget(container model.ApplicationContainerInfo, instanceCntAfterAutoScale uint, action string, cause string) model.AutoScaleTarget{
+func generateAutoScaleTarget(container model.ApplicationContainerInfo, instanceCntAfterAutoScale uint, action string, cause string) model.AutoScaleTarget {
 
 	var autoScaleTarget model.AutoScaleTarget
 	autoScaleTarget.AppName = container.ApplicationName
@@ -191,4 +203,3 @@ func generateAutoScaleTarget(container model.ApplicationContainerInfo, instanceC
 
 	return autoScaleTarget
 }
-
