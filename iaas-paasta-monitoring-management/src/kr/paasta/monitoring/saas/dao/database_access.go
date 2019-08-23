@@ -114,21 +114,14 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 	var err model.ErrMessage
 
 	// Delete And Insert
+	status := dbClient.Debug().Where("service_type = 'SaaS'").Delete(model.BatchAlarmInfo{})
+
 	for _, data := range udateData {
 		batchAlarmInfo := model.BatchAlarmInfo{}
 		tempMap := data.Map()
 		tempWaring, _ := strconv.Atoi(tempMap["Warning"].String())
 		tempCritical, _ := strconv.Atoi(tempMap["Critical"].String())
-		tempAlarmId, _ := strconv.Atoi(tempMap["AlarmId"].String())
-		//Delete
-		delAlarm := model.BatchAlarmInfo{
-			AlarmId: tempAlarmId,
-		}
 
-		status := dbClient.Debug().Delete(&delAlarm)
-		err = util.GetError().DbCheckError(status.Error)
-
-		//make cron_expression
 		cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
 		batchAlarmInfo.ServiceType = "SaaS"
 		batchAlarmInfo.MetricType = tempMap["Name"].String()
@@ -136,6 +129,7 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 		batchAlarmInfo.CriticalValue = tempCritical
 		batchAlarmInfo.MeasureTime = timeData
 		batchAlarmInfo.CronExpression = cronExpression
+
 		if tempMap["Name"].String() == "SYSTEM_CPU" {
 			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} System CPU 현재사용률 (${Currend_value}%)"
 			batchAlarmInfo.ParamData1 = "/getAgentStat/cpuLoad/chart.pinpoint"
