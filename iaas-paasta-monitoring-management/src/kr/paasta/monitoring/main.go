@@ -103,7 +103,7 @@ func main() {
 	var paaSInfluxServerClient client.Client
 	var paasElasticClient *elastic.Client
 	var databases bm.Databases
-	var cfProvider cfclient.Config
+	//var cfProvider cfclient.Config
 	var boshClient *gogobosh.Client
 
 	// Common MysqlDB
@@ -131,7 +131,10 @@ func main() {
 		Addr:     config["redis.addr"],
 		Password: config["redis.password"],
 	})
-
+	cfConfig := bm.CFConfig{
+		Host:           config["paas.monitoring.cf.host"],
+		CaasBrokerHost: config["caas.monitoring.broker.host"],
+	}
 	//IaaS Connection Info
 	//if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_IAAS {
 	//	iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
@@ -148,24 +151,13 @@ func main() {
 	//		os.Exit(-1)
 	//	}
 	//}
-
+	//12
 	// Route Path 정보와 처리 서비스 연결
 	var handler http.Handler
-	_ = handler
-	if sysType == utils.SYS_TYPE_IAAS {
-		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, nil,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, nil, monClient, auth, bm.Databases{},
-			cfclient.Config{}, rdClient, sysType, nil)
-	} else if sysType == utils.SYS_TYPE_PAAS {
-		handler = handlers.NewHandler(model.OpenstackProvider{}, nil, paaSInfluxServerClient,
-			nil, paasDbAccessObj, nil, paasElasticClient, monascaclient.Client{}, gophercloud.AuthOptions{}, databases,
-			cfProvider, rdClient, sysType, boshClient)
-	} else {
-		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, monClient, auth, databases,
-			cfProvider, rdClient, sysType, boshClient)
-	}
 
+	handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
+		iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, monClient, auth, databases,
+		rdClient, sysType, boshClient, cfConfig)
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 		log.Fatalln(err)
 	}

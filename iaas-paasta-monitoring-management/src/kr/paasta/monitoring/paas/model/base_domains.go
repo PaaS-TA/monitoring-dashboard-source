@@ -1,14 +1,14 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
-	"errors"
 )
 
 const (
 	DB_DATE_FORMAT       string = "2006-01-02T15:04:05+00:00"
-	ALARM_LEVEL_FAIL 	 string = "fail"
+	ALARM_LEVEL_FAIL     string = "fail"
 	ALARM_LEVEL_CRITICAL string = "critical"
 	ALARM_LEVEL_WARNING  string = "warning"
 
@@ -20,8 +20,8 @@ const (
 	ORIGIN_TYPE_PAASTA    string = "pas"
 	ORIGIN_TYPE_CONTAINER string = "con"
 
-	RESULT_NAME 		= "name"
-	RESULT_STAT_NAME	= "stat"
+	RESULT_NAME      = "name"
+	RESULT_STAT_NAME = "stat"
 )
 
 type Marshaler interface {
@@ -38,6 +38,14 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 type (
+	CFConfig struct {
+		UserId         string
+		UserPw         string
+		Host           string
+		Type           string
+		CaasBrokerHost string
+	}
+
 	BaseModel struct {
 		Service          string `json:"service"`
 		JobName          string `json:"jobName"`
@@ -60,24 +68,24 @@ type (
 	}
 
 	LogMessage struct {
-		Id			string		`json:"id"`
-		PageIndex 	int 		`json:"pageIndex"`
-		PageItems 	int 		`json:"pageItems"`
-		LogType		string  	`json:"logType"`
-		Keyword 	string 		`json:"keyword"`
-		Index 		string 		`json:"logstashIndex"`
-		TargetDate 	string 		`json:"targetDate"`
-		Period 		int64 		`json:"period"`
-		StartTime	string 		`json:"startTime"`
-		EndTime		string 		`json:"endTime"`
-		CurrentItems 	int 	`json:"currentItems"`
-		TotalCount 	int 		`json:"totalCount"`
-		Messages 	[]LogInfo	`json:"messages"`
+		Id           string    `json:"id"`
+		PageIndex    int       `json:"pageIndex"`
+		PageItems    int       `json:"pageItems"`
+		LogType      string    `json:"logType"`
+		Keyword      string    `json:"keyword"`
+		Index        string    `json:"logstashIndex"`
+		TargetDate   string    `json:"targetDate"`
+		Period       int64     `json:"period"`
+		StartTime    string    `json:"startTime"`
+		EndTime      string    `json:"endTime"`
+		CurrentItems int       `json:"currentItems"`
+		TotalCount   int       `json:"totalCount"`
+		Messages     []LogInfo `json:"messages"`
 	}
 
 	LogInfo struct {
-		Time	string	`json:"time"`
-		Message string	`json:"message"`
+		Time    string `json:"time"`
+		Message string `json:"message"`
 	}
 )
 

@@ -13,6 +13,7 @@ import (
 	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/common/service"
 	"kr/paasta/monitoring/iaas/model"
+	pm "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 )
@@ -22,21 +23,23 @@ type LoginController struct {
 	OpenstackProvider model.OpenstackProvider
 	MonAuth           monascagopher.AuthOptions
 	MonClient         monascaclient.Client
-	CfProvider        cfclient.Config
-	txn               *gorm.DB
-	RdClient          *redis.Client
-	sysType           string
+	//CfProvider        cfclient.Config
+	txn      *gorm.DB
+	RdClient *redis.Client
+	sysType  string
+	CfConfig pm.CFConfig
 }
 
-func NewLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, cfProvider cfclient.Config, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
+func NewLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, txn *gorm.DB, rdClient *redis.Client, sysType string, cfConfig pm.CFConfig) *LoginController {
 	return &LoginController{
 		OpenstackProvider: openstackProvider,
 		MonAuth:           auth,
 		MonClient:         monsClient,
-		CfProvider:        cfProvider,
-		txn:               txn,
-		RdClient:          rdClient,
-		sysType:           sysType,
+		//CfProvider: cfProvider,
+		txn:      txn,
+		RdClient: rdClient,
+		sysType:  sysType,
+		CfConfig: cfConfig,
 	}
 
 }
@@ -55,10 +58,10 @@ func NewIaasLoginController(openstackProvider model.OpenstackProvider, monsClien
 
 func NewPaasLoginController(cfProvider cfclient.Config, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
 	return &LoginController{
-		CfProvider: cfProvider,
-		txn:        txn,
-		RdClient:   rdClient,
-		sysType:    sysType,
+		//CfProvider: cfProvider,
+		txn:      txn,
+		RdClient: rdClient,
+		sysType:  sysType,
 	}
 
 }
@@ -74,7 +77,6 @@ func (s *LoginController) Ping(w http.ResponseWriter, r *http.Request) {
 	} else {
 		//fmt.Println("pint Token::::", token)
 		//session.PutString(w, token, token)
-		model.SessionManager.Load(r.Context(), token)
 		w.Header().Add(model.CSRF_TOKEN_NAME, token)
 	}
 
@@ -108,23 +110,27 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		var userInfo cm.UserInfo
 		var loginErr model.ErrMessage
 
-		if s.sysType == utils.SYS_TYPE_IAAS {
-			userInfo, _, err = services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
-			loginErr = utils.GetError().GetCheckErrorMessage(err)
-		} else if s.sysType == utils.SYS_TYPE_PAAS {
-			userInfo, _, err = services.GetPaasLoginService(s.CfProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
-			loginErr = utils.GetError().GetCheckErrorMessage(err)
-		} else {
-			userInfo, _, err = services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
-			loginErr = utils.GetError().GetCheckErrorMessage(err)
-		}
+		// check saas,caas
+		userInfo, _, err = services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest, reqCsrfToken, s.CfConfig)
+		loginErr = utils.GetError().GetCheckErrorMessage(err)
+
+		//if s.sysType == utils.SYS_TYPE_IAAS{
+		//	userInfo, _, err = services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest)
+		//	loginErr = utils.GetError().GetCheckErrorMessage(err)
+		//}else if s.sysType == utils.SYS_TYPE_PAAS{
+		//	userInfo, _, err = services.GetPaasLoginService( s.CfProvider , s.txn, s.RdClient, s.sysType).Login(apiRequest)
+		//	loginErr = utils.GetError().GetCheckErrorMessage(err)
+		//}else{
+		//	userInfo, _, err = services.GetLoginService(s.OpenstackProvider, s.CfProvider , s.txn, s.RdClient, s.sysType).Login(apiRequest)
+		//	loginErr = utils.GetError().GetCheckErrorMessage(err)
+		//}
 
 		if loginErr != nil {
 			utils.ErrRenderJsonResponse(loginErr, w)
 			return
 		} else {
 
-			services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken)
+			services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
 			userInfo.SysType = s.sysType
 			utils.RenderJsonResponse(userInfo, w)
 			return
@@ -161,13 +167,14 @@ func loginValidate(apiRequest cm.UserInfo) error {
 
 func (s *LoginController) Join(w http.ResponseWriter, r *http.Request) {
 
-	if s.sysType == utils.SYS_TYPE_IAAS {
-		services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
-	} else if s.sysType == utils.SYS_TYPE_PAAS {
-		services.GetPaasLoginService(s.CfProvider, s.txn, s.RdClient, s.sysType)
-	} else {
-		services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType)
-	}
+	services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
+	//if s.sysType == utils.SYS_TYPE_IAAS{
+	//	services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
+	//}else if s.sysType == utils.SYS_TYPE_PAAS{
+	//	services.GetPaasLoginService(s.CfProvider, s.txn, s.RdClient, s.sysType)
+	//}else{
+	//	services.GetLoginService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient, s.sysType)
+	//}
 
 	utils.RenderJsonLogoutResponse(nil, w)
 
