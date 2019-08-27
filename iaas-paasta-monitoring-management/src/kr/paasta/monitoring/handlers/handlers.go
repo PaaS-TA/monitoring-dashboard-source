@@ -463,7 +463,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 		}
 
 		// token Pass
-		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") {
+		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/") && !strings.Contains(r.RequestURI, "/v2/saas/app/") {
 			fmt.Println("Request URI :: ", r.RequestURI)
 
 			reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)
@@ -555,7 +555,6 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 			fmt.Println("url pass ::", r.RequestURI)
 			handler.ServeHTTP(w, r)
 		}
-		handler.ServeHTTP(w, r)
 	}
 
 }

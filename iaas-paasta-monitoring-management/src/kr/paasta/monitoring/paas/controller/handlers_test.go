@@ -2,7 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-community/go-cfclient"
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
 	monascagopher "github.com/gophercloud/gophercloud"

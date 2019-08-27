@@ -94,20 +94,22 @@ const (
 	*/
 
 	//Pod Usage Metrics
-	PQ_POD_LIST         = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name)"
-	PQ_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m]))by(pod_name)*100"
-	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name)/1024/1024"
-	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)/1024/1024"
-	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)/max(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name)*100"
-	PQ_POD_MEMORY_USAGE = "(sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!=''})by(pod_name))*100"
+	PQ_POD_LIST       = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name)"
+	PQ_POD_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m]))by(pod_name)*100"
+	PQ_POD_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name)/1024/1024"
+	PQ_POD_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)/1024/1024"
+	PQ_POD_DISK_USAGE = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name)/max(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name)*100"
+	//PQ_POD_MEMORY_USAGE = "(sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!=''})by(pod_name))*100"
+	PQ_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 
 	//Container Usage Metrics
 	//	PQ_COTAINER_NAME_LIST  = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"
-	PQ_COTAINER_CPU_USE      = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)" //(MS)
-	PQ_COTAINER_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m])*100)by(namespace,pod_name,container_name)"
-	PQ_COTAINER_MEMORY_USE   = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
-	PQ_COTAINER_DISK_USE     = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
-	PQ_COTAINER_MEMORY_USAGE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''}/container_memory_max_usage_bytes{container_name!='POD',image!=''}*100)by(namespace,pod_name,container_name)"
+	PQ_COTAINER_CPU_USE    = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)" //(MS)
+	PQ_COTAINER_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m])*100)by(namespace,pod_name,container_name)"
+	PQ_COTAINER_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
+	PQ_COTAINER_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
+	//PQ_COTAINER_MEMORY_USAGE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''}/container_memory_max_usage_bytes{container_name!='POD',image!=''}*100)by(namespace,pod_name,container_name)"
+	PQ_COTAINER_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 
 	//Pod Phase
 	PQ_POD_PHASE = "count(kube_pod_status_phase>0)by(phase)"
@@ -282,7 +284,8 @@ func (s *MetricsService) GetContainerInfo(request model.MetricsRequest) (model.C
 	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'}[5m]))by(namespace,pod_name,container_name)*100"
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	pqMemoryUsage := "(sum(container_memory_working_set_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name))*100"
+	//pqMemoryUsage := "(sum(container_memory_working_set_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name))*100"
+	pqMemoryUsage := "avg(container_memory_working_set_bytes{ccontainer_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
@@ -530,8 +533,8 @@ func (s *MetricsService) GetPodInfo(request model.MetricsRequest) (model.Contain
 	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name='" + podName + "'}[5m]))by(pod_name)*100"
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	pqMemoryUsage := "(sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name))*100"
-
+	//pqMemoryUsage := "(sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name))*100"
+	pqMemoryUsage := "avg(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
 		"sum(container_fs_usage_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})" +
@@ -1270,9 +1273,11 @@ func GetDivsionContiCpuUsage(url string, namespace string, podname string, divis
 func GetDivsionContiMemoryUsage(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
+		//pqUrl = "container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
+		pqUrl = "avg(container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 	} else if division == "pod" {
-		pqUrl = "container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
+		//pqUrl = "container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
+		pqUrl = "avg(container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 

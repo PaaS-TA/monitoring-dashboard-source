@@ -1,16 +1,11 @@
 package controller
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring/caas/model"
 	"kr/paasta/monitoring/caas/service"
 	"kr/paasta/monitoring/caas/util"
-	"log"
 	"net/http"
-	"strings"
 )
 
 type MetricController struct {
@@ -94,47 +89,6 @@ func (s *MetricController) GetContainerLog(w http.ResponseWriter, r *http.Reques
 		util.RenderJsonResponse(err, w)
 	}
 	util.RenderJsonResponse(result, w)
-
-	//js, err := json.Marshal(result)
-	//if err != nil {
-	//	log.Fatalln("Error writing JSON:", err)
-	//}
-	//
-	//w.Header().Set("Content-Type", "application/json")
-	//w.WriteHeader(200)
-	//w.Write(js)
-	//return
-}
-
-func JSONMarshal(t interface{}) ([]byte, error) {
-	buffer := &bytes.Buffer{}
-	encoder := json.NewEncoder(buffer)
-	encoder.SetEscapeHTML(true)
-	err := encoder.Encode(t)
-	return buffer.Bytes(), err
-}
-
-func RenderJsonResponseTest(data interface{}, w http.ResponseWriter) {
-
-	/* NaN 데이터가 있는경우 json.Marshal 에서 panic 발행후 프로세스가 정지 되므로 사전에 체크하여 우회한다. */
-	str := fmt.Sprint(data)
-
-	if strings.Contains(str, "NaN") {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
-		w.Write([]byte(""))
-		return
-	}
-
-	js, err := JSONMarshal(data)
-	if err != nil {
-		log.Fatalln("Error writing JSON:", err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(js)
-	return
 }
 
 func (s *MetricController) GetClusterOverView(w http.ResponseWriter, r *http.Request) {

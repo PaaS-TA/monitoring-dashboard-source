@@ -82,25 +82,7 @@ func GetBatchAlarmReceiver(dbClient *gorm.DB) ([]model.BatchAlarmReceiver, model
 //// 알람 수신자 조회
 func GetBatchAlarmLog(dbClient *gorm.DB) ([]model.BatchAlarmExecution, model.ErrMessage) {
 	var alarmLog []model.BatchAlarmExecution
-	var tempAlarmDiv []alarmId
-	var quaryAlarmDiv string
-
-	temp := dbClient.Debug().Table("batch_alarm_infos").
-		Select("alarm_id").
-		Where("service_type = 'SaaS'").Find(&tempAlarmDiv)
-
-	err1 := util.GetError().DbCheckError(temp.Error)
-	if err1 != nil {
-		return nil, err1
-	}
-
-	for _, data := range tempAlarmDiv {
-		quaryAlarmDiv += data.AlarmId + ","
-	}
-
-	quaryAlarmDiv += "''"
-
-	status := dbClient.Debug().Table("batch_alarm_executions").Where("alarm_id in (" + quaryAlarmDiv + ") and critical_status <> 'Success' ").Find(&alarmLog)
+	status := dbClient.Debug().Table("batch_alarm_executions").Where("service_type = 'SaaS' and critical_status <> 'Success' ").Find(&alarmLog)
 
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -183,9 +165,3 @@ func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string
 
 	return err
 }
-
-//func InsertBatchExecution(dbClient *gorm.DB, batchExection *model.BatchAlarmExecution) {
-//	if err := dbClient.Debug().Create(&batchExection).Error; err != nil {
-//		fmt.Printf("insert error : %v\n", dbClient.Error)
-//	}
-//}

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs"
 	"github.com/cihub/seelog"
-	"github.com/cloudfoundry-community/go-cfclient"
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"

@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/cihub/seelog"
-	"github.com/cloudfoundry-community/go-cfclient"
+	//"github.com/cloudfoundry-community/go-cfclient"
+
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
@@ -308,7 +310,7 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 	return
 }
 
-func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elastic.Client, databases bm.Databases, cfProvider cfclient.Config, boshClient *gogobosh.Client, err error) {
+func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elastic.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
 
 	// InfluxDB
 	paasUrl, _ := config["paas.metric.db.url"]
@@ -338,12 +340,12 @@ func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasEl
 	databases.ContainerDatabase = container_database
 
 	// Cloud Foundry Client
-	cfProvider = cfclient.Config{
-		ApiAddress: config["paas.cf.client.apiaddress"],
-		//Username:     "admin",
-		//Password:     "admin",
-		SkipSslValidation: true,
-	}
+	//cfProvider = cfclient.Config{
+	//	ApiAddress: config["paas.cf.client.apiaddress"],
+	//	//Username:     "admin",
+	//	//Password:     "admin",
+	//	SkipSslValidation: true,
+	//}
 
 	// BOSH Client Config
 	boshConfig := &gogobosh.Config{
