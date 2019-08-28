@@ -143,14 +143,8 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string, snsId int64) model.ErrMessage {
 	var err model.ErrMessage
 	batchAlarmReceiver := model.BatchAlarmReceiver{}
-	tempReceiverId, _ := strconv.Atoi(receiverId)
-
-	//Delete
-	delAlarmReceiver := model.BatchAlarmReceiver{
-		ReceiverId: tempReceiverId,
-	}
-
-	status := dbClient.Debug().Delete(&delAlarmReceiver)
+	// Delete And Insert
+	status := dbClient.Debug().Where("service_type = 'SaaS'").Delete(model.BatchAlarmReceiver{})
 	err = util.GetError().DbCheckError(status.Error)
 
 	//batchAlarmReceiver.ReceiverId	= ""  autoincrement
