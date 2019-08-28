@@ -118,7 +118,7 @@ type (
 
 	GraphMetric struct {
 		Metric []map[string]string `json:"metric"`
-		Name   string              `json:"Name"`
+		Name   string              `json:"name"`
 	}
 
 	GraphMetricList struct {
