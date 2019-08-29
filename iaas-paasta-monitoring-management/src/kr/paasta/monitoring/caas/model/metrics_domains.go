@@ -48,11 +48,11 @@ type (
 		ContainerName string `json:"ContainerName"`
 		PodName       string `json:"PodName"`
 		NameSpace     string `json:"NameSpace"`
-		//Cpu           string `json:"Cpu"`
-		Memory      string `json:"Memory"`
-		Disk        string `json:"Disk"`
-		CpuUsage    string `json:"CpuUsage"`
-		MemoryUsage string `json:"MemoryUsage"`
+		Cpu           string `json:"Cpu"`
+		Memory        string `json:"Memory"`
+		Disk          string `json:"Disk"`
+		CpuUsage      string `json:"CpuUsage"`
+		MemoryUsage   string `json:"MemoryUsage"`
 	}
 
 	ContainerInfo struct {
@@ -107,8 +107,8 @@ type (
 	}
 
 	PodMetricList struct {
-		PodName string `json:"PodName"`
-		//Cpu         string `json:"Cpu"`
+		PodName     string `json:"PodName"`
+		Cpu         string `json:"Cpu"`
 		Memory      string `json:"Memory"`
 		Disk        string `json:"Disk"`
 		CpuUsage    string `json:"CpuUsage"`
@@ -117,8 +117,8 @@ type (
 	}
 
 	GraphMetric struct {
-		Metric []map[string]string `json:"Metric"`
-		Name   string              `json:"Name"`
+		Metric []map[string]string `json:"metric"`
+		Name   string              `json:"name"`
 	}
 
 	GraphMetricList struct {

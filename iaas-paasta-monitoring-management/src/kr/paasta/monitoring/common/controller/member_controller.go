@@ -367,15 +367,15 @@ func (s *MemberController) MemberCheckPaaS(w http.ResponseWriter, r *http.Reques
 	s.CfConfig.Type = "PAAS"
 	result = ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
 
-	cfApp, cfErr := services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).GetAppByGuid(s.CfConfig, "bf60a3b5-c937-4d9f-ae97-3f7a7ef81d24", reqCsrfToken)
-
-	if cfErr != nil {
-		fmt.Println(cfErr)
-		return
-	}
-	var aur cm.ScaleProcess
-	aur.Instances = cfApp.Instances + 1
-	cfApp, cfErr = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).UpdateApp(s.CfConfig, "bf60a3b5-c937-4d9f-ae97-3f7a7ef81d24", aur, reqCsrfToken)
+	//cfApp, cfErr := services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).GetAppByGuid(s.CfConfig, "bf60a3b5-c937-4d9f-ae97-3f7a7ef81d24", reqCsrfToken)
+	//
+	//if cfErr != nil {
+	//	fmt.Println(cfErr)
+	//	return
+	//}
+	//var aur cm.ScaleProcess
+	//aur.Instances = cfApp.Instances + 1
+	//cfApp, cfErr = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).UpdateApp(s.CfConfig, "bf60a3b5-c937-4d9f-ae97-3f7a7ef81d24", aur, reqCsrfToken)
 
 	//result = services.GetMemberService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient).GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig)
 	//if s.sysType == utils.SYS_TYPE_IAAS{

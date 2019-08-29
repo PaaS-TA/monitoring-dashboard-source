@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/alexedwards/scs"
+	//"github.com/alexedwards/scs"
 	"github.com/cihub/seelog"
-	"github.com/cloudfoundry-community/go-cfclient"
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
@@ -64,7 +64,7 @@ var _ = Describe("Controller BeforeSuite", func() {
 
 	BeforeSuite(func() {
 		fmt.Println(">>>>>>>>>>>>>>>>>>>>>> srtart test  ")
-		iaasModels.SessionManager = *scs.NewCookieManager("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
+		//iaasModels.SessionManager = *scs.NewCookieManager("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
 		config, err := readConfig(`../../config.ini`)
 		if err != nil {
 			fmt.Println("read config file error: %s", err)

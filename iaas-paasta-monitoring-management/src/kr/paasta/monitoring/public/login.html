@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div class="loginWrap">
+            <div>
+				<h1>SIGN IN</h1>
+				<p>Already have an account?</p>
+                <fieldset>
+                    <div class="id">
+						<label>Login</label>
+						<input type="text" id="id" placeholder="User ID">
+                    </div>
+                    <div class="pw">
+						<label>Password</label>
+                        <input type="password" id="pw" placeholder="Password">
+                    </div>
+                    <div class="btn">
+                        <button id="loginBtn">Sign In</button>
+					</div>
+					<div>
+						<a href="join.html" id="join">Register now!</a>
+					</div>
+                </fieldset>
+            </div>
+		</div>
+
+		<!-- // Wrap -->
+		<script type="text/javascript" src="resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const login = {
+					init() {
+						document.getElementById('loginBtn').addEventListener('click', () => {
+							if(document.getElementById('id').value != '' && document.getElementById('pw').value != ''){
+								fnComm.getToken(document.getElementById('id').value, document.getElementById('pw').value);
+							} else {
+								alert('Please enter id and pw.');
+							}
+						});
+						
+						document.getElementById('join').addEventListener('click', () => {
+							ocument.location.href = 'join.html';
+						});
+
+						document.getElementById('pw').onkeydown = function(event) {
+							if(event.keyCode === 13){
+								if(document.getElementById('id').value != '' && document.getElementById('pw').value != ''){
+									fnComm.getToken(document.getElementById('id').value, document.getElementById('pw').value);
+								} else {
+									alert('Please enter id and pw.');
+								}
+							};
+						};
+					},
+				};
+
+				login.init();
+			};
+		</script>
+
+	</body>
+</html>

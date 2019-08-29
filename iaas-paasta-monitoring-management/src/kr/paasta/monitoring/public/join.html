@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div class="loginWrap">
+			<!-- Contents -->
+			<div class="join">
+				<fieldset>
+					<h4>PaaS Certification</h4>
+                    <div>
+						<label>ID</label>
+						<input type="text" class="uID" placeholder="ID">
+                    </div>
+                    <div>
+						<label>Password</label>
+						<input type="password" class="uPw" placeholder="Password">
+                    </div>
+					<div class="certif">
+						<p class="idc">아이디를 입력해주세요</p>
+					</div>
+					<button class="certification">인증하기</button>
+				</fieldset>
+				
+				<fieldset>
+					<h4>Member Info</h4>
+                    <div>
+						<label>Login</label>
+						<input type="text" class="id" placeholder="ID">
+                    </div>
+                    <div>
+						<label>Name</label>
+                        <input type="text" class="name" placeholder="Name">
+                    </div>
+                    <div>
+						<label>Password</label>
+                        <input type="password" class="pw" placeholder="Password">
+                    </div>
+                    <div>
+						<label>Password Confirm</label>
+                        <input type="password" class="pwc" placeholder="Password Confirm">
+                    </div>
+                    <div>
+						<label>e-mail</label>
+						<input type="text" class="email" placeholder="e-mail">
+                    </div>
+				</fieldset>
+
+				<div class="btns">
+					<button class="coml">Cancel</button>
+					<button class="save" id="loginBtn">Join</button>
+				</div>
+			</div>
+			<!-- // Contents -->
+		</div>
+		<!-- // Wrap -->
+
+		<script type="text/javascript" src="resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const join = {
+					flag : false,
+
+					init() {
+						document.querySelector('.uID').onblur = (e) => {
+							if(e.target.value != ''){
+								join.idCheck(e.target.value);
+								return false;
+							};
+						};
+						
+						document.querySelector('.certification').addEventListener('click', (e) => {
+							if(document.querySelector('.uID').value != ''){
+                    			if(document.querySelector('.uPw').value != ''){
+									var joinData = `{"paasUserId":"${document.querySelector('.uID').value}","paasUserPw":"${document.querySelector('.uPw').value}"}`;
+
+									join.pwCheck(joinData);
+								} else{
+									alert('Password를 입력해주세요.');
+								};
+							} else{
+								alert('ID를 입력해주세요.');
+							};
+						});
+						
+						document.querySelector('.coml').addEventListener('click', (e) => {
+							window.location.href = 'login.html';
+						});
+						
+						document.querySelector('.save').addEventListener('click', (e) => {
+							if(join.flag){
+								if(document.querySelector('.name').value != ''){
+									if(document.querySelector('.email').value != ''){
+										if(document.querySelector('.email').value.indexOf('@') == -1){
+											alert('e-mail 형식이 잘못되었습니다.');
+											return false;
+										};
+
+										join.complete();
+									} else {
+										alert('e-mail 을 입력해주세요.');
+									};
+								} else {
+									alert('Name 을 입력해주세요.');
+								};
+							} else {
+								alert('User ID 및 User Password 를 인증해주세요.');
+							};
+						});
+					},
+
+					idCheck(id) {
+						var request = new XMLHttpRequest();
+						request.open('GET', `${fnComm.url}member/join/check/id/${id}`);
+						request.onreadystatechange = () => {
+							if (request.readyState === XMLHttpRequest.DONE){
+								if(request.status === 201 && JSON.parse(request.responseText) != id){
+									document.querySelector('.certification').classList.toggle('off', false);
+									document.querySelector('.idc').classList.toggle('on', true);
+									document.querySelector('.idc').innerHTML = '사용가능한 아이디입니다.';
+
+									join.idPaas(id);
+								} else {
+									document.querySelector('.idc').classList.toggle('on', false);
+									document.querySelector('.idc').innerHTML = '이미 등록된 사용자입니다.';
+								};
+							};
+						};
+
+						request.send();
+					},
+
+					idPaas(id) {
+						var request = new XMLHttpRequest();
+						request.open('GET', `${fnComm.url}member/join/check/duplication/paas/${id}`);
+						request.onreadystatechange = () => {
+							if (request.readyState === XMLHttpRequest.DONE){
+								console.log(request);
+								if(request.status === 201 && JSON.parse(request.responseText) != id){
+									document.querySelector('.certification').classList.toggle('off', false);
+									document.querySelector('.idc').classList.toggle('on', true);
+									document.querySelector('.idc').innerHTML = '사용가능한 아이디입니다.';
+								} else {
+									document.querySelector('.certification').classList.toggle('off', true);
+									document.querySelector('.idc').classList.toggle('on', false);
+									document.querySelector('.idc').innerHTML = '이미 등록된 사용자입니다.';
+								};
+							};
+						};
+
+						request.send();
+					},
+
+					pwCheck(data) {
+						var request = new XMLHttpRequest();
+						request.open('POST', `${fnComm.url}member/join/check/paas`);
+						request.onreadystatechange = () => {
+							if (request.readyState === XMLHttpRequest.DONE){
+								console.log(request);
+								if(request.status === 201){
+									if(JSON.parse(request.responseText) == ''){
+										document.querySelector('.uID').setAttribute('disabled', 'disabled');
+										document.querySelector('.uPw').setAttribute('disabled', 'disabled');
+
+										alert('인증되었습니다.');
+										
+										join.flag = true;
+									} else if(JSON.parse(request.responseText) == 'bad_credentials'){
+										alert('아이디 또는 비밀번호가 틀렸습니다.');
+									} else if(JSON.parse(request.responseText) == 'account_locked'){
+										alert('인증 횟수가 초과되었습니다.\n관리자에게 문의 하시기 바랍니다.');
+									} else {
+										alert('인증에 실패하였습니다.\n관리자에게 문의 하시기 바랍니다.');
+									};
+								} else {
+								};
+
+							};
+						};
+						request.send(data);
+					},
+
+					complete() {
+						var saveData = `{"paasUserId":"${document.querySelector('.uID').value}","paasUserPw":"${document.querySelector('.uPw').value}","userId":"${document.querySelector('.id').value}","userPw":"${document.querySelector('.pw').value}","userPwConfirm":"${document.querySelector('.pwc').value}","userNm":"${document.querySelector('.name').value}","userEmail":"${document.querySelector('.email').value}","paasUserUseYn":"Y","paasUserChck":"true"}`;
+
+						console.log(saveData);
+						
+						var request = new XMLHttpRequest();
+						request.open('POST', `${fnComm.url}member/join`);
+						request.onreadystatechange = () => {
+							if (request.readyState === XMLHttpRequest.DONE){
+								console.log(request);
+								if(request.status === 201){
+									alert('회원가입이 완료되었습니다.');
+
+									location.href = 'login.html';
+								} else {
+								};
+							};
+						};
+
+						request.send(saveData);
+					},
+				};
+
+				join.init();
+			};
+		</script>
+
+	</body>
+</html>

@@ -124,10 +124,8 @@ func (s *AlarmService) GetAlarmLog() ([]model.AlarmLog, model.ErrMessage) {
 	alarmLog = make([]model.AlarmLog, len(alarmLogs))
 
 	for idx, data := range alarmLogs {
-		alarmLog[idx].NameSpace = data.MeasureName2
-		alarmLog[idx].WorkNode = data.MeasureName1
 		alarmLog[idx].Issue = data.ExecutionResult
-		alarmLog[idx].Pod = data.MeasureName3
+		alarmLog[idx].Application = data.MeasureName1
 		alarmLog[idx].Status = data.CriticalStatus
 		alarmLog[idx].Time = data.ExecutionTime
 	}

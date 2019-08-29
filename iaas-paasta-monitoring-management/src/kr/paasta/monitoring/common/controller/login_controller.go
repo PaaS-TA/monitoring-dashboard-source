@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	//"github.com/cloudfoundry-community/go-cfclient"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/monasca/golang-monascaclient/monascaclient"
 	//"github.com/rackspace/gophercloud"
-	"github.com/cloudfoundry-community/go-cfclient"
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
 	cm "kr/paasta/monitoring/common/model"
@@ -56,7 +57,7 @@ func NewIaasLoginController(openstackProvider model.OpenstackProvider, monsClien
 
 }
 
-func NewPaasLoginController(cfProvider cfclient.Config, txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
+func NewPaasLoginController(txn *gorm.DB, rdClient *redis.Client, sysType string) *LoginController {
 	return &LoginController{
 		//CfProvider: cfProvider,
 		txn:      txn,

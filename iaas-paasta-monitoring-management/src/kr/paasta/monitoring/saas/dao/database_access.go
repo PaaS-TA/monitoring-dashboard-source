@@ -82,25 +82,7 @@ func GetBatchAlarmReceiver(dbClient *gorm.DB) ([]model.BatchAlarmReceiver, model
 //// 알람 수신자 조회
 func GetBatchAlarmLog(dbClient *gorm.DB) ([]model.BatchAlarmExecution, model.ErrMessage) {
 	var alarmLog []model.BatchAlarmExecution
-	var tempAlarmDiv []alarmId
-	var quaryAlarmDiv string
-
-	temp := dbClient.Debug().Table("batch_alarm_infos").
-		Select("alarm_id").
-		Where("service_type = 'SaaS'").Find(&tempAlarmDiv)
-
-	err1 := util.GetError().DbCheckError(temp.Error)
-	if err1 != nil {
-		return nil, err1
-	}
-
-	for _, data := range tempAlarmDiv {
-		quaryAlarmDiv += data.AlarmId + ","
-	}
-
-	quaryAlarmDiv += "''"
-
-	status := dbClient.Debug().Table("batch_alarm_executions").Where("alarm_id in (" + quaryAlarmDiv + ") and critical_status <> 'Success' ").Find(&alarmLog)
+	status := dbClient.Debug().Table("batch_alarm_executions").Where("service_type = 'SaaS' and critical_status <> 'Success' ").Find(&alarmLog)
 
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -114,21 +96,14 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 	var err model.ErrMessage
 
 	// Delete And Insert
+	status := dbClient.Debug().Where("service_type = 'SaaS'").Delete(model.BatchAlarmInfo{})
+
 	for _, data := range udateData {
 		batchAlarmInfo := model.BatchAlarmInfo{}
 		tempMap := data.Map()
 		tempWaring, _ := strconv.Atoi(tempMap["Warning"].String())
 		tempCritical, _ := strconv.Atoi(tempMap["Critical"].String())
-		tempAlarmId, _ := strconv.Atoi(tempMap["AlarmId"].String())
-		//Delete
-		delAlarm := model.BatchAlarmInfo{
-			AlarmId: tempAlarmId,
-		}
 
-		status := dbClient.Debug().Delete(&delAlarm)
-		err = util.GetError().DbCheckError(status.Error)
-
-		//make cron_expression
 		cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
 		batchAlarmInfo.ServiceType = "SaaS"
 		batchAlarmInfo.MetricType = tempMap["Name"].String()
@@ -136,6 +111,7 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 		batchAlarmInfo.CriticalValue = tempCritical
 		batchAlarmInfo.MeasureTime = timeData
 		batchAlarmInfo.CronExpression = cronExpression
+
 		if tempMap["Name"].String() == "SYSTEM_CPU" {
 			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} System CPU 현재사용률 (${Currend_value}%)"
 			batchAlarmInfo.ParamData1 = "/getAgentStat/cpuLoad/chart.pinpoint"
@@ -167,14 +143,8 @@ func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) 
 func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string, snsId int64) model.ErrMessage {
 	var err model.ErrMessage
 	batchAlarmReceiver := model.BatchAlarmReceiver{}
-	tempReceiverId, _ := strconv.Atoi(receiverId)
-
-	//Delete
-	delAlarmReceiver := model.BatchAlarmReceiver{
-		ReceiverId: tempReceiverId,
-	}
-
-	status := dbClient.Debug().Delete(&delAlarmReceiver)
+	// Delete And Insert
+	status := dbClient.Debug().Where("service_type = 'SaaS'").Delete(model.BatchAlarmReceiver{})
 	err = util.GetError().DbCheckError(status.Error)
 
 	//batchAlarmReceiver.ReceiverId	= ""  autoincrement
@@ -189,9 +159,3 @@ func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string
 
 	return err
 }
-
-//func InsertBatchExecution(dbClient *gorm.DB, batchExection *model.BatchAlarmExecution) {
-//	if err := dbClient.Debug().Create(&batchExection).Error; err != nil {
-//		fmt.Printf("insert error : %v\n", dbClient.Error)
-//	}
-//}

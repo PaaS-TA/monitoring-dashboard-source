@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
+						<li><a href="paas.html"><span>B</span></a></li>
+						<li><a href="paas.html"><span>P</span></a></li>
+						<li><a href="cont.html"><span>C</span></a></li>
+						<li>
+							<a href="alarm_policy.html" class="on"><span>A</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+								<li><a href="alarm_statis.html">Statistics</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="alarmStatus">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<fieldset class="statusSearch">
+						<h4>Search Status</h4>
+						<select id="type1">
+							<option value="">대상 전체</option>
+							<option value="pas">PaaS-TA</option>
+							<option value="bos">Bosh</option>
+							<option value="con">Container</option>
+						</select>
+						<select id="type2">
+							<option value="">자원유형 전체</option>
+							<option value="cpu">CPU</option>
+							<option value="memory">Memory</option>
+							<option value="disk">Disk</option>
+						</select>
+						<select id="type3">
+							<option value="">Alarm 등급 전체</option>
+							<option value="warning">Warning</option>
+							<option value="critical">Critical</option>
+						</select>
+						<select id="type4">
+							<option value="">Alarm 상태 전체</option>
+							<option value="1">Alarm 발생</option>
+							<option value="2">Alarm 처리중</option>
+							<option value="3">Alarm 처리완료</option>
+						</select>
+						<span>Start Date</span>
+						<input type="date" id="date1" placeholder="From Date">
+						<span>End Date</span>
+						<input type="date" id="date2" placeholder="To Date">
+					</fieldset>
+					<div class="btnWrap center">
+						<button class="search">SEARCH</button>
+					</div>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="push">
+						<h4>Alarm Status Summary</h4>
+                        <div id="statusList" class="statusList">
+						</div>
+                    </article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+
+		</div>
+		<!-- // Wrap -->
+
+	</body>
+	
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	
+	<script type="text/javascript">
+		window.onload = () => {
+			const alarm = {
+				id : 'bos',
+				data : [],
+				flag : true,
+
+				init() {
+					// Alarm Count
+					fnComm.alarmCount();
+
+					// Alarm Policy, Measuring Time, Alarm Receiver Address
+					fnComm.loadData('GET', psRoot.url + 'paas/alarm/statuses?pageItems=1000&pageIndex=1', alarm.alarmStatus);
+				},
+
+				alarmStatus(data) {
+					console.log(data);
+					var target = document.getElementById('statusList');
+					
+					fnComm.removeHtml(target);
+
+					data.data.forEach((value, idx) => {
+						//////////////////////////////////////////////////////////////////////
+						// alarmCnt: 1
+						// alarmMessage: "doppler/3 memory 의 상태critical memory 의 임계치인90%를 초과하였습니다.현재 사용률 [95.51]% 입니다. "
+                        // alarmSendDate: "2018-12-03 15:48:58"
+                        // alarmTitle: "[doppler/3]의 memory 상태 [critical]"
+						// alarmType: "memory"
+						// appIndex: 0
+						// appName: ""
+						// appYn: "N"
+						// containerName: ""
+						// id: 47
+						// ip: "10.20.20.90"
+						// level: "critical"
+						// originId: 148
+						// originName: "doppler/3"
+						// originType: "pas"
+						// regDate: "2018-12-03 15:48:58"
+						// regUser: "Bat"
+						// resolveStatus: "1"
+						// resolveStatusName: "Alarm 발생"
+						// userName: "admin"
+						//////////////////////////////////////////////////////////////////////
+						
+						var html = '<div class="'+value.level+'">';
+						html += '	<div>';
+						html += '		<strong title="'+value.alarmMessage+'">'+value.alarmMessage+'</strong>';
+						html += '	</div>';
+						html += '	<div>';
+						html += '		<dl>';
+						html += '			<dt>Alarm Type</dt>';
+						html += '			<dd>'+value.alarmType+'</dd>';
+						html += '		</dl>';
+						html += '		<dl>';
+						html += '			<dt>Origin Type</dt>';
+						html += '			<dd>'+value.originType+'</dd>';
+						html += '		</dl>';
+						html += '		<dl>';
+						html += '			<dt>Origin Name</dt>';
+						html += '			<dd>'+value.originName+'</dd>';
+						html += '		</dl>';
+						html += '		<dl>';
+						html += '			<dt>IP</dt>';
+						html += '			<dd>'+value.ip+'</dd>';
+						html += '		</dl>';
+						html += '		<dl>';
+						html += '			<dt>Date</dt>';
+						html += '			<dd>'+value.alarmSendDate+'</dd>';
+						html += '		</dl>';
+						html += '	</div>';
+						html += '	<ul class="historyWrap data-read'+value.id+'">';
+						html += '	</ul>';
+						html += '	<div class="receipt">';
+						html += '		<textarea></textarea>';
+						html += '		<div data-id="'+value.id+'">';
+						html += '			<button class="saveBtn">SAVE (조치내용만 입력)</button>';
+						html += '			<button class="complBtn">COMPLETE (조치내용도 함께 입력)</button>';
+						html += '		</div>';
+						html += '	</div>';
+						html += '	<div class="summaryBtn" data-id="'+value.id+'"  data-name="'+value.name+'">';
+						html += '		<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="Receipt"><span>Receipt</span></a>';
+						html += '	</div>';
+						html += '</a>';
+						
+						fnComm.appendHtml(target, html, 'div');
+						
+						fnComm.loadData('GET', psRoot.url + 'paas/alarm/status/'+value.id, alarm.history, value.id);
+					});
+					
+					// Button Event (receipt)
+					var elm = document.querySelectorAll('.process');
+					for(var i=0 ; i<elm.length ; i++){
+						elm[i].addEventListener('click', (e) => {
+							e.target.parentNode.parentNode.previousSibling.previousSibling.classList.toggle('on');
+						}, false);
+					};
+				
+					// receipt 코멘트 저장 및 컴플릿
+					var saveBtn = document.querySelectorAll('.saveBtn');
+					var complBtn = document.querySelectorAll('.complBtn');
+					for(var i=0 ; i<saveBtn.length ; i++){
+						saveBtn[i].addEventListener('click', (e) => {
+							var actionPush = '{"alarmId":'+e.target.parentNode.getAttribute('data-id')+',"alarmActionDesc":"'+e.target.parentNode.previousSibling.previousSibling.value+'"}';
+
+							fnComm.saveData('POST', psRoot.url + 'paas/alarm/action/'+e.target.parentNode.getAttribute('data-id'), JSON.parse(actionPush));
+
+							e.target.parentNode.previousSibling.previousSibling.value = '';
+
+							fnComm.alertPopup('SAVE', 'COMPLETE');
+						}, false);
+
+						complBtn[i].addEventListener('click', (e) => {
+							var actionPush = '{"alarmActionDesc":"'+e.target.parentNode.previousSibling.previousSibling.value+'"}';
+
+							fnComm.saveData('PATCH', psRoot.url + 'paas/alarm/action/'+e.target.parentNode.getAttribute('data-id'), JSON.parse(actionPush));
+
+							e.target.parentNode.previousSibling.previousSibling.value = '';
+
+							fnComm.alertPopup('PATCH', 'COMPLETE');
+						}, false);
+					};
+					/*
+					function historyEvent(){
+						$('.alarmHistory').find('button.update').off().on('click', function(){
+							console.log($(this).parents('li').data('id'));
+							
+							pass.ajaxPost(pass.url + 'paas/alarm/action/'+$(this).parents('li').data('id'), 'PATCH', '{"alarmActionDesc":"'+$(this).parent().siblings('input').val()+'"}');
+
+							alert('저장되었습니다.');
+						});
+
+						$('.alarmHistory').find('button.delete').off().on('click', function(){
+							pass.ajaxPost(pass.url + 'paas/alarm/action/'+$(this).parents('li').data('id'), 'DELETE');
+
+							alert('삭제되었습니다.');
+
+							$(this).parents('li').remove();
+
+							if($('.alarmHistory ul').find('li').length == 0){
+								$('.alarmHistory .hisWrap').hide();
+							};
+						});
+					};
+					*/
+					
+					if(alarm.flag){
+						alarm.flag = false;
+						alarm.event();
+					};
+				},
+
+				history(data, list){
+					if(data.data.length > 0){
+						data.data.forEach(value => {
+							var target = document.querySelector('.data-read'+value.alarmId);
+
+							var html = '<li>';
+							html += '	<p>';
+							html += '		<input type="text" title="'+value.alarmActionDesc+'" value="'+value.alarmActionDesc+'">';
+							html += '		<em>'+value.regDate+'</em>';
+							html += '	</p>';
+							html += '	<div data-id="'+value.alarmId+'">';
+							html += '		<button class="update" onClick="hisChange(this);">Update</button>';
+							html += '		<button class="delete" onClick="javascript:alarm.hisDelete(this);">Deledte</button>';
+							html += '	</div>';
+							html += '</li>';
+
+							fnComm.appendHtml(target, html, 'li');
+						});
+					};
+				},
+
+				event(){
+					document.querySelector('.search').addEventListener('click', (e) => {
+						var rfDate = new Date(document.getElementById('date1').value+' 00:00:00');
+						var toDate = new Date(document.getElementById('date2').value+' 00:00:00');
+
+						fnComm.loadData('GET', psRoot.url + 'paas/alarm/statuses?pageItems=1000&pageIndex=1&originType='+document.getElementById('type1').value+'&alarmType='+document.getElementById('type2').value+'&resolveStatus='+document.getElementById('type4').value+'&level='+document.getElementById('type3').value+'&searchDateFrom='+rfDate.getTime()+'&searchDateTo='+toDate.getTime(), alarm.alarmStatus);
+					}, false);
+				},
+			}
+
+			alarm.init();
+		};
+
+		// 히스토리 수정
+		function hisChange(target){
+			var actionPush = '{"alarmActionDesc":"'+target.parentNode.previousSibling.previousSibling.querySelector('input').value+'"}';
+
+			fnComm.saveData('PATCH', psRoot.url + 'paas/alarm/action/'+target.parentNode.getAttribute('data-id'), JSON.parse(actionPush));
+
+			fnComm.alertPopup('PATCH', 'COMPLETE');
+
+			console.log(actionPush);
+		}
+		
+		// 히스토리 삭제
+		function hisDelete(target){
+			var actionPush = '{"alarmActionDesc":"'+target.parentNode.previousSibling.previousSibling.querySelector('input').value+'"}';
+
+			fnComm.saveData('DELETE', psRoot.url + 'paas/alarm/action/'+target.parentNode.getAttribute('data-id'));
+
+			fnComm.alertPopup('DELETE', 'COMPLETE');
+		};
+	</script>
+</html>
