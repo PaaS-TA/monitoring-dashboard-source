@@ -100,7 +100,15 @@ func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.C
 			cfConfig.UserId = result.PaasUserId
 			cfConfig.UserPw = result.PaasUserPw
 			cfConfig.Type = "PAAS"
-			resultString = ua.GetUaaToken(req, reqCsrfToken, cfConfig, n.RdClient)
+			resultString, err = ua.GetUaaToken(result, reqCsrfToken, cfConfig, n.RdClient)
+
+			if err != nil {
+				fmt.Println("uaa token::", err.Error())
+				//return req, provider, err
+			} else {
+				req.PaasToken = resultString
+			}
+
 			//resultString = GetMemberService(n.openstackProvider, n.CfProvider, n.txn, n.RdClient).GetUaaToken(req, reqCsrfToken, cfConfig)
 			fmt.Println("paas token ::", resultString)
 
@@ -112,13 +120,21 @@ func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.C
 			cfConfig.UserId = result.CaasUserId
 			cfConfig.UserPw = result.CaasUserPw
 			cfConfig.Type = "CAAS"
-			resultCaasString := ""
-			resultCaasString = GetMemberService(n.openstackProvider, n.txn, n.RdClient).CaasServiceCheck(req, reqCsrfToken, cfConfig)
-			if resultCaasString == "adm" {
-				resultString = ua.GetUaaToken(req, reqCsrfToken, cfConfig, n.RdClient)
+			//resultCaasString := ""
+			//resultCaasString = GetMemberService(n.openstackProvider, n.txn, n.RdClient).CaasServiceCheck(result, reqCsrfToken, cfConfig)
+			//if resultCaasString == "adm" {
+			resultString, err = ua.GetUaaToken(result, reqCsrfToken, cfConfig, n.RdClient)
+
+			if err != nil {
+				fmt.Println("uaa token::", err.Error())
+				//return req, provider, err
 			} else {
-				fmt.Println("caas token get fail ::" + resultCaasString)
+				req.CaasToken = resultString
 			}
+
+			//} else {
+			//	fmt.Println("caas token get fail ::" + resultCaasString)
+			//}
 			//resultString = ua.GetUaaToken(req, reqCsrfToken, cfConfig,n.RdClient)
 			//resultString = GetMemberService(n.openstackProvider, n.CfProvider, n.txn, n.RdClient).GetUaaToken(req, reqCsrfToken, cfConfig)
 			//fmt.Println("caas token ::",resultString)
@@ -147,10 +163,12 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 	var strcd2 = ""
 	var strcd3 = ""
 	var strcd4 = ""
+	var strcd5 = ""
+	var strcd6 = ""
 
 	userInfo.Username = userInfo.UserId
 
-	if s.sysType == utils.SYS_TYPE_IAAS {
+	if strings.Contains(s.sysType, utils.SYS_TYPE_IAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
 		if userInfo.IaasUserUseYn == "Y" {
 			strcd1 = "I"
 			var tokenRequest cm.UserInfo
@@ -169,16 +187,23 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 			strcd2 = "F"
 			GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
 		}
-	} else if s.sysType == utils.SYS_TYPE_PAAS {
+	}
+	if strings.Contains(s.sysType, utils.SYS_TYPE_PAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
 		if userInfo.PaasUserUseYn == "Y" {
 			strcd3 = "P"
-			var tokenRequest cm.UserInfo
-			tokenRequest.PaasUserId = userInfo.PaasUserId
-			tokenRequest.PaasUserPw = userInfo.PaasUserPw
-			cfConfig.Type = "PAAS"
-			result := ua.GetUaaToken(tokenRequest, reqCsrfToken, cfConfig, s.RdClient)
+			//var tokenRequest cm.UserInfo
+			//tokenRequest.PaasUserId = userInfo.PaasUserId
+			//tokenRequest.PaasUserPw = userInfo.PaasUserPw
+			//cfConfig.Type = "PAAS"
+			//result,err := ua.GetUaaToken(tokenRequest, reqCsrfToken, cfConfig, s.RdClient)
+			//
+			//if err != nil {
+			//	fmt.Println("uaa token::", err.Error())
+			//	//return req, provider, err
+			//}
+
 			//result := GetPaasMemberService(s.CfProvider, s.txn, s.RdClient).GetUaaToken(tokenRequest, reqCsrfToken, cfConfig)
-			if result != "" {
+			if userInfo.PaasToken != "" {
 				strcd4 = "S"
 			} else {
 				strcd4 = "F"
@@ -189,44 +214,32 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 			strcd4 = "F"
 			GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
-	} else {
-		if userInfo.IaasUserUseYn == "Y" {
-			strcd1 = "I"
-			var tokenRequest cm.UserInfo
-			tokenRequest.IaasUserId = userInfo.IaasUserId
-			tokenRequest.IaasUserPw = userInfo.IaasUserPw
-			result := GetMemberService(s.openstackProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
+	}
+	if strings.Contains(s.sysType, utils.SYS_TYPE_CAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
+		if userInfo.CaasUserUseYn == "Y" {
+			strcd5 = "C"
+			//var tokenRequest cm.UserInfo
+			//tokenRequest.PaasUserId = userInfo.PaasUserId
+			//tokenRequest.PaasUserPw = userInfo.PaasUserPw
+			//cfConfig.Type = "PAAS"
+			//result,err := ua.GetUaaToken(tokenRequest, reqCsrfToken, cfConfig, s.RdClient)
+			//
+			//if err != nil {
+			//	fmt.Println("uaa token::", err.Error())
+			//	//return req, provider, err
+			//}
 
-			if result != "" {
-				strcd2 = "S"
+			//result := GetPaasMemberService(s.CfProvider, s.txn, s.RdClient).GetUaaToken(tokenRequest, reqCsrfToken, cfConfig)
+			if userInfo.PaasToken != "" {
+				strcd6 = "S"
 			} else {
-				strcd2 = "F"
+				strcd6 = "F"
 			}
 
 		} else {
-			strcd1 = "F"
-			strcd2 = "F"
-			GetMemberService(s.openstackProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
-		}
-
-		if userInfo.PaasUserUseYn == "Y" {
-			strcd3 = "P"
-			var tokenRequest cm.UserInfo
-			tokenRequest.PaasUserId = userInfo.PaasUserId
-			tokenRequest.PaasUserPw = userInfo.PaasUserPw
-			cfConfig.Type = "PAAS"
-			result := ua.GetUaaToken(tokenRequest, reqCsrfToken, cfConfig, s.RdClient)
-			//result := GetMemberService(s.openstackProvider, s.CfProvider, s.txn, s.RdClient).GetUaaToken(tokenRequest, reqCsrfToken,cfConfig)
-			if result != "" {
-				strcd4 = "S"
-			} else {
-				strcd4 = "F"
-			}
-
-		} else {
-			strcd3 = "F"
-			strcd4 = "F"
-			GetMemberService(s.openstackProvider, s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
+			strcd5 = "F"
+			strcd6 = "F"
+			GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
 	}
 
@@ -236,8 +249,11 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 	userInfo.AuthI2 = strcd2
 	userInfo.AuthP1 = strcd3
 	userInfo.AuthP2 = strcd4
+	userInfo.AuthC1 = strcd5
+	userInfo.AuthC2 = strcd6
 
 	userInfo.IaasUserPw = ""
 	userInfo.PaasUserPw = ""
+	userInfo.CaasUserPw = ""
 	userInfo.UserPw = ""
 }

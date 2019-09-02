@@ -32,8 +32,11 @@ func (a *MemberDao) MemberJoinSave(request cm.UserInfo, txn *gorm.DB) error {
 		IaasUserPw:    request.IaasUserPw,
 		PaasUserId:    request.PaasUserId,
 		PaasUserPw:    request.PaasUserPw,
+		CaasUserId:    request.CaasUserId,
+		CaasUserPw:    request.CaasUserPw,
 		PaasUserUseYn: request.PaasUserUseYn,
 		IaasUserUseYn: request.IaasUserUseYn,
+		CaasUserUseYn: request.CaasUserUseYn,
 	}
 
 	status := a.txn.Debug().Create(&actionData)
@@ -120,8 +123,11 @@ func (h *MemberDao) MemberInfoUpdate(request cm.UserInfo, txn *gorm.DB) (int, er
 			"iaas_user_pw":     request.IaasUserPw,
 			"paas_user_id":     request.PaasUserId,
 			"paas_user_pw":     request.PaasUserPw,
+			"caas_user_id":     request.CaasUserId,
+			"caas_user_pw":     request.CaasUserPw,
 			"iaas_user_use_yn": request.IaasUserUseYn,
 			"paas_user_use_yn": request.PaasUserUseYn,
+			"caas_user_use_yn": request.CaasUserUseYn,
 			"updated_at":       time.Now()})
 	if status.Error != nil {
 		return 0, status.Error

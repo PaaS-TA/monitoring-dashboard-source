@@ -365,7 +365,13 @@ func (s *MemberController) MemberCheckPaaS(w http.ResponseWriter, r *http.Reques
 	var apiRequest cm.UserInfo
 	_ = json.NewDecoder(r.Body).Decode(&apiRequest)
 	s.CfConfig.Type = "PAAS"
-	result = ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
+	_, err := ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
+
+	if err != nil {
+		fmt.Println("uaa token::", err.Error())
+		result = err.Error()
+		//return req, provider, err
+	}
 
 	//cfApp, cfErr := services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).GetAppByGuid(s.CfConfig, "bf60a3b5-c937-4d9f-ae97-3f7a7ef81d24", reqCsrfToken)
 	//
@@ -398,7 +404,15 @@ func (s *MemberController) MemberCheckCaaS(w http.ResponseWriter, r *http.Reques
 	s.CfConfig.Type = "CAAS"
 	result = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).CaasServiceCheck(apiRequest, reqCsrfToken, s.CfConfig)
 	if result == "adm" {
-		result = ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
+		result := ""
+		_, err := ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
+
+		if err != nil {
+			fmt.Println("uaa token::", err.Error())
+			result = err.Error()
+			//return req, provider, err
+		}
+		fmt.Println("uaa token::", result)
 		//result = services.GetMemberService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient).GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig)
 	} else {
 		result = "admin check fail"
@@ -500,7 +514,7 @@ func (s *MemberController) MemberInfoDelete(w http.ResponseWriter, r *http.Reque
 	id := r.FormValue(":id")
 	apiRequest.UserId = id
 
-	var cnt int
+	var cnt = 0
 	var loginErr model.ErrMessage
 	var err error
 

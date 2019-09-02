@@ -16,9 +16,6 @@ type (
 		PaasUserPw    string `json:"paasUserPw"`
 		PaasToken     string `json:"paasToken"`
 		PaasAdminYn   string `json:"paasAdminYn"`
-		SaasUserId    string `json:"saasUserId"`
-		SaasUserPw    string `json:"saasUserPw"`
-		SaasToken     string `json:"saasToken"`
 		CaasUserId    string `json:"caasUserId"`
 		CaasUserPw    string `json:"caasUserPw"`
 		CaasToken     string `json:"caasToken"`
@@ -27,10 +24,11 @@ type (
 		AuthI2        string `json:"authI2"`
 		AuthP1        string `json:"authP1"`
 		AuthP2        string `json:"authP2"`
+		AuthC1        string `json:"authC1"`
+		AuthC2        string `json:"authC2"`
 		SysType       string `json:"sysType"`
 		IaasUserUseYn string `json:"iaasUserUseYn"`
 		PaasUserUseYn string `json:"paasUserUseYn"`
-		SaasUserUseYn string `json:"saasUserUseYn"`
 		CaasUserUseYn string `json:"caasUserUseYn"`
 	}
 
@@ -43,13 +41,10 @@ type (
 		IaasUserPw    string `json:"iaasUserPw"`
 		PaasUserId    string `json:"paasUserId"`
 		PaasUserPw    string `json:"paasUserPw"`
-		SaasUserId    string `json:"saasUserId"`
-		SaasUserPw    string `json:"saasUserPw"`
 		CaasUserId    string `json:"caasUserId"`
 		CaasUserPw    string `json:"caasUserPw"`
 		IaasUserUseYn string `json:"iaasUserUseYn"`
 		PaasUserUseYn string `json:"paasUserUseYn"`
-		SaasUserUseYn string `json:"saasUserUseYn"`
 		CaasUserUseYn string `json:"caasUserUseYn"`
 	}
 )

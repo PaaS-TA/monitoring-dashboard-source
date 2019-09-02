@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
 	"io/ioutil"
@@ -25,7 +26,7 @@ type UaaToken struct {
 	ErrorDescription string `json:"error_description"`
 }
 
-func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig, RdClient *redis.Client) string {
+func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig, RdClient *redis.Client) (string, error) {
 
 	//n.CfProvider.Username = strings.TrimSpace(apiRequest.PaasUserId)
 	//n.CfProvider.Password = strings.TrimSpace(apiRequest.PaasUserPw)
@@ -70,6 +71,7 @@ func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConf
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Println(err)
+			return "", err
 		}
 		bodyString := string(bodyBytes)
 		fmt.Println(bodyString)
@@ -79,7 +81,7 @@ func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConf
 
 		if resp.StatusCode != http.StatusOK {
 			fmt.Println(uaaToken)
-			return uaaToken.ErrorDescription
+			return "", errors.New(uaaToken.ErrorDescription)
 		}
 
 		t := time.Now().Local().Add(time.Second * time.Duration(uaaToken.Expire))
@@ -121,7 +123,8 @@ func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConf
 
 					result = uaaToken.Token
 				} else {
-					return "not_admin_account"
+					return "", errors.New("not_admin_account")
+
 				}
 			} else {
 				rdresult := RdClient.Get(reqCsrfToken)
@@ -136,14 +139,15 @@ func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConf
 			}
 
 		} else {
-			result = ""
+			return "", errors.New("scope len is none")
 		}
 
 	} else {
-		result = "parameter is none"
+		return "", errors.New("parameter is none")
+		//result = "parameter is none"
 	}
 
-	return result
+	return result, nil
 }
 
 func GetUaaReFreshToken(reqCsrfToken string, cfConfig pm.CFConfig, RdClient *redis.Client) (string, string) {
@@ -153,7 +157,7 @@ func GetUaaReFreshToken(reqCsrfToken string, cfConfig pm.CFConfig, RdClient *red
 
 	fmt.Println(RdClient.HGet(reqCsrfToken, "paasRefreshToken").Val())
 	apiUrl := cfConfig.Host
-	resource := "/uaa/oauth/token"
+	resource := "/oauth/token"
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("response_type", "token")

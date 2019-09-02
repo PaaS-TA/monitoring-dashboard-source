@@ -49,8 +49,11 @@ type MemberInfo struct {
 	IaasUserPw    string    `gorm:"type:varchar(100);null;"`
 	PaasUserId    string    `gorm:"type:varchar(100);null;"`
 	PaasUserPw    string    `gorm:"type:varchar(100);null;"`
+	CaasUserId    string    `gorm:"type:varchar(100);null;"`
+	CaasUserPw    string    `gorm:"type:varchar(100);null;"`
 	IaasUserUseYn string    `gorm:"type:varchar(1);null;"`
 	PaasUserUseYn string    `gorm:"type:varchar(1);null;"`
+	CaasUserUseYn string    `gorm:"type:varchar(1);null;"`
 	UpdatedAt     time.Time `gorm:"type:datetime;null;DEFAULT:null"`
 	CreatedAt     time.Time `gorm:"type:datetime;null;DEFAULT:CURRENT_TIMESTAMP"`
 }

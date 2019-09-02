@@ -463,7 +463,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 		}
 
 		// token Pass
-		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/") && !strings.Contains(r.RequestURI, "/v2/saas/app/") {
+		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") {
 			fmt.Println("Request URI :: ", r.RequestURI)
 
 			reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)
@@ -476,7 +476,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 				//모든 경로의 redis 의 토큰 정보를 확인한다
 				val := rdClient.HGetAll(reqToken).Val()
 				if val == nil || len(val) == 0 { // redis 에서 token 정보가 expire 된경우 로그인 화면으로 돌아간다
-					//fmt.Println("HttpWrap Hander redis.iaas_userid is null ")
+					fmt.Println("HttpWrap Hander redis.iaas_userid is null ")
 					errMessage := model.ErrMessage{"Message": "UnAuthrized"}
 					utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
 				} else {
@@ -508,7 +508,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 							}
 						}
 
-					} else if strings.Contains(r.RequestURI, "/v2/paas") && val["paasToken"] != "" && val["paasUserId"] != "" { // PaaS 토큰 정보가 있는경우
+					} else if strings.Contains(r.RequestURI, "/v2/paas") && val["paasRefreshToken"] != "" { // PaaS 토큰 정보가 있는경우
 
 						// Pass token 검증 로직 추가
 						//get paas token
@@ -516,34 +516,85 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 						t1, _ := time.Parse(time.RFC3339, val["paasExpire"])
 						if t1.Before(time.Now()) {
 							fmt.Println("paas time : " + t1.String())
-						}
-						cfConfig.Type = "PAAS"
-						result, err := utils.GetUaaReFreshToken(reqToken, cfConfig, rdClient)
-						//client_test, err := cfclient.NewClient(&cfProvider)
-						fmt.Println("paas token : " + result)
-						errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-						if err != "" {
-							utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-						} else {
-							//_, err01 := client_test.GetToken() // cf token 을 refresh 함
-							//if err01 != nil {
-							//	utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-							//	return
-							//}
-							/*
-								fmt.Println("paas hander token ::: ",token)
 
-								token01, err02 := client_test.ListApps()
-								if err02 != nil {
-									fmt.Println("paas ListApps error::",token01,":::",err02.Error())
-								}else{
-									fmt.Println("paas ListApps info  ::",token01)
-								}
-							*/
+							cfConfig.Type = "PAAS"
+							result, err := utils.GetUaaReFreshToken(reqToken, cfConfig, rdClient)
+							//client_test, err := cfclient.NewClient(&cfProvider)
+							fmt.Println("paas token : " + result)
+							errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+
+							if err != "" {
+								utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+							} else {
+								//_, err01 := client_test.GetToken() // cf token 을 refresh 함
+								//if err01 != nil {
+								//	utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+								//	return
+								//}
+								/*
+									fmt.Println("paas hander token ::: ",token)
+
+									token01, err02 := client_test.ListApps()
+									if err02 != nil {
+										fmt.Println("paas ListApps error::",token01,":::",err02.Error())
+									}else{
+										fmt.Println("paas ListApps info  ::",token01)
+									}
+								*/
+								rdClient.Expire(reqToken, 30*60*time.Second)
+								handler.ServeHTTP(w, r)
+							}
+						} else {
 							rdClient.Expire(reqToken, 30*60*time.Second)
 							handler.ServeHTTP(w, r)
 						}
 
+					} else if strings.Contains(r.RequestURI, "/v2/caas") && val["caasRefreshToken"] != "" { // PaaS 토큰 정보가 있는경우
+
+						// Pass token 검증 로직 추가
+						//get paas token
+						//cfProvider.Token = val["paasToken"]
+						//t1, _ := time.Parse(time.RFC3339, val["caasExpire"])
+						//if t1.Before(time.Now()) {
+						//	fmt.Println("caas time : " + t1.String())
+						//
+						//	cfConfig.Type = "CAAS"
+						//	result, err := utils.GetUaaReFreshToken(reqToken, cfConfig, rdClient)
+						//	//client_test, err := cfclient.NewClient(&cfProvider)
+						//	fmt.Println("caas token : " + result)
+						//	errMessage := model.ErrMessage{"Message": "UnAuthrized"}
+						//	if err != "" {
+						//		utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+						//	} else {
+						//		//_, err01 := client_test.GetToken() // cf token 을 refresh 함
+						//		//if err01 != nil {
+						//		//	utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
+						//		//	return
+						//		//}
+						//		/*
+						//			fmt.Println("paas hander token ::: ",token)
+						//
+						//			token01, err02 := client_test.ListApps()
+						//			if err02 != nil {
+						//				fmt.Println("paas ListApps error::",token01,":::",err02.Error())
+						//			}else{
+						//				fmt.Println("paas ListApps info  ::",token01)
+						//			}
+						//		*/
+						//		rdClient.Expire(reqToken, 30*60*time.Second)
+						//		handler.ServeHTTP(w, r)
+						//	}
+						//}else{
+						//	rdClient.Expire(reqToken, 30*60*time.Second)
+						//	handler.ServeHTTP(w, r)
+						//}
+						rdClient.Expire(reqToken, 30*60*time.Second)
+						handler.ServeHTTP(w, r)
+
+					} else if strings.Contains(r.RequestURI, "/v2/saas") { // PaaS 토큰 정보가 있는경우
+
+						rdClient.Expire(reqToken, 30*60*time.Second)
+						handler.ServeHTTP(w, r)
 					} else {
 						fmt.Println("URL Not All")
 						//rdClient.Expire(reqToken, 30*60*time.Second)
@@ -555,6 +606,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 			fmt.Println("url pass ::", r.RequestURI)
 			handler.ServeHTTP(w, r)
 		}
+		//handler.ServeHTTP(w, r)
 	}
 
 }
