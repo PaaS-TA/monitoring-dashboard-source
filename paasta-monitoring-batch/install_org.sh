@@ -9,7 +9,7 @@ go get github.com/go-sql-driver/mysql
 go get github.com/jinzhu/gorm
 
 #InfluxDB Library Download
-go get github.com/influxdata/influxdb/client/v2
+go get github.com/influxdata/influxdb1-client/v2
 
 #Bosh Client
 go get github.com/cloudfoundry-community/gogobosh

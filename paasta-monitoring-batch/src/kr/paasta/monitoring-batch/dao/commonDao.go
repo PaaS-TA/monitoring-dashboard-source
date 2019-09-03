@@ -1,27 +1,26 @@
 package dao
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
-	cb "kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
-	"github.com/jinzhu/gorm"
 	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/jinzhu/gorm"
+	"kr/paasta/monitoring-batch/model"
+	cb "kr/paasta/monitoring-batch/model/base"
+	"kr/paasta/monitoring-batch/util"
 	"time"
 )
 
 type commonStruct struct {
-	influxClient 	client.Client
+	influxClient client.Client
 }
 
-
-func GetCommonDao(influxClient client.Client) *commonStruct{
+func GetCommonDao(influxClient client.Client) *commonStruct {
 	return &commonStruct{
-		influxClient: 	influxClient,
+		influxClient: influxClient,
 	}
 }
 
-func (f commonStruct) GetIsNotExistAlarm( alarmData cb.Alarm,  txn *gorm.DB) (bool, cb.Alarm){
+func (f commonStruct) GetIsNotExistAlarm(alarmData cb.Alarm, txn *gorm.DB) (bool, cb.Alarm) {
 
 	//resolve_status
 	// 1 : Alarm 발생, 2 : Alarm 접수
@@ -33,7 +32,7 @@ func (f commonStruct) GetIsNotExistAlarm( alarmData cb.Alarm,  txn *gorm.DB) (bo
 }
 
 //TestCode용
-func (f commonStruct) GetIsNotExistAlarmCheck( alarmData cb.Alarm,  txn *gorm.DB) (bool, cb.Alarm){
+func (f commonStruct) GetIsNotExistAlarmCheck(alarmData cb.Alarm, txn *gorm.DB) (bool, cb.Alarm) {
 
 	//resolve_status
 	// 1 : Alarm 발생, 2 : Alarm 접수
@@ -44,36 +43,35 @@ func (f commonStruct) GetIsNotExistAlarmCheck( alarmData cb.Alarm,  txn *gorm.DB
 	return isNew, alarm
 }
 
-
-func (b commonStruct) CreateAlarmData(boshAlarm cb.Alarm, txn *gorm.DB) cb.ErrMessage{
+func (b commonStruct) CreateAlarmData(boshAlarm cb.Alarm, txn *gorm.DB) cb.ErrMessage {
 
 	eventData := cb.Alarm{OriginId: boshAlarm.OriginId, OriginType: boshAlarm.OriginType, AlarmType: boshAlarm.AlarmType, Level: boshAlarm.Level,
-		AppYn: boshAlarm.AppYn, Ip: boshAlarm.Ip, AlarmTitle: boshAlarm.AlarmTitle, AlarmMessage: boshAlarm.AlarmMessage , ResolveStatus: boshAlarm.ResolveStatus, AlarmCnt: 1,
-		RegDate: time.Now(), RegUser: "Bat" , ModiUser: cb.BAT_USER, ModiDate: time.Now(), AlarmSendDate: time.Now()}
+		AppYn: boshAlarm.AppYn, Ip: boshAlarm.Ip, AlarmTitle: boshAlarm.AlarmTitle, AlarmMessage: boshAlarm.AlarmMessage, ResolveStatus: boshAlarm.ResolveStatus, AlarmCnt: 1,
+		RegDate: time.Now(), RegUser: "Bat", ModiUser: cb.BAT_USER, ModiDate: time.Now(), AlarmSendDate: time.Now()}
 	status := txn.Debug().Create(&eventData)
 	err := util.GetError().DbCheckError(status.Error)
-	if err != nil{
-		fmt.Println("Error::", err )
+	if err != nil {
+		fmt.Println("Error::", err)
 	}
-	return  err
+	return err
 }
 
-func (b commonStruct) UpdateSendDate(boshAlarm cb.Alarm, txn *gorm.DB) cb.ErrMessage{
+func (b commonStruct) UpdateSendDate(boshAlarm cb.Alarm, txn *gorm.DB) cb.ErrMessage {
 
-	status := txn.Debug().Model(&boshAlarm).Where("origin_type = ? and origin_id = ? and alarm_type = ? and level = ? and resolve_status = '1'", boshAlarm.OriginType, boshAlarm.OriginId, boshAlarm.AlarmType, boshAlarm.Level ).
-		Updates(map[string]interface{}{ "alarm_send_date": time.Now(), "modi_date": time.Now(), "modi_user": cb.BAT_USER})
+	status := txn.Debug().Model(&boshAlarm).Where("origin_type = ? and origin_id = ? and alarm_type = ? and level = ? and resolve_status = '1'", boshAlarm.OriginType, boshAlarm.OriginId, boshAlarm.AlarmType, boshAlarm.Level).
+		Updates(map[string]interface{}{"alarm_send_date": time.Now(), "modi_date": time.Now(), "modi_user": cb.BAT_USER})
 	err := util.GetError().DbCheckError(status.Error)
-	if err != nil{
-		fmt.Println("Error::", err )
-		return   err
+	if err != nil {
+		fmt.Println("Error::", err)
+		return err
 	}
-	return  err
+	return err
 }
 
 func (b commonStruct) GetAlarmData(alarm cb.Alarm, txn *gorm.DB) (bool, model.Alarm) {
 
 	var alarmData model.Alarm
-	isNew := txn.Debug().Model(&alarm).Where("origin_type = ? and origin_id = ? and alarm_type = ? and resolve_status = '1'", alarm.OriginType, alarm.OriginId, alarm.AlarmType ).
+	isNew := txn.Debug().Model(&alarm).Where("origin_type = ? and origin_id = ? and alarm_type = ? and resolve_status = '1'", alarm.OriginType, alarm.OriginId, alarm.AlarmType).
 		Find(&alarmData).RecordNotFound()
 	return isNew, alarmData
 
@@ -100,11 +98,10 @@ func (b commonStruct) GetAlarmSnsTarget(alarmSns model.AlarmSns, txn *gorm.DB) (
 	return alarmSnsTargets, err
 }
 
-func (b commonStruct) UpdateSnsAlarmTargets(alarmSnsTarget model.AlarmSnsTarget, txn *gorm.DB) (cb.ErrMessage) {
+func (b commonStruct) UpdateSnsAlarmTargets(alarmSnsTarget model.AlarmSnsTarget, txn *gorm.DB) cb.ErrMessage {
 
 	status := txn.Debug().Table("alarm_sns_targets").
 		Set("gorm:insert_option", "on duplicate key update modi_date = now(), modi_user = 'system'").Create(&alarmSnsTarget)
 	err := util.GetError().DbCheckError(status.Error)
 	return err
 }
-

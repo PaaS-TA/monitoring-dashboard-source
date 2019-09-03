@@ -1,23 +1,23 @@
 package dao
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/model/base"
 	"kr/paasta/monitoring-batch/model"
+	"kr/paasta/monitoring-batch/model/base"
 	"kr/paasta/monitoring-batch/util"
 )
 
 type AutoScalerDaoStruct struct {
-	txn *gorm.DB
+	txn          *gorm.DB
 	influxClient client.Client
 	influxDbName string
 }
 
-func AutoScalerDao(txn *gorm.DB, influxClient client.Client, influxDbName string) *AutoScalerDaoStruct{
+func AutoScalerDao(txn *gorm.DB, influxClient client.Client, influxDbName string) *AutoScalerDaoStruct {
 	return &AutoScalerDaoStruct{
 		influxClient: influxClient,
-		txn: txn,
+		txn:          txn,
 		influxDbName: influxDbName,
 	}
 }
@@ -30,5 +30,3 @@ func (p AutoScalerDaoStruct) GetAutoScalePolicy() ([]model.AppAutoScalingPolicy,
 	err := util.GetError().DbCheckError(status.Error)
 	return listAutoScalePolicy, err
 }
-
-

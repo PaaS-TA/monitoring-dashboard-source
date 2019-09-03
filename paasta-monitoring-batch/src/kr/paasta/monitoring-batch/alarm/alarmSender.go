@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	client "github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring-batch/dao"
 	mod "kr/paasta/monitoring-batch/model"
@@ -13,10 +13,11 @@ import (
 	"kr/paasta/monitoring-batch/util"
 	"net/smtp"
 	"strconv"
-	"time"
 	"strings"
 	"sync"
+	"time"
 )
+
 /*
 type Mail struct {
 	Sender  string
@@ -214,7 +215,7 @@ func (f AlarmService) AlarmSend(alarmSource cb.AlarmThreshold, alarmData cb.Alar
 }
 
 //Send Alarm Message To Telegram
-func (f AlarmService) SendTelegram (metricClient client.Client, txn *gorm.DB, alarmData cb.Alarm, message mod.MailContents) {
+func (f AlarmService) SendTelegram(metricClient client.Client, txn *gorm.DB, alarmData cb.Alarm, message mod.MailContents) {
 	alarmSns, err := dao.GetCommonDao(metricClient).GetAlarmSns(alarmData.OriginType, txn)
 	if len(alarmSns) < 1 {
 		return
@@ -291,9 +292,9 @@ func (f AlarmService) SendMail(subject string, body mod.MailContents, receiver [
 			fmt.Println("TLS client auth error :", err)
 			return
 		}
-	}else{
+	} else {
 		fmt.Println(">>>>>>>>>>>>>>> Sendmail STMP Mode")
-		client, err = smtp.Dial(smtpServer.Host+":"+smtpServer.Port)
+		client, err = smtp.Dial(smtpServer.Host + ":" + smtpServer.Port)
 		if err != nil {
 			fmt.Println("smtp connection & client create error :", err)
 			return
@@ -338,7 +339,7 @@ func (f AlarmService) SendMail(subject string, body mod.MailContents, receiver [
 
 	//client.Quit()
 	fmt.Println(">>>>>>>>Mail sent successfully")
-	defer func(){
+	defer func() {
 
 		if err := recover(); err != nil {
 			//fmt.Println("######## Mail sent catch panic")

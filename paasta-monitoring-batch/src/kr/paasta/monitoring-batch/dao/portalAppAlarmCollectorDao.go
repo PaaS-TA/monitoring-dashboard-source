@@ -1,25 +1,25 @@
 package dao
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
-	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
 	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/jinzhu/gorm"
+	"kr/paasta/monitoring-batch/model"
+	"kr/paasta/monitoring-batch/model/base"
+	"kr/paasta/monitoring-batch/util"
 	"time"
 )
 
 type portalAppAlarmDao struct {
-	txn *gorm.DB
+	txn          *gorm.DB
 	influxClient client.Client
 	influxDbName string
 }
 
-func GetPortalAppAlarmDao(txn *gorm.DB, influxClient client.Client, influxDbName string) *portalAppAlarmDao{
+func GetPortalAppAlarmDao(txn *gorm.DB, influxClient client.Client, influxDbName string) *portalAppAlarmDao {
 	return &portalAppAlarmDao{
 		influxClient: influxClient,
-		txn: txn,
+		txn:          txn,
 		influxDbName: influxDbName,
 	}
 }
@@ -78,16 +78,16 @@ func (p portalAppAlarmDao) UpdateTerminatedAlarm(listTerminated []model.AppAlarm
 func (p portalAppAlarmDao) UpdateContinuousAppAlarm(updated model.AppAlarmHistory) base.ErrMessage {
 
 	where := "app_guid = ? " +
-			"AND app_idx = ? " +
-			"AND resource_type = ? " +
-			"AND container_interface = ? " +
-			"AND terminate_yn = 'N'"
+		"AND app_idx = ? " +
+		"AND resource_type = ? " +
+		"AND container_interface = ? " +
+		"AND terminate_yn = 'N'"
 
 	update := map[string]interface{}{
-		"alarm_level": updated.AlarmLevel,
-		"alarm_title": updated.AlarmTitle,
+		"alarm_level":   updated.AlarmLevel,
+		"alarm_title":   updated.AlarmTitle,
 		"alarm_message": updated.AlarmMessage,
-		"modi_date": time.Now(),
+		"modi_date":     time.Now(),
 	}
 
 	status := p.txn.Debug().Table("app_alarm_histories").
@@ -108,37 +108,35 @@ func (p portalAppAlarmDao) InsertNewAppAlarm(new model.AppAlarmHistory) base.Err
 func (p portalAppAlarmDao) UpdateAlarmSendDate(alarm model.SendTargetAppAlarmHistory) base.ErrMessage {
 
 	t := time.Now()
-	status := p.txn.Debug().Table("app_alarm_histories").Where("alarm_id = ?",	alarm.AlarmId).
+	status := p.txn.Debug().Table("app_alarm_histories").Where("alarm_id = ?", alarm.AlarmId).
 		Update("alarm_send_date", t, "modi_date", t)
 	err := util.GetError().DbCheckError(status.Error)
 	return err
 }
 
-func (p portalAppAlarmDao) GetAppInfo(appGuid string) (_ client.Response, errMsg base.ErrMessage)  {
+func (p portalAppAlarmDao) GetAppInfo(appGuid string) (_ client.Response, errMsg base.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = base.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	sql :=	"SELECT application_id, application_name, application_index, cell_ip, container_id, container_interface, value " +
-			"FROM container_metrics " +
-			"WHERE time > now() - 1m AND application_id = '%s' " +
-			"GROUP BY container_interface LIMIT 1;"
+	sql := "SELECT application_id, application_name, application_index, cell_ip, container_id, container_interface, value " +
+		"FROM container_metrics " +
+		"WHERE time > now() - 1m AND application_id = '%s' " +
+		"GROUP BY container_interface LIMIT 1;"
 	q := client.Query{
 		Command:  fmt.Sprintf(sql, appGuid),
 		Database: p.influxDbName,
 	}
 	resp, err := p.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return util.GetError().CheckError(*resp, err)
 }
-
-
