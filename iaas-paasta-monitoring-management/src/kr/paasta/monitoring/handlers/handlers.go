@@ -286,18 +286,34 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	var saasActions rata.Handlers
 	// add SAAS
 	if strings.Contains(sysType, utils.SYS_TYPE_SAAS) || sysType == utils.SYS_TYPE_ALL {
+		applicationController = saasContoller.NewSaasController(paasTxn)
+
 		saasActions = rata.Handlers{
 			routes.SAAS_API_APPLICATION_LIST:   route(applicationController.GetApplicationList),
 			routes.SAAS_API_APPLICATION_STATUS: route(applicationController.GetAgentStatus),
 			routes.SAAS_API_APPLICATION_GAUGE:  route(applicationController.GetAgentGaugeTot),
-			routes.SAAS_ALARM_INFO:             route(applicationController.GetAlarmInfo),
-			routes.SAAS_ALARM_UPDATE:           route(applicationController.GetAlarmUpdate),
-			routes.SAAS_ALARM_LOG:              route(applicationController.GetAlarmLog),
+
+			routes.SAAS_ALARM_INFO:     route(applicationController.GetAlarmInfo),
+			routes.SAAS_ALARM_UPDATE:   route(applicationController.GetAlarmUpdate),
+			routes.SAAS_ALARM_LOG:      route(applicationController.GetAlarmLog),
+			routes.SAAS_ALARM_SNS_INFO: route(applicationController.GetSnsInfo),
+			routes.SAAS_ALARM_COUNT:    route(applicationController.GetAlarmCount),
+			routes.SAAS_ALARM_SNS_SAVE: route(applicationController.GetlarmSnsSave),
+
+			routes.SAAS_ALARM_STATUS_UPDATE:      route(applicationController.UpdateAlarmState),
+			routes.SAAS_ALARM_ACTION:             route(applicationController.CreateAlarmResolve),
+			routes.SAAS_ALARM_ACTION_DELETE:      route(applicationController.DeleteAlarmResolve),
+			routes.SAAS_ALARM_ACTION_UPDATE:      route(applicationController.UpdateAlarmResolve),
+			routes.SAAS_ALARM_SNS_CHANNEL_LIST:   route(applicationController.GetAlarmSnsReceiver),
+			routes.SAAS_ALARM_SNS_CHANNEL_DELETE: route(applicationController.DeleteAlarmSnsChannel),
+			routes.SAAS_ALARM_ACTION_LIST:        route(applicationController.GetAlarmActionList),
 		}
 	}
 	var caasActions rata.Handlers
 	// add CAAS
 	if strings.Contains(sysType, utils.SYS_TYPE_CAAS) || sysType == utils.SYS_TYPE_ALL {
+		caasMetricsController = caasContoller.NewMetricControllerr(paasTxn)
+
 		caasActions = rata.Handlers{
 			routes.MEMBER_JOIN_CHECK_DUPLICATION_CAAS_ID: route(memberController.MemberJoinCheckDuplicationCaasId),
 			routes.MEMBER_JOIN_CHECK_CAAS:                route(memberController.MemberCheckCaaS),
@@ -320,10 +336,22 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 			routes.CAAS_WORKLOADS_GRAPH:                  route(caasMetricsController.GetWorkloadsInfoGraph),
 			routes.CAAS_POD_GRAPH:                        route(caasMetricsController.GetPodInfoGraph),
 			routes.CAAS_CONTIANER_GRAPH:                  route(caasMetricsController.GetContainerInfoGraph),
-			routes.CAAS_ALARM_INFO:                       route(caasMetricsController.GetAlarmInfo),
-			routes.CAAS_ALARM_UPDATE:                     route(caasMetricsController.GetAlarmUpdate),
-			routes.CAAS_ALARM_LOG:                        route(caasMetricsController.GetAlarmLog),
-			routes.CAAS_WORK_NODE_GRAPHLIST:              route(caasMetricsController.GetWorkNodeInfoGraphList),
+
+			routes.CAAS_ALARM_INFO:          route(caasMetricsController.GetAlarmInfo),
+			routes.CAAS_ALARM_UPDATE:        route(caasMetricsController.GetAlarmUpdate),
+			routes.CAAS_ALARM_LOG:           route(caasMetricsController.GetAlarmLog),
+			routes.CAAS_WORK_NODE_GRAPHLIST: route(caasMetricsController.GetWorkNodeInfoGraphList),
+			routes.CAAS_ALARM_SNS_INFO:      route(caasMetricsController.GetSnsInfo),
+			routes.CAAS_ALARM_COUNT:         route(caasMetricsController.GetAlarmCount),
+			routes.CAAS_ALARM_SNS_SAVE:      route(caasMetricsController.GetlarmSnsSave),
+
+			routes.CAAS_ALARM_STATUS_UPDATE:      route(caasMetricsController.UpdateAlarmState),
+			routes.CAAS_ALARM_ACTION:             route(caasMetricsController.CreateAlarmResolve),
+			routes.CAAS_ALARM_ACTION_DELETE:      route(caasMetricsController.DeleteAlarmResolve),
+			routes.CAAS_ALARM_ACTION_UPDATE:      route(caasMetricsController.UpdateAlarmResolve),
+			routes.CAAS_ALARM_SNS_CHANNEL_LIST:   route(caasMetricsController.GetAlarmSnsReceiver),
+			routes.CAAS_ALARM_SNS_CHANNEL_DELETE: route(caasMetricsController.DeleteAlarmSnsChannel),
+			routes.CAAS_ALARM_ACTION_LIST:        route(caasMetricsController.GetAlarmActionList),
 		}
 	}
 
@@ -365,6 +393,9 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	if strings.Contains(sysType, utils.SYS_TYPE_PAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, paasActions)
 		routeList = append(routeList, routes.PaasRoutes)
+
+		actionlist = append(actionlist, saasActions)
+		routeList = append(routeList, routes.SaasRoutes)
 	}
 	if strings.Contains(sysType, utils.SYS_TYPE_SAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, saasActions)
@@ -463,7 +494,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 		}
 
 		// token Pass
-		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") {
+		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/monitoring/podList") {
 			fmt.Println("Request URI :: ", r.RequestURI)
 
 			reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)

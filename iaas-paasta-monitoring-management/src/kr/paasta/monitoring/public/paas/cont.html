@@ -14,16 +14,23 @@
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
-						<li><a href="paas.html"><span>B</span></a></li>
-						<li><a href="paas.html"><span>P</span></a></li>
-						<li><a href="cont.html" class="on"><span>C</span></a></li>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="paas.html">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html" class="on">C<span>ontainer</span></a></li>
 						<li>
-							<a href="alarm_policy.html"><span>A</span></a>
+							<a href="alarm_policy.html">A<span>larm</span></a>
 							<ul>
 								<li><a href="alarm_policy.html">Policy</a></li>
 								<li><a href="alarm_status.html">Status</a></li>
@@ -201,14 +208,14 @@
 
 					init() {
 						// Alarm Count
-						fnComm.alarmCount();
+					fnComm.alarmCount('paas');
 						
 						// cell 컨디션 차트
-						fnComm.loadData('GET', psRoot.url + 'paas/cell/overview', fnComm.paasConditionChart);
+						fnComm.loadData('GET', fnComm.url + 'paas/cell/overview', fnComm.paasConditionChart);
 						// container 컨디션 차트
-						fnComm.loadData('GET', psRoot.url + 'paas/container/overview', fnComm.contConditionChart);
+						fnComm.loadData('GET', fnComm.url + 'paas/container/overview', fnComm.contConditionChart);
 						// paas Summary 리스트
-						fnComm.loadData('GET', psRoot.url + 'paas/container/summary', cont.contSummaryList);
+						fnComm.loadData('GET', fnComm.url + 'paas/container/summary', cont.contSummaryList);
 					},
 					
 					contSummaryList(data) {
@@ -276,7 +283,7 @@
 
 							if(idx === 0){
 								// Set Relation 
-								fnComm.loadData('GET', psRoot.url + 'paas/container/relationship/' + value.zoneName, cont.contRelation );
+								fnComm.loadData('GET', fnComm.url + 'paas/container/relationship/' + value.zoneName, cont.contRelation );
 							};
 						});
 						
@@ -287,7 +294,7 @@
 							elm[i].querySelector('.chart').addEventListener('click', (e) => {
 								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
 
-								fnComm.loadData('GET', psRoot.url + 'paas/container/relationship/' + elmID, cont.contRelation );
+								fnComm.loadData('GET', fnComm.url + 'paas/container/relationship/' + elmID, cont.contRelation );
 							}, false);
 						};
 					},
@@ -371,25 +378,25 @@
 
 						setTimeout(() => {
 							// CPU Usage 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/cpu/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/cpu/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
 
 							// CPU Load 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/cpu/'+ elmID +'/loads' + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/cpu/'+ elmID +'/loads' + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
 
 							// Memory Usage 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/memory/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/memory/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
 
 							// Disk Usage 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/disk/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/disk/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
 
 							// Network IO Bytes 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/network/'+ elmID +'/bytes' + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/network/'+ elmID +'/bytes' + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
 							
 							// Network IO Drop 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/network/'+ elmID +'/drops' + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/network/'+ elmID +'/drops' + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
 							
 							// Network IO Error 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/container/network/'+ elmID +'/errors' + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
+							fnComm.loadData('GET', fnComm.url + 'paas/container/network/'+ elmID +'/errors' + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
 						},500);
 					},
 				}

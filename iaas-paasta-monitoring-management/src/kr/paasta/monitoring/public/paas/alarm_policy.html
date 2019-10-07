@@ -14,16 +14,23 @@
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
-						<li><a href="paas.html"><span>B</span></a></li>
-						<li><a href="paas.html"><span>P</span></a></li>
-						<li><a href="cont.html"><span>C</span></a></li>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="paas.html">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
 						<li>
-							<a href="alarm_policy.html" class="on"><span>A</span></a>
+							<a href="alarm_policy.html" class="on">A<span>larm</span></a>
 							<ul>
 								<li><a href="alarm_policy.html">Policy</a></li>
 								<li><a href="alarm_status.html">Status</a></li>
@@ -108,7 +115,7 @@
 					<h4>Measuring Time
 						<div class="inputRange">
 							<input type="range" class="mData" name="points" min="30" max="960" step="30" value="30" oninput="document.getElementById('mValue').value = this.value;">
-							<input type="text" id="mValue">
+							<input type="text" id="mValue" value="0">
 						</div>
 					</h4>
 					<h4>Alarm Receiver Address<input type="checkbox" id="mail" value="Y"><label for="mail">OFF</label></h4>
@@ -208,14 +215,14 @@
 					</div>
 
 					<article class="push">
-                        <h4>Alarm SNS Channel (Telegram)<input type="checkbox" id="sns"><label for="sns">OFF</label></h4>
+                        <h4>Alarm SNS Channel (Telegram)<input type="checkbox" id="sns" value="N"><label for="sns">OFF</label></h4>
                         <div class="snsBot">
-							<p>Telegram 에 등록된 Bot 채널이 없습니다.</p>
+							<p class="noneSns">Telegram 에 등록된 Bot 채널이 없습니다.</p>
 							<div class="snsWrap" id="snsList">
 								<p class="snsInfo">Telegram 메신져에서 아래 아이디를 검색 후 Bot 채널에 참여 하시면 알람 메세지를 받을 수 있습니다.</p>
 								<div class="snsInfo list">
-									<span>@all_paasta_sns_alarm</span>
-									<em>전체 SNS 알람 수신</em>
+									<span id="snsId">@all_paasta_sns_alarm</span>
+									<em id="snsDe">전체 SNS 알람 수신</em>
 								</div>
 								<button>DELETE</button>
 							</div>
@@ -260,13 +267,13 @@
 
 				init() {
 					// Alarm Count
-					fnComm.alarmCount();
+					fnComm.alarmCount('paas');
 					
 					// Alarm Policy, Measuring Time, Alarm Receiver Address
-					fnComm.loadData('GET', psRoot.url + 'paas/alarm/policies', alarm.alarmPolicies);
+					fnComm.loadData('GET', `${fnComm.url}paas/alarm/policies`, alarm.alarmPolicies);
 
 					// Alarm SNS Channel
-					fnComm.loadData('GET', psRoot.url + 'paas/alarm/sns/channel/list', alarm.alarmChannel);
+					fnComm.loadData('GET', `${fnComm.url}paas/alarm/sns/channel/list`, alarm.alarmChannel);
 				},
 
 				alarmPolicies(data) {
@@ -335,7 +342,7 @@
 				},
 
 				alarmPolicySave(){
-					var policyData = [];
+					var policyData = '[';
 
 					// Alarm Policy 데이터 저장
 					var target = document.querySelectorAll('.alarmSetting > dl');
@@ -343,16 +350,15 @@
 					var cTarget = document.querySelectorAll('.cData');
 					var rTarget = document.querySelectorAll('.rData');
 
-					for(var i=0; i<document.querySelectorAll('.alarmSetting > dl').length; i++){
-						var policy = new Array();
-						policy.push('originType:'+document.getElementById('type').value);
-						policy.push('alarmType:'+target[i].getAttribute('data-id'));
-						policy.push('warningThreshold:'+wTarget[i].value);
-						policy.push('criticalThreshold:'+cTarget[i].value);
-						policy.push('repeatTime:'+rTarget[i].value);
-						policy.push('measureTime:'+document.getElementById('mValue').value);
-					
-						policyData.push(policy);
+					for(var i=0; i<target.length; i++){
+						policyData += `{
+							"originType":"${document.getElementById('type').value}",
+							"alarmType":"${target[i].getAttribute('data-id')}",
+							"warningThreshold":${wTarget[i].value},
+							"criticalThreshold":${cTarget[i].value},
+							"repeatTime":${rTarget[i].value},
+							"measureTime":${document.getElementById('mValue').value}
+						},`;
 					};
 					
 					// Alarm Receiver 알림 여부
@@ -370,183 +376,65 @@
 					};
 
 					// Alarm Receiver Address 데이터 저장
-					var address = new Array();
-					address.push('originType:'+document.getElementById('type').value);
-					address.push('mailAddress:'+document.querySelector('.mailAddress').value+'@'+document.querySelector('.mailDomain').value);
-					address.push('mailSendYn:'+mailYN);
-					address.push('snsSendYn:'+snsYN);
-					
-					policyData.push(address);
+					policyData += `{
+						"originType":"${document.getElementById('type').value}",
+						"mailAddress":"${document.querySelector('.mailAddress').value}@${document.querySelector('.mailDomain').value}",
+						"mailSendYn":"${mailYN}",
+						"snsSendYn":"${snsYN}"
+					}]`;
 
-					fnComm.saveData('PUT', psRoot.url + 'paas/alarm/policy', policyData);
+					console.log(policyData.replace(/(\s*)/g,''));
+
+					fnComm.saveData('PUT', `${fnComm.url}paas/alarm/policy`, policyData.replace(/(\s*)/g,''));
 				},
 
 				alarmChannel(data){
 					console.log(data);
+					if(data != 'undefined' && data != null && data != ''){
+						document.querySelector('.noneSns').style.display = 'none';
+						document.querySelector('.snsWrap').style.display = 'block';
+
+						document.getElementById('snsId').innerHTML = data.snsId;
+						document.getElementById('snsDe').innerHTML = data.expl;
+						
+						if(data.snsSendYn == 'Y'){
+							document.getElementById('sns').value = 'Y';
+							document.getElementById('sns').setAttribute('checked', 'checked');
+						} else {
+							document.getElementById('sns').value = 'N';
+							document.getElementById('sns').removeAttribute('checked');
+						};
+					} else {
+						document.querySelector('.noneSns').style.display = 'block';
+						document.querySelector('.snsWrap').style.display = 'none';
+					};
+					
+
+					// Alarm Channel 등록
+					document.querySelector('.regist').addEventListener('click', (e) => {
+						alarm.alarmChannelSave();
+					}, false);
+				},
+
+				alarmChannelSave(){
+					if(document.getElementById('sns').checked == true){
+						document.getElementById('sns').value = 'Y';
+					} else {
+						document.getElementById('sns').value = 'N';
+					};
+
+					var channelData = `{"originType":"${document.getElementById('dvSelect').value}",
+						"snsId":"${document.querySelector('.snsid').value}",
+						"token":"${document.querySelector('.token').value}",
+						"expl":"${document.querySelector('.expl').value}",
+						"snsSendYn":"${document.getElementById('sns').value}"
+					}`
+
+					fnComm.saveData('POST', `${fnComm.url}paas/alarm/sns/channel`, channelData.replace(/(\s*)/g,''));
 				},
 			}
 
 			alarm.init();
 		};
-		/*
-		$(function(){
-			var measureTime = 0;
-			var alarmPolicyPush = [];
-			var paasAlarmLoad = pass.url + 'paas/alarm/policies';
-			var paasAlarmChange = pass.url + 'paas/alarm/policy';
-			var channelInfoLoad = pass.url + 'paas/alarm/sns/channel/list';
-
-			// paasta Alarm Data Load
-			var paasAlarmData = pass.ajaxLoad(paasAlarmLoad);
-			var channelInfoData = pass.ajaxLoad(channelInfoLoad);
-
-			alarmPolicyReset('bos');
-
-			// paasta Alarm Data Reset - Bosh
-			function alarmPolicyReset(name){
-				$.each(paasAlarmData, function(){
-					if(this.originType == name){// warning  critical  repeat
-						$('.'+this.alarmType).find('.warning').find('input').val(this.warningThreshold);
-						$('.'+this.alarmType).find('.critical').find('input').val(this.criticalThreshold);
-						$('.'+this.alarmType).find('.repeat').find('input').val(this.repeatTime);
-
-						measureTime = this.measureTime;
-
-						if(this.mailSendYn == 'Y'){
-							$('#mail').prop('checked', true);
-
-							var mailSplit = this.mailAddress.split('@');
-
-							$('.mailAddress').val(mailSplit[0]);
-							$('.mailDomain').val(mailSplit[1]);
-
-							$('#mailSelect option').each(function(n){
-								if($(this).val() == mailSplit[1]){
-									$('#mailSelect').val(mailSplit[1]).change();
-									return false;
-								};
-							});
-						};
-					};
-				});
-			};
-
-			//console.log(channelInfoData);
-
-			channelInfo();
-
-			function channelInfo(){
-				if(channelInfoData.length > 0){
-					$('#sns').prop('checked', true);
-					$('.snsInfo').show();
-				} else {
-					$('#sns').prop('checked', false);
-					$('.snsInfo').hide();
-				};
-			};
-
-			$('#type').change(function(){
-				alarmPolicyReset($(this).val());
-			});
-
-			$('.slider').slider({
-				range: 'min',
-				value: measureTime,
-				min: 0,
-				max: 960,
-				step: 30,
-				slide: function( event, ui ) {
-					$(this).find('span').text(ui.value);
-				}
-			}).find('span').text(measureTime);
-
-			$('#mail').change(function(){
-				//console.log($(this).val())
-			})
-
-			$('.save').off().on('click', function(){
-				var originType = $('#type').val();
-
-				var policyData = '[';
-
-				$('.alarmSetting > dl').each(function(n){
-					if(n != 0){
-						policyData += ',{"originType":"'+originType;
-					} else  {
-						policyData += '{"originType":"'+originType;
-					};
-					policyData += '","alarmType":"'+$(this).attr('class');
-					policyData += '","warningThreshold":"'+$(this).find('.warning').find('input').val();
-					policyData += '","criticalThreshold":"'+$(this).find('.critical').find('input').val();
-					policyData += '","repeatTime":"'+$(this).find('.repeat').find('input').val();
-					policyData += '","measureTime":"'+$('.slider').find('span').text()+'"}';
-				});
-
-				if($('#mail').is(':checked')){
-					var mailYN = 'Y';
-				} else {
-					var mailYN = 'N';
-				};
-
-				if($('#sns').is(':checked')){
-					var snsYN = 'Y';
-				} else {
-					var snsYN = 'N';
-				};
-				
-				policyData += ',{';
-				policyData += '"originType":"'+originType;
-				policyData += '","mailAddress":"'+$('.mailAddress').val()+'@'+$('.mailDomain').val();
-				policyData += '","mailSendYn":"'+mailYN;
-				policyData += '","snsSendYn":"'+snsYN;
-				policyData += '"}]';
-
-				console.log(policyData);
-				console.log(JSON.parse(policyData));
-
-				pass.ajaxPost(paasAlarmChange, 'PUT', JSON.parse(policyData));
-
-				location.reload();
-
-				//[{"originType":"bos","alarmType":"cpu","warningThreshold":80,"criticalThreshold":90,"repeatTime":10,"measureTime":600},
-				//{"originType":"bos","alarmType":"memory","warningThreshold":85,"criticalThreshold":90,"repeatTime":10,"measureTime":600},
-				//{"originType":"bos","alarmType":"disk","warningThreshold":85,"criticalThreshold":90,"repeatTime":10,"measureTime":600},
-				//{"originType":"bos","mailAddress":"adminUser@gmail.com","mailSendYn":"Y","snsSendYn":"N"}]
-				return false;
-			});
-
-			/{
-			"originType":"bos",
-			"snsId":"csupshin",
-			"token":"aaaaaa",
-			"expl":"aaa",
-			"sendSnsYn":"Y"
-			}/
-			$('.regist').off().on('click', function(){
-				if($('#sns').is(':checked')){
-					var snsYN = 'Y';
-				} else {
-					var snsYN = 'N';
-				};
-				var channelData = '{';
-				channelData += 'originType:'+$('#dvSelect').val();
-				channelData += ',snsId:'+$('.snsid').val();
-				channelData += ',token:'+$('.token').val();
-				channelData += ',expl:'+$('.expl').val();
-				channelData += ',sendSnsYn:'+snsYN;
-				channelData += '}';
-
-				if($('.snsid').val().length < 1){
-					alert('Bot ID 를 입력해주세요.');
-				} else if($('.token').val().length < 1){
-					alert('Token Value 를 입력해주세요.');
-				} else if($('.expl').val().length < 1){
-					alert('Description 을 입력해주세요.');
-				} else {
-					console.log(channelData);
-				}
-				
-			});
-		});*/
 	</script>
 </html>

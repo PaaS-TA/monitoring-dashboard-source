@@ -291,3 +291,10 @@ func GetPromqlFromToParameter(interval int64, timeStep string) string {
 	parameter := "&start=" + fromTime + "&end=" + toTime + "&step=" + timeStep
 	return parameter
 }
+
+func GetDBCurrentTime() time.Time {
+	now := time.Now()
+	t := now.Format(model.DB_DATE_FORMAT)
+	currentTime, _ := time.Parse(time.RFC3339, t)
+	return currentTime
+}

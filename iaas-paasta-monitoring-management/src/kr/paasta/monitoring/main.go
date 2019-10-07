@@ -47,10 +47,10 @@ type MemberInfo struct {
 	UserNm        string    `gorm:"type:varchar(100);null;"`
 	IaasUserId    string    `gorm:"type:varchar(100);null;"`
 	IaasUserPw    string    `gorm:"type:varchar(100);null;"`
-	PaasUserId    string    `gorm:"type:varchar(100);null;"`
-	PaasUserPw    string    `gorm:"type:varchar(100);null;"`
 	CaasUserId    string    `gorm:"type:varchar(100);null;"`
 	CaasUserPw    string    `gorm:"type:varchar(100);null;"`
+	PaasUserId    string    `gorm:"type:varchar(100);null;"`
+	PaasUserPw    string    `gorm:"type:varchar(100);null;"`
 	IaasUserUseYn string    `gorm:"type:varchar(1);null;"`
 	PaasUserUseYn string    `gorm:"type:varchar(1);null;"`
 	CaasUserUseYn string    `gorm:"type:varchar(1);null;"`
@@ -149,13 +149,14 @@ func main() {
 	//	}
 	//}
 	//
-	//if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS {
-	//	paaSInfluxServerClient, paasElasticClient, databases, cfProvider, boshClient, err = getPaasClients(config)
-	//	if err != nil {
-	//		log.Println(err)
-	//		os.Exit(-1)
-	//	}
-	//}
+	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_PAAS) {
+		fmt.Println("sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS")
+		paaSInfluxServerClient, paasElasticClient, databases, boshClient, err = getPaasClients(config)
+		if err != nil {
+			log.Println(err)
+			os.Exit(-1)
+		}
+	}
 	//12
 	// Route Path 정보와 처리 서비스 연결
 	var handler http.Handler
@@ -325,6 +326,9 @@ func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasEl
 		Username: paasuserName,
 		Password: paasPassword,
 	})
+
+	fmt.Printf("paaSInfluxServerClient : %v\n", paaSInfluxServerClient)
+	fmt.Printf("err : %v\n", err)
 
 	// ElasticSearch
 	paasElasticUrl, _ := config["paas.elastic.url"]

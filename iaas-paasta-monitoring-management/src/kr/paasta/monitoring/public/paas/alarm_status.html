@@ -14,16 +14,23 @@
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
-						<li><a href="paas.html"><span>B</span></a></li>
-						<li><a href="paas.html"><span>P</span></a></li>
-						<li><a href="cont.html"><span>C</span></a></li>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="paas.html">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
 						<li>
-							<a href="alarm_policy.html" class="on"><span>A</span></a>
+							<a href="alarm_policy.html" class="on">A<span>larm</span></a>
 							<ul>
 								<li><a href="alarm_policy.html">Policy</a></li>
 								<li><a href="alarm_status.html">Status</a></li>
@@ -67,9 +74,9 @@
 							<option value="3">Alarm 처리완료</option>
 						</select>
 						<span>Start Date</span>
-						<input type="date" id="date1" placeholder="From Date">
+						<input type="date" id="date1" value="" placeholder="From Date">
 						<span>End Date</span>
-						<input type="date" id="date2" placeholder="To Date">
+						<input type="date" id="date2" value="" placeholder="To Date">
 					</fieldset>
 					<div class="btnWrap center">
 						<button class="search">SEARCH</button>
@@ -181,10 +188,26 @@
 
 				init() {
 					// Alarm Count
-					fnComm.alarmCount();
+					fnComm.alarmCount('paas');
+					
+					// 오늘 날짜
+					var today = new Date();
+					var dd = today.getDate();
+					var mm = today.getMonth()+1;
+					var nn = today.getMonth();
+					var yyyy = today.getFullYear();
 
-					// Alarm Policy, Measuring Time, Alarm Receiver Address
-					fnComm.loadData('GET', psRoot.url + 'paas/alarm/statuses?pageItems=1000&pageIndex=1', alarm.alarmStatus);
+					if(dd < 10) dd = '0'+dd;
+					if(mm < 10) mm = '0'+mm;
+					if(nn < 10) nn = '0'+nn;
+					
+					// 검색 Default set
+					document.getElementById('date1').value = `${yyyy}-${nn}-${dd}`;
+					document.getElementById('date2').value = `${yyyy}-${mm}-${dd}`;
+
+					console.log(`${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`);
+
+					fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, alarm.alarmStatus);
 				},
 
 				alarmStatus(data) {
@@ -193,152 +216,139 @@
 					
 					fnComm.removeHtml(target);
 
-					data.data.forEach((value, idx) => {
-						//////////////////////////////////////////////////////////////////////
-						// alarmCnt: 1
-						// alarmMessage: "doppler/3 memory 의 상태critical memory 의 임계치인90%를 초과하였습니다.현재 사용률 [95.51]% 입니다. "
-                        // alarmSendDate: "2018-12-03 15:48:58"
-                        // alarmTitle: "[doppler/3]의 memory 상태 [critical]"
-						// alarmType: "memory"
-						// appIndex: 0
-						// appName: ""
-						// appYn: "N"
-						// containerName: ""
-						// id: 47
-						// ip: "10.20.20.90"
-						// level: "critical"
-						// originId: 148
-						// originName: "doppler/3"
-						// originType: "pas"
-						// regDate: "2018-12-03 15:48:58"
-						// regUser: "Bat"
-						// resolveStatus: "1"
-						// resolveStatusName: "Alarm 발생"
-						// userName: "admin"
-						//////////////////////////////////////////////////////////////////////
-						
-						var html = '<div class="'+value.level+'">';
-						html += '	<div>';
-						html += '		<strong title="'+value.alarmMessage+'">'+value.alarmMessage+'</strong>';
-						html += '	</div>';
-						html += '	<div>';
-						html += '		<dl>';
-						html += '			<dt>Alarm Type</dt>';
-						html += '			<dd>'+value.alarmType+'</dd>';
-						html += '		</dl>';
-						html += '		<dl>';
-						html += '			<dt>Origin Type</dt>';
-						html += '			<dd>'+value.originType+'</dd>';
-						html += '		</dl>';
-						html += '		<dl>';
-						html += '			<dt>Origin Name</dt>';
-						html += '			<dd>'+value.originName+'</dd>';
-						html += '		</dl>';
-						html += '		<dl>';
-						html += '			<dt>IP</dt>';
-						html += '			<dd>'+value.ip+'</dd>';
-						html += '		</dl>';
-						html += '		<dl>';
-						html += '			<dt>Date</dt>';
-						html += '			<dd>'+value.alarmSendDate+'</dd>';
-						html += '		</dl>';
-						html += '	</div>';
-						html += '	<ul class="historyWrap data-read'+value.id+'">';
-						html += '	</ul>';
-						html += '	<div class="receipt">';
-						html += '		<textarea></textarea>';
-						html += '		<div data-id="'+value.id+'">';
-						html += '			<button class="saveBtn">SAVE (조치내용만 입력)</button>';
-						html += '			<button class="complBtn">COMPLETE (조치내용도 함께 입력)</button>';
-						html += '		</div>';
-						html += '	</div>';
-						html += '	<div class="summaryBtn" data-id="'+value.id+'"  data-name="'+value.name+'">';
-						html += '		<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="Receipt"><span>Receipt</span></a>';
-						html += '	</div>';
-						html += '</a>';
-						
-						fnComm.appendHtml(target, html, 'div');
-						
-						fnComm.loadData('GET', psRoot.url + 'paas/alarm/status/'+value.id, alarm.history, value.id);
-					});
-					
-					// Button Event (receipt)
-					var elm = document.querySelectorAll('.process');
-					for(var i=0 ; i<elm.length ; i++){
-						elm[i].addEventListener('click', (e) => {
-							e.target.parentNode.parentNode.previousSibling.previousSibling.classList.toggle('on');
-						}, false);
-					};
-				
-					// receipt 코멘트 저장 및 컴플릿
-					var saveBtn = document.querySelectorAll('.saveBtn');
-					var complBtn = document.querySelectorAll('.complBtn');
-					for(var i=0 ; i<saveBtn.length ; i++){
-						saveBtn[i].addEventListener('click', (e) => {
-							var actionPush = '{"alarmId":'+e.target.parentNode.getAttribute('data-id')+',"alarmActionDesc":"'+e.target.parentNode.previousSibling.previousSibling.value+'"}';
-
-							fnComm.saveData('POST', psRoot.url + 'paas/alarm/action/'+e.target.parentNode.getAttribute('data-id'), JSON.parse(actionPush));
-
-							e.target.parentNode.previousSibling.previousSibling.value = '';
-
-							fnComm.alertPopup('SAVE', 'COMPLETE');
-						}, false);
-
-						complBtn[i].addEventListener('click', (e) => {
-							var actionPush = '{"alarmActionDesc":"'+e.target.parentNode.previousSibling.previousSibling.value+'"}';
-
-							fnComm.saveData('PATCH', psRoot.url + 'paas/alarm/action/'+e.target.parentNode.getAttribute('data-id'), JSON.parse(actionPush));
-
-							e.target.parentNode.previousSibling.previousSibling.value = '';
-
-							fnComm.alertPopup('PATCH', 'COMPLETE');
-						}, false);
-					};
-					/*
-					function historyEvent(){
-						$('.alarmHistory').find('button.update').off().on('click', function(){
-							console.log($(this).parents('li').data('id'));
+					if(data.data.length > 0){
+						data.data.forEach((value, idx) => {
+							//////////////////////////////////////////////////////////////////////
+							// alarmCnt: 1
+							// alarmMessage: "doppler/3 memory 의 상태critical memory 의 임계치인90%를 초과하였습니다.현재 사용률 [95.51]% 입니다. "
+							// alarmSendDate: "2018-12-03 15:48:58"
+							// alarmTitle: "[doppler/3]의 memory 상태 [critical]"
+							// alarmType: "memory"
+							// appIndex: 0
+							// appName: ""
+							// appYn: "N"
+							// containerName: ""
+							// id: 47
+							// ip: "10.20.20.90"
+							// level: "critical"
+							// originId: 148
+							// originName: "doppler/3"
+							// originType: "pas"
+							// regDate: "2018-12-03 15:48:58"
+							// regUser: "Bat"
+							// resolveStatus: "1"
+							// resolveStatusName: "Alarm 발생"
+							// userName: "admin"
+							//////////////////////////////////////////////////////////////////////
 							
-							pass.ajaxPost(pass.url + 'paas/alarm/action/'+$(this).parents('li').data('id'), 'PATCH', '{"alarmActionDesc":"'+$(this).parent().siblings('input').val()+'"}');
-
-							alert('저장되었습니다.');
+							var html = `<div class="${value.level}">
+								<div>
+									<strong title="${value.alarmMessage}">${value.alarmMessage}</strong>
+								</div>
+								<div>
+									<dl>
+										<dt>Alarm Type</dt>
+										<dd>${value.alarmType}</dd>
+									</dl>
+									<dl>
+										<dt>Origin Type</dt>
+										<dd>${value.originType}</dd>
+									</dl>
+									<dl>
+										<dt>Origin Name</dt>
+										<dd>${value.originName}</dd>
+									</dl>
+									<dl>
+										<dt>IP</dt>
+										<dd>${value.ip}</dd>
+									</dl>
+									<dl>
+										<dt>Date</dt>
+										<dd>${value.alarmSendDate}</dd>
+									</dl>
+								</div>
+								<ul class="historyWrap data-read="${value.id}">
+								</ul>
+								<div class="receipt">
+									<textarea></textarea>
+									<div>
+										<button class="saveBtn" data-id="${value.id}">SAVE (조치내용만 입력)</button>
+										<button class="complBtn" data-id="${value.id}">COMPLETE (조치내용도 함께 입력)</button>
+									</div>
+								</div>
+								<div class="summaryBtn" data-id="${value.id}"  data-name="${value.name}">
+									<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="Receipt"><span>Receipt</span></a>
+								</div>
+							</a>`;
+							
+							fnComm.appendHtml(target, html, 'div');
+							
+							fnComm.loadData('GET', `${fnComm.url}paas/alarm/status/${value.id}`, alarm.history, value.id);
 						});
-
-						$('.alarmHistory').find('button.delete').off().on('click', function(){
-							pass.ajaxPost(pass.url + 'paas/alarm/action/'+$(this).parents('li').data('id'), 'DELETE');
-
-							alert('삭제되었습니다.');
-
-							$(this).parents('li').remove();
-
-							if($('.alarmHistory ul').find('li').length == 0){
-								$('.alarmHistory .hisWrap').hide();
-							};
-						});
-					};
-					*/
+						
+						// Button Event (receipt)
+						var elm = document.querySelectorAll('.process');
+						for(var i=0 ; i<elm.length ; i++){
+							elm[i].addEventListener('click', (e) => {
+								e.target.parentNode.parentNode.previousSibling.previousSibling.classList.toggle('on');
+							}, false);
+						};
 					
-					if(alarm.flag){
-						alarm.flag = false;
-						alarm.event();
-					};
+						// receipt 코멘트 저장 및 컴플릿
+						var saveBtn = document.querySelectorAll('.saveBtn');
+						var complBtn = document.querySelectorAll('.complBtn');
+						for(var i=0 ; i<saveBtn.length ; i++){
+							saveBtn[i].addEventListener('click', (e) => {
+								var actionPush = `{"alarmId":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
+
+								fnComm.saveData('POST', `${fnComm.url}paas/alarm/action`, actionPush);
+
+								e.target.parentNode.previousSibling.previousSibling.value = '';
+							}, false);
+
+							complBtn[i].addEventListener('click', (e) => {
+								var actionPush = `{"alarmId":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
+
+								fnComm.saveData('POST', `${fnComm.url}paas/alarm/action`, actionPush);
+
+								e.target.parentNode.previousSibling.previousSibling.value = '';
+							}, false);
+						};
+						
+						if(alarm.flag){
+							alarm.flag = false;
+							alarm.event();
+						};
+					} else {
+						var html = `<div class="none">최근 한달간 알람이 없습니다.</div>`;
+							
+						fnComm.appendHtml(target, html, 'div');
+					}
 				},
 
 				history(data, list){
+					// ModiDate: "2019-09-06 07:01:02"
+					// alarmActionDesc: "dsfgsdfg"
+					// alarmId: "238"
+					// id: 4
+					// modiUser: "system"
+					// regDate: "2019-09-06 16:01:02"
+					// regUser: "system"
+
 					if(data.data.length > 0){
 						data.data.forEach(value => {
 							var target = document.querySelector('.data-read'+value.alarmId);
 
-							var html = '<li>';
-							html += '	<p>';
-							html += '		<input type="text" title="'+value.alarmActionDesc+'" value="'+value.alarmActionDesc+'">';
-							html += '		<em>'+value.regDate+'</em>';
-							html += '	</p>';
-							html += '	<div data-id="'+value.alarmId+'">';
-							html += '		<button class="update" onClick="hisChange(this);">Update</button>';
-							html += '		<button class="delete" onClick="javascript:alarm.hisDelete(this);">Deledte</button>';
-							html += '	</div>';
-							html += '</li>';
+							var html = `<li>
+								<p>
+									<input type="text" title="${value.alarmActionDesc}" value="${value.alarmActionDesc}">
+									<em>${value.regDate}</em>
+								</p>
+								<div>
+									<button class="update" data-id="${value.id}" onClick="hisChange(this);">Update</button>
+									<button class="delete" data-id="${value.id}" onClick="javascript:hisDelete(this);">Deledte</button>
+								</div>
+							</li>`;
 
 							fnComm.appendHtml(target, html, 'li');
 						});
@@ -347,10 +357,7 @@
 
 				event(){
 					document.querySelector('.search').addEventListener('click', (e) => {
-						var rfDate = new Date(document.getElementById('date1').value+' 00:00:00');
-						var toDate = new Date(document.getElementById('date2').value+' 00:00:00');
-
-						fnComm.loadData('GET', psRoot.url + 'paas/alarm/statuses?pageItems=1000&pageIndex=1&originType='+document.getElementById('type1').value+'&alarmType='+document.getElementById('type2').value+'&resolveStatus='+document.getElementById('type4').value+'&level='+document.getElementById('type3').value+'&searchDateFrom='+rfDate.getTime()+'&searchDateTo='+toDate.getTime(), alarm.alarmStatus);
+						fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType="${document.getElementById('type1').value}"&alarmType=${document.getElementById('type2').value}"&resolveStatus="${document.getElementById('type4').value}"&level="${document.getElementById('type3').value}"&searchDateFrom="${document.getElementById('date1').value}"&searchDateTo="${document.getElementById('date2').value}"`, alarm.alarmStatus);
 					}, false);
 				},
 			}
@@ -360,22 +367,14 @@
 
 		// 히스토리 수정
 		function hisChange(target){
-			var actionPush = '{"alarmActionDesc":"'+target.parentNode.previousSibling.previousSibling.querySelector('input').value+'"}';
+			var actionPush = `{"alarmActionDesc":"${target.parentNode.previousSibling.previousSibling.querySelector('input').value}"}`;
 
-			fnComm.saveData('PATCH', psRoot.url + 'paas/alarm/action/'+target.parentNode.getAttribute('data-id'), JSON.parse(actionPush));
-
-			fnComm.alertPopup('PATCH', 'COMPLETE');
-
-			console.log(actionPush);
+			fnComm.saveData('PATCH', `${fnComm.url}paas/alarm/action/${target.getAttribute('data-id')}`, actionPush);
 		}
 		
 		// 히스토리 삭제
 		function hisDelete(target){
-			var actionPush = '{"alarmActionDesc":"'+target.parentNode.previousSibling.previousSibling.querySelector('input').value+'"}';
-
-			fnComm.saveData('DELETE', psRoot.url + 'paas/alarm/action/'+target.parentNode.getAttribute('data-id'));
-
-			fnComm.alertPopup('DELETE', 'COMPLETE');
+			fnComm.saveData('DELETE', `${fnComm.url}paas/alarm/action/${target.getAttribute('data-id')}`);
 		};
 	</script>
 </html>

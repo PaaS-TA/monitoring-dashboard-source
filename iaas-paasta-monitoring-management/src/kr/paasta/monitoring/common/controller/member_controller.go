@@ -3,6 +3,8 @@ package controller
 import (
 	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/common/service"
+	"strings"
+
 	//"github.com/cloudfoundry-community/go-cfclient"
 	"encoding/json"
 	"fmt"
@@ -11,6 +13,7 @@ import (
 	"kr/paasta/monitoring/utils"
 	"net/http"
 	//"github.com/cloudfoundry-community/go-cfclient"
+	"errors"
 	"github.com/jinzhu/gorm"
 	pm "kr/paasta/monitoring/paas/model"
 	ua "kr/paasta/monitoring/utils"
@@ -68,7 +71,6 @@ func (s *MemberController) MemberJoinInfo(w http.ResponseWriter, r *http.Request
 func (s *MemberController) MemberJoinSave(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("MemberController MemberJoinSave enter!!")
-
 	var apiRequest cm.UserInfo
 	err := json.NewDecoder(r.Body).Decode(&apiRequest)
 	if err != nil {
@@ -79,6 +81,35 @@ func (s *MemberController) MemberJoinSave(w http.ResponseWriter, r *http.Request
 	} else {
 
 		var loginErr model.ErrMessage
+
+		if strings.Contains(s.sysType, utils.SYS_TYPE_IAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
+			if apiRequest.IaasUserId == "" {
+				loginErr = utils.GetError().GetCheckErrorMessage(errors.New("please request after IaaS service certification"))
+				utils.ErrRenderJsonResponse(loginErr, w)
+				return
+			}
+		}
+		if strings.Contains(s.sysType, utils.SYS_TYPE_PAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
+			if apiRequest.PaasUserId == "" {
+				loginErr = utils.GetError().GetCheckErrorMessage(errors.New("please request after PaaS service certification"))
+				utils.ErrRenderJsonResponse(loginErr, w)
+				return
+			}
+		}
+		if strings.Contains(s.sysType, utils.SYS_TYPE_CAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
+			if apiRequest.CaasUserId == "" {
+				loginErr = utils.GetError().GetCheckErrorMessage(errors.New("please request after CaaS service certification"))
+				utils.ErrRenderJsonResponse(loginErr, w)
+				return
+			}
+		}
+
+		//if(apiRequest.IaasUserId=="" && apiRequest.PaasUserId=="" && apiRequest.CaasUserId==""){
+		//
+		//	loginErr = utils.GetError().GetCheckErrorMessage(errors.New("user service is none."))
+		//	utils.ErrRenderJsonResponse(loginErr, w)
+		//	return
+		//}
 
 		err := services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinSave(apiRequest)
 		loginErr = utils.GetError().GetCheckErrorMessage(err)
@@ -334,7 +365,7 @@ func (s *MemberController) MemberJoinCheckDuplicationCaasId(w http.ResponseWrite
 		utils.ErrRenderJsonResponse(loginErr, w)
 		return
 	}
-	utils.RenderJsonLogoutResponse(userInfo.PaasUserId, w)
+	utils.RenderJsonLogoutResponse(userInfo.CaasUserId, w)
 }
 
 func (s *MemberController) MemberCheckIaaS(w http.ResponseWriter, r *http.Request) {
@@ -399,12 +430,12 @@ func (s *MemberController) MemberCheckCaaS(w http.ResponseWriter, r *http.Reques
 	fmt.Println("MemberController MemberCheckCaaS enter!!")
 	reqCsrfToken := r.Header.Get(model.CSRF_TOKEN_NAME)
 	result := ""
+	resultBroker := "adm"
 	var apiRequest cm.UserInfo
 	_ = json.NewDecoder(r.Body).Decode(&apiRequest)
 	s.CfConfig.Type = "CAAS"
-	result = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).CaasServiceCheck(apiRequest, reqCsrfToken, s.CfConfig)
-	if result == "adm" {
-		result := ""
+	//resultBroker = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).CaasServiceCheck(apiRequest, reqCsrfToken, s.CfConfig)
+	if resultBroker == "adm" {
 		_, err := ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
 
 		if err != nil {
@@ -413,6 +444,7 @@ func (s *MemberController) MemberCheckCaaS(w http.ResponseWriter, r *http.Reques
 			//return req, provider, err
 		}
 		fmt.Println("uaa token::", result)
+
 		//result = services.GetMemberService(s.OpenstackProvider, s.CfProvider, s.txn, s.RdClient).GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig)
 	} else {
 		result = "admin check fail"

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/thoas/go-funk"
 	"github.com/tidwall/gjson"
+	"kr/paasta/monitoring/saas/model"
 	"sort"
 	"strconv"
 	"strings"
@@ -26,6 +27,17 @@ type SaasController struct {
 	pinpointUrl string
 }
 
+type ApplicationList struct {
+	PinpointUrl string            `json:"pinpointUrl"`
+	Data        []ApplicationStat `json:"data"`
+}
+
+func NewSaasController(txn *gorm.DB) *SaasController {
+	return &SaasController{
+		txn: txn,
+	}
+}
+
 type ApplicationStat struct {
 	AppName        string  `json:"appName"`
 	AgentId        string  `json:"agentId"`
@@ -39,13 +51,15 @@ type ApplicationStat struct {
 }
 
 type ApplicationGaugeTot struct {
-	AgentTotCnt       int64   `json:"agentTotCnt"`
-	AgentUseCnt       int64   `json:"agentUseCnt"`
-	SystemCpuRate     float64 `json:"systemCpuRate"`
-	HaepMaxMemory     float64 `json:"haepMaxMemory"`
-	HaepMemory        float64 `json:"haepMemory"`
-	NoneHeapMaxMemory float64 `json:"noneHeapMaxMemory"`
-	NoneHeapMemory    float64 `json:"noneHeapMemory"`
+	AgentTotCnt        int64   `json:"agentTotCnt"`
+	AgentUseCnt        int64   `json:"agentUseCnt"`
+	SystemCpuRate      float64 `json:"systemCpuRate"`
+	HeapMemoryRate     float64 `json:"heapMemoryRate"`
+	HaepMaxMemory      float64 `json:"haepMaxMemory"`
+	HaepMemory         float64 `json:"haepMemory"`
+	NoneHeapMemoryRate float64 `json:"noneHeapMemoryRate"`
+	NoneHeapMaxMemory  float64 `json:"noneHeapMaxMemory"`
+	NoneHeapMemory     float64 `json:"noneHeapMemory"`
 }
 
 type AgentStatus struct {
@@ -157,7 +171,7 @@ func (p *SaasController) GetApplicationList(w http.ResponseWriter, r *http.Reque
 		return applicationStats[i].AppName < applicationStats[j].AppName
 	})
 
-	util.RenderJsonResponse(applicationStats, w)
+	util.RenderJsonResponse(ApplicationList{PinpointUrl: pinpointUrl, Data: applicationStats}, w)
 }
 
 func (p *SaasController) GetAgentStatus(w http.ResponseWriter, r *http.Request) {
@@ -226,6 +240,8 @@ func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request
 	var sumNoneHeapMemory float64 = 0
 
 	var avgSystemCpuRate float64 = 0
+	var avgHaepMemoryRate float64 = 0
+	var avgNoneHaepMemoryRate float64 = 0
 
 	//applicationGaugeTot := make([]ApplicationGaugeTot, agentCount, agentCount)
 
@@ -241,6 +257,9 @@ func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request
 
 	if agentCount > 0 {
 		avgSystemCpuRate = sumSystemCpuRate / float64(agentCount)
+		avgHaepMemoryRate = sumHaepMemory / sumHaepMaxMemory * 100
+		avgNoneHaepMemoryRate = sumNoneHeapMemory / sumNoneHeapMaxMemory * 100
+
 	}
 
 	avgSystemCpuRate, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", avgSystemCpuRate), 0)
@@ -248,15 +267,19 @@ func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request
 	sumHaepMemory, _ = strconv.ParseFloat(fmt.Sprintf("%.0f", sumHaepMemory), 0)
 	sumNoneHeapMaxMemory, _ = strconv.ParseFloat(fmt.Sprintf("%.0f", sumNoneHeapMaxMemory), 0)
 	sumNoneHeapMemory, _ = strconv.ParseFloat(fmt.Sprintf("%.0f", sumNoneHeapMemory), 0)
+	avgHaepMemoryRate, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", avgHaepMemoryRate), 0)
+	avgNoneHaepMemoryRate, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", avgNoneHaepMemoryRate), 0)
 
 	resultData := ApplicationGaugeTot{
-		AgentTotCnt:       agentCount,
-		AgentUseCnt:       agentUseCnt,
-		SystemCpuRate:     avgSystemCpuRate,
-		HaepMaxMemory:     sumHaepMaxMemory,
-		HaepMemory:        sumHaepMemory,
-		NoneHeapMaxMemory: sumNoneHeapMaxMemory,
-		NoneHeapMemory:    sumNoneHeapMemory,
+		AgentTotCnt:        agentCount,
+		AgentUseCnt:        agentUseCnt,
+		SystemCpuRate:      avgSystemCpuRate,
+		HeapMemoryRate:     avgHaepMemoryRate,
+		NoneHeapMemoryRate: avgNoneHaepMemoryRate,
+		HaepMaxMemory:      sumHaepMaxMemory,
+		HaepMemory:         sumHaepMemory,
+		NoneHeapMaxMemory:  sumNoneHeapMaxMemory,
+		NoneHeapMemory:     sumNoneHeapMemory,
 	}
 
 	util.RenderJsonResponse(resultData, w)
@@ -457,28 +480,162 @@ Alarm Api call
 */
 func (p *SaasController) GetAlarmInfo(w http.ResponseWriter, r *http.Request) {
 	//service호출
-	result, err := service.GetAlarmService().GetAlarmInfo()
+	result, err := service.GetAlarmService(p.txn).GetAlarmInfo()
 	if err != nil {
 		util.RenderJsonResponse(err, w)
+		return
 	}
 	util.RenderJsonResponse(result, w)
 }
 
 func (p *SaasController) GetAlarmUpdate(w http.ResponseWriter, r *http.Request) {
-	//service호출
-	//result, err := service.GetAlarmService().GetAlarmUpdate(r)
-	service.GetAlarmService().GetAlarmUpdate(r)
-	//if err != nil {
-	//	util.RenderJsonResponse(err, w)
-	//}
-	//util.RenderJsonResponse(result, w)
+	var apiRequest []model.AlarmPolicyRequest
+	data, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
+	err := json.Unmarshal(data, &apiRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	service.GetAlarmService(p.txn).GetAlarmUpdate(apiRequest)
 }
 
 func (p *SaasController) GetAlarmLog(w http.ResponseWriter, r *http.Request) {
-	//service호출
-	result, err := service.GetAlarmService().GetAlarmLog()
+	searchDateFrom := r.URL.Query().Get("searchDateFrom")
+	searchDateTo := r.URL.Query().Get("searchDateTo")
+
+	alarmType := r.URL.Query().Get("alarmType")
+	alarmStatus := r.URL.Query().Get("alarmStatus")
+	resolveStatus := r.URL.Query().Get("resolveStatus")
+
+	result, err := service.GetAlarmService(p.txn).GetAlarmLog(searchDateFrom, searchDateTo, alarmType, alarmStatus, resolveStatus)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
+		return
 	}
 	util.RenderJsonResponse(result, w)
+}
+
+func (p *SaasController) GetSnsInfo(w http.ResponseWriter, r *http.Request) {
+	result, err := service.GetAlarmService(p.txn).GetSnsInfo()
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+		return
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (p *SaasController) GetAlarmCount(w http.ResponseWriter, r *http.Request) {
+	result, err := service.GetAlarmService(p.txn).GetAlarmCount()
+
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+		return
+	}
+	util.RenderJsonResponse(result, w)
+}
+
+func (p *SaasController) GetlarmSnsSave(w http.ResponseWriter, r *http.Request) {
+	var alarmSns model.BatchAlarmSnsRequest
+	err := json.NewDecoder(r.Body).Decode(&alarmSns)
+	defer r.Body.Close()
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	error := service.GetAlarmService(p.txn).GetlarmSnsSave(alarmSns)
+
+	util.RenderJsonResponse(error, w)
+}
+
+func (h *SaasController) UpdateAlarmState(w http.ResponseWriter, r *http.Request) {
+
+	var alarmrRsolveRequest model.AlarmrRsolveRequest
+	err := json.NewDecoder(r.Body).Decode(&alarmrRsolveRequest)
+	defer r.Body.Close()
+
+	id, _ := strconv.Atoi(r.FormValue(":id"))
+	alarmrRsolveRequest.Id = uint64(id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	error := service.GetAlarmService(h.txn).UpdateAlarmSate(alarmrRsolveRequest)
+	util.RenderJsonResponse(error, w)
+}
+
+func (h *SaasController) CreateAlarmResolve(w http.ResponseWriter, r *http.Request) {
+	var alarmrRsolveRequest model.AlarmrRsolveRequest
+	err := json.NewDecoder(r.Body).Decode(&alarmrRsolveRequest)
+	defer r.Body.Close()
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	error := service.GetAlarmService(h.txn).CreateAlarmResolve(alarmrRsolveRequest)
+	util.RenderJsonResponse(error, w)
+}
+
+func (h *SaasController) UpdateAlarmResolve(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.FormValue(":id"))
+
+	var alarmrRsolveRequest model.AlarmrRsolveRequest
+	err := json.NewDecoder(r.Body).Decode(&alarmrRsolveRequest)
+	defer r.Body.Close()
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	alarmrRsolveRequest.Id = uint64(id)
+	error := service.GetAlarmService(h.txn).UpdateAlarmResolve(alarmrRsolveRequest)
+	util.RenderJsonResponse(error, w)
+	return
+}
+
+func (h *SaasController) DeleteAlarmResolve(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.FormValue(":id"))
+
+	error := service.GetAlarmService(h.txn).DeleteAlarmResolve(uint64(id))
+	util.RenderJsonResponse(error, w)
+	return
+}
+
+func (h *SaasController) GetAlarmSnsReceiver(w http.ResponseWriter, r *http.Request) {
+	alarmReceiver, _ := service.GetAlarmService(h.txn).GetAlarmSnsReceiver()
+	util.RenderJsonResponse(alarmReceiver, w)
+}
+
+func (h *SaasController) DeleteAlarmSnsChannel(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.FormValue(":id"))
+
+	err := service.GetAlarmService(h.txn).DeleteAlarmSnsChannel(id)
+	util.RenderJsonResponse(err, w)
+}
+
+func (h *SaasController) GetAlarmActionList(w http.ResponseWriter, r *http.Request) {
+
+	id, _ := strconv.Atoi(r.FormValue(":id"))
+
+	result, err := service.GetAlarmService(h.txn).GetAlarmActionList(id)
+
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	} else {
+		util.RenderJsonResponse(result, w)
+	}
 }

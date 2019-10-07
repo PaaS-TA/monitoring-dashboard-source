@@ -32,6 +32,14 @@ func GetDataFloatFromInterfaceSingle(data map[string]interface{}) float64 {
 
 	var jsonValue json.Number
 
+	fmt.Printf("model.RESULT_DATA_NAME : %v\n", model.RESULT_DATA_NAME)
+	fmt.Printf("data : %v\n", data[model.RESULT_DATA_NAME])
+
+	// 임시 오류 처리
+	if data[model.RESULT_DATA_NAME] == nil {
+		return 0
+	}
+
 	datamap := data[model.RESULT_DATA_NAME].([]map[string]interface{})
 	for _, data := range datamap {
 		jsonValue = data["value"].(json.Number)

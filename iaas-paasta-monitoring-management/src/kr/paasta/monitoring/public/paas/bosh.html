@@ -14,16 +14,23 @@
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
-						<li><a href="bosh.html" class="on"><span>B</span></a></li>
-						<li><a href="paas.html"><span>P</span></a></li>
-						<li><a href="cont.html"><span>C</span></a></li>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="bosh.html" class="on">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
 						<li>
-							<a href="alarm_policy.html"><span>A</span></a>
+							<a href="alarm_policy.html">A<span>larm</span></a>
 							<ul>
 								<li><a href="alarm_policy.html">Policy</a></li>
 								<li><a href="alarm_status.html">Status</a></li>
@@ -195,7 +202,7 @@
 					<fieldset>
 						<div>
 							<label>Date</label>
-							<input type="date" id="date" placeholder="2019-05-09" style="width:240px;">
+							<input type="date" id="date" placeholder="2019-05-09" style="width:220px;">
 							<label>Time</label>
 							<input type="time" id="sTime" style="width:180px;">
 							<em>~</em>
@@ -206,10 +213,16 @@
 							<label>Message</label>
 							<input type="text" id="message" style="width:800px;">
 						</div>
-						<button class="search">SEARCH</button>
+						<button class="logSearch">SEARCH</button>
 					</fieldset>
 					<div class="preText">
 						<pre></pre>
+					</div>
+					<div class="paging logPaging">
+						<a href="javascript:void(0);" class="move next">&lt;</a>
+						<span>
+						</span>
+						<a href="javascript:void(0);" class="move prev">&gt;</a>
 					</div>
 				</div>
 				<a href="javascript:void(0);" class="chartClosed"></a>
@@ -228,15 +241,14 @@
 			window.onload = () => {
 				const bosh = {
 					id : '',
+					logId : '',
+					logCnt : 1,
+					logPage : 1,
+					logSum : 1,
 
 					init() {
 						// Alarm Count
-						fnComm.alarmCount();
-						
-						// BOSH 컨디션 차트
-						fnComm.loadData('GET', psRoot.url + 'paas/bosh/overview', fnComm.boshConditionChart);
-						// BOSH Summary 리스트
-						fnComm.loadData('GET', psRoot.url + 'paas/bosh/summary', bosh.boshSummaryList);
+						fnComm.alarmCount('paas');
 
 						// 오늘 날짜
 						var today = new Date();
@@ -246,14 +258,29 @@
 
 						if(dd < 10) dd='0'+dd;
 						if(mm < 10) mm='0'+mm;
-						
+
 						// LOG 검색 Default set
-						document.getElementById('date').value = yyyy + '-' + mm + '-' + dd;
-						document.getElementById('sTime').value = "00:00:00";
-						document.getElementById('eTime').value = "01:00:00";
+						document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+						var hh = today.getHours();
+						var hs = today.getHours()-1;
+						var nn = today.getMinutes();
+						var ss = today.getSeconds();
+
+						if(hs < 10) hs='0'+hs;
+						if(ss < 10) ss='0'+ss;
+
+						document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+						document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+						
+						// BOSH 컨디션 차트
+						fnComm.loadData('GET', fnComm.url + 'paas/bosh/overview', fnComm.boshConditionChart);
+						// BOSH Summary 리스트
+						fnComm.loadData('GET', fnComm.url + 'paas/bosh/summary', bosh.boshSummaryList);
 					},
 					
 					boshSummaryList(data) {
+						console.log(data);
 						//////////////////////////////////////////////////////////////////////
 						// BOSH Summary : 리스트
 						// Data Example //////////////////////////////////////////////////////
@@ -276,90 +303,142 @@
 						var target = document.getElementById('boshSummary');
 						
 						fnComm.removeHtml(target);
-	
-						data.data.forEach((value, idx)=>{
-							var html = '<div class="'+value.state+'">';
-							html += '	<div>';
-							html += '		<strong>'+value.name+'</strong>';
-							html += '		<em>'+value.address+'</em>';
-							html += '		<em>Core '+value.core+'</em>';
-							html += '	</div>';
-							html += '	<div>';
-							html += '		<dl>';
-							html += '			<dt>CPU Used</dt>';
-							html += '			<dd>'+value.cpuUsage+' %</dd>';
-							html += '		</dl>';
-							html += '		<dl>';
-							html += '			<dt>Total Memory</dt>';
-							html += '			<dd>'+fnComm.numberComma(2, value.cpuUsage)+' %</dd>';
-							html += '		</dl>';
-							html += '		<dl>';
-							html += '			<dt>Memory Used</dt>';
-							html += '			<dd>'+fnComm.numberComma(2, value.memoryUsage)+' %</dd>';
-							html += '		</dl>';
-							html += '	</div>';
-							html += '	<div>';
-							html += '		<dl>';
-							html += '			<dt>Total Disk</dt>';
-							html += '			<dd>'+fnComm.numberComma(0, value.totalDisk)+' MB</dd>';
-							html += '		</dl>';
-							html += '		<dl>';
-							html += '			<dt>Disk Status</dt>';
-							html += '			<dd>'+value.diskStatus+'</dd>';
-							html += '		</dl>';
-							html += '	</div>';
-							html += '	<div class="summaryBtn" data-id="'+value.id+'"  data-name="'+value.name+'">';
-							html += '		<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="process"><span>Process</span></a>';
-							html += '		<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>';
-							html += '		<a href="javascript:void(0);" class="log"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>';
-							html += '	</div>';
-							html += '</a>';
+
+						if(data.data != null){
+							data.data.forEach((value, idx)=>{
+								var html = `<div class="${value.state}">
+									<div>
+										<strong>${value.name}</strong>
+										<em>${value.address}</em>
+										<em>Core ${value.core}</em>
+									</div>
+									<div>
+										<dl>
+											<dt>CPU Used</dt>
+											<dd>${value.cpuUsage} %</dd>
+										</dl>
+										<dl>
+											<dt>Total Memory</dt>
+											<dd>${fnComm.numberComma(2, value.cpuUsage)} %</dd>
+										</dl>
+										<dl>
+											<dt>Memory Used</dt>
+											<dd>${fnComm.numberComma(2, value.memoryUsage)} %</dd>
+										</dl>
+									</div>
+									<div>
+										<dl>
+											<dt>Total Disk</dt>
+											<dd>${fnComm.numberComma(0, value.totalDisk)} MB</dd>
+										</dl>
+										<dl>
+											<dt>Disk Status</dt>
+											<dd>${value.diskStatus}</dd>
+										</dl>
+									</div>
+									<div class="summaryBtn" data-id="${value.id}"  data-name="${value.name}">
+										<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="process"><span>Process</span></a>
+										<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+										<a href="javascript:void(0);" class="log"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>
+									</div>
+								</a>`;
+								
+								fnComm.appendHtml(target, html, 'div');
+
+								var article = target.childNodes.item(idx);
+								article.setAttribute('data-id', value.id);
+
+								if(idx === 0){
+									bosh.id = value.id;
+
+									document.getElementById('boshTopTitle').innerHTML = value.name;
+								};
+							});
 							
-							fnComm.appendHtml(target, html, 'div');
+							// Set BOSH Top Process 
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/topprocess/${bosh.id}/memory`, bosh.boshTopProcess );
+							
+							// Button Event (Process, Chart, Log)
+							var elm = document.querySelectorAll('.summaryBtn');
+							for(var i=0 ; i<elm.length ; i++){
+								// Process Event
+								elm[i].querySelector('.process').addEventListener('click', (e) => {
+									var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
+									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 
-							var article = target.childNodes.item(idx);
-							article.setAttribute('data-id', value.id);
+									fnComm.loadData('GET', `${fnComm.url}paas/bosh/topprocess/${elmID}/memory`, bosh.boshTopProcess );
 
-							if(idx === 0){
-								bosh.id = value.id;
-								document.getElementById('boshTopTitle').innerHTML = value.name;
+									console.log(elmName);
+
+									document.getElementById('boshTopTitle').innerHTML = elmName;
+								}, false);
+
+								// Chart Event
+								elm[i].querySelector('.chart').addEventListener('click', (e) => {
+									var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
+									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+									document.querySelector('.chartTitle').innerHTML = elmName;
+									bosh.chartView(elmID);
+								}, false);
+
+								// Log Event
+								elm[i].querySelector('.log').addEventListener('click', (e) => {
+									bosh.logId = e.target.parentNode.parentNode.getAttribute('data-id');
+									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+									document.querySelector('.chartTitle').innerHTML = elmName;
+
+									bosh.logView();
+								}, false);
 							};
-						});
-						
-						// Set BOSH Top Process 
-						fnComm.loadData('GET', psRoot.url + 'paas/bosh/topprocess/'+bosh.id+'/memory', bosh.boshTopProcess );
-						
-						// Button Event (Process, Chart, Log)
-						var elm = document.querySelectorAll('.summaryBtn');
-						for(var i=0 ; i<elm.length ; i++){
-							var elmID = elm[i].getAttribute('data-id');
-							var elmName = elm[i].getAttribute('data-name');
-
-							// Process Event
-							elm[i].querySelector('.process').addEventListener('click', (e) => {
-								fnComm.loadData('GET', psRoot.url + 'paas/bosh/topprocess/' + elmID + '/memory', bosh.boshTopProcess );
-							}, false);
-
-							// Chart Event
-							elm[i].querySelector('.chart').addEventListener('click', (e) => {
-								document.querySelector('.chartTitle').innerHTML = elmName;
-								bosh.chartView(elmID);
-							}, false);
-
-							// Log Event
-							elm[i].querySelector('.log').addEventListener('click', (e) => {
-								document.querySelector('.chartTitle').innerHTML = elmName;
-								bosh.logView(elmID);
-							}, false);
 							
-							// Chart Event
+							// Chart Close Event
 							document.querySelector('.chartClosed').addEventListener('click', (e) => {
 								document.getElementById('chartWrap').classList.toggle('on', false);
+							}, false);
+						
+							// LOG Reset Event
+							document.querySelector('.reset').addEventListener('click', (e) => {
+								// 오늘 날짜
+								var today = new Date();
+								var dd = today.getDate();
+								var mm = today.getMonth()+1;
+								var yyyy = today.getFullYear();
+
+								if(dd < 10) dd='0'+dd;
+								if(mm < 10) mm='0'+mm;
+
+								// LOG 검색 Default set
+								document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+								var hh = today.getHours();
+								var hs = today.getHours()-1;
+								var nn = today.getMinutes();
+								var ss = today.getSeconds();
+
+								if(hh < 10) hh='0'+hh;
+								if(hs < 10) hs='0'+hs;
+								if(nn < 10) nn='0'+nn;
+								if(ss < 10) ss='0'+ss;
+
+								document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+								document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+								document.getElementById('message').value = '';
+							}, false);
+							
+							// LOG Search Event
+							document.querySelector('.logSearch').addEventListener('click', (e) => {
+								var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}&keyword=${document.getElementById('message').value}`;
+
+								console.log(logParameter);
+							
+								// Log 리스트
+								fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
 							}, false);
 						};
 					},
 	
 					boshTopProcess(data) {
+						console.log(data);
 						//////////////////////////////////////////////////////////////////////
 						// BOSH Top Process : 리스트
 						// Data Example //////////////////////////////////////////////////////
@@ -374,27 +453,27 @@
 						fnComm.removeHtml(target);
 	
 						data.data.forEach((value, idx)=>{
-							var html = '<div>';
-							html += '	<strong>'+value.index+'</strong>';
-							html += '	<div>';
-							html += '		<dl class="time">';
-							html += '			<dt><img src="../resources/img/icon_time.png" alt="time"></dt>';
-							html += '			<dd>'+value.time+'</dd>';
-							html += '		</dl>';
-							html += '		<dl class="pid">';
-							html += '			<dt><img src="../resources/img/icon_id.png" alt="pid"></dt>';
-							html += '			<dd>'+value.pid+'</dd>';
-							html += '		</dl>';
-							html += '		<dl class="process">';
-							html += '			<dt><img src="../resources/img/icon_process.png" alt="process"></dt>';
-							html += '			<dd>'+value.process+'</dd>';
-							html += '		</dl>';
-							html += '		<dl class="memory">';
-							html += '			<dt><img src="../resources/img/icon_memory.png" alt="memory"></dt>';
-							html += '			<dd>'+fnComm.numberComma(0, value.memory)+' MB</dd>';
-							html += '		</dl>';
-							html += '	</div>';
-							html += '</div>';
+							var html = `<div>
+								<strong>${value.index}</strong>
+								<div>
+									<dl class="time">
+										<dt><img src="../resources/img/icon_time.png" alt="time"></dt>
+										<dd>${value.time}</dd>
+									</dl>
+									<dl class="pid">
+										<dt><img src="../resources/img/icon_id.png" alt="pid"></dt>
+										<dd>${value.pid}</dd>
+									</dl>
+									<dl class="process">
+										<dt><img src="../resources/img/icon_process.png" alt="process"></dt>
+										<dd>${value.process}</dd>
+									</dl>
+									<dl class="memory">
+										<dt><img src="../resources/img/icon_memory.png" alt="memory"></dt>
+										<dd>${fnComm.numberComma(0, value.memory)} MB</dd>
+									</dl>
+								</div>
+							</div>`;
 	
 							fnComm.appendHtml(target, html, 'div');
 						});
@@ -406,48 +485,144 @@
 
 						setTimeout(() => {
 							// CPU Usage 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/cpu/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/cpu/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
 
 							// CPU Load 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/cpu/'+ elmID +'/loads' + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/cpu/${elmID}/loads` + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
 
 							// Memory Usage 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/memory/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/memory/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
 
 							// Disk Usage 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/disk/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/disk/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
 
 							// Disk IO 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/disk/'+ elmID +'/ios' + fnComm.setTimer(), fnComm.detailChart, '#diskIoChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/disk/${elmID}/ios` + fnComm.setTimer(), fnComm.detailChart, '#diskIoChart');
 
 							// Network IO Bytes 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/network/'+ elmID +'/bytes' + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/bytes` + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
 							
 							// Network IO Packets 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/network/'+ elmID +'/packets' + fnComm.setTimer(), fnComm.detailChart, '#networkPacktesChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/packets` + fnComm.setTimer(), fnComm.detailChart, '#networkPacktesChart');
 							
 							// Network IO Drop 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/network/'+ elmID +'/drops' + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/drops` + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
 							
 							// Network IO Error 정보
-							fnComm.loadData('GET', psRoot.url + 'paas/bosh/network/'+ elmID +'/errors' + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
+							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/errors` + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
 						},500);
 					},
 
-					logView(elmID) {
-						//?endTime=16:18:44&id=2cd43cb5-2237-40f3-5748-4a8e18159394&logType=bosh&pageIndex=1&pageItems=50&period=5m&startTime=16:17:43&targetDate=2019-05-09
-						//?id=2cd43cb5-2237-40f3-5748-4a8e18159394&logType=bosh&pageIndex=1&pageItems=1000&period=5m&startTime=00:00:00&endTime=01:00:00&targetDate=2019-05-09
-						
+					logView() {
 						document.getElementById('chartWrap').classList.toggle('on', true);
 						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
 
-						var logParameter = '?id=' + elmID + '&logType=bosh&pageIndex=1&pageItems=10000&period=5m&startTime=' + document.getElementById('sTime').value + '&endTime=' + document.getElementById('eTime').value + '&targetDate=' + document.getElementById('date').value;
+						setTimeout(() => {
+							var logParameter = `?id=${bosh.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
 
-						console.log(logParameter);
+							console.log(logParameter);
 						
-						// Log 리스트
-						fnComm.loadData('GET', psRoot.url + 'paas/log/specific'+ logParameter, fnComm.detailLog);
+							// Log 리스트
+							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.detailLog);
+						},500);
 					},
+
+					detailLog(data){
+						bosh.logPage = 1;
+
+						if(data.messages !=  null){
+
+							bosh.logCnt = Math.ceil(data.totalCount / 100);
+							bosh.logSum = Math.ceil(bosh.logCnt / 10);
+
+							if(bosh.logCnt > 2){
+								document.querySelector('.logPaging').classList.toggle('on', true);
+							};
+							if(bosh.logCnt > 10){
+								document.querySelector('.logPaging').classList.toggle('over', true);
+							};
+							
+							fnComm.removeHtml(document.querySelector('.logPaging span'));
+
+							for(var i=1; i<=bosh.logCnt; i++){
+								var html = `<a href="javascript:void(0);" class="view" data-page="${i}">${i}</a>`;
+
+								fnComm.appendHtml(document.querySelector('.logPaging span'), html, 'span');
+							};
+
+							bosh.logDraw(data);
+
+							// LOG Paging
+							var btn =  document.querySelectorAll('.logPaging span a');
+
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].removeEventListener('click', this);
+								btn[i].addEventListener('click', (e) => {
+									var logParameter = `?id=${bosh.logId}&logType=cf&pageIndex=${e.target.getAttribute('data-page')}&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+
+									console.log(e.target.getAttribute('data-page'));
+								
+									// Log 리스트
+									fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.logDraw);
+									
+							var logParameter = `?id=${bosh.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+
+							console.log(logParameter);
+						
+							// Log 리스트
+							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.detailLog);
+								}, false);
+							};
+
+							document.querySelector('.logPaging .next').removeEventListener('click', bosh.nextBtn);
+							document.querySelector('.logPaging .prev').removeEventListener('click', bosh.prevBtn);
+							
+							document.querySelector('.logPaging .next').addEventListener('click', bosh.nextBtn);
+							
+							document.querySelector('.logPaging .prev').addEventListener('click', bosh.prevBtn);
+						} else {
+							document.querySelector('.preText pre').innerHTML = 'No Log'
+						};
+					},
+
+					nextBtn(){
+						var btn =  document.querySelectorAll('.logPaging span a');
+
+						if(bosh.logPage > 1){
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].classList.toggle('view', false);
+							};
+							bosh.logPage--;
+							for(var j=((bosh.logPage-1)*10); j<(bosh.logPage*10) ; j++){
+								btn[j].classList.toggle('view', true);
+							};
+						};
+					},
+
+					prevBtn(){
+						var btn =  document.querySelectorAll('.logPaging span a');
+
+						if(bosh.logSum > bosh.logPage){
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].classList.toggle('view', false);
+							};
+							bosh.logPage++;
+							for(var j=((bosh.logPage-1)*10); j<(bosh.logPage*10) ; j++){
+								btn[j].classList.toggle('view', true);
+							};
+						};
+					},
+
+					logDraw(data){
+						var logText = '';
+						
+						data.messages.forEach((value)=>{
+							logText += `${value.time}<br>`;
+							logText += `${value.message}<br><br>`;
+						});
+
+						document.querySelector('.preText pre').innerHTML = logText;
+					}
 				}
 	
 				bosh.init();

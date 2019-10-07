@@ -236,14 +236,19 @@ func (b BoshStatusDao) GetBoshId(deployName string) (_ client.Response, errMsg m
 		}
 	}()
 
-	sql := "select id, value from bosh_metrics where deployment = '%s' and time > now() - 1m order by time desc limit 1 ;"
+	//sql := "select id, value from bosh_metrics where deployment = '%s' and time > now() - 1m order by time desc limit 1 ;"
+	sql := "select id, value from bosh_metrics where deployment = '" + deployName + "' and time > now() - 1m order by time desc limit 1 ;"
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf(sql, deployName),
+		//Command:  fmt.Sprintf(sql, deployName),
+		Command:  sql,
 		Database: b.databases.BoshDatabase,
 	}
+
+	fmt.Println("sql : " + sql)
+	fmt.Printf("b.databases.BoshDatabase : %v\n", b.databases.BoshDatabase)
 
 	resp, err := b.influxClient.Query(q)
 	if err != nil {

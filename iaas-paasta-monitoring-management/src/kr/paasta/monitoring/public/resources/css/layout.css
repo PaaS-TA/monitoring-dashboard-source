@@ -2,38 +2,38 @@
 
 @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
-*, :before, :after { margin: 0; padding: 0; border:0; font-style: normal; vertical-align: top; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; outline: none;}
+*, :before, :after {margin:0; padding:0; border:0; font-style:normal; vertical-align:top; box-sizing:border-box; -moz-box-sizing:border-box; -webkit-box-sizing:border-box; outline:none;}
 
-html {-webkit-font-smoothing: antialiased;}
-table {width:100%; border-collapse: collapse; border-spacing: 0; table-layout: fixed;}
-th, td {vertical-align:middle; word-break: break-word; white-space: nowrap;}
-ul, ol, dl { list-style: none; word-break: keep-all; word-break: break-word; }
-hr { display: none; }
-caption, figcaption, legend { overflow: hidden; position: absolute; z-index:-1; height:0; visibility: hidden; }
+html {-webkit-font-smoothing:antialiased;}
+table {width:100%; border-collapse:collapse; border-spacing:0;}
+th, td {vertical-align:middle; word-break:break-word; white-space:nowrap;}
+ul, ol, dl {list-style:none; word-break:keep-all; word-break:break-word;}
+hr {display:none;}
+caption, figcaption, legend {overflow:hidden; position:absolute; z-index:-1; height:0; visibility:hidden;}
 
 h1, h2, h3, h4, h5, h6, strong {font-weight:500;}
 
-a { color: #333; text-decoration: none; }
-a:hover, a:focus { text-decoration: none; }
+a {color:#333; text-decoration:none;}
+a:hover, a:focus {text-decoration:none;}
 
-button { padding: 0; border: 0; cursor: pointer; background: none; vertical-align: middle; appearance: none; font-family: "Noto Sans KR", "맑은 고딕", sans-serif; color: #747474; outline: none; }
+button {padding:0; border:0; cursor:pointer; background:none; vertical-align:middle; appearance:none; font-family:"Noto Sans KR", "맑은 고딕", sans-serif; color:#747474; outline:none;}
 
-select {appearance: none; color: #747474; font-family: "Noto Sans KR", "맑은 고딕", sans-serif; min-width:120px; height:36px; padding-left:7px; padding-right:40px; font-size:16px; line-height:34px; vertical-align:top; background-color:#fff; border:1px solid #d1d1d1;}
+select {appearance:none; color:#747474; font-family:"Noto Sans KR", "맑은 고딕", sans-serif; min-width:120px; height:36px; padding-left:7px; padding-right:40px; font-size:16px; line-height:34px; vertical-align:top; background-color:#fff; border:1px solid #d1d1d1;}
 select:focus {border:1px solid #000;}
-select:disabled { background-color: #f2f2f2; color: #999; }
-select::-ms-expand { display: none; }
+select:disabled {background-color:#f2f2f2; color:#999;}
+select::-ms-expand {display:none;}
 
 select {min-width:120px; height:36px; padding-left:7px; padding-right:40px; font-size:16px; line-height:34px; vertical-align:top; background-color:#fff; border:1px solid #d1d1d1;}
 
-input { margin: 0; padding: 0; font-family: inherit; font-size: inherit; color: #333; line-height: 17px; vertical-align: top; -webkit-appearance: none; border-radius: 0; outline: none;}
+input {margin:0; padding:0; font-family:inherit; font-size:inherit; color:#333; line-height:17px; vertical-align:top; -webkit-appearance:none; border-radius:0; outline:none;}
 input[type="text"],
 input[type="password"],
 input[type="tel"],
-input[type="file"] {height:36px; padding:0 10px; font-size:16px; font-weight:100; line-height:34px; background-color:#fff; border:1px solid #d1d1d1; box-sizing:border-box; -webkit-appearance:none; border-radius: 0;}
+input[type="file"] {height:36px; padding:0 10px; font-size:16px; font-weight:100; line-height:34px; background-color:#fff; border:1px solid #d1d1d1; box-sizing:border-box; -webkit-appearance:none; border-radius:0;}
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="tel"]:focus,
-input[type="file"]:focus { border-bottom: 1px solid #f576c3; }
+input[type="file"]:focus {border-bottom:1px solid #f576c3;}
 input[type="text"]:disabled,
 input[type="text"][readonly],
 input[type="password"]:disabled,
@@ -41,13 +41,13 @@ input[type="password"][readonly],
 input[type="tel"]:disabled,
 input[type="tel"][readonly],
 input[type="file"]:disabled,
-input[type="file"][readonly] { background-color: #f2f2f2; color: #999; }
+input[type="file"][readonly] {background-color:#f2f2f2; color:#999;}
 
-input[type="radio"] {position:absolute; z-index:-1; visibility:hidden; width: 18px; height: 18px; }
+input[type="radio"] {position:absolute; z-index:-1; visibility:hidden; width:18px; height:18px;}
 
-input[type="checkbox"] {position:absolute; z-index:-1; visibility:hidden; width: 18px; height: 18px; }
+input[type="checkbox"] {position:absolute; z-index:-1; visibility:hidden; width:18px; height:18px;}
 
-input[type="checkbox"] + label {position:relative; display:inline-block; overflow:hidden; width: 18px; height: 18px; text-indent:-9999em; border:1px solid #ccc; vertical-align: middle; cursor: pointer;}
+input[type="checkbox"] + label {position:relative; display:inline-block; overflow:hidden; width:18px; height:18px; text-indent:-9999em; border:1px solid #ccc; vertical-align:middle; cursor:pointer;}
 input[type="checkbox"]:checked + label {border:1px solid #40cecd;}
 input[type="checkbox"]:checked + label:after {content:''; position:absolute; top:0; left:5px; width:6px; height:12px; border-right:2px solid #40cecd; border-bottom:2px solid #40cecd; transform:rotate(45deg);}
 
@@ -57,37 +57,46 @@ input[type="radio"]:checked + label {color:#000;}
 input[type="radio"]:checked + label:after {border:1px solid #000;}
 input[type="radio"]:checked + label:before {content:''; position:absolute; left:4px; top:4px; width:10px; height:10px; text-indent:-9999em; background:#000; border-radius:6px;}
 
-input[type="radio"].noText + label {position:relative; display:inline-block; overflow:hidden; width: 18px; height: 18px; text-indent:-9999em; border:1px solid #ccc; vertical-align: middle; cursor: pointer;}
+input[type="radio"].noText + label {position:relative; display:inline-block; overflow:hidden; width:18px; height:18px; text-indent:-9999em; border:1px solid #ccc; vertical-align:middle; cursor:pointer;}
 input[type="radio"].noText:checked + label {border:1px solid #40cecd;}
 input[type="radio"].noText:checked + label:after {content:''; position:absolute; top:0; left:5px; width:6px; height:12px; border-right:2px solid #40cecd; border-bottom:2px solid #40cecd; transform:rotate(45deg);}
 
-textarea { -webkit-appearance: none; border-radius: 0; border:1px solid #d1d1d1; color: #222; font-weight:300; background: #fff; padding: 15px 10px; font-family: "Noto Sans KR", "맑은 고딕", sans-serif; font-size: 16px; width: 100%; min-height: 80px; box-sizing: border-box; resize: none;}
+textarea {-webkit-appearance:none; border-radius:0; border:1px solid #d1d1d1; color:#222; font-weight:300; background:#fff; padding:15px 10px; font-family:"Noto Sans KR", "맑은 고딕", sans-serif; font-size:16px; width:100%; min-height:80px; box-sizing:border-box; resize:none;}
 
-::placeholder {color: #a1a2a6; font-weight:100; opacity: 1;}
-:-ms-input-placeholder {color: #a1a2a6; font-weight:100;}
-::-ms-input-placeholder {color: #a1a2a6; font-weight:100;}
+::placeholder {color:#a1a2a6; font-weight:100; opacity:1;}
+:-ms-input-placeholder {color:#a1a2a6; font-weight:100;}
+::-ms-input-placeholder {color:#a1a2a6; font-weight:100;}
 
-body { font-family: "Noto Sans KR", "맑은 고딕", sans-serif; font-weight:300; font-size: 16px; color: #222; line-height: normal; -webkit-text-size-adjust: 100%; -moz-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+/*input[type=time]::-webkit-datetime-edit-ampm-field {display:none;}*/
+
+body {font-family:"Noto Sans KR", "맑은 고딕", sans-serif; font-weight:300; font-size:16px; color:#222; line-height:normal; -webkit-text-size-adjust:100%; -moz-text-size-adjust:100%; -ms-text-size-adjust:100%;}
 
 #wrap {position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; overflow-x:auto; min-width:1580px;}
 
 /* 요소 숨김 */
-.blind { overflow: hidden; position: absolute; z-index:-1; height:0; visibility: hidden; }
+.blind {overflow:hidden; position:absolute; z-index:-1; height:0; visibility:hidden;}
 
-header {position:absolute; top:0; left:0; z-index:100; width:90px; height:100%; border-right:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1);}
+header {position:absolute; top:0; left:0; z-index:100; width:90px; height:100%; border-right:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1); transition:.3s;}
+header:hover {width:150px;}
 header h1 {overflow:hidden; margin-bottom:100px; text-align:center;}
+
+header .global {position:absolute; top:-50px; left:200px; width:480px; padding:0 60px 0 20px; background:#444; border-radius:50px;}
+header .global li {float:left; width:100px; text-align:center;}
+header .global li a {display:block; height:100px; color:#fff; font-size:16px; line-height:150px; white-space:nowrap;}
 
 header nav {text-align:center;}
 header nav > ul {display:inline-block; width:100%;}
-header nav > ul > li {position:relative;}
-header nav > ul > li > a {display:block; height:90px;}
-header nav > ul > li > a span {display:block; overflow:hidden; width:100%; height:90px; color:#222; font-size:24px; font-weight:400; text-align:center; line-height:89px;}
-header nav > ul > li > a:hover span,
-header nav > ul > li > a.on span {color:#45b1ff;}
-header nav > ul > li > a:hover span img,
-header nav > ul > li > a.on span img {margin-left:-90px;}
+header nav > ul > li {position:relative; height:90px;}
+header nav > ul > li > a {position:relative; float:left; width:90px; height:90px; color:#222; font-size:24px; font-weight:400; line-height:89px; text-align:center; letter-spacing:1px;}
+header nav > ul > li > a span {display:none; position:absolute; overflow:hidden; font-size:16px; font-weight:300; white-space:nowrap;}
+header nav > ul > li > a em {display:inline-block; overflow:hidden; width:90px; height:90px; font-size:16px; font-weight:300;}
+header nav > ul > li > a:hover,
+header nav > ul > li > a.on {color:#45b1ff;}
+header:hover nav > ul > li > a span {display:inline-block;}
+header nav > ul > li > a:hover em img,
+header nav > ul > li > a.on em img {margin-left:-90px;}
 header nav > ul > li:hover ul {z-index:1; left:0px; opacity:1;}
-header nav ul li ul {position:absolute; top:0; left:-120px; z-index:-1; width:120px; padding:10px; border:1px solid #222; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.2); opacity:0; transition:.5s;}
+header nav ul li ul {position:absolute; top:70px; left:-120px; z-index:-1; width:120px; padding:10px; border:1px solid #222; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.2); opacity:0; transition:.5s;}
 header nav ul li ul li a {display:block; height:26px; padding-left:15px; color:#222; font-size:14px; text-align:left; line-height:26px;}
 header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; background:#45b1ff;}
 
@@ -100,13 +109,18 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .contentsLeft h4 span:after {content:'|'; position:absolute; top:0; left:0; font-size:14px; color:#ddd; line-height:60px;}
 .contentsLeft h4 {display:inline-block; width:100%; height:60px; font-size:26px; font-weight:100; line-height:60px;}
 .contentsLeft h4 strong {color:#40cecd; font-size:26px; font-weight:300;}
-.contentsLeft h4 input[type=checkbox] {float:right; visibility: hidden;}
-.contentsLeft h4 input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:70px; height:30px; margin-top:15px; padding:0 10px; font-size:14px; line-height:30px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition: .5s;}
+.contentsLeft h4 input[type=checkbox] {float:right; visibility:hidden;}
+.contentsLeft h4 input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:70px; height:30px; margin-top:15px; padding:0 10px; font-size:14px; line-height:30px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition:.5s;}
 .contentsLeft h4 input[type=checkbox] + label:before {content:'ON'; position:absolute; top:0; left:-90px; z-index:1; width:140px; height:30px; color:#fff; font-weight:400; border:0;}
-.contentsLeft h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius: 12px; transition: .5s;}
+.contentsLeft h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius:12px; transition:.5s;}
 .contentsLeft h4 input[type=checkbox]:checked + label {text-indent:102px; background:#f576c3;}
-.contentsLeft h4 input[type=checkbox]:checked + label:after { border:0;left:43px;}
+.contentsLeft h4 input[type=checkbox]:checked + label:after {border:0;left:43px;}
 .contentsLeft .chartView {width:100%; height:120px;}
+.contentsLeft .gaugeChart {width:100%; height:140px; margin-top:30px;}
+.contentsLeft .donutChart {overflow:hidden;}
+.contentsLeft .donutChart > div {float:left; width:50%; height:240px; margin-top:60px;}
+.contentsLeft .donutChart > div strong {display:block; height:40px; font-size:16px; font-weight:100; text-align:center;}
+.contentsLeft .donutChart > div div {height:200px;}
 .contentsLeft .topList {width:100%;}
 .contentsLeft .topList > div {display:flex; align-items:center; width:100%; margin-top:10px; padding:10px; background:#fff; box-shadow:2px 2px 5px rgba(150,150,150,.1);}
 .contentsLeft .topList > div strong {display:inline-block; width:40px; height:40px; margin-right:10px; color:#aaa; font-size:26px; font-weight:100; text-align:center; line-height:40px; border-right:1px solid #eee;}
@@ -141,20 +155,22 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .contentsLeft .cellCollection a div dl {overflow:hidden; width:140px;}
 .contentsLeft .cellCollection a div dl dt {float:left; width:40px; color:#333; font-size:12px; font-weight:400; text-align:left; line-height:18px; white-space:nowrap;}
 .contentsLeft .cellCollection a div dl dd {float:left; width:100px; color:#666; font-size:12px; text-align:left; line-height:18px; white-space:nowrap;}
-
-.contentsLeft .location {overflow:hidden;}
-.contentsLeft .location ul {overflow:hidden;}
-.contentsLeft .location ul li {float:left;}
-.contentsLeft .location ul li a {position:relative; display:block; overflow:hidden; height:50px; padding:0 25px 0 50px; font-size:14px; font-weight:100; line-height:50px;}
-.contentsLeft .location ul li a:before {content:''; position:absolute; top:0; left:-35px; width:50px; height:50px; border:1px solid #e2e2e2; transform:rotate(45deg);}
-.contentsLeft .location ul li:first-child a {padding-left:20px;}
-.contentsLeft .location ul li:first-child a:before {display:none;}
-.contentsLeft .location ul li:last-child a {color:#00a1a1;}
+.contentsLeft .statusNum {overflow:hidden;}
+.contentsLeft .statusNum li {margin-top:30px; text-align:center;}
+.contentsLeft .statusNum li.fail {color:#c048c8;}
+.contentsLeft .statusNum li.running {color:#55c554;}
+.contentsLeft .statusNum li.pending {color:#e91a61;}
+.contentsLeft .statusNum li.susseed {color:#45b1ff;}
+.contentsLeft .statusNum li.unknown {color:#999;}
+.contentsLeft .statusNum li h6 {display:inline-block; width:60px; font-size:50px; color:#999; font-weight:100; line-height:80px;}
+.contentsLeft .statusNum li strong {display:inline-block; width:160px; font-size:80px; font-weight:100; line-height:80px; text-align:right;}
 
 
 #contents {position:relative; overflow:hidden; overflow-y:scroll; flex:2; padding:70px 30px 30px; background:#fff; box-shadow:0px -5px 10px rgba(0,0,0,.1);}
 .alarmPolicy #contents {flex:.5;}
 .alarmStatus #contents {flex:3.5;}
+.gaugeWrap #contents {flex:3;}
+.donutWrap #contents {flex:1.5;}
 
 #contents .timePop {z-index:-1; opacity:0; position:absolute; top:20px; left:30px; width:420px; border:1px solid #222; background:#fff; box-shadow:1px 1px 5px rgba(0,0,0,.3); transition:.5s;}
 #contents .timePop.on {opacity:1; z-index:102;}
@@ -169,7 +185,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #contents .timePop .btnWrap {padding-top:10px;}
 
 #contents nav {position:absolute; top:20px; left:0; width:100%; padding:0 30px;}
-#contents nav > a {float:left;}
+#contents nav > a {float:left; display:none;}
 #contents nav ul {float:right;}
 #contents nav ul li {position:relative; float:left; margin-left:50px;}
 #contents nav ul li:first-child {margin-left:0;}
@@ -188,22 +204,24 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #contents nav ul li .logout:hover span {opacity:1;}
 
 #contents article {position:relative; margin-top:50px;}
-#contents article h4 {display:inline-block; width:100%; height:60px; font-size:26px; font-weight:100; line-height:60px;}
+#contents article h4 {display:inline-block; width:100%; height:60px; margin-top:30px; font-size:26px; font-weight:100; line-height:60px;}
+#contents article h4:first-child {margin-top:0;}
 #contents article h4 strong {color:#40cecd; font-size:26px; font-weight:300;}
-#contents article h4 input[type=checkbox] {float:right; visibility: hidden;}
-#contents article h4 input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:70px; height:30px; margin-top:16px; padding:0 10px; font-size:16px; line-height:30px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition: .5s;}
+#contents article h4 input[type=checkbox] {float:right; visibility:hidden;}
+#contents article h4 input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:70px; height:30px; margin-top:16px; padding:0 10px; font-size:16px; line-height:30px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition:.5s;}
 #contents article h4 input[type=checkbox] + label:before {content:'ON'; position:absolute; top:0; left:-90px; z-index:1; width:140px; height:30px; color:#fff; font-weight:400; border:0;}
-#contents article h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius: 12px; transition: .5s;}
+#contents article h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius:12px; transition:.5s;}
 #contents article h4 input[type=checkbox]:checked + label {text-indent:102px; background:#f576c3;}
-#contents article h4 input[type=checkbox]:checked + label:after { border:0;left:43px;}
+#contents article h4 input[type=checkbox]:checked + label:after {border:0;left:43px;}
+#contents article h5 {display:inline-block; width:100%; height:40px;font-size:16px; font-weight:100; line-height:40px;}
 
 #alertPop {position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; width:100%; height:100%; background:rgba(255,255,255,.8);}
 #alertPop > div {position:absolute; top:50%; left:50%; width:460px; min-height:181px; margin-left:-230px; margin-top:-100px; text-align:center; border:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1);}
 #alertPop div h3 {height:50px; padding:0 25px; color:#f4256c; font-size:28px; font-weight:200; line-height:50px; border-bottom:1px solid #eee;}
 #alertPop div p {padding:25px; color:#666; font-size:20px; font-weight:100;}
 #alertPop div div {overflow:hidden;}
-#alertPop div div button {width:100%; height:50px; color:#ccc; background:#f4f4f4;}
-#alertPop div div button:hover {color:#fff; background:#f4256c;}
+#alertPop div div button {width:100%; height:50px; color:#fff; font-size:18px; font-weight:100; background:#333;}
+#alertPop div div button:hover {background:#f4256c;}
 
 .popWrap {display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:200; background:rgba(0,0,0,.4);}
 .popWrap .status {position:absolute; top:15%; left:50%; width:1200px; margin-left:-600px; padding:0 20px 20px; background:#fff;}
@@ -244,10 +262,14 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .tab.style01 div a.overview:before {content:''; position:absolute; top:23px; left:20px; width:16px; height:16px; border-top:2px solid #fff; border-bottom:2px solid #fff;}
 .tab.style01 div a.overview:after {content:''; position:absolute; top:30px; left:20px; width:16px; height:2px; border-top:2px solid #fff;}
 
-.paging {overflow:hidden; padding:25px 0; text-align:center;}
-.paging > a {display:inline-block; width:30px; height:30px; border:1px solid #ddd;}
-.paging span {display:inline-block;}
-.paging span a {display:inline-block; width:30px; height:30px; border:1px solid #ddd;}
+.paging {display:none; overflow:hidden; padding:25px 0; text-align:center;}
+.paging.on {display:block;}
+.paging > a {display:none; width:30px; height:30px; border:1px solid #ddd;}
+.paging.over > a {display:inline-block;}
+.paging span {display:none; overflow:hidden; max-width:300px; height:30px;}
+.paging.on span {display:inline-block;}
+.paging span a {display:none; width:30px; height:30px; border:1px solid #ddd;}
+.paging span a.view {display:inline-block;}
 .paging span a.on, .paging span a:hover {color:#fff; border:1px solid #40cecd; background:#40cecd;}
 
 .summaryList {position:relative;}
@@ -255,12 +277,14 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList > div:hover,
 .summaryList > div.on {box-shadow:3px 3px 10px rgba(0,0,0,.1);}
 .summaryList > div:first-child {margin-top:0;}
-.summaryList > div:before {content:''; position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
+.summaryList > div:before {content:''; position:absolute; top:18px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
 .summaryList > div.running:before {content:'R'; background:#55c554;}
 .summaryList > div.warning:before {content:'W'; background:#fba602;}
 .summaryList > div.critical:before {content:'C'; background:#e91a61;}
 .summaryList > div.fail:before {content:'F'; background:#c048c8;}
 .summaryList > div.normal:before {content:'N'; background:#ddd;}
+.summaryList > div.TRUE:before {content:'T'; background:#55c554;}
+.summaryList > div.FALSE:before {content:'F'; background:#e91a61;}
 .summaryList > div > span {position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px; text-transform:uppercase;}
 .summaryList > div > span.running {background:#55c554;}
 .summaryList > div > span.warning {background:#fba602;}
@@ -269,10 +293,16 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList > div > span.normal {background:#ddd;}
 .summaryList > div div {overflow:hidden; padding-left:80px; line-height:24px;}
 .summaryList > div div:first-child {margin-bottom:10px;}
-.summaryList > div div strong {float:left; margin-right:30px; font-size:22px; font-weight:300; line-height:inherit;}
-.summaryList > div div em {float:left; margin-right:30px; color:#222; font-size:18px; font-weight:300; line-height:inherit;}
+.summaryList > div div strong {float:left; margin-right:30px; font-size:22px; font-weight:300; line-height:28px;}
+.summaryList > div div em {float:left; margin-right:30px; color:#222; font-size:18px; font-weight:100; line-height:inherit;}
 .summaryList > div div dl {float:left; margin-right:15px;}
-.summaryList > div div dl dt {float:left;color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.summaryList > div div dl dt {float:left; color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.summaryList > div div dl.color1 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#e91a61; border-radius:12px;}
+.summaryList > div div dl.color1 dd {width:85px;}
+.summaryList > div div dl.color2 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#55c554; border-radius:12px;}
+.summaryList > div div dl.color2 dd {width:85px;}
+.summaryList > div div dl.color3 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#4868a3; border-radius:12px;}
+.summaryList > div div dl.color3 dd {width:85px;}
 .summaryList > div div dl dd {float:left; padding-left:10px; color:#222; font-size:14px; line-height:inherit;}
 
 .summaryList > div div dl.running dt,
@@ -294,21 +324,23 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 .tableList {border-spacing:5px; border-top:2px solid #ddd;}
 .tableList thead tr th {min-height:60px; padding:10px 5px; font-size:18px; font-weight:200; line-height:22px; border-bottom:2px solid #ddd;}
-.tableList tbody tr td {min-height:60px; padding:10px 5px; font-size:16px; color:#666; text-align:center; border-bottom:1px solid #eee; transition:.5s;}
+.tableList tbody tr td {min-height:60px; padding:10px 5px; font-size:16px; color:#666; text-align:center; border-bottom:1px solid #eee; transition:.5s; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
 .tableList tbody tr:hover td {background:#f9f9f9;}
 .tableList tbody tr td:hover {background:#fff8ea;}
-.tableList tbody tr td a.link {display:inline-block; height:22px; padding-right:30px; font-weight:400; line-height:20px; background: url(../img/icon_link.png) no-repeat 100% 50%;}
-/**************/
+.tableList tbody tr td a.link {display:inline-block; height:22px; padding-right:30px; font-weight:400; line-height:20px; background:url(../img/icon_link.png) no-repeat 100% 50%;}
+.tableList tbody tr td.left {text-align:left;}
+
 
 .statusSearch {overflow:hidden; padding-top:40px; text-align:center;}
 .statusSearch select {width:80%; margin-top:15px;}
 .statusSearch span {display:inline-block; width:80%; margin-top:15px; color:#999; font-size:18px; line-height:40px;}
 .statusSearch span:first-of-type {margin-top:50px;}
 .statusSearch input[type=date] {width:80%; height:36px; font-size:18px; text-align:center; border-bottom:1px solid #d1d1d1; background:transparent;}
-.statusSearch input[type=date]:focus { border-bottom: 1px solid #f576c3;}
+.statusSearch input[type=date]:focus {border-bottom:1px solid #f576c3;}
 
 .statusList {position:relative;}
 .statusList > div {position:relative; margin-top:15px; padding:15px; min-height:100px; transition:.5s;}
+.statusList > div.none {font-size:28px; padding:100px 15px;}
 .statusList > div:hover,
 .statusList > div.on {box-shadow:3px 3px 10px rgba(0,0,0,.1);}
 .statusList > div:first-child {margin-top:0;}
@@ -326,7 +358,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .statusList > div > span.normal {background:#ddd;}
 .statusList > div > div {overflow:hidden; padding-left:80px; line-height:24px;}
 .statusList > div > div:first-child {margin-bottom:10px;}
-.statusList > div > div strong {float:left; width:88%; overflow:hidden; font-size:18px; color:#222; font-weight:300; line-height:inherit; text-overflow:ellipsis; white-space:nowrap;}
+.statusList > div > div strong {float:left; width:88%; overflow:hidden; font-size:18px; color:#222; font-weight:300; line-height:24px;}
 .statusList > div > div em {float:left; width:20%; margin-left:5%; color:#999; font-size:14px; font-weight:300; line-height:inherit;}
 .statusList > div > div dl {float:left; margin-right:15px;}
 .statusList > div > div dl dt {float:left;color:#222; font-size:14px; font-weight:400; line-height:inherit;}
@@ -358,27 +390,58 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .statusList .summaryBtn a {float:left; overflow:hidden; width:60px; height:60px; margin-left:5px; color:#fff; font-size:12px; text-align:center; letter-spacing:1px; opacity:.5; transition:.3s;}
 .statusList .summaryBtn a:hover {opacity:1;}
 .statusList .summaryBtn a span {display:block; line-height:18px;}
-.statusList .summaryBtn a.process {background:#656872}
-.statusList .summaryBtn a.chart {background:#ed7161}
-.statusList .summaryBtn a.log {background:#80c2b8}
+.statusList .summaryBtn a.process {background:#656872;}
+.statusList .summaryBtn a.chart {background:#ed7161;}
+.statusList .summaryBtn a.log {background:#80c2b8};
+
+.ovChart {height:250px;}
+
+.statusBlock {overflow:hidden;}
+.statusBlock > div {float:left; width:25%; padding-top:50px;}
+.statusBlock > div:nth-child(2n+1) {margin-left:0;}
+.statusBlock > div h5 {text-align:center;}
+.statusBlock > div ul {overflow:hidden; padding-top:5px;}
+.statusBlock > div ul li {float:left; width:25%; text-align:center;}
+.statusBlock > div ul li.bg1 {color:#656872;}
+.statusBlock > div ul li.bg2 {color:#fba602;}
+.statusBlock > div ul li.bg3 {color:#45b1ff;}
+.statusBlock > div ul li.bg4 {color:#e91a61;}
+.statusBlock > div ul li span {display:block; font-size:12px; font-weight:100;}
+.statusBlock > div ul li strong {display:block; height:44px; font-size:40px; font-weight:100; line-height:44px;}
 
 /**********************************/
 
 #chartWrap {position:fixed; top:0; right:-100%; z-index:999; width:100%; min-width:1400px; height:100%; padding-top:50px; background:rgba(255,255,255,.8); transition:.5s;}
 #chartWrap.on {right:0;}
-#chartWrap h4 {width:1280px; margin:0 auto; padding:0 60px; border:1px solid #eee; border-bottom:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1);}
-#chartWrap h4 span {display:block; height:70px; padding-left:15px; color:#222; font-size:28px; font-weight:100; text-align:center; line-height:70px; border-bottom:1px solid #eee; }
-#chartWrap .chart {display:none; overflow:hidden; width:1280px; margin:0 auto; height:700px; padding:10px 60px 60px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1);}
+#chartWrap h4 span {display:block; height:70px; color:#222; font-size:28px; font-weight:100; text-align:center; line-height:70px; border-bottom:1px solid #eee;}
+#chartWrap .chart {display:none; position:absolute; top:50%; left:50%; overflow:hidden; width:1280px; height:770px; margin-left:-640px; margin-top:-385px; padding:0 60px 60px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1);}
 #chartWrap .chart.on {display:block;}
-#chartWrap .chart li {float:left; width:30%; margin-left:5%; margin-top:25px;}
-#chartWrap .chart li:nth-child(3n+1) {margin-left:0;}
-#chartWrap .chart li h5 {color:#666; font-size:18px; font-weight:200; text-align:center; line-height:34px;}
-#chartWrap .chart li div {width:100%; height:150px; padding-right:15px;}
-#chartWrap .chart li div svg {overflow:visible !important;}
+#chartWrap .chart > ul {display:inline-block; width:100%;}
+#chartWrap .chart > li {float:left; width:30%; margin-left:4%; margin-top:25px;}
+#chartWrap .chart > li:nth-child(3n+1) {margin-left:0;}
+#chartWrap .chart > ul.one > li {float:none; width:100%; margin-left:0; margin-top:25px;}
+#chartWrap .chart > ul.one > li:nth-child(3n+1) {margin-left:0%;}
+#chartWrap .chart > ul.one > li:nth-child(4n+1) {margin-left:0;}
+#chartWrap .chart > ul.four > li {float:left; width:22%; margin-left:3%; margin-top:25px;}
+#chartWrap .chart > ul.four > li:nth-child(3n+1) {margin-left:3%;}
+#chartWrap .chart > ul.four > li:nth-child(4n+1) {margin-left:0;}
+#chartWrap .chart li h5 {margin:0; color:#666; font-size:18px; font-weight:200; text-align:center; line-height:34px;}
+#chartWrap .chart > li div {width:100%; height:150px; padding-right:15px;}
+#chartWrap .chart > li div svg {overflow:visible !important;}
 #chartWrap .chartClosed {position:absolute; top:20px; right:20px; width:70px; height:70px;}
 #chartWrap .chartClosed:before {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(45deg);}
 #chartWrap .chartClosed:after {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(-45deg);}
-#chartWrap .logs {overflow:hidden; min-width:1280px; height:700px; padding:10px 60px 60px; background:rgba(255,255,255,.9);}
+
+#chartWrap .chart h5 {height:40px; padding-left:15px; margin:50px 0 15px; color:#222; font-size:20px; font-weight:100; text-align:center; line-height:40px;}
+#chartWrap .chart .tableList {height:300px; overflow-y:scroll; overflow-x:hidden;}
+
+#chartWrap .chart.gauge {display:block;}
+#chartWrap .chart.gauge li {width:22%; margin-top:40px;}
+#chartWrap .chart.gauge li:nth-child(3n+1) {margin-left:4%;}
+#chartWrap .chart.gauge li:nth-child(4n+1) {margin-left:0;}
+#chartWrap .chart.gauge li .gaugeChart {width:auto; padding-right:0; margin:0 10px 50px;}
+
+#chartWrap .logs {overflow:hidden; min-width:1280px; height:800px; padding:10px 60px 60px; background:rgba(255,255,255,.9);}
 #chartWrap .chart.on + .logs {display:none;}
 #chartWrap .logs fieldset {position:relative; width:1000px; margin:25px auto 0;}
 #chartWrap .logs fieldset > div {overflow:hidden; margin-top:15px;}
@@ -389,11 +452,27 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #chartWrap .logs fieldset div a,
 #chartWrap .logs fieldset div button {float:left;}
 #chartWrap .logs fieldset div label {width:90px; height:34px; color:#000; font-size:14px; font-weight:100; line-height:34px;}
-#chartWrap .logs fieldset div input {height:34px; color:#333; font-size:20px; text-align:center; font-weight:300; line-height:34px; border-color:#666; border-width:0 0 1px 0; background:transparent;}
+#chartWrap .logs fieldset div input {height:34px; color:#333; font-size:20px; text-align:left; font-weight:300; line-height:34px; border-color:#666; border-width:0 0 1px 0; background:transparent;}
+#chartWrap .logs fieldset div input[type=time] {text-align:center;}
 #chartWrap .logs fieldset div input:focus {border-color:#f576c3; border-width:0 0 1px 0;}
+#chartWrap .logs fieldset div em {display:inline-block; width:30px; text-align:center; line-height:34px;}
 #chartWrap .logs fieldset div button {height:34px; width:100px; font-size:12px; color:#666; line-height:32px; border:1px solid #ddd;}
 #chartWrap .logs fieldset div button:hover {color:#f576c3;border:1px solid #f576c3;}
-#chartWrap .logs fieldset .search {position:absolute; top:0; right:0; width:83px; height:83px; font-size:14px; color:#fff; font-weight:300; background:#222;}
+#chartWrap .logs fieldset .logSearch {position:absolute; top:0; right:0; width:83px; height:83px; font-size:14px; color:#fff; font-weight:300; background:#222;}
+#chartWrap .logs fieldset .logSearch:hover {background:#f576c3;}
+#chartWrap .preText {width:1000px; margin:40px auto 0;}
+#chartWrap .preText pre {overflow:hidden; overflow-y:scroll; height:500px; padding:30px; font-family:'Courier New'; color:#fff; font-weight:300; line-height:24px; border:1px solid #eee; background:#333; white-space:pre-wrap;}
+
+#chartWrap .logWrap {position:absolute; top:100px; right:-100%; width:1000px; height:600px; padding:0 60px 60px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1); transition:.5s;}
+#chartWrap .logWrap.on {right:30px;}
+#chartWrap .logWrap h4 {height:70px; margin-bottom:30px; color:#222; font-size:28px; font-weight:100; text-align:center; line-height:70px; border-bottom:1px solid #eee;}
+#chartWrap .logWrap .logChart {display:inline-block; width:100%; height:200px; margin-bottom:30px}
+#chartWrap .logWrap .logChart svg {overflow:visible !important;}
+
+#chartWrap .logWrap pre {height:250px; overflow:hidden; overflow-y:scroll; padding:20px; line-height:25px; white-space:pre-wrap; background:#eee;}
+#chartWrap .logWrap .logClosed {position:absolute; top:10px; right:10px; width:40px; height:40px;}
+#chartWrap .logWrap .logClosed:before {content:''; position:absolute; top:0; left:20px; width:1px; height:40px; border-left:1px solid #000; transform:rotate(45deg);}
+#chartWrap .logWrap .logClosed:after {content:''; position:absolute; top:0; left:20px; width:1px; height:40px; border-left:1px solid #000; transform:rotate(-45deg);}
 
 #pinWrap {position:fixed; top:0; right:-100%; z-index:999; width:100%; min-width:1600px; height:100%; min-height:700px; padding-top:20px; background:rgba(255,255,255,.8); transition:.5s;}
 #pinWrap.on {right:0;}
@@ -405,7 +484,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 .more {overflow:hidden; padding:25px 0; text-align:center;}
 .more a {position:relative; display:inline-block; height:36px; padding:0 50px 0 35px; color:#fff; font-size:18px; line-height:36px; background:#00a1a1;}
-.more a:after {content:''; position:absolute; top:9px; right:20px; width:12px; height:12px; border-bottom:1px solid #fff; border-right:1px solid #fff; transform: rotate(45deg);}
+.more a:after {content:''; position:absolute; top:9px; right:20px; width:12px; height:12px; border-bottom:1px solid #fff; border-right:1px solid #fff; transform:rotate(45deg);}
 
 /* BTN */
 .btnWrap {overflow:hidden; padding:35px 0;}
@@ -417,6 +496,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 /* BOARD SEARCH */
 .listSearch {overflow:hidden; width:80%; margin:0 auto;}
+.alarmPolicy .listSearch {position:absolute; right:30px; width:200px; margin-top:-47px;}
 .listSearch input[type=text],
 .listSearch select {width:100%; margin-bottom:10px;}
 .listSearch input[type=text]:disabled {width:100%; height:40px; padding:0; color:#222; font-size:18px; text-align:center; font-weight:300; line-height:40px; letter-spacing:1px; border:0; border-bottom:1px solid #222; background:transparent;}
@@ -439,10 +519,12 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .listBtns .receipt:before {content:''; position:absolute; top:23px; left:27px; width:2px; height:16px; border-left:2px solid #fff;}
 .listBtns .receipt:after {content:''; position:absolute; top:30px; left:20px; width:16px; height:2px; border-top:2px solid #fff;}
 .listBtns .search {width:100%;}
+.listBtns .print {width:100%;}
+.listBtns .excel {width:100%; margin-top:5px;}
 
 /* Bosh Chart */
 .boshChart {overflow:hidden; padding-bottom:40px;}
-.boshChart .list {overflow:hidden; display:flex; width:100%; flex-wrap: wrap; justify-content:center;}
+.boshChart .list {overflow:hidden; display:flex; width:100%; flex-wrap:wrap; justify-content:center;}
 .boshChart .list li {width:30%; height:250px; margin-left:2%; margin-top:40px;}
 .boshChart .list li:nth-child(3n+1) {margin-left:0;}
 .boshChart .list li h5 {height:30px; font-size:17px; font-weight:100; text-align:center; line-height:30px;}
@@ -491,10 +573,10 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .alarmPolicy h4 .slider {position:relative; float:right; width:480px; height:5px; margin-top:29px; margin-right:75px;}
 .alarmPolicy h4 .slider:after {content:''; position:absolute; left:0; top:0; z-index:1; overflow:hidden; width:496px; height:5px; background:#e9ecf1;}
 .alarmPolicy h4 .slider div {position:absolute; left:0; top:0; z-index:2; height:5px; background:#5e6983;}
-.alarmPolicy h4 .slider div:before {content:''; position:absolute; right:-13px; top:-23px; width:10px; height:10px; background:#5e6983; transform: rotate(45deg);}
+.alarmPolicy h4 .slider div:before {content:''; position:absolute; right:-13px; top:-23px; width:10px; height:10px; background:#5e6983; transform:rotate(45deg);}
 .alarmPolicy h4 .slider span {position:absolute; top:-42px; z-index:2; width:50px; height:24px; color:#fff; font-size:14px; line-height:24px;}
 .alarmPolicy h4 .slider span:before {content:''; position:absolute; top:0; left:-18px; z-index:-1; overflow:hidden; width:50px; height:24px; background:#5e6983; border-radius:7px;}
-.alarmPolicy h4 .slider span:after {content:''; position:absolute; top:36px; left:0; width:17px; height:17px;border:4px solid #40cecd; background:#fff; cursor:pointer; border-radius: 9px;}
+.alarmPolicy h4 .slider span:after {content:''; position:absolute; top:36px; left:0; width:17px; height:17px;border:4px solid #40cecd; background:#fff; cursor:pointer; border-radius:9px;}
 .alarmPolicy h4 .slider .min {position:absolute; left:-45px; top:-6px; font-size:16px; line-height:16px;}
 .alarmPolicy h4 .slider .max {position:absolute; right:-70px; top:-6px; font-size:16px; line-height:16px;}
 .alarmPolicy .alarmSetting {width:100%;}
@@ -520,7 +602,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .alarmPolicy input[type=range]::-webkit-slider-thumb {border:1px solid #f576c3; height:20px; width:20px; background:#ffffff; cursor:pointer; -webkit-appearance:none; border-radius:10px; margin-top:-5px;}
 
 .alarmPolicy input[type=range]::-moz-range-track {width:100%; height:5px; cursor:pointer; background:#ccc;}
-.alarmPolicy input[type=range]::-moz-range-thumb {border:1px solid #f576c3; height: 15px; width:10px; background:#ffffff; cursor:pointer;}
+.alarmPolicy input[type=range]::-moz-range-thumb {border:1px solid #f576c3; height:15px; width:10px; background:#ffffff; cursor:pointer;}
 
 .alarmPolicy input[type=range]::-ms-track {width:100%; height:5px; cursor:pointer; background:transparent; border-color:transparent; color:transparent;}
 .alarmPolicy input[type=range]::-ms-fill-lower {background:#ccc;}
@@ -534,10 +616,12 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .alarmStatistics .chart {width:100%; height:190px; margin-top:30px;}
 
 .push .snsBot {padding:30px 0;}
-.push .snsBot .snsWrap {margin-top:60px;}
+.push .snsBot .snsWrap {margin-top:40px;}
+.push .snsBot #snsList {margin-top:0px;}
 .push .snsBot p {margin-bottom:15px; font-size:15px; color:#ed1b59;}
 .push .snsBot .list {overflow:hidden;}
 .push .snsBot .list span {float:left; height:36px; font-size:22px; text-align:center; font-weight:100; line-height:34px;}
+.push .snsBot .list span:before {content:'# '; color:#ccc; font-size:24px; font-weight:400;}
 .push .snsBot .list em {float:right; height:36px; font-size:18px; color:#999; text-align:center; font-weight:100; line-height:34px;}
 .push .snsBot #snsList {display:none;}
 .push .snsBot #snsList button {width:100%; height:36px; margin-top:25px; color:#fff; font-size:14px; text-align:center; font-weight:100; line-height:34px; background:#db396e}
@@ -549,12 +633,12 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 
 .loginWrap {position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; background:#fff;}
-.loginWrap:after {content:''; position:absolute; top:-50%; left:-49%; z-index:1; width:100%; height:200%; background:#f6f7fc; border-radius:0 100% 100% 0; box-shadow: inset 0 0 30px rgba(0,0,0,.1);}
+.loginWrap:after {content:''; position:absolute; top:-50%; left:-49%; z-index:1; width:100%; height:200%; background:#f6f7fc; border-radius:0 100% 100% 0; box-shadow:inset 0 0 30px rgba(0,0,0,.1);}
 .loginWrap > div {position:absolute; top:50%; left:50%; z-index:2; overflow:hidden; width:300px; margin:-220px 0 0 -150px;}
 .loginWrap > div h1 {position:relative; padding-top:80px; color:#424f70; text-align:center;}
 .loginWrap > div h1:before {content:''; position:absolute; top:0; left:50%; width:70px; height:70px; margin-left:-35px; border:16px solid #fff; background:#f576c3; border-radius:100%; box-shadow:0 0 10px rgba(0,0,0,.1);}
 .loginWrap > div h1:after {content:''; position:absolute; top:22px; left:50%; width:26px; height:26px; margin-left:-13px; background:#fff; border-radius:100%;}
-.loginWrap > div p { margin-bottom:30px; color:#424f70; font-size:12px; text-align:center;}
+.loginWrap > div p {margin-bottom:30px; color:#424f70; font-size:12px; text-align:center;}
 .loginWrap > div fieldset {overflow:hidden;}
 .loginWrap > div fieldset div {margin-top:20px; text-align:center;}
 .loginWrap > div fieldset div:first-child {margin-top:0;}
@@ -566,18 +650,24 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .loginWrap > div fieldset div #loginBtn:hover {color:#f576c3;}
 .loginWrap > div fieldset div #join {color:#f576c3; font-size:14px; text-decoration:underline;}
 
-.loginWrap > div.join {width:800px; margin:-300px 0 0 -400px;}
-.loginWrap > div.join fieldset {float:left; overflow:visible; width:400px; padding:0 50px; text-align:center;}
+.loginWrap > div.join {width:1220px; margin:-300px 0 0 -610px; text-align:center;}
+.loginWrap > div.join fieldset {position:relative; display:inline-block; overflow:visible; width:300px; padding:0 50px; text-align:center;}
+.loginWrap > div.join fieldset.hide {display:none;}
+.loginWrap > div.join fieldset .uck {position:absolute; top:10px; left:60px; width:30px; height:30px;}
+.loginWrap > div.join fieldset .uck + label {position:absolute; top:10px; left:70px; width:30px; height:30px; border:0;}
+.loginWrap > div.join fieldset .uck + label:after {content:''; position:absolute; top:3px; left:10px; width:12px; height:20px; border-right:4px solid #ccc; border-bottom:4px solid #ccc; transform:rotate(45deg);}
+.loginWrap > div.join fieldset .uck:checked + label:after {border-right:4px solid #f576c3; border-bottom:4px solid #f576c3;}
+.loginWrap > div.join fieldset .uck:checked + label + h4 {color:#f576c3;}
 .loginWrap > div.join fieldset h4 {font-size:32px; font-weight:100; text-align:center;}
 .loginWrap > div.join fieldset .certif .idc {height:30px; margin:0 0 25px; color:#e91a61;}
 .loginWrap > div.join fieldset .certif .idc.on {color:#55c554;}
 .loginWrap > div.join fieldset .certification {width:150px; height:34px; margin:0 5px; color:#fff; font-size:14px; line-height:34px; background:#999; border-radius:17px; box-shadow:2px 2px 5px rgba(100,100,100,.2); transition:.5s;}
 .loginWrap > div.join fieldset .certification:hover {color:#666; background:#fff; border-radius:5px; box-shadow:2px 2px 5px rgba(100,100,100,.8);}
 .loginWrap > div.join fieldset .certification.off {opacity:.1;}
-.loginWrap > div.join > .btns {display:inline-block; width:100%; padding:35px 0 10px; text-align:center;}
-.loginWrap > div.join > .btns button {width:200px; height:50px; margin:0 95px; color:#666; font-size:18px; line-height:50px; background:#fff; border-radius:25px; box-shadow:2px 2px 5px rgba(100,100,100,.2); transition:.5s;}
-.loginWrap > div.join > .btns button:hover {border-radius:15px; box-shadow:2px 2px 5px rgba(100,100,100,.8);}
-.loginWrap > div.join > .btns button.save {color:#fff; background:#f576c3;}
+.loginWrap > div.join fieldset > .btns {display:inline-block; width:100%; padding:35px 0 10px; text-align:right;}
+.loginWrap > div.join fieldset > .btns button {float:left; width:95px; height:50px; color:#666; font-size:18px; line-height:50px; background:#fff; border-radius:25px; box-shadow:2px 2px 5px rgba(100,100,100,.2); transition:.5s;}
+.loginWrap > div.join fieldset > .btns button:hover {border-radius:15px; box-shadow:2px 2px 5px rgba(100,100,100,.8);}
+.loginWrap > div.join fieldset > .btns button.save {margin-left:10px; color:#fff; background:#f576c3;}
 
 .zoneWrap h4 span {float:left; height:60px; margin-right:25px;}
 .zoneWrap h4 select {float:right; margin-top:15px;}
@@ -607,6 +697,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #contents article.alarmWrap h4{border-bottom:0;}
 .alarmList {overflow:hidden;}
 .alarmList li {float:left; width:32%; margin-left:1%; margin-bottom:20px; border:1px solid #eee; cursor:pointer; transition:.5s;}
+.alarmList li.none {width:100%; height:300px; text-align:center; line-height:300px;}
 .alarmList li:nth-child(3n+1) {margin-left:0;}
 .alarmList li:hover {border:1px solid #000; box-shadow:2px 2px 5px rgba(0,0,0,.3);}
 .alarmList li h6 {position:relative; height:30px; color:#333;}
@@ -621,24 +712,28 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .alarmList li dl dt {position:relative; float:left; width:28%; height:26px; padding-left:43px; color:#999; font-size:13px; line-height:26px;}
 .alarmList li dl dd {float:left; overflow:hidden; width:70%; height:26px; color:#333; font-size:13px; line-height:26px; white-space:nowrap; text-overflow:ellipsis;}
 
+.alarmBox {margin-top:15px; text-align:center;}
+.alarmBox input {width:76%; text-align:center;}
+.alarmBox span {display:block; height:34px; padding:5px 0; color:#999; line-height:22px;}
+
 
 /********************************** loader ******************************************/
-#loadWrap { position:fixed; top:0; left:0; z-index:99999; width:100%; height:100%; background: rgba(0,0,0,.8); display: flex; justify-content: center; align-items: center; display:none;}
-#loadWrap .loader {display: inline-block; margin: 0 16px; width: 44px; height: 44px; position: relative;}
-#loadWrap .loader:before {content: ''; width: 6px; height: 6px; border-radius: 50%; position: absolute; display: block; background: #fff; top: 37px; left: 19px; transform: translate(-18px, -18px); animation: dotRect 3s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;}
-#loadWrap .loader svg {display: block; width: 100%; height: 100%;}
-#loadWrap .loader svg rect {fill: none; stroke: #fff; stroke-width: 10px; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 192 64 192 64; stroke-dashoffset: 0; animation: pathRect 3s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;}
+#loadWrap {position:fixed; top:0; left:0; z-index:99999; width:100%; height:100%; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; display:none;}
+#loadWrap .loader {display:inline-block; margin:0 16px; width:44px; height:44px; position:relative;}
+#loadWrap .loader:before {content:''; width:6px; height:6px; border-radius:50%; position:absolute; display:block; background:#fff; top:37px; left:19px; transform:translate(-18px, -18px); animation:dotRect 3s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;}
+#loadWrap .loader svg {display:block; width:100%; height:100%;}
+#loadWrap .loader svg rect {fill:none; stroke:#fff; stroke-width:10px; stroke-linejoin:round; stroke-linecap:round; stroke-dasharray:192 64 192 64; stroke-dashoffset:0; animation:pathRect 3s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;}
 
 @keyframes pathRect {
-    25% {stroke-dashoffset: 64;}
-    50% {stroke-dashoffset: 128;}
-    75% {stroke-dashoffset: 192;}
-    100% {stroke-dashoffset: 256;}
+    25% {stroke-dashoffset:64;}
+    50% {stroke-dashoffset:128;}
+    75% {stroke-dashoffset:192;}
+    100% {stroke-dashoffset:256;}
 }
 
 @keyframes dotRect {
-    25% {transform: translate(0, 0);}
-    50% {transform: translate(18px, -18px);}
-    75% {transform: translate(0, -36px);}
-    100% {transform: translate(-18px, -18px);}
+    25% {transform:translate(0, 0);}
+    50% {transform:translate(18px, -18px);}
+    75% {transform:translate(0, -36px);}
+    100% {transform:translate(-18px, -18px);}
 }

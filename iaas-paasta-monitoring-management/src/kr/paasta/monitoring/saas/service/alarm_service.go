@@ -2,13 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/tidwall/gjson"
-	"io/ioutil"
+	"github.com/jinzhu/gorm"
+	"github.com/thoas/go-funk"
 	"kr/paasta/monitoring/saas/dao"
 	"kr/paasta/monitoring/saas/model"
-	//"kr/paasta/monitoring/caas/util"
-	"log"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -22,100 +19,82 @@ type AlarmService struct {
 	promethusUrl      string
 	promethusRangeUrl string
 	k8sApiUrl         string
+	txn               *gorm.DB
 }
 
-func GetAlarmService() *AlarmService {
-	return &AlarmService{}
+func GetAlarmService(txn *gorm.DB) *AlarmService {
+	return &AlarmService{
+		txn: txn,
+	}
 }
 
-func (s *AlarmService) GetAlarmInfo() (model.ResultAlarmInfo, model.ErrMessage) {
-	var alramInfo []model.AlarmInfo
-	var resultAlarmInfo model.ResultAlarmInfo
-	var measuringTime int
+func (s *AlarmService) GetAlarmInfo() ([]model.AlarmPolicyResponse, model.ErrMessage) {
+	var alramInfo []model.AlarmPolicyResponse
 
-	dbAccessObj := dao.GetdbAccessObj()
+	//dbAccessObj := dao.GetdbAccessObj()
 
 	//alarm Info
-	alarmInfos, err := dao.GetBatchAlarmInfo(dbAccessObj)
+	alarmInfos, err := dao.GetBatchAlarmInfo(s.txn)
 	if err != nil {
 		fmt.Println(err)
-		return resultAlarmInfo, err
+		return nil, err
 	}
 
 	//Notification Info
-	alarmNotis, err1 := dao.GetBatchAlarmReceiver(dbAccessObj)
+	alarmNotis, err1 := dao.GetBatchAlarmReceiver(s.txn, "EMAIL")
 	if err1 != nil {
 		fmt.Println(err1)
-		return resultAlarmInfo, err1
+		return nil, err1
 	}
 
-	alramInfo = make([]model.AlarmInfo, len(alarmInfos))
+	alramInfo = make([]model.AlarmPolicyResponse, len(alarmInfos))
 
 	for idx, data := range alarmInfos {
 		delay := data.CronExpression
 		index := strings.Fields(delay)
-		alramInfo[idx].Name = data.MetricType
-		alramInfo[idx].Critical = data.CriticalValue
-		alramInfo[idx].Warning = data.WarningValue
-		alramInfo[idx].Delay = fmt.Sprintf("%s", strings.Replace(index[0], "*/", "", 1))
-		alramInfo[idx].AlarmId = data.AlarmId
-		measuringTime = data.MeasureTime
+		alramInfo[idx].Id = data.AlarmId
+		alramInfo[idx].OriginType = data.ServiceType
+		alramInfo[idx].AlarmType = data.MetricType
+		alramInfo[idx].WarningThreshold = data.WarningValue
+		alramInfo[idx].CriticalThreshold = data.CriticalValue
 
-		resultAlarmInfo.Result = alramInfo
+		repeatTime, _ := strconv.Atoi(fmt.Sprintf("%s", strings.Replace(index[0], "*/", "", 1)))
+
+		alramInfo[idx].RepeatTime = repeatTime
+		alramInfo[idx].Comment = ""
+		alramInfo[idx].MeasureTime = data.MeasureTime
+
+		if len(alarmNotis) > 0 {
+			alramInfo[idx].MailAddress = alarmNotis[0].TargetId
+			alramInfo[idx].MailSendYn = alarmNotis[0].UseYn
+		}
+
 	}
 
-	if len(alarmNotis) > 0 {
-		resultAlarmInfo.MeasuringTime = measuringTime
-		resultAlarmInfo.AlarmMail = alarmNotis[0].Email
-		resultAlarmInfo.AlarmTelegram = alarmNotis[0].SnsId
-		resultAlarmInfo.ReceiverID = alarmNotis[0].ReceiverId
-	}
-
-	return resultAlarmInfo, nil
+	return alramInfo, nil
 }
 
-func (s *AlarmService) GetAlarmUpdate(r *http.Request) {
-	dbAccessObj := dao.GetdbAccessObj()
+func (s *AlarmService) GetAlarmUpdate(request []model.AlarmPolicyRequest) model.ErrMessage {
+	//dbAccessObj := dao.GetdbAccessObj()
 
-	// 결과 출력
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Println(err)
-	}
-	str2 := string(data)
-
-	jsonString1 := gjson.Get(str2, "Threshold")
-	jsonString2 := gjson.Get(str2, "MeasuringTime")
-	jsonString3 := gjson.Get(str2, "AlarmMail")
-	jsonString4 := gjson.Get(str2, "AlarmTelegram")
-	jsonString5 := gjson.Get(str2, "ReceiverID")
-
-	temp := jsonString1.Array()
-	measuringTime, _ := strconv.Atoi(jsonString2.String())
-	alarmMail := jsonString3.String()
-	alarmTelegram := jsonString4.Int()
-	receiverID := jsonString5.String()
-
-	err1 := dao.InsertAlarmInfo(dbAccessObj, temp, measuringTime)
+	email := request[3].MailAddress
+	emailUseYn := request[3].MailSendYn
+	err1 := dao.InsertAlarmInfo(s.txn, request[:3], email, emailUseYn)
 
 	if err1 != nil {
-		fmt.Println(err)
+		fmt.Println(err1)
 	}
 
-	err2 := dao.InsertAlarmReceivers(dbAccessObj, receiverID, alarmMail, alarmTelegram)
-
-	if err2 != nil {
-		fmt.Println(err2)
-	}
+	return err1
 }
 
-func (s *AlarmService) GetAlarmLog() ([]model.AlarmLog, model.ErrMessage) {
+func (s *AlarmService) GetAlarmLog(searchDateFrom string, searchDateTo string, alarmType string, alarmStatus string, resolveStatus string) ([]model.AlarmLog, model.ErrMessage) {
 	var alarmLog []model.AlarmLog
 
-	dbAccessObj := dao.GetdbAccessObj()
+	//dbAccessObj := dao.GetdbAccessObj()
 
 	//alarm Info
-	alarmLogs, err := dao.GetBatchAlarmLog(dbAccessObj)
+	alarmLogs, err := dao.GetBatchAlarmLog(s.txn, searchDateFrom, searchDateTo, alarmType, alarmStatus, resolveStatus)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -124,11 +103,140 @@ func (s *AlarmService) GetAlarmLog() ([]model.AlarmLog, model.ErrMessage) {
 	alarmLog = make([]model.AlarmLog, len(alarmLogs))
 
 	for idx, data := range alarmLogs {
+		alarmLog[idx].Id = data.ExcutionId
 		alarmLog[idx].Issue = data.ExecutionResult
 		alarmLog[idx].Application = data.MeasureName1
 		alarmLog[idx].Status = data.CriticalStatus
-		alarmLog[idx].Time = data.ExecutionTime
+		alarmLog[idx].ResolveStatus = data.ResolveStatus
+
+		if data.ResolveStatus == "1" {
+			alarmLog[idx].ResolveStatusName = "Alarm 발생"
+		} else if data.ResolveStatus == "2" {
+			alarmLog[idx].ResolveStatusName = "Alarm 처리중"
+		} else if data.ResolveStatus == "3" {
+			alarmLog[idx].ResolveStatusName = "Alarm 처리완료"
+		}
+
+		alarmLog[idx].RegDate = data.ExecutionTime.Format("2006-01-02 15:04:05")
+		if funk.IsZero(data.CompleteDate) {
+			alarmLog[idx].CompleteDate = ""
+		} else {
+			alarmLog[idx].CompleteDate = data.CompleteDate.Format("2006-01-02 15:04:05")
+		}
+
+		alarmResolves, err := dao.GetBatchAlarmResolve(s.txn, data.ExcutionId)
+		if err == nil {
+			alarmLog[idx].Data = alarmResolves
+		}
 	}
 
 	return alarmLog, nil
+}
+
+func (s *AlarmService) GetSnsInfo() (interface{}, interface{}) {
+	var alarmSns model.BatchAlarmSnsRequest
+
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	alarmSns, err := dao.GetSnsInfo(s.txn)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	//// list convert map
+	//for _, alarmConfig := range alarmConfigs {
+	//	alarmConfigMap[alarmConfig.ConfigId] = alarmConfig.ConfigValue
+	//}
+	return alarmSns, nil
+}
+
+func (s *AlarmService) GetAlarmCount() (model.AlarmCount, interface{}) {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	var alarmCount model.AlarmCount
+	alarmCount, err := dao.GetAlarmCount(s.txn)
+
+	if err != nil {
+		fmt.Println(err)
+		return alarmCount, err
+	}
+
+	return alarmCount, nil
+}
+
+func (s *AlarmService) GetlarmSnsSave(alarmSns model.BatchAlarmSnsRequest) interface{} {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	err := dao.GetAlarmSnsSave(s.txn, alarmSns)
+	return err
+}
+
+func (s *AlarmService) UpdateAlarmSate(request model.AlarmrRsolveRequest) interface{} {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	err := dao.UpdateAlarmSate(s.txn, request)
+	return err
+}
+
+func (s *AlarmService) CreateAlarmResolve(request model.AlarmrRsolveRequest) interface{} {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	err := dao.CreateAlarmResolve(s.txn, request)
+	return err
+}
+
+func (s *AlarmService) UpdateAlarmResolve(request model.AlarmrRsolveRequest) interface{} {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	err := dao.UpdateAlarmResolve(s.txn, request)
+	return err
+}
+
+func (s *AlarmService) DeleteAlarmResolve(id uint64) interface{} {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	err := dao.DeleteAlarmResolve(s.txn, id)
+	return err
+
+}
+
+func (s *AlarmService) GetAlarmSnsReceiver() ([]model.BatchAlarmReceiver, interface{}) {
+	var alarmReceiver []model.BatchAlarmReceiver
+	//dbAccessObj := dao.GetdbAccessObj()
+	alarmReceiver, err := dao.GetBatchAlarmReceiver(s.txn, "SNS")
+
+	if err != nil {
+		return nil, err
+	}
+	return alarmReceiver, err
+}
+
+func (s *AlarmService) DeleteAlarmSnsChannel(id int) interface{} {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	err := dao.DeleteAlarmSnsChannel(s.txn, id)
+	return err
+}
+
+func (s *AlarmService) GetAlarmActionList(id int) ([]model.AlarmActionResponse, model.ErrMessage) {
+	//dbAccessObj := dao.GetdbAccessObj()
+
+	alarmResolves, err := dao.GetBatchAlarmResolve(s.txn, uint64(id))
+
+	alarmActionResponses := make([]model.AlarmActionResponse, len(alarmResolves))
+
+	for index, action := range alarmResolves {
+		alarmActionResponses[index].AlarmId = uint64(id)
+		alarmActionResponses[index].ResolveId = action.ResolveId
+		alarmActionResponses[index].AlarmActionDesc = action.AlarmActionDesc
+		alarmActionResponses[index].RegDate = action.RegDate
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return alarmActionResponses, nil
 }

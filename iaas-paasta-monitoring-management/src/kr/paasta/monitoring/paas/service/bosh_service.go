@@ -32,6 +32,7 @@ func GetBoshStatusService(txn *gorm.DB, influxClient client.Client, databases mo
 func (n BoshStatusService) GetBoshStatusOverview(request model.BoshSummaryReq) (model.BoshOverviewCntRes, model.ErrMessage) {
 	boshSummary, err := GetBoshStatusService(n.txn, n.influxClient, n.databases).getBoshStatus(request)
 	if err != nil {
+		//log.Println(err)
 		logger.Error(err)
 	}
 
@@ -41,6 +42,7 @@ func (n BoshStatusService) GetBoshStatusOverview(request model.BoshSummaryReq) (
 func (n BoshStatusService) GetBoshStatusSummary(request model.BoshSummaryReq) (res model.BoshStatusOverviewRes, err model.ErrMessage) {
 	boshSummary, err := GetBoshStatusService(n.txn, n.influxClient, n.databases).getBoshStatus(request)
 	if err != nil {
+		//log.Println(err)
 		logger.Error(err)
 	}
 

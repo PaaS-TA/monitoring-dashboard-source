@@ -88,8 +88,8 @@ type (
 	}
 
 	WorkloadsContiSummary struct {
-		Name string `json:"Name"`
-		//		Cpu         string `json:"Cpu"`
+		Name        string `json:"Name"`
+		Cpu         string `json:"Cpu"`
 		Memory      string `json:"Memory"`
 		Disk        string `json:"Disk"`
 		CpuUsage    string `json:"CpuUsage"`
@@ -108,6 +108,7 @@ type (
 
 	PodMetricList struct {
 		PodName     string `json:"PodName"`
+		NameSpace   string `json:"NameSpace"`
 		Cpu         string `json:"Cpu"`
 		Memory      string `json:"Memory"`
 		Disk        string `json:"Disk"`

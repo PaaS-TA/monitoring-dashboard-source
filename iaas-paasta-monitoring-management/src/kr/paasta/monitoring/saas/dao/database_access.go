@@ -3,7 +3,6 @@ package dao
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"github.com/tidwall/gjson"
 	"kr/paasta/monitoring/saas/model"
 	"kr/paasta/monitoring/saas/util"
 	"strconv"
@@ -36,23 +35,33 @@ func init() {
 	port := config["paas.monitoring.db.port"]
 
 	connectionString = fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s", userName, userPassword, "tcp", host, port, dbName, "")
-}
 
-func GetdbAccessObj() *gorm.DB {
 	dbAccessObj, paasDbErr := gorm.Open(dbType, connectionString+"?charset=utf8&parseTime=true")
 	if paasDbErr != nil {
 		fmt.Println("err::", paasDbErr)
-		return nil
 	}
-	return dbAccessObj
+	CreateTable(dbAccessObj)
 }
 
+//func GetdbAccessObj() *gorm.DB {
+//	dbAccessObj, paasDbErr := gorm.Open(dbType, connectionString+"?charset=utf8&parseTime=true")
+//	if paasDbErr != nil {
+//		fmt.Println("err::", paasDbErr)
+//		return nil
+//	}
+//	return dbAccessObj
+//}
+
 func CreateTable(dbClient *gorm.DB) {
-	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{})
+	//defer dbClient.Close()
+
+	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{}, &model.BatchAlarmSns{}, &model.BatchAlarmExecutionResolve{})
 }
 
 // Alarm Info
 func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMessage) {
+	//defer dbClient.Close()
+
 	var alarmInfos []model.BatchAlarmInfo
 	//status := dbClient.Debug().Find(&alarmInfos)
 	status := dbClient.Debug().Table("batch_alarm_infos").Where("service_type = 'SaaS'").Find(&alarmInfos)
@@ -66,10 +75,12 @@ func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMess
 }
 
 //// 알람 수신자 조회
-func GetBatchAlarmReceiver(dbClient *gorm.DB) ([]model.BatchAlarmReceiver, model.ErrMessage) {
+func GetBatchAlarmReceiver(dbClient *gorm.DB, receiveType string) ([]model.BatchAlarmReceiver, model.ErrMessage) {
+	//defer dbClient.Close()
+
 	var alarmReceiver []model.BatchAlarmReceiver
 
-	status := dbClient.Debug().Table("batch_alarm_receivers").Where("service_type = 'SaaS'").Find(&alarmReceiver)
+	status := dbClient.Debug().Table("batch_alarm_receivers").Where("service_type = 'SaaS' AND receive_type = '" + receiveType + "'").Find(&alarmReceiver)
 
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -80,9 +91,29 @@ func GetBatchAlarmReceiver(dbClient *gorm.DB) ([]model.BatchAlarmReceiver, model
 }
 
 //// 알람 수신자 조회
-func GetBatchAlarmLog(dbClient *gorm.DB) ([]model.BatchAlarmExecution, model.ErrMessage) {
+func GetBatchAlarmLog(dbClient *gorm.DB, searchDateFrom string, searchDateTo string, alarmType string, alarmStatus string, resolveStatus string) ([]model.BatchAlarmExecution, model.ErrMessage) {
+	//defer dbClient.Close()
+
+	var queryWhere string
+	queryWhere = ""
+
+	if len(searchDateFrom) > 0 && len(searchDateTo) > 0 {
+		queryWhere += " AND execution_time BETWEEN '" + searchDateFrom + " 00:00:00' AND '" + searchDateTo + " 23:59:59' "
+	}
+
+	if len(alarmType) > 0 {
+		queryWhere += " AND execution_result LIKE '%" + alarmType + "%' "
+	}
+
+	if len(alarmStatus) > 0 {
+		queryWhere += " AND critical_status = '" + alarmStatus + "' "
+	}
+	if len(resolveStatus) > 0 {
+		queryWhere += " AND resolve_status = '" + resolveStatus + "' "
+	}
+
 	var alarmLog []model.BatchAlarmExecution
-	status := dbClient.Debug().Table("batch_alarm_executions").Where("service_type = 'SaaS' and critical_status <> 'Success' ").Find(&alarmLog)
+	status := dbClient.Debug().Table("batch_alarm_executions").Where("service_type = 'SaaS' and critical_status <> 'Success' " + queryWhere).Find(&alarmLog)
 
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -92,70 +123,207 @@ func GetBatchAlarmLog(dbClient *gorm.DB) ([]model.BatchAlarmExecution, model.Err
 	return alarmLog, nil
 }
 
-func InsertAlarmInfo(dbClient *gorm.DB, udateData []gjson.Result, timeData int) model.ErrMessage {
+func GetBatchAlarmResolve(dbClient *gorm.DB, id uint64) ([]model.AlarmrRsolveResponse, model.ErrMessage) {
+	//defer dbClient.Close()
+
+	var alarmRsolves []model.AlarmrRsolveResponse
+	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Select(" resolve_id , alarm_action_desc,  reg_date").Where("excution_id = " + strconv.Itoa(int(id))).Find(&alarmRsolves)
+
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		return nil, err
+	}
+
+	return alarmRsolves, nil
+}
+
+func InsertAlarmInfo(dbClient *gorm.DB, request []model.AlarmPolicyRequest, email string, emailUseYn string) model.ErrMessage {
+	//defer dbClient.Close()
+
 	var err model.ErrMessage
 
+	tx := dbClient.Begin().Debug()
 	// Delete And Insert
-	status := dbClient.Debug().Where("service_type = 'SaaS'").Delete(model.BatchAlarmInfo{})
-
-	for _, data := range udateData {
+	status := tx.Where("service_type = 'SaaS'").Delete(model.BatchAlarmInfo{})
+	for _, data := range request {
 		batchAlarmInfo := model.BatchAlarmInfo{}
-		tempMap := data.Map()
-		tempWaring, _ := strconv.Atoi(tempMap["Warning"].String())
-		tempCritical, _ := strconv.Atoi(tempMap["Critical"].String())
+		repeatTime := strconv.Itoa(data.RepeatTime)
+		batchAlarmInfo.ServiceType = data.OriginType
+		batchAlarmInfo.MetricType = data.AlarmType
+		batchAlarmInfo.WarningValue = data.WarningThreshold
+		batchAlarmInfo.CriticalValue = data.CriticalThreshold
+		batchAlarmInfo.MeasureTime = data.MeasureTime
+		batchAlarmInfo.CronExpression = "*/" + repeatTime + " * * * *"
 
-		cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
-		batchAlarmInfo.ServiceType = "SaaS"
-		batchAlarmInfo.MetricType = tempMap["Name"].String()
-		batchAlarmInfo.WarningValue = tempWaring
-		batchAlarmInfo.CriticalValue = tempCritical
-		batchAlarmInfo.MeasureTime = timeData
-		batchAlarmInfo.CronExpression = cronExpression
-
-		if tempMap["Name"].String() == "SYSTEM_CPU" {
+		if data.AlarmType == "SYSTEM_CPU" {
 			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} System CPU 현재사용률 (${Currend_value}%)"
 			batchAlarmInfo.ParamData1 = "/getAgentStat/cpuLoad/chart.pinpoint"
 			batchAlarmInfo.ParamData2 = "charts.y.CPU_LOAD_SYSTEM.#.2"
 			batchAlarmInfo.ParamData3 = ""
 		}
 
-		if tempMap["Name"].String() == "JVM_CPU" {
+		if data.AlarmType == "JVM_CPU" {
 			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} JVM CPU 현재사용률 (${Currend_value}%)"
 			batchAlarmInfo.ParamData1 = "/getAgentStat/cpuLoad/chart.pinpoint"
 			batchAlarmInfo.ParamData2 = "charts.y.CPU_LOAD_JVM.#.2"
 			batchAlarmInfo.ParamData3 = ""
 		}
 
-		if tempMap["Name"].String() == "HEAP_MEMORY" {
+		if data.AlarmType == "HEAP_MEMORY" {
 			batchAlarmInfo.ExecMsg = "SaaS Application : ${AppName} Heap Memory 현재사용률 (${Currend_value}%)"
 			batchAlarmInfo.ParamData1 = "/getAgentStat/jvmGc/chart.pinpoint"
 			batchAlarmInfo.ParamData2 = "charts.y.JVM_MEMORY_HEAP_USED.#.2"
 			batchAlarmInfo.ParamData3 = "charts.y.JVM_MEMORY_HEAP_MAX.#.2"
 		}
 
-		status = dbClient.Debug().Create(&batchAlarmInfo)
+		status = tx.Create(&batchAlarmInfo)
 		err = util.GetError().DbCheckError(status.Error)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
 
+	// Email Receiver 지정
+	alarmReceiver := model.BatchAlarmReceiver{
+		ServiceType: "SaaS",
+		ReceiveType: "EMAIL",
+		TargetId:    email,
+		UseYn:       emailUseYn,
+	}
+
+	status = tx.Where("service_type = 'SaaS' AND receive_type = 'EMAIL'").Delete(model.BatchAlarmReceiver{})
+	err = util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	status = tx.Create(&alarmReceiver)
+	err = util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return err
+}
+
+func GetSnsInfo(dbClient *gorm.DB) (model.BatchAlarmSnsRequest, model.ErrMessage) {
+	//defer dbClient.Close()
+
+	var alarmSns model.BatchAlarmSnsRequest
+	status := dbClient.Debug().Table("batch_alarm_sns").Where("origin_type = 'SaaS'").Find(&alarmSns)
+
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		return model.BatchAlarmSnsRequest{}, err
+	}
+
+	return alarmSns, nil
+}
+
+func GetAlarmCount(dbClient *gorm.DB) (model.AlarmCount, model.ErrMessage) {
+	//defer dbClient.Close()
+
+	var alarmCnt int
+	status := dbClient.Debug().Table("batch_alarm_executions").Where("critical_status != 'Success' and service_type = 'SaaS'").Count(&alarmCnt)
+
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		return model.AlarmCount{}, err
+	}
+
+	alarmCount := model.AlarmCount{AlarmCnt: alarmCnt}
+
+	return alarmCount, nil
+}
+
+func GetAlarmSnsSave(dbClient *gorm.DB, alarmSns model.BatchAlarmSnsRequest) model.ErrMessage {
+	//defer dbClient.Close()
+
+	status := dbClient.Debug().Table("batch_alarm_sns").
+		Set("gorm:insert_option", "on duplicate key update modi_date = now(), modi_user = 'system', sns_id = '"+alarmSns.SnsId+"' , token = '"+alarmSns.Token+"', expl = '"+alarmSns.Expl+"' , sns_send_yn = '"+alarmSns.SnsSendYn+"'").Create(&alarmSns)
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		fmt.Printf("error : %v\n", err)
+		return err
 	}
 	return err
 }
 
-func InsertAlarmReceivers(dbClient *gorm.DB, receiverId string, emailData string, snsId int64) model.ErrMessage {
-	var err model.ErrMessage
-	batchAlarmReceiver := model.BatchAlarmReceiver{}
-	// Delete And Insert
-	status := dbClient.Debug().Where("service_type = 'SaaS'").Delete(model.BatchAlarmReceiver{})
-	err = util.GetError().DbCheckError(status.Error)
+func UpdateAlarmSate(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model.ErrMessage {
+	//defer dbClient.Close()
 
-	//batchAlarmReceiver.ReceiverId	= ""  autoincrement
-	batchAlarmReceiver.ServiceType = "SaaS"
-	batchAlarmReceiver.Name = "Admin"
-	batchAlarmReceiver.Email = emailData
-	batchAlarmReceiver.SnsId = snsId
-	batchAlarmReceiver.UseYn = "Y"
+	var status *gorm.DB
+	if request.ResolveStatus == "3" {
+		status = dbClient.Debug().Table("batch_alarm_executions").Where("excution_id = ? ", request.Id).
+			Updates(map[string]interface{}{"complete_date": util.GetDBCurrentTime(), "resolve_status": request.ResolveStatus})
+	} else {
+		status = dbClient.Debug().Table("batch_alarm_executions").Where("excution_id = ? ", request.Id).
+			Updates(map[string]interface{}{"resolve_status": request.ResolveStatus})
+	}
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		fmt.Printf("error : %v\n", err)
+	}
 
-	status = dbClient.Debug().Create(&batchAlarmReceiver)
-	err = util.GetError().DbCheckError(status.Error)
+	return err
+}
 
+func CreateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model.ErrMessage {
+	//defer dbClient.Close()
+
+	var alarmExecutionResolve model.BatchAlarmExecutionResolve
+	alarmExecutionResolve.ExcutionId = request.Id
+	alarmExecutionResolve.AlarmActionDesc = request.AlarmActionDesc
+	alarmExecutionResolve.RegDate = util.GetDBCurrentTime()
+
+	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Create(&alarmExecutionResolve)
+
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		fmt.Printf("error : %v\n", err)
+	}
+	return err
+}
+
+func UpdateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model.ErrMessage {
+	//defer dbClient.Close()
+
+	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Where("resolve_id = ? ", request.Id).
+		Updates(map[string]interface{}{"alarm_action_desc": request.AlarmActionDesc})
+
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		fmt.Printf("error : %v\n", err)
+	}
+	return err
+}
+
+func DeleteAlarmResolve(dbClient *gorm.DB, id uint64) model.ErrMessage {
+	//defer dbClient.Close()
+
+	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Where("resolve_id = " + strconv.Itoa(int(id))).Delete(model.BatchAlarmExecutionResolve{})
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		fmt.Printf("error : %v\n", err)
+	}
+	return err
+}
+
+func DeleteAlarmSnsChannel(dbClient *gorm.DB, id int) model.ErrMessage {
+	//defer dbClient.Close()
+
+	alarmSns := model.BatchAlarmSns{
+		ChannelId: id,
+	}
+	status := dbClient.Debug().Delete(&alarmSns)
+
+	err := util.GetError().DbCheckError(status.Error)
+	if err != nil {
+		fmt.Printf("error : %v\n", err)
+	}
 	return err
 }

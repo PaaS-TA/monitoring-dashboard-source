@@ -1,28 +1,29 @@
 package controller
 
 import (
-	"net/http"
+	"encoding/json"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"io/ioutil"
+	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/service"
 	"kr/paasta/monitoring/paas/util"
-	"encoding/json"
-	"kr/paasta/monitoring/paas/model"
-	"fmt"
+	"net/http"
 	"strconv"
 )
 
 type AlarmPolicyService struct {
-	txn   *gorm.DB
+	txn *gorm.DB
 }
 
 func GetAlarmPolicyController(txn *gorm.DB) *AlarmPolicyService {
 	return &AlarmPolicyService{
-		txn:   txn,
+		txn: txn,
 	}
 }
 
 // Alarm 정책 조회
-func (h *AlarmPolicyService) GetAlarmPolicyList(w http.ResponseWriter, r *http.Request){
+func (h *AlarmPolicyService) GetAlarmPolicyList(w http.ResponseWriter, r *http.Request) {
 
 	alarmPolicyList, err := service.GetAlarmPolicyService(h.txn).GetAlarmPolicyList()
 
@@ -34,12 +35,19 @@ func (h *AlarmPolicyService) GetAlarmPolicyList(w http.ResponseWriter, r *http.R
 }
 
 // Alarm정책 Update
-func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *http.Request){
-
+func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *http.Request) {
 	var apiRequest []model.AlarmPolicyRequest
+	data, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 
-	json.NewDecoder(r.Body).Decode(&apiRequest)
-    i:=0
+	err := json.Unmarshal(data, &apiRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	i := 0
 	for _, data := range apiRequest {
 		if i < 3 {
 			err := data.AlarmPolicyValidate(data)
@@ -50,17 +58,17 @@ func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *htt
 			}
 		} else {
 			err := data.AlarmEmailValidate(data)
-			if err != nil{
+			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte(err.Error()))
 				return
 			}
 		}
-       	i++
+		i++
 	}
 
-	err := service.GetAlarmPolicyService(h.txn).UpdateAlarmPolicyList(apiRequest)
-	if err != nil {
+	error := service.GetAlarmPolicyService(h.txn).UpdateAlarmPolicyList(apiRequest)
+	if error != nil {
 		util.RenderJsonResponse(err, w)
 	}
 
@@ -71,7 +79,7 @@ func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *htt
 	return
 }
 
-func (h *AlarmPolicyService) GetAlarmSnsChannelList(w http.ResponseWriter, r *http.Request){
+func (h *AlarmPolicyService) GetAlarmSnsChannelList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmPolicyRequest
 	apiRequest.SnsType = r.URL.Query().Get("snsType")

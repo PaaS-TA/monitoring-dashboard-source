@@ -112,6 +112,7 @@ func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConf
 					rdresult := RdClient.Get(reqCsrfToken)
 
 					if rdresult.Val() == "" {
+						fmt.Println("redis check")
 						RdClient.HSet(reqCsrfToken, "paasUserId", cfConfig.UserId)
 						RdClient.HSet(reqCsrfToken, "paasToken", uaaToken.Token)
 						RdClient.HSet(reqCsrfToken, "paasAdminYn", 'Y')

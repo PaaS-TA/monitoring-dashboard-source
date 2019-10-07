@@ -14,11 +14,25 @@
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="bosh.html" class="on"><span>A</span></a></li>
+						<li><a href="index.html" class="on">A<span>pplication</span></a></li>
+						<li>
+							<a href="alarm_policy.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+							</ul>
+						</li>
 					</ul>
 				</nav>
 				<!-- // Navigation -->
@@ -31,12 +45,14 @@
 				<div class="contentsLeft">
 					<!-- Overview -->
 					<fieldset class="statusSearch">
+						<!--
 						<h4>Sort List</h4>
 						<div class="listSearch">
 							<button class="date" data-sort="c">CPU</button>
 							<button class="date" data-sort="m">Memory</button>
 							<button class="date" data-sort="d">Disk</button>
 						</div>
+						-->
 						<h4>Search List</h4>
 						<div class="listSearch">
 							<!--
@@ -182,21 +198,21 @@
 		<script type="text/javascript">
 			window.onload = () => {
 				const saas = {
-					id : '',
+					url : '',
 					data : [],
-					sortData : 'jvmCpuRate',
 					reload : true,
 
 					init() {
 						// Alarm Count
-						//fnComm.alarmCount();
+					fnComm.alarmCount('saas');
 						
 						// SaaS Application 목록
-						fnComm.loadData('GET', ssRoot.url + 'saas/app/application/list', saas.applicationList);
+						fnComm.loadData('GET', `${fnComm.url}saas/app/application/list`, saas.applicationList);
 					},
 					
 					applicationList(data) {
-						saas.data = data;
+						saas.url = data.pinpointUrl;
+						saas.data = data.data;
 						console.log(saas.data);
 						//////////////////////////////////////////////////////////////////////
 						// Application List : 리스트
@@ -215,16 +231,16 @@
 						
 						fnComm.removeHtml(target);
 	
-						data.forEach((value)=>{
+						saas.data.forEach((value)=>{
 							var html = `<tr>
-											<td><a href="javascript:void(0);" class="link" data-id="${value.appName}@${value.serviceType}">${value.appName}</a></td>
-											<td>${value.haepMemory}</td>
-											<td>${value.noneHeapMemory}</td>
-											<td>${value.jvmCpuRate}</td>
-											<td>${value.systemCpuRate}</td>
-											<td>${value.activeThread}</td>
-											<td>${value.responseTime}</td>
-										</tr>`;
+								<td><a href="javascript:void(0);" class="link" data-id="${value.appName}@${value.serviceType}">${value.appName}</a></td>
+								<td>${value.haepMemory}</td>
+								<td>${value.noneHeapMemory}</td>
+								<td>${value.jvmCpuRate}</td>
+								<td>${value.systemCpuRate}</td>
+								<td>${value.activeThread}</td>
+								<td>${value.responseTime}</td>
+							</tr>`;
 							
 							fnComm.appendHtml(target, html, 'tbody');
 						});
@@ -243,7 +259,7 @@
 						if(saas.reload){
 							// SaaS Application 목록 검색 조회
 							document.querySelector('.search').addEventListener('click', (e) => {
-								fnComm.loadData('GET', ssRoot.url + `saas/app/application/list?appName=${document.querySelector('.searchTxt').value}`, saas.applicationList);
+								fnComm.loadData('GET', `${fnComm.url}saas/app/application/list?appName=${document.querySelector('.searchTxt').value}`, saas.applicationList);
 							}, false);
 
 								
@@ -265,7 +281,7 @@
 					},
 
 					pinPoint(elmID) {
-						document.getElementById('pinFrame').setAttribute('src', `http://13.125.236.133:8079/#/main/${elmID}/5m/${saas.toDayTime()}`);
+						document.getElementById('pinFrame').setAttribute('src', `${saas.url}/#/main/${elmID}/5m/${saas.toDayTime()}`);
 
 						document.getElementById('pinWrap').classList.toggle('on', true);
 					},
@@ -280,7 +296,7 @@
 						var minutes = '00'+today.getMinutes();
 						var seconds = '00'+today.getSeconds();
 
-						return year +'-'+ month.substring(month.length-2) +'-'+ day.substring(day.length-2) +'-'+ hours.substring(hours.length-2) +'-'+ minutes.substring(minutes.length-2) +'-'+ seconds.substring(seconds.length-2);
+						return `${year}-${month.substring(month.length-2)}-${day.substring(day.length-2)}-${hours.substring(hours.length-2)}-${minutes.substring(minutes.length-2)}-${seconds.substring(seconds.length-2)}`;
 					},
 				}
 	

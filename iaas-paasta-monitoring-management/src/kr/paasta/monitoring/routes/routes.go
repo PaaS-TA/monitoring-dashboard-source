@@ -179,9 +179,19 @@ const (
 	SAAS_API_APPLICATION_STATUS = "SAAS_API_APPLICATION_STATUS"
 	SAAS_API_APPLICATION_GAUGE  = "SAAS_API_APPLICATION_GAUGE"
 
-	SAAS_ALARM_INFO   = "SAAS_ALARM_INFO"
-	SAAS_ALARM_UPDATE = "SAAS_ALARM_UPDATE"
-	SAAS_ALARM_LOG    = "SAAS_ALARM_LOG"
+	SAAS_ALARM_INFO               = "SAAS_ALARM_INFO"
+	SAAS_ALARM_SNS_INFO           = "SAAS_ALARM_SNS_INFO"
+	SAAS_ALARM_UPDATE             = "SAAS_ALARM_UPDATE"
+	SAAS_ALARM_LOG                = "SAAS_ALARM_LOG"
+	SAAS_ALARM_COUNT              = "SAAS_ALARM_COUNT"
+	SAAS_ALARM_SNS_SAVE           = "SAAS_ALARM_SNS_SAVE"
+	SAAS_ALARM_STATUS_UPDATE      = "SAAS_ALARM_STATUS_UPDATE"
+	SAAS_ALARM_ACTION             = "SAAS_ALARM_ACTION"
+	SAAS_ALARM_ACTION_DELETE      = "SAAS_ALARM_ACTION_DELETE"
+	SAAS_ALARM_ACTION_UPDATE      = "SAAS_ALARM_ACTION_UPDATE"
+	SAAS_ALARM_SNS_CHANNEL_LIST   = "SAAS_ALARM_SNS_CHANNEL_LIST"
+	SAAS_ALARM_SNS_CHANNEL_DELETE = "SAAS_ALARM_SNS_CHANNEL_DELETE"
+	SAAS_ALARM_ACTION_LIST        = "SAAS_ALARM_ACTION_LIST"
 
 	// CAAS_API
 	CAAS_K8S_CLUSTER_AVG = "CAAS_K8S_CLUSTER_AVG"
@@ -201,18 +211,26 @@ const (
 	CAAS_POD_LIST                = "CAAS_POD_LIST"
 	CAAS_POD_INFO                = "CAAS_POD_INFO"
 
-	CAAS_WORK_NODE_GRAPH = "CAAS_WORK_NODE_GRAPH"
-	CAAS_WORKLOADS_GRAPH = "CAAS_WORKLOADS_GRAPH"
-	CAAS_POD_GRAPH       = "CAAS_POD_GRAPH"
-	CAAS_CONTIANER_GRAPH = "CAAS_CONTIANER_GRAPH"
-
-	CAAS_WORK_NODE_AVG = "CAAS_WORK_NODE_AVG"
-
-	CAAS_ALARM_INFO   = "CAAS_ALARM_INFO"
-	CAAS_ALARM_UPDATE = "CAAS_ALARM_UPDATE"
-	CAAS_ALARM_LOG    = "CAAS_ALARM_LOG"
-
+	CAAS_WORK_NODE_GRAPH     = "CAAS_WORK_NODE_GRAPH"
+	CAAS_WORKLOADS_GRAPH     = "CAAS_WORKLOADS_GRAPH"
+	CAAS_POD_GRAPH           = "CAAS_POD_GRAPH"
+	CAAS_CONTIANER_GRAPH     = "CAAS_CONTIANER_GRAPH"
+	CAAS_WORK_NODE_AVG       = "CAAS_WORK_NODE_AVG"
 	CAAS_WORK_NODE_GRAPHLIST = "CAAS_WORK_NODE_GRAPHLIST"
+
+	CAAS_ALARM_INFO               = "CAAS_ALARM_INFO"
+	CAAS_ALARM_SNS_INFO           = "CAAS_ALARM_SNS_INFO"
+	CAAS_ALARM_UPDATE             = "CAAS_ALARM_UPDATE"
+	CAAS_ALARM_LOG                = "CAAS_ALARM_LOG"
+	CAAS_ALARM_COUNT              = "CAAS_ALARM_COUNT"
+	CAAS_ALARM_SNS_SAVE           = "CAAS_ALARM_SNS_SAVE"
+	CAAS_ALARM_STATUS_UPDATE      = "CAAS_ALARM_STATUS_UPDATE"
+	CAAS_ALARM_ACTION             = "CAAS_ALARM_ACTION"
+	CAAS_ALARM_ACTION_DELETE      = "CAAS_ALARM_ACTION_DELETE"
+	CAAS_ALARM_ACTION_UPDATE      = "CAAS_ALARM_ACTION_UPDATE"
+	CAAS_ALARM_SNS_CHANNEL_LIST   = "CAAS_ALARM_SNS_CHANNEL_LIST"
+	CAAS_ALARM_SNS_CHANNEL_DELETE = "CAAS_ALARM_SNS_CHANNEL_DELETE"
+	CAAS_ALARM_ACTION_LIST        = "CAAS_ALARM_ACTION_LIST"
 
 	// Web Resource
 	Main   = "Main"
@@ -427,20 +445,44 @@ var CaasRoutes = rata.Routes{
 	{Path: "/v2/caas/monitoring/podList", Method: "GET", Name: CAAS_POD_LIST},
 	{Path: "/v2/caas/monitoring/podInfo", Method: "GET", Name: CAAS_POD_INFO},
 	{Path: "/v2/caas/monitoring/workerNodeGraph", Method: "GET", Name: CAAS_WORK_NODE_GRAPH},
+	{Path: "/v2/caas/monitoring/workerNodeGraphList", Method: "GET", Name: CAAS_WORK_NODE_GRAPHLIST},
 	{Path: "/v2/caas/monitoring/workloadsGraph", Method: "GET", Name: CAAS_WORKLOADS_GRAPH},
 	{Path: "/v2/caas/monitoring/podGraph", Method: "GET", Name: CAAS_POD_GRAPH},
 	{Path: "/v2/caas/monitoring/containerGraph", Method: "GET", Name: CAAS_CONTIANER_GRAPH},
-	{Path: "/v2/caas/monitoring/alarmInfo", Method: "GET", Name: CAAS_ALARM_INFO},
-	{Path: "/v2/caas/monitoring/alarmUpdate", Method: "PUT", Name: CAAS_ALARM_UPDATE},
-	{Path: "/v2/caas/monitoring/alarmLog", Method: "GET", Name: CAAS_ALARM_LOG},
-	{Path: "/v2/caas/monitoring/workerNodeGraphList", Method: "GET", Name: CAAS_WORK_NODE_GRAPHLIST},
+
+	{Path: "/v2/caas/monitoring/alarmInfo", Method: "GET", Name: CAAS_ALARM_INFO},         // 완료
+	{Path: "/v2/caas/monitoring/alarmUpdate", Method: "PUT", Name: CAAS_ALARM_UPDATE},     // 완료
+	{Path: "/v2/caas/monitoring/alarmLog", Method: "GET", Name: CAAS_ALARM_LOG},           // 완료
+	{Path: "/v2/caas/monitoring/alarmSnsInfo", Method: "GET", Name: CAAS_ALARM_SNS_INFO},  // 완료
+	{Path: "/v2/caas/monitoring/alarmCount", Method: "GET", Name: CAAS_ALARM_COUNT},       // 완료
+	{Path: "/v2/caas/monitoring/alarmSnsSave", Method: "POST", Name: CAAS_ALARM_SNS_SAVE}, // 완료
+
+	{Path: "/v2/caas/monitoring/alarmStatus/:id", Method: "PUT", Name: CAAS_ALARM_STATUS_UPDATE},
+	{Path: "/v2/caas/monitoring/alarmAction", Method: "POST", Name: CAAS_ALARM_ACTION},
+	{Path: "/v2/caas/monitoring/alarmAction/:id", Method: "DELETE", Name: CAAS_ALARM_ACTION_DELETE},
+	{Path: "/v2/caas/monitoring/alarmAction/:id", Method: "PATCH", Name: CAAS_ALARM_ACTION_UPDATE},
+	{Path: "/v2/caas/monitoring/snsChannel/list", Method: "GET", Name: CAAS_ALARM_SNS_CHANNEL_LIST},
+	{Path: "/v2/caas/monitoring/snsChannel/:id", Method: "DELETE", Name: CAAS_ALARM_SNS_CHANNEL_DELETE},
+	{Path: "/v2/caas/monitoring/alarmAction/:id", Method: "GET", Name: CAAS_ALARM_ACTION_LIST},
 }
 
 var SaasRoutes = rata.Routes{
 	{Path: "/v2/saas/app/application/list", Method: "GET", Name: SAAS_API_APPLICATION_LIST},
 	{Path: "/v2/saas/app/application/status", Method: "GET", Name: SAAS_API_APPLICATION_STATUS},
 	{Path: "/v2/saas/app/application/gauge", Method: "GET", Name: SAAS_API_APPLICATION_GAUGE},
-	{Path: "/v2/saas/app/application/alarmInfo", Method: "GET", Name: SAAS_ALARM_INFO},
-	{Path: "/v2/saas/app/application/alarmUpdate", Method: "PUT", Name: SAAS_ALARM_UPDATE},
-	{Path: "/v2/saas/app/application/alarmLog", Method: "GET", Name: SAAS_ALARM_LOG},
+
+	{Path: "/v2/saas/app/application/alarmInfo", Method: "GET", Name: SAAS_ALARM_INFO},         // 완료
+	{Path: "/v2/saas/app/application/alarmSnsInfo", Method: "GET", Name: SAAS_ALARM_SNS_INFO},  // 완료
+	{Path: "/v2/saas/app/application/alarmUpdate", Method: "PUT", Name: SAAS_ALARM_UPDATE},     // 완료
+	{Path: "/v2/saas/app/application/alarmLog", Method: "GET", Name: SAAS_ALARM_LOG},           // 완료
+	{Path: "/v2/saas/app/application/alarmCount", Method: "GET", Name: SAAS_ALARM_COUNT},       // 완료
+	{Path: "/v2/saas/app/application/alarmSnsSave", Method: "POST", Name: SAAS_ALARM_SNS_SAVE}, // 완료
+
+	{Path: "/v2/saas/app/application/alarmStatus/:id", Method: "PUT", Name: SAAS_ALARM_STATUS_UPDATE},
+	{Path: "/v2/saas/app/application/alarmAction", Method: "POST", Name: SAAS_ALARM_ACTION},
+	{Path: "/v2/saas/app/application/alarmAction/:id", Method: "DELETE", Name: SAAS_ALARM_ACTION_DELETE},
+	{Path: "/v2/saas/app/application/alarmAction/:id", Method: "PATCH", Name: SAAS_ALARM_ACTION_UPDATE},
+	{Path: "/v2/saas/app/application/snsChannel/list", Method: "GET", Name: SAAS_ALARM_SNS_CHANNEL_LIST},
+	{Path: "/v2/saas/app/application/snsChannel/:id", Method: "DELETE", Name: SAAS_ALARM_SNS_CHANNEL_DELETE},
+	{Path: "/v2/saas/app/application/alarmAction/:id", Method: "GET", Name: SAAS_ALARM_ACTION_LIST},
 }

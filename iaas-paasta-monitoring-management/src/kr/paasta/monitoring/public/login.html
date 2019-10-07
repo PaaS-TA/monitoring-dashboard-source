@@ -36,12 +36,15 @@
 		<script type="text/javascript">
 			window.onload = () => {
 				const login = {
+					sysType : '',
+
 					init() {
+
 						document.getElementById('loginBtn').addEventListener('click', () => {
 							if(document.getElementById('id').value != '' && document.getElementById('pw').value != ''){
 								fnComm.getToken(document.getElementById('id').value, document.getElementById('pw').value);
 							} else {
-								alert('Please enter id and pw.');
+								fnComm.alertPopup('ERROR', 'Please Enter ID and PW.');
 							}
 						});
 						
@@ -51,11 +54,15 @@
 
 						document.getElementById('pw').onkeydown = function(event) {
 							if(event.keyCode === 13){
-								if(document.getElementById('id').value != '' && document.getElementById('pw').value != ''){
-									fnComm.getToken(document.getElementById('id').value, document.getElementById('pw').value);
+								if(document.getElementById('alertPop')){
+									document.body.removeChild(document.getElementById('alertPop'));
 								} else {
-									alert('Please enter id and pw.');
-								}
+									if(document.getElementById('id').value != '' && document.getElementById('pw').value != ''){
+										fnComm.getToken(document.getElementById('id').value, document.getElementById('pw').value);
+									} else {
+										fnComm.alertPopup('ERROR', 'Please Enter ID and PW.');
+									};
+								};
 							};
 						};
 					},

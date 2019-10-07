@@ -14,16 +14,23 @@
 			<!-- Header -->
 			<header class="np">
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
-						<li><a href="paas.html"><span>B</span></a></li>
-						<li><a href="paas.html"><span>P</span></a></li>
-						<li><a href="cont.html"><span>C</span></a></li>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="paas.html">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
 						<li>
-							<a href="alarm_policy.html" class="on"><span>A</span></a>
+							<a href="alarm_policy.html" class="on">A<span>larm</span></a>
 							<ul>
 								<li><a href="alarm_policy.html">Policy</a></li>
 								<li><a href="alarm_status.html">Status</a></li>
@@ -167,7 +174,7 @@
 
 				init() {
 					// Alarm Count
-					fnComm.alarmCount();
+					fnComm.alarmCount('paas');
 
 					alarm.reload();
 					alarm.event();
@@ -175,11 +182,11 @@
 
 				reload() {
 					// 알람통계 total
-					fnComm.loadData('GET', psRoot.url + 'paas/alarm/statistics/graph/total?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmTotal');
+					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/total?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmTotal');
 					// 알람통계 service
-					fnComm.loadData('GET', psRoot.url + 'paas/alarm/statistics/graph/service?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmService');
+					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/service?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmService');
 					// 알람통계 matrix
-					fnComm.loadData('GET', psRoot.url + 'paas/alarm/statistics/graph/matrix?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmMatrix');
+					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/matrix?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmMatrix');
 				},
 				
 				// Detail 차트 //////////////////////////////////////////////////////////////////////////

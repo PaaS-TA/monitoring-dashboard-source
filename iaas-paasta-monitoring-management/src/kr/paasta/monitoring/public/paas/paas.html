@@ -14,16 +14,23 @@
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
 				
 				<!-- Navigation -->
 				<nav>
 					<ul>
-						<li><a href="index.html"><span><img src="../resources/img/nav_home.png" alt="home" ></span></a></li>
-						<li><a href="bosh.html"><span>B</span></a></li>
-						<li><a href="paas.html" class="on"><span>P</span></a></li>
-						<li><a href="cont.html"><span>C</span></a></li>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="bosh.html">B<span>osh</span></a></li>
+						<li><a href="paas.html" class="on">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
 						<li>
-							<a href="alarm_policy.html"><span>A</span></a>
+							<a href="alarm_policy.html">A<span>larm</span></a>
 							<ul>
 								<li><a href="alarm_policy.html">Policy</a></li>
 								<li><a href="alarm_status.html">Status</a></li>
@@ -195,21 +202,27 @@
 					<fieldset>
 						<div>
 							<label>Date</label>
-							<input type="date" id="date" placeholder="2019-05-09" style="width:240px;">
+							<input type="date" id="date" placeholder="2019-05-09" style="width:220px;">
 							<label>Time</label>
-							<input type="time" id="sTime" style="width:180px;">
+							<input type="time" id="sTime" value="00:00:00" style="width:180px;">
 							<em>~</em>
-							<input type="time" id="eTime" style="width:180px;">
+							<input type="time" id="eTime" value="01:00:00" style="width:180px;">
 							<button class="reset">RESET</button>
 						</div>
 						<div>
 							<label>Message</label>
 							<input type="text" id="message" style="width:800px;">
 						</div>
-						<button class="search">SEARCH</button>
+						<button class="logSearch">SEARCH</button>
 					</fieldset>
 					<div class="preText">
 						<pre></pre>
+					</div>
+					<div class="paging logPaging">
+						<a href="javascript:void(0);" class="move next">&lt;</a>
+						<span>
+						</span>
+						<a href="javascript:void(0);" class="move prev">&gt;</a>
 					</div>
 				</div>
 				<a href="javascript:void(0);" class="chartClosed"></a>
@@ -228,15 +241,14 @@
 			window.onload = () => {
 				const paas = {
 					id : '',
+					logId : '',
+					logCnt : 1,
+					logPage : 1,
+					logSum : 1,
 
 					init() {
 						// Alarm Count
-						fnComm.alarmCount();
-						
-						// paas 컨디션 차트
-						fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
-						// paas Summary 리스트
-						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.paasSummaryList);
+						fnComm.alarmCount('paas');
 
 						// 오늘 날짜
 						var today = new Date();
@@ -246,11 +258,27 @@
 
 						if(dd < 10) dd='0'+dd;
 						if(mm < 10) mm='0'+mm;
-						
+
 						// LOG 검색 Default set
-						document.getElementById('date').value = yyyy + '-' + mm + '-' + dd;
-						document.getElementById('sTime').value = "00:00:00";
-						document.getElementById('eTime').value = "01:00:00";
+						document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+						var hh = today.getHours();
+						var hs = today.getHours()-1;
+						var nn = today.getMinutes();
+						var ss = today.getSeconds();
+
+						if(hh < 10) hh='0'+hh;
+						if(hs < 10) hs='0'+hs;
+						if(nn < 10) nn='0'+nn;
+						if(ss < 10) ss='0'+ss;
+
+						document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+						document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+						
+						// paas 컨디션 차트
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
+						// paas Summary 리스트
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.paasSummaryList);
 					},
 					
 					paasSummaryList(data) {
@@ -313,7 +341,7 @@
 							html += '		<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>';
 							html += '		<a href="javascript:void(0);" class="log"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>';
 							html += '	</div>';
-							html += '</a>';
+							html += '</div>';
 							
 							fnComm.appendHtml(target, html, 'div');
 
@@ -336,7 +364,6 @@
 							elm[i].querySelector('.process').addEventListener('click', (e) => {
 								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
 								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
-								console.log(elmName);
 
 								fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/' + elmID + '/memory?id=' + paas.id, paas.paasTopProcess );
 								document.getElementById('paasTopTitle').innerHTML = elmName;
@@ -352,17 +379,55 @@
 
 							// Log Event
 							elm[i].querySelector('.log').addEventListener('click', (e) => {
-								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
+								paas.logId = e.target.parentNode.parentNode.getAttribute('data-id');
 								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 								document.querySelector('.chartTitle').innerHTML = elmName;
-								paas.logView(elmID);
-							}, false);
-							
-							// Chart Close Event
-							document.querySelector('.chartClosed').addEventListener('click', (e) => {
-								document.getElementById('chartWrap').classList.toggle('on', false);
+
+								paas.logView();
 							}, false);
 						};
+						
+						// Chart Close Event
+						document.querySelector('.chartClosed').addEventListener('click', (e) => {
+							document.getElementById('chartWrap').classList.toggle('on', false);
+						}, false);
+						
+						// LOG Reset Event
+						document.querySelector('.reset').addEventListener('click', (e) => {
+							// 오늘 날짜
+							var today = new Date();
+							var dd = today.getDate();
+							var mm = today.getMonth()+1;
+							var yyyy = today.getFullYear();
+
+							if(dd < 10) dd='0'+dd;
+							if(mm < 10) mm='0'+mm;
+
+							// LOG 검색 Default set
+							document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+							var hh = today.getHours();
+							var hs = today.getHours()-1;
+							var nn = today.getMinutes();
+							var ss = today.getSeconds();
+
+							if(hh < 10) hh='0'+hh;
+							if(hs < 10) hs='0'+hs;
+							if(nn < 10) nn='0'+nn;
+							if(ss < 10) ss='0'+ss;
+
+							document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+							document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+							document.getElementById('message').value = '';
+						}, false);
+						
+						// LOG Search Event
+						document.querySelector('.logSearch').addEventListener('click', (e) => {
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}&keyword=${document.getElementById('message').value}`;
+						
+							// Log 리스트
+							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+						}, false);
 					},
 	
 					paasTopProcess(data) {
@@ -412,48 +477,134 @@
 
 						setTimeout(() => {
 							// CPU Usage 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/cpu/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/cpu/${elmID}/usages${fnComm.setTimer()}`, fnComm.detailChart, '#cpuUsageChart');
 
 							// CPU Load 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/cpu/'+ elmID +'/loads' + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/cpu/${elmID}/loads${fnComm.setTimer()}`, fnComm.detailChart, '#cpuLoadChart');
 
 							// Memory Usage 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/memory/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/memory/${elmID}/usages${fnComm.setTimer()}`, fnComm.detailChart, '#memoryUsageChart');
 
 							// Disk Usage 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/disk/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/disk/${elmID}/usages${fnComm.setTimer()}`, fnComm.detailChart, '#diskUsageChart');
 
 							// Disk IO 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/disk/'+ elmID +'/ios' + fnComm.setTimer(), fnComm.detailChart, '#diskIoChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/disk/${elmID}/ios${fnComm.setTimer()}`, fnComm.detailChart, '#diskIoChart');
 
 							// Network IO Bytes 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/network/'+ elmID +'/bytes' + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/bytes${fnComm.setTimer()}`, fnComm.detailChart, '#networkByteChart');
 							
 							// Network IO Packets 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/network/'+ elmID +'/packets' + fnComm.setTimer(), fnComm.detailChart, '#networkPacktesChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/packets${fnComm.setTimer()}`, fnComm.detailChart, '#networkPacktesChart');
 							
 							// Network IO Drop 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/network/'+ elmID +'/drops' + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/drops${fnComm.setTimer()}`, fnComm.detailChart, '#networkDropChart');
 							
 							// Network IO Error 정보
-							fnComm.loadData('GET', fnComm.url + 'paas/paasta/network/'+ elmID +'/errors' + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/errors${fnComm.setTimer()}`, fnComm.detailChart, '#networkErrorChart');
 						},500);
 					},
 
-					logView(elmID) {
-						//?endTime=16:18:44&id=2cd43cb5-2237-40f3-5748-4a8e18159394&logType=paas&pageIndex=1&pageItems=50&period=5m&startTime=16:17:43&targetDate=2019-05-09
-						//?id=2cd43cb5-2237-40f3-5748-4a8e18159394&logType=paas&pageIndex=1&pageItems=1000&period=5m&startTime=00:00:00&endTime=01:00:00&targetDate=2019-05-09
-						
+					logView() {
 						document.getElementById('chartWrap').classList.toggle('on', true);
 						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
 
-						var logParameter = '?id=' + elmID + '&logType=paas&pageIndex=1&pageItems=10000&period=5m&startTime=' + document.getElementById('sTime').value + '&endTime=' + document.getElementById('eTime').value + '&targetDate=' + document.getElementById('date').value;
-
-						console.log(logParameter);
+						setTimeout(() => {
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
 						
-						// Log 리스트
-						fnComm.loadData('GET', fnComm.url + 'paas/log/specific'+ logParameter, fnComm.detailLog);
+							// Log 리스트
+							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+						},500);
 					},
+
+					detailLog(data){
+						paas.logPage = 1;
+
+						if(data.messages !=  null){
+							paas.logCnt = Math.ceil(data.totalCount / 100);
+							paas.logSum = Math.ceil(paas.logCnt / 10);
+
+							if(paas.logCnt > 2){
+								document.querySelector('.logPaging').classList.toggle('on', true);
+							};
+							if(paas.logCnt > 10){
+								document.querySelector('.logPaging').classList.toggle('over', true);
+							};
+							
+							fnComm.removeHtml(document.querySelector('.logPaging span'));
+
+							for(var i=1; i<=paas.logCnt; i++){
+								var html = `<a href="javascript:void(0);" class="view" data-page="${i}">${i}</a>`;
+
+								fnComm.appendHtml(document.querySelector('.logPaging span'), html, 'span');
+							};
+
+							paas.logDraw(data);
+
+							// LOG Paging
+							var btn =  document.querySelectorAll('.logPaging span a');
+
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].removeEventListener('click', this);
+								btn[i].addEventListener('click', (e) => {
+									var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=${e.target.getAttribute('data-page')}&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+
+									console.log(e.target.getAttribute('data-page'));
+								
+									// Log 리스트
+									fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.logDraw);
+								}, false);
+							};
+
+							document.querySelector('.logPaging .next').removeEventListener('click', paas.nextBtn);
+							document.querySelector('.logPaging .prev').removeEventListener('click', paas.prevBtn);
+							
+							document.querySelector('.logPaging .next').addEventListener('click', paas.nextBtn);
+							
+							document.querySelector('.logPaging .prev').addEventListener('click', paas.prevBtn);
+						} else {
+
+						};
+					},
+
+					nextBtn(){
+						var btn =  document.querySelectorAll('.logPaging span a');
+
+						if(paas.logPage > 1){
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].classList.toggle('view', false);
+							};
+							paas.logPage--;
+							for(var j=((paas.logPage-1)*10); j<(paas.logPage*10) ; j++){
+								btn[j].classList.toggle('view', true);
+							};
+						};
+					},
+
+					prevBtn(){
+						var btn =  document.querySelectorAll('.logPaging span a');
+						
+						if(paas.logSum > paas.logPage){
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].classList.toggle('view', false);
+							};
+							paas.logPage++;
+							for(var j=((paas.logPage-1)*10); j<(paas.logPage*10) ; j++){
+								btn[j].classList.toggle('view', true);
+							};
+						};
+					},
+
+					logDraw(data){
+						var logText = '';
+						
+						data.messages.forEach((value)=>{
+							logText += `${value.time}<br>`;
+							logText += `${value.message}<br><br>`;
+						});
+
+						document.querySelector('.preText pre').innerHTML = logText;
+					}
 				}
 	
 				paas.init();

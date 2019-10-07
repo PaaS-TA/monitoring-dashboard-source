@@ -24,7 +24,7 @@ func NewMainController(openstackProvider model.OpenstackProvider, influxClient c
 func (h *OpenstackServices) Main(w http.ResponseWriter, r *http.Request) {
 	model.MonitLogger.Debug("Main API Called")
 
-	url := "/public/dist/index.html"
+	url := "/public/index.html"
 	http.Redirect(w, r, url, 302)
 }
 
