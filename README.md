@@ -190,7 +190,7 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
 
 - *Intellij IDEA 설치(Windows)*
     
-    idealC-2017.2.5.exe 더블클릭하여 설치를 실행한다.<br/>
+    idealC-2019.2.3.exe 더블클릭하여 설치를 실행한다.<br/>
     ![](images/2.2.3_1.png)<br/>
     
     'Next' 버튼 클릭<br/>
@@ -213,7 +213,7 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
 - *Intellij IDEA 설치(Ubuntu)*
 ```
 cd download
-sudo tar xvzf ideaIC-2017.1.6.tar.gz
+sudo tar xvzf ideaIC-2019.2.3.tar.gz
 ```
 
 <br/><br/>
@@ -312,9 +312,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         ```
         go get github.com/tedsuo/ifrit
         go get github.com/tedsuo/rata
-        go get github.com/influxdata/influxdb/client/v2
+        go get github.com/influxdata/influxdb1-client/v2
         go get github.com/rackspace/gophercloud
-        go get github.com/cloudfoundry-community/go-cfclient
         go get github.com/go-redis/redis
         go get github.com/go-sql-driver/mysql
         go get github.com/jinzhu/gorm
@@ -327,6 +326,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         go get github.com/onsi/gomega
         go get github.com/stretchr/testify
         go get github.com/cloudfoundry-community/gogobosh
+        go get github.com/thoas/go-funk
+        go get github.com/tidwall/gjson
         ```
         <br/>
     
@@ -386,7 +387,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         go get github.com/tedsuo/ifrit
         go get github.com/go-sql-driver/mysql
         go get github.com/jinzhu/gorm
-        go get github.com/influxdata/influxdb/client/v2
+        go get github.com/influxdata/influxdb1-client/v2
         go get github.com/cloudfoundry-community/gogobosh
         go get golang.org/x/oauth2
         go get golang.org/x/net/context
@@ -420,96 +421,15 @@ go run main.go
 ```
 <br/>
 
-### 2.3.2. Front-End 환경설정 (Windows / Ubuntu) <div id='2.3.2' />
-> **NodeJS Install** <div id='2.3.2.1' />
-- NodeJS 다운로드 URL
-    + https://nodejs.org/en/
-<br/>
-
-- NodeJS 설치 (Windows)
-    - “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_01.png)<br/>
-
-    - “I accept the terms in the License Agreement” 를 선택 후 “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_02.png)<br/>
-
-    - 설치할 경로를 지정 후 “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_03.png)<br/>
-
-    - “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_04.png)<br/>
-
-    - “Install” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_05.png)<br/>
-    <br/>
-    ![](images/nodejs_install_06.png)<br/>
-
-    - “Finish” 버튼을 클릭 후 설치를 마친다.<br/>
-    ![](images/nodejs_install_07.png)<br/>
-    
-    <br/><br/>
-
-- NodeJS 설치 (Ubuntu)
-```
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-<br/>
-
-> **bower Install** <div id='2.3.2.2' />
-```
-npm install -g bower
-```
-<br/>
-
-> **Dependencies Module Download** <div id='2.3.2.3' />
-```
-npm install
-bower install
-```
-![](images/dependency_module_download.png)<br/>
-<br/><br/>
-
-> **UI Source Build** <div id='2.3.2.4' />
-
-- Windows
-```
-cd \...\IaaS-Monitoring\src\paasta-monitoring-management\src\kr\paasta\monitoring\pubilc
-gulp package
-```
-
-- Ubuntu
-```
-cd /.../IaaS-PaaS-Monitoring/src/paasta-monitoring-management/src/kr/paasta/monitoring/pubilc
-gulp package
-```
-<br/><br/>
-
-> **Server 구동** <div id='2.3.2.5' />
-
-- Windows
-```
-cd \...\IaaS-Monitoring\src\paasta-monitoring-management\src\kr\paasta\monitoring\pubilc
-gulp serve
-```
-
-- Ubuntu
-```
-cd /.../IaaS-PaaS-Monitoring/src/paasta-monitoring-management/src/kr/paasta/monitoring/pubilc
-gulp serve
-```
-<br/><br/>
-
-# 3. IaaS-PaaS Monitoring Application 구성 <div id='3' />
-IaaS-PaaS Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다. 
-&nbsp;&nbsp;&nbsp; ![](images/IaaS_PaaS-TA_Monitoring_architecture.png)
+# 3. Paas-Ta Monitoring Application 구성 <div id='3' />
+Paas-Ta Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다. 
+&nbsp;&nbsp;&nbsp; ![](images/PaasTa_Monitoring_architecture.png)
 그림 1. PaaS-TA Monitoring 구성도
 
-## 3.1. IaaS-PaaS-Monitoring <div id='3.1' />
+## 3.1. Paas-Ta Monitoring <div id='3.1' />
 
 ### 3.1.1. 관련 Table 목록 및 구조 <div id='3.1.1' />
-IaaS-PaaS Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database를 생성하여 사용한다. ‘PasstaMonitoring’ Database는 Server 실행시  Table을 자동으로 생성한다. PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database를 생성하여 사용한다. ‘PasstaMonitoring’ Database는 Server 실행시  Table을 자동으로 생성한다. PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
 
 > **관련 Table 목록** <div id='3.1.1.1' />
 
@@ -534,7 +454,7 @@ IaaS-PaaS Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Databa
 
 <br/>
 
-\<IaaS Monitoring Database\>
+\<PaaS Monitoring Database\>
 
 |Table명|설명|
 |:--------|:--------|
@@ -550,6 +470,18 @@ IaaS-PaaS Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Databa
 |member_infos|회원정보|
 |vms|PaaS-TA VM 정보|
 |zones|PaaS-TA Zone 정보|
+
+<br/>
+
+\<CaaS/SaaS Monitoring Database\>
+|:--------|:--------|
+|batch_alarm_infos|Alarm 임계치 및 스케쥴 정보를 설정한다.|
+|batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
+|batch_alarm_executions|발생된 알람 정보.|
+|batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
+|alarm_targets|Alarm 발생시 전송받을 채널(EMAIL)을 정의한다.|
+|batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
+
 
 <br/><br/>
 
@@ -993,6 +925,18 @@ IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리�
     ![](images/paas_monitoring_architecture.png)<br/>
     <br/>
 
+- CaaS Monitoring
+
+    다음 그림은 CaaS 모니터링의 좀더 상세한 구조를 보여준다.<br/>
+    ![](images/caas_monitoring_architecture.png)<br/>
+    <br/>
+    
+- SaaS Monitoring
+
+    다음 그림은 SaaS 모니터링의 좀더 상세한 구조를 보여준다.<br/>
+    ![](images/saas_monitoring_architecture.png)<br/>
+    <br/>    
+
 <br/><br/>
 
 
@@ -1033,126 +977,145 @@ IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리�
 
 ### 3.1.3. 설정 정보 <div id='3.1.3' />
 ```
-server.url = http://monitapi.115.68.151.188.xip.io
+server.url = http://127.0.0.1:8080
 server.port = 8080
 
-# 모니터링 시스템 사용 옵션 정보
-# IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용, ALL : IaaS, PaaS 모두 사용
-system.monitoring.type=ALL
+#모니터링 시스템 사용 옵션 정보
+#( IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용 , CaaS : CaaS 만 사용, SaaS : SaaS 만 사용, ALL : 모두 사용)
+# 모두 사용하지 않고 조합시 ","로 구분 예) PaaS,CaaS
+system.monitoring.type=PaaS,CaaS,SaaS
 
 # Monasca RDB 접속 정보
 iaas.monitoring.db.type=mysql
 iaas.monitoring.db.dbname=mon
-iaas.monitoring.db.username=username
-iaas.monitoring.db.password=password
-iaas.monitoring.db.host=xxx.xxx.xxx.xxx
-iaas.monitoring.db.port=3306
+iaas.monitoring.db.username=root
+iaas.monitoring.db.password=wofl07
+iaas.monitoring.db.host=13.125.236.133
+iaas.monitoring.db.port=33067
 
-# IaaS InfluxDB
+# InfluxDB
 iaas.metric.db.username =
 iaas.metric.db.password =
-iaas.metric.db.url=http://xxx.xxx.xxx.xxx:xxxx
+iaas.metric.db.url=http://115.68.151.184:8086
+
 iaas.metric.db.name=mon
 
 # PaaS RDB 접속 정보
 paas.monitoring.db.type=mysql
 paas.monitoring.db.dbname=PaastaMonitoring
-paas.monitoring.db.username=username
+paas.monitoring.db.username=root
 paas.monitoring.db.password=password
-paas.monitoring.db.host= xxx.xxx.xxx.xxx
+paas.monitoring.db.host=10.0.161.100
 paas.monitoring.db.port=3306
 
-# PaaS InfluxDB
 paas.metric.db.username =
 paas.metric.db.password =
-paas.metric.db.url = http://xxx.xxx.xxx.xxx:8086
+paas.metric.db.url = http://10.0.161.101:8086
 paas.metric.db.name.paasta=cf_metric_db
 paas.metric.db.name.bosh=bosh_metric_db
 paas.metric.db.name.container=container_metric_db
+
 # Openstack Admin
 default.region=RegionOne
 default.domain=default
-default.username=username
-default.password=password
+default.username=admin
+default.password=cfmonit
 default.tenant_name=admin
-default.tenant_id=9c1a27e20412473b843dbf32bdec2390
-identity.endpoint=http://xxx.xxx.xxx.xxx:5000/v3        → Keystone Endpoint
-keystone.url=http://xxx.xxx.xxx.xxx:35357/v3           → Keystone URL
+default.tenant_id=61e66f7d847e4951aa38452fe74c93eb
+identity.endpoint=http://115.68.151.175:5000/v3
+keystone.url=http://115.68.151.175:35357/v3
 
 # Monasca Api
-monasca.url=http://xxx.xxx.xxx.xxx:8020/v2.0
+monasca.url=http://115.68.151.184:8020/v2.0
+#monasca.url=http://54.65.181.81:8020/v2.0
 monasca.connect.timeout=60
 monasca.secure.tls=false
 
 # Openstack Nova
-nova.target.url=http://xxx.xxx.xxx.xxx:8774
+nova.target.url=http://115.68.151.175:8774
 nova.target.version=v2.1
-nova.target.tenant_id=9c1a27e20412473b843dbf32bdec2390
+nova.target.tenant_id=61e66f7d847e4951aa38452fe74c93eb
 
 # Openstack Keystone
-keystone.target.url=http://xxx.xxx.xxx.xxx:35357
+keystone.target.url=http://115.68.151.175:35357
 keystone.target.version=v3
 
 # Openstack Neutron
-neutron.target.url=http://xxx.xxx.xxx.xxx:9696
+neutron.target.url=http://115.68.151.175:9696
 neutron.target.version=v2.0
 
 # Openstack Cinder
-cinder.target.url=http://xxx.xxx.xxx.xxx:8776
+cinder.target.url=http://115.68.151.175:8776
 cinder.target.version=v2
 
 # Openstack Glance
-glance.target.url=http://xxx.xxx.xxx.xxx:9191
+glance.target.url=http://115.68.151.175:9191
 glance.target.version=v2
 
 # RabbitMQ
-rabbitmq.user=user
-rabbitmq.pass=password
-rabbitmq.ip=xxx.xxx.xxx.xxx
+rabbitmq.user=openstack
+rabbitmq.pass=cfmonit
+rabbitmq.ip=115.68.151.175
 rabbitmq.port=15672
 rabbitmq.target.node=rabbit@controller
 
 # Elasticsearch URL
-iaas.elastic.url=xxx.xxx.xxx.xxx:9200
-paas.elastic.url=elastic.xxx.xxx.xxx.xxx.xip.io
+iaas.elastic.url=10.0.161.231:9200
+paas.elastic.url=10.0.161.231:9200
 
 # Bosh Info
 bosh.count=1
 bosh.0.name=micro-bosh
-bosh.0.ip=xxx.xxx.xxx.xxx
+bosh.0.ip=10.0.1.6
 bosh.0.deployname=bosh
 
-# Bosh client
-bosh.client.api.address=https://xxx.xxx.xxx.xxx:25555
-bosh.client.api.username=username
-bosh.client.api.password=password
+# BOSH client
+bosh.client.api.address=https://10.0.1.6:25555
+bosh.client.api.username=admin
+bosh.client.api.password=yfjejbebht0njagdza8o
+#bosh.client.api.password=admin_password
 
-# Disk mount point
+#disk mount point
 disk.mount.point=/,/var/vcap/data
 disk./.resp.json.name=/
 disk./var/vcap/data.resp.json.name=data
 
-# Disk io mount point
+#disk io mount point
 disk.io.mount.point=/,/var/vcap/data
 disk.io./.read.json.name=/-read
 disk.io./.write.json.name=/-write
 disk.io./var/vcap/data.read.json.name=data-read
 disk.io./var/vcap/data.write.json.name=data-write
 
-# Network monitor item
+#network monitor item
 network.monitor.item=eth0
 
 # Time difference(hour)
 gmt.time.gap=9
 
-# Cloud Foundry Provider
-paas.cf.client.apiaddress=https://api.monit.paasta-dev.com
+#cfProvider
+paas.cf.client.apiaddress=https://api.115.68.151.185.xip.io
 paas.cf.client.skipsslvalidation=true
-    
-# redis
-redis.addr=xxx.xxx.xxx.xxx:xxxx
+
+#redis
+redis.addr=10.0.121.101:6379
 redis.password=password
 redis.db=0
+
+#Caas monitoring tool Prometheus
+#prometheus.addr=http://35.188.183.252:9090
+prometheus.addr=http://10.0.201.234:30090
+
+#Caas k8s ApiServer URL
+kubernetesApi.addr=https://10.0.0.232:8443
+kubernetes.admin.token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLWR6ZjhoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJiOGQ5ZTQ4NC1lNGFmLTExZTktYjg5My0wYTBhMjVhZmNiNTAiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.VJVQaf_PNvEaEbwYwiUGYU6BG9E9oS2S9GAVILYOuryF1ELcT1FS2p1fuol5pfoNupgG_rX5jo43udQn1dpq3d3DcCuznmPFq9g2QK7VqgX0wasLNN5Q9Fr7JmQdVQ2f3AMplL1RmWleXXnHTCNbT3pMXo93YeVPRgFH6pYH5eTL7t-lqk2MunRKqPtYmj7OftxqxBBmaTeI3Q3wS-TZ-ytNOi2e7GYvUMgAnjzCJ0CPHe1WBSwyRDWlTG6HIcVUco0_f2nEzgl4JDrQof8U0tM2O2akUKUWKJ8rpuiXwKx2eroD9n6VaU5-JVz61FfFZQx72hHrpKYuRPI-ov5Qrg
+caas.monitoring.broker.host=http://13.124.44.34:3334
+
+#SaaS Pinpoint Url
+saas.pinpoint.url=http://15.164.210.67:8079
+
+paas.monitoring.cf.host=https://uaa.15.164.20.58.xip.io
+
 ```
 
 ### 3.1.4. API Package 구조 <div id='3.1.4' />
@@ -1165,8 +1128,6 @@ redis.db=0
 
 ### 3.1.6. UI Package 구조 <div id='3.1.6' />
 ![](images/ui_package.png)<br/>
-<br/>
-![](images/ui_package2.png)<br/>
 <br/>
 
 ### 3.1.7. UI Package 간 호출 구조 <div id='3.1.7' />

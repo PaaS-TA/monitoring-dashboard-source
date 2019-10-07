@@ -280,6 +280,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 			routes.PAAS_APP_POLICY_INFO:               route(appController.GetPaasAppPolicyInfo),
 			routes.PAAS_APP_ALARM_LIST:                route(appController.GetPaasAppAlarmList),
 			routes.PAAS_APP_POLICY_DELETE:             route(appController.DeletePaasAppPolicy),
+			routes.PAAS_PAAS_ALL_OVERVIEW:             route(paasController.GetPaasAllOverview),
 		}
 	}
 

@@ -358,3 +358,43 @@ func (p *PaasController) GetTopologicalView(w http.ResponseWriter, r *http.Reque
 		util.RenderJsonResponse(result, w)
 	}
 }
+
+func (p *PaasController) GetPaasAllOverview(w http.ResponseWriter, r *http.Request) {
+
+	var apiRequest model.PaasRequest
+
+	apiRequest.Origin = r.FormValue(":origin")
+	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
+	apiRequest.ServiceName = r.URL.Query().Get("serviceName")
+	apiRequest.Index = r.URL.Query().Get("index")
+	apiRequest.Addr = r.URL.Query().Get("addr")
+	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
+
+	// PaaS-TA Overview
+	result, err := service.GetPaasService(p.txn, p.influxClient, p.databases, p.boshClient).GetPaasOverview(apiRequest)
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+
+	// Container Overview
+	resList, err := service.GetContainerService(p.txn, p.influxClient, p.databases).GetContainerOverview(model.ContainerReq{})
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+
+	// Bosh Overview
+	boshOverview, err := service.GetBoshStatusService(p.txn, p.influxClient, p.databases).GetBoshStatusOverview(model.BoshSummaryReq{})
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+	}
+
+	result.Total = result.Total + resList.Total + boshOverview.Total
+	result.Running = result.Running + resList.Running + boshOverview.Running
+	result.Critical = result.Critical + resList.Critical + boshOverview.Critical
+	result.Warning = result.Warning + resList.Warning + boshOverview.Warning
+	result.Failed = result.Failed + resList.Failed + boshOverview.Failed
+
+	util.RenderJsonResponse(result, w)
+}

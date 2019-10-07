@@ -173,6 +173,7 @@ const (
 	PAAS_APP_POLICY_INFO               = "PAAS_APP_POLICY_INFO"
 	PAAS_APP_ALARM_LIST                = "PAAS_APP_ALARM_LIST"
 	PAAS_APP_POLICY_DELETE             = "PAAS_APP_POLICY_DELETE"
+	PAAS_PAAS_ALL_OVERVIEW             = "PAAS_PAAS_ALL_OVERVIEW"
 
 	// SAAS
 	SAAS_API_APPLICATION_LIST   = "SAAS_API_APPLICATION_LIST"
@@ -424,6 +425,7 @@ var PaasRoutes = rata.Routes{
 	{Path: "/v2/paas/app/alarm/policy", Method: "GET", Name: PAAS_APP_POLICY_INFO},
 	{Path: "/v2/paas/app/alarm/list", Method: "GET", Name: PAAS_APP_ALARM_LIST},
 	{Path: "/v2/paas/app/policy/:guid", Method: "DELETE", Name: PAAS_APP_POLICY_DELETE},
+	{Path: "/v2/paas/all/overview", Method: "GET", Name: PAAS_PAAS_ALL_OVERVIEW},
 }
 
 var CaasRoutes = rata.Routes{
