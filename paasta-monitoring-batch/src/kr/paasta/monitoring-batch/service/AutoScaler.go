@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"time"
 	//"github.com/cloudfoundry-community/go-cfclient"
 	"kr/paasta/monitoring-batch/dao"
 	"kr/paasta/monitoring-batch/model"
@@ -47,8 +48,25 @@ func (a *AutoScalerStruct) AutoScale() {
 	//fmt.Println(">>>>>dfsfef:", updateResp)
 
 	var listAutoScaleTarget []model.AutoScaleTarget
-	cfToken := util.GetUaaToken(a.b.CfConfig)
-	fmt.Println(">>>>> cf token:", cfToken.Token)
+	if a.b.CfClientToken.Token == "" {
+		util.GetUaaToken(a.b.CfConfig)
+	} else {
+		fmt.Println("time:", a.b.CfClientToken.ExpireTime)
+		if a.b.CfClientToken.ExpireTime.Before(time.Now()) {
+			util.GetUaaToken(a.b.CfConfig)
+			//fmt.Println(">>>>> cf token:", cfToken.Token)
+		}
+
+	}
+	//t1, _ := time.Parse(time.RFC3339, a.b.CfClientToken.ExpireTime.String())
+	//fmt.Println("time:", a.b.CfClientToken.ExpireTime)
+	//fmt.Println("time now:",time.Now() )
+	//if a.b.CfClientToken.ExpireTime.Before(time.Now()) {
+	//	cfToken := util.GetUaaToken(a.b.CfConfig)
+	//fmt.Println(">>>>> cf token:", cfToken.Token)
+	//}
+	//cfToken := util.GetUaaToken(a.b.CfConfig)
+	//fmt.Println(">>>>> cf token:", cfToken.Token)
 	//App 알람 정책 별 사용량 조회
 	var wg sync.WaitGroup
 	wg.Add(len(listAutoScalePolicy))

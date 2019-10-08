@@ -5,7 +5,7 @@ set PATH=%PATH%;%GOPATH%bin
 //DependenciesModuleDownload
 go get github.com/tedsuo/ifrit
 go get github.com/tedsuo/rata
-go get github.com/influxdata/influxdb1-client/v2
+go get github.com/influxdata/influxdb/client/v2
 go get github.com/rackspace/gophercloud
 go get github.com/cloudfoundry-community/go-cfclient
 go get github.com/go-redis/redis

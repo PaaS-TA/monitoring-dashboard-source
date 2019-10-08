@@ -126,7 +126,7 @@ func NewBackendServices(gmtTimeGapHour int64, influx *InfluxConfig, configDB *DB
 		Host:     config["cf.client.uaa_address"],
 		ApiHost:  config["cf.client.api_address"],
 	}
-	cfToken := util.GetUaaToken(cfConfig)
+	//cfToken := util.GetUaaToken(cfConfig)
 
 	CreateTable(dbAccessObj)
 	CreateAlarmPolicyInitialData(dbAccessObj)
@@ -196,7 +196,7 @@ func NewBackendServices(gmtTimeGapHour int64, influx *InfluxConfig, configDB *DB
 		MailConfig:    mailConfig,
 		StopChan:      stop,
 		config:        config,
-		CfClientToken: cfToken,
+		CfClientToken: md.UaaToken{},
 		CfConfig:      cfConfig,
 	}
 }

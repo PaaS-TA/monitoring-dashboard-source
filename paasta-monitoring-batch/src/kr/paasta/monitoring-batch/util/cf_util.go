@@ -51,8 +51,14 @@ func GetUaaToken(n md.CFConfig) (token md.UaaToken) {
 		r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 		r.SetBasicAuth(url.QueryEscape("cf"), url.QueryEscape(""))
-		resp, _ := client.Do(r)
+		resp, err := client.Do(r)
 		fmt.Println(resp.Status)
+
+		if err != nil {
+			fmt.Println(err)
+			time.Sleep(3 * time.Second)
+			GetUaaToken(n)
+		}
 
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
