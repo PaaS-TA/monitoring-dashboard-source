@@ -493,7 +493,6 @@ Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database
 |batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
 |batch_alarm_executions|발생된 알람 정보.|
 |batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
-|alarm_targets|Alarm 발생시 전송받을 채널(EMAIL)을 정의한다.|
 |batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
 
 
@@ -1542,4 +1541,144 @@ redis.db=0
 > **telegram** <div id='3.2.6.2' />
 
 ![](images/telegram.png)
+<br><br><br>
+
+## 3.3. CaaS Monitoring Batch <div id='3.3' />
+CaaS-Monitoring-Batch는 Table 및 기초 Data를 구성하며, Prometheus Metric CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다.
+
+### 3.3.1. 관련 Table 목록 및 구조 <div id='3.3.1' />
+CaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. CaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+
+\<PasstaMonitoring Database\>
+
+|Table명|설명|
+|:--------|:--------|
+|batch_alarm_infos|Alarm 임계치 및 스케쥴 정보를 설정한다.|
+|batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
+|batch_alarm_executions|발생된 알람 정보.|
+|batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
+|batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
+
+![](images/caas_batch_architecture.png)
+그림 1. Monitoring-Batch 구성도
+<br><br><br>
+
+### 3.3.2. Component 정보 <div id='3.3.2' />
+|Component|설명|
+|:--------|:--------|
+|Pod Alarm Collector|Pod Metric 정보(CPU/Memory/Disk) 상태 정보를 읽어 정의된 임계치 초과시 관리자에게 Alarm 발송한다.|
+|Update SNS Alarm Target|알람 발생시 알람 전송받을 Telegram 채널에 등록된 사용자 ID를 PasstaMonitoring Database에 동기화 처리를 한다.|
+
+<br>
+
+### 3.3.3. 설정 정보 <div id='3.3.3' />
+```
+# monitoring RDB 접속 정보
+monitoring.db.type=mysql
+monitoring.db.dbname=PaastaMonitoring
+monitoring.db.username=root
+monitoring.db.password=password
+monitoring.db.host=10.0.161.100
+monitoring.db.port=3306
+
+# SMTP
+mail.smtp.host=smtp.naver.com
+mail.smtp.port=587
+mail.sender.password=xxxxx
+mail.sender=xxxx@naver.com
+mail.resource.url=http://54.65.181.81:8080
+
+# CaaS Info
+caas.monitoring.api.url = http://52.79.197.117:8080
+```
+    
+### 3.3.4. Package 구조 <div id='3.3.4' />
+![](images/caas_batch_package.png)
+<br><br><br>
+
+### 3.3.5. Package 간 호출 구조 <div id='3.3.5' />
+![](images/caas_batch_package_call.png)
+<br><br><br>
+
+### 3.3.6. Alarm Message <div id='3.3.6' />
+
+> **e-mail** <div id='3.3.6.1' />
+
+![](images/caas_email.png)
+<br><br><br>
+
+> **telegram** <div id='3.3.6.2' />
+
+![](images/caas_telegram.png)
+<br><br><br>
+
+
+## 3.4. SaaS Monitoring Batch <div id='3.4' />
+SaaS-Monitoring-Batch는 Table 및 기초 Data를 구성하며, PINPOINT Metric System CPU/JVM CPU/Heap Memory 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다.
+
+### 3.4.1. 관련 Table 목록 및 구조 <div id='3.4.1' />
+SaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. SaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+
+\<PasstaMonitoring Database\>
+
+|Table명|설명|
+|:--------|:--------|
+|batch_alarm_infos|Alarm 임계치 및 스케쥴 정보를 설정한다.|
+|batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
+|batch_alarm_executions|발생된 알람 정보.|
+|batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
+|batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
+
+![](images/saas_batch_architecture.png)
+그림 1. Monitoring-Batch 구성도
+<br><br><br>
+
+### 3.4.2. Component 정보 <div id='3.4.2' />
+|Component|설명|
+|:--------|:--------|
+|Application Alarm Collector|Application Metric 정보(System CPU/JVM CPU/Heap Memory) 상태 정보를 읽어 정의된 임계치 초과시 관리자에게 Alarm 발송한다.|
+|Update SNS Alarm Target|알람 발생시 알람 전송받을 Telegram 채널에 등록된 사용자 ID를 PasstaMonitoring Database에 동기화 처리를 한다.|
+
+<br>
+
+### 3.4.3. 설정 정보 <div id='3.4.3' />
+```
+# monitoring RDB 접속 정보
+monitoring.db.type=mysql
+monitoring.db.dbname=PaastaMonitoring
+monitoring.db.username=root
+monitoring.db.password=password
+monitoring.db.host=10.0.161.100
+monitoring.db.port=3306
+
+
+# SMTP
+mail.smtp.host=smtp.naver.com
+mail.smtp.port=587
+mail.sender.password=xxxxxx
+mail.sender=xxxxxx@naver.com
+mail.resource.url=http://54.65.181.81:8080
+
+# SaaS Info
+saas.pinpoint.url = http://52.79.224.122:8079
+```
+    
+### 3.4.4. Package 구조 <div id='3.4.4' />
+![](images/saas_batch_package.png)
+<br><br><br>
+
+### 3.4.5. Package 간 호출 구조 <div id='3.4.5' />
+![](images/saas_batch_package_call.png)
+<br><br><br>
+
+### 3.4.6. Alarm Message <div id='3.4.6' />
+
+> **e-mail** <div id='3.4.6.1' />
+
+![](images/saas_email.png)
+<br><br><br>
+
+> **telegram** <div id='3.4.6.2' />
+
+![](images/saas_telegram.png)
 <br><br><br>
