@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/thoas/go-funk"
-	"kr/paasta/batch/model"
-	"kr/paasta/batch/util"
+	"kr/paasta/monitoring-batch/model"
+	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
+	"strconv"
 )
 
 var dbType string
@@ -41,7 +42,7 @@ func GetdbAccessObj() *gorm.DB {
 }
 
 func CreateTable(dbClient *gorm.DB) {
-	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{})
+	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{}, &model.BatchAlarmSns{}, &model.BatchAlarmExecutionResolve{})
 }
 
 func GetBatchAlarmInfo(dbClient *gorm.DB) []model.BatchAlarmInfo {
@@ -51,7 +52,12 @@ func GetBatchAlarmInfo(dbClient *gorm.DB) []model.BatchAlarmInfo {
 }
 
 func InsertBatchExecution(dbClient *gorm.DB, batchExection *model.BatchAlarmExecution) {
-	if err := dbClient.Debug().Create(&batchExection).Error; err != nil {
+	sql := "INSERT  INTO batch_alarm_executions (alarm_id, service_type, critical_status, measure_value, measure_name1, measure_name2, measure_name3, execution_time, execution_result, resolve_status) "
+	sql += "VALUES"
+	sql += "(%s, '%s', '%s', %s, '%s', '%s', '',  now(), '%s', '1')"
+	insertSql := fmt.Sprintf(sql, strconv.Itoa(batchExection.AlarmId), batchExection.ServiceType, batchExection.CriticalStatus,
+		strconv.FormatFloat(batchExection.MeasureValue, 'f', 6, 64), batchExection.MeasureName1, batchExection.MeasureName2, batchExection.ExecutionResult)
+	if err := dbClient.Debug().Exec(insertSql).Error; err != nil {
 		fmt.Printf("insert error : %v\n", dbClient.Error)
 	}
 }
@@ -66,22 +72,50 @@ func GetBatchAlarmReceiver(serviceType string, dbClient *gorm.DB) ([]string, []i
 
 	if len(alarmReceiver) > 0 {
 		filterEmail := funk.Filter(alarmReceiver, func(x model.BatchAlarmReceiver) bool {
-			return len(x.Email) > 0 && x.ServiceType == serviceType && x.UseYn == "Y"
+			return x.ReceiveType == "EMAIL" && x.ServiceType == serviceType && x.UseYn == "Y"
 		}).([]model.BatchAlarmReceiver)
 
 		mapedEmail = funk.Map(filterEmail, func(x model.BatchAlarmReceiver) string {
-			return x.Email
+			return x.TargetId
 		}).([]string)
 
 		filterSnsId := funk.Filter(alarmReceiver, func(x model.BatchAlarmReceiver) bool {
-			return x.SnsId > 0 && x.ServiceType == serviceType && x.UseYn == "Y"
+			return x.ReceiveType == "SNS" && x.ServiceType == serviceType && x.UseYn == "Y"
 		}).([]model.BatchAlarmReceiver)
 
 		mapedSnsId = funk.Map(filterSnsId, func(x model.BatchAlarmReceiver) int64 {
-			return x.SnsId
+			id, _ := strconv.ParseInt(x.TargetId, 10, 64)
+			return int64(id)
 		}).([]int64)
+
+		fmt.Printf("mapedSnsId : %v\n", mapedSnsId)
 
 		return mapedEmail, mapedSnsId
 	}
 	return nil, nil
+}
+
+func GetBatchAlarmSnsToken(serviceType string, dbClient *gorm.DB) model.BatchAlarmSns {
+	var alarmSns model.BatchAlarmSns
+	dbClient.Debug().Table("batch_alarm_sns").Where("origin_type = '" + serviceType + "'").Find(&alarmSns)
+	return alarmSns
+}
+
+func SaveBatchAlarmSnsReceiver(serviceType string, dbClient *gorm.DB, targetIds []string) {
+	tx := dbClient.Begin().Debug()
+	for _, targetId := range targetIds {
+		alarmReceiver := model.BatchAlarmReceiver{
+			ServiceType: serviceType,
+			ReceiveType: "SNS",
+			TargetId:    targetId,
+		}
+
+		status := tx.Table("batch_alarm_receivers").
+			Set("gorm:insert_option", "on duplicate key update modi_date = now(), modi_user = 'system'").Create(&alarmReceiver)
+		if err := status.Error; err != nil {
+			fmt.Printf("insert error : %v\n", dbClient.Error)
+			tx.Rollback()
+		}
+	}
+	tx.Commit()
 }

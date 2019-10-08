@@ -47,3 +47,12 @@ func ReadConfig(filename string) (Config, error) {
 	}
 	return config, nil
 }
+
+func ContainsTargetId(a []int64, x int64) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}

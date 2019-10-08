@@ -8,8 +8,8 @@ import (
 
 	//"net/smtp"
 	"gopkg.in/gomail.v2"
-	"kr/paasta/batch/model"
-	"kr/paasta/batch/util"
+	"kr/paasta/monitoring-batch/model"
+	"kr/paasta/monitoring-batch/util"
 	"os"
 )
 
@@ -27,8 +27,8 @@ func init() {
 
 	smtpHost := config["mail.smtp.host"]
 	smtpPort, _ := strconv.Atoi(config["mail.smtp.port"])
-	username := config["mail.username"]
-	password := config["mail.password"]
+	username := config["mail.sender"]
+	password := config["mail.sender.password"]
 	sender = config["mail.sender"]
 	resourceUrl = config["mail.resource.url"]
 

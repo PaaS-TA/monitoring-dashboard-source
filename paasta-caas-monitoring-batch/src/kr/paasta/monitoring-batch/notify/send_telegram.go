@@ -3,7 +3,7 @@ package notify
 import (
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"kr/paasta/batch/util"
+	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
 )
@@ -19,9 +19,10 @@ func init() {
 	}
 }
 
-func SendChatBot(serviceType string, receivers []int64, message string) {
+func SendChatBot(receivers []int64, message string, token string) {
+	fmt.Println("token : " + token)
+	fmt.Printf(" sns len : %v\n", len(receivers))
 	if len(receivers) > 0 {
-		token := config["telegram."+serviceType+".token"]
 		bot, err := tgbotapi.NewBotAPI(token)
 		if err != nil {
 			fmt.Println("Failed to get telegram client connection! :", err)
