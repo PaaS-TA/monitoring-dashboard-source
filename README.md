@@ -485,7 +485,7 @@ Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database
 
 <br/>
 
-\<CaaS/SaaS Monitoring Database\>
+\<CaaS SaaS Monitoring Database\>
 
 |Table명|설명|
 |:--------|:--------|
