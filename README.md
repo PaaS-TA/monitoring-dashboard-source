@@ -1300,6 +1300,102 @@ paas.monitoring.cf.host=https://uaa.15.164.20.58.xip.io
     ![](images/alarm_stat_print.png)<br>
     ※ 출력시 인쇄 화면이 나타나면 레이아웃으로 가로방향으로 지정해야 전체적인 화면에 출력된다.
 
+> **CaaS Main** <div id='3.1.8.26' />
+
+- CaaS Main 화면에는 Cluster 사용율, Deployment Replica Status, Stateful Replica Status,  DaemonSet Status, Pod Container Status 정보를 보여준다.<br>
+![](images/24_caas_main.png)<br>
+<br><br>
+
+> **CaaS Cluster** <div id='3.1.8.27' />
+
+- CaaS Cluster 화면에는 Cluster 사용율, Cluster의 WorkNode CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/25_caas_cluster.png)<br>
+<br><br>
+
+> **CaaS Cluster Detail** <div id='3.1.8.28' />
+
+- CaaS Cluster 상세화면에는 선택된 WorkNode의 POD, CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/26_caas_cluster_chart.png)<br>
+<br><br>
+
+> **CaaS WorkLoads** <div id='3.1.8.29' />
+
+- CaaS Workloads 화면에는 Workload 상태정보 및 Workload(deployment, statefulset, daemonset)별 CPU, Memory, Disy 사용률 정보를 보여준다.<br>
+![](images/27_caas_workload.png)<br>
+<br><br>
+
+> **CaaS WorkLoads Detail** <div id='3.1.8.30' />
+
+- CaaS WorkLoads 상세화면에는 선택된 Workload의 Container 별 CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/28_caas_workload_chart.png)<br>
+<br><br>
+
+> **CaaS Pod** <div id='3.1.8.31' />
+
+- CaaS Pod 화면에는 Pod의 상태 정봐 및 Pod 별 CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/29_caas_pod.png)<br>
+<br><br>
+
+> **CaaS Pod Detail** <div id='3.1.8.32' />
+
+- CaaS Pod 상세화면에는 선택된 Pod의 Container 별 CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/30_caas_pod_chart.png)<br>
+<br><br>
+
+> **CaaS Container Log** <div id='3.1.8.33' />
+
+- CaaS Container Log 화면에는 선택된 Container 의 CPU, Memory, Disk 사용율 정보 및 로그 정보를 보여준다.<br>
+![](images/31_caas_container_log.png)<br>
+<br><br>
+
+> **CaaS Alarm Policy** <div id='3.1.8.34' />
+
+- Alarm Policy 화면에는 Pod의 CPU, Memory, Disk별 임계치 및 알람수신자, 측정시간 정보를 보여준다. 또한 Telegram 수신 정보를 보여준다.
+![](images/32_caas_alarm_policy.png)<br>
+<br><br>
+
+> **CaaS Alarm Status** <div id='3.1.8.35' />
+
+- Alarm Status 화면에는 설정한 임계치를 벗어나 발생된 알람 정보를 목록으로 보여준다.
+![](images/33_caas_alarm_status.png)<br>
+<br><br>
+
+> **CaaS Alarm Status Detail** <div id='3.1.8.36' />
+
+- Alarm Status Detail 화면에는 발생된 알람 정보를 보여주고 또한 조치한 내역이 있을 경우 조치 내역도 보여준다.
+![](images/34_caas_alarm_status_detail.png)<br>
+<br><br>
+
+> **SaaS Main** <div id='3.1.8.37' />
+
+- SaaS Main 화면에는 Cluster 사용율, Deployment Replica Status, Stateful Replica Status,  DaemonSet Status, Pod Container Status 정보를 보여준다.<br>
+![](images/35_saas_main.png)<br>
+<br><br>
+
+> **SaaS PINPOINT** <div id='3.1.8.38' />
+
+- SaaS PINPOINT 화면에는 선택된 Application의 PINPOINT APM 데시보드 화면을 보여준다.<br>
+![](images/36_saas_pinpoint.png)<br>
+<br><br>
+
+> **SaaS Alarm Policy** <div id='3.1.8.39' />
+
+- Alarm Policy 화면에는 Pod의 CPU, Memory, Disk별 임계치 및 알람수신자, 측정시간 정보를 보여준다. 또한 Telegram 수신 정보를 보여준다.
+![](images/37_saas_alarm_policy.png)<br>
+<br><br>
+
+> **SaaS Alarm Status** <div id='3.1.8.40' />
+
+- Alarm Status 화면에는 설정한 임계치를 벗어나 발생된 알람 정보를 목록으로 보여준다.
+![](images/38_saas_alarm_status.png)<br>
+<br><br>
+
+> **CaaS SaaS Status Detail** <div id='3.1.8.41' />
+
+- Alarm Status Detail 화면에는 발생된 알람 정보를 보여주고 또한 조치한 내역이 있을 경우 조치 내역도 보여준다.
+![](images/39_saas_alarm_status_detail.png)<br>
+<br><br>
+
 ## 3.2. PaaS-TA Monitoring Batch <div id='3.2' />
 PaaS-TA-Monitoring-Batch는 Table 및 기초 Data를 구성하며, Influx에서 CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다. AutoScale 시 PortalDB에서 AutoScale 정보를 읽어 임계치를 초과한 경우 PaaS-TA Portal에 Scale In/Out 요청을 한다.
 
