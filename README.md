@@ -117,7 +117,7 @@ PaaS_TA_Monitoring-v4.6
 
 ### 1.1.1. 목적 <div id='1.1.1' />
 
-> 본 문서는 Paas-TA 프로젝트의 IaaS, PaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
+> 본 문서는 Paas-TA 프로젝트의 IaaS, PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
 
 <br />
 
@@ -132,7 +132,7 @@ PaaS_TA_Monitoring-v4.6
 - https://git-scm.com
 - github.com/tedsuo/ifrit
 - github.com/tedsuo/rata
-- github.com/influxdata/influxdb/client/v2
+- github.com/influxdata/influxdb1-client/v2
 - github.com/rackspace/gophercloud
 - github.com/cloudfoundry-community/go-cfclient
 - github.com/go-redis/redis
@@ -148,13 +148,16 @@ PaaS_TA_Monitoring-v4.6
 - github.com/stretchr/testify
 - github.com/cloudfoundry-community/gogobosh
 - github.com/go-telegram-bot-api/telegram-bot-api
+- github.com/thoas/go-funk
+- get github.com/tidwall/gjson
+- gopkg.in/gomail.v2
 <br /><br /><br />
 
 #   2. IaaS-PaaS Monitoring Application 환경 설정 <div id='2' />
 
 ##  2.1. 개요 <div id='2.1' />
 
-> 클라우드 서비스(IaaS/PaaS) 통합 운영관리 기술 개발 프로젝트의 IaaS-PaaS-Monitoring 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 IaaS-PaaS-Monitoring 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
 <br />
 
 ##  2.2. 개발환경 사전 설치 사항 <div id='2.2' />
@@ -168,7 +171,7 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
 - OS : Window/Ubuntu
-- Golang : 1.8.3
+- Golang : 1.12.6
 - Dependencies :  github.com/tedsuo/ifrit
                   github.com/tedsuo/rata
                   github.com/influxdata/influxdb/client/v2
@@ -187,10 +190,10 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
                   github.com/stretchr/testify
                   github.com/cloudfoundry-community/gogobosh
                   github.com/go-telegram-bot-api/telegram-bot-api
-- IDE : Intellij IDEA 2017.
+- IDE : Intellij IDEA 2019.
 - 형상관리: Git
 ```
-※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2017.1 이하에서 환경 구성이 가능하다.
+※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
 
 <br/>
 
@@ -1172,8 +1175,8 @@ paas.monitoring.cf.host=https://uaa.15.164.20.58.xip.io
 ### 3.1.8. 화면 <div id='3.1.8' />
 > **Login** <div id='3.1.8.1' />
 
-- 로그인 화면으로 IaaS / PaaS 통합 회원 ID/PW를 사용하여 Login을 한다.<br>
-(시스템 및 사용자별 IaaS/PaaS 인증)
+- 로그인 화면으로 IaaS / PaaS / CaaS / SaaS 통합 회원 ID/PW를 사용하여 Login을 한다.<br>
+(시스템 및 사용자별 IaaS/PaaS /CaaS/SaaS 인증)
 ![](images/login.png)<br/>
 <br><br>
 
