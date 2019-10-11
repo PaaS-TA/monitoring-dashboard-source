@@ -442,6 +442,80 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         
         <br/><br/>
 
+    - paasta-caas-monitoring-batch Dependency Module Download
+    
+        Power Shall 또는 Terminal 을 실행한다.
+    
+        - Path 설정 (Windows)<br/>
+        ```
+        cd \...\IaaS-PaaS-Monitoring\src\paasta-caas-monitoring-batch
+        set GOPATH='현재 디렉토리 경로"
+        set PATH=%PATH%;%GOPATH%bin;
+        ```
+        <br/>
+    
+        - Path 설정 (Ubuntu)<br/>
+        ```
+        cd .../IaaS-PaaS-Monitoring/src/paasta-caas-monitoring-batch
+        export GOPATH=$PWD
+        export PATH=$GOPATH/bin:$PATH
+        ```
+        <br/>
+            
+        - Power Shall 또는 Terminal 에 아래와 같이 실행한다. (공통)<br/>
+        ```
+        go get github.com/go-sql-driver/mysql
+        go get github.com/jinzhu/gorm
+        go get github.com/mileusna/crontab
+        go get github.com/thoas/go-funk
+        go get github.com/tidwall/gjson
+        go get gopkg.in/gomail.v2
+        go get github.com/go-telegram-bot-api/telegram-bot-api
+        ```
+        <br/>        
+    
+        - src 디렉토리에 Dependency 소스들이 다운로드 되어 있음을 확인한다.<br/>
+        ![](images/2.4.1_8.png)<br/>
+        
+        <br/><br/>
+
+    - paasta-saas-monitoring-batch Dependency Module Download
+    
+        Power Shall 또는 Terminal 을 실행한다.
+    
+        - Path 설정 (Windows)<br/>
+        ```
+        cd \...\IaaS-PaaS-Monitoring\src\paasta-saas-monitoring-batch
+        set GOPATH='현재 디렉토리 경로"
+        set PATH=%PATH%;%GOPATH%bin;
+        ```
+        <br/>
+    
+        - Path 설정 (Ubuntu)<br/>
+        ```
+        cd .../IaaS-PaaS-Monitoring/src/paasta-saas-monitoring-batch
+        export GOPATH=$PWD
+        export PATH=$GOPATH/bin:$PATH
+        ```
+        <br/>
+            
+        - Power Shall 또는 Terminal 에 아래와 같이 실행한다. (공통)<br/>
+        ```
+        go get github.com/go-sql-driver/mysql
+        go get github.com/jinzhu/gorm
+        go get github.com/mileusna/crontab
+        go get github.com/thoas/go-funk
+        go get github.com/tidwall/gjson
+        go get gopkg.in/gomail.v2
+        go get github.com/go-telegram-bot-api/telegram-bot-api
+        ```
+        <br/>        
+    
+        - src 디렉토리에 Dependency 소스들이 다운로드 되어 있음을 확인한다.<br/>
+        ![](images/2.4.1_8.png)<br/>
+        
+        <br/><br/>
+
 > **Server Start** <div id='2.3.1.7' />
     
 - Windows
@@ -1337,6 +1411,7 @@ paas.monitoring.cf.host=https://uaa.15.164.20.58.xip.io
     ※ 로컬 개발환경에서는 [출력]을 클릭할 경우 화면 깨짐 현상이 나타난다. 그 이유는 CSS경로를 서버로 설정되어 있어서 발생한다. 따라서 로컬 개발환경에서 확인 할 경우 빌드(gulp package) 후 localhost:8080로 접속하면 정상적으로 출력 화면이 보인다.
     ![](images/alarm_stat_print.png)<br>
     ※ 출력시 인쇄 화면이 나타나면 레이아웃으로 가로방향으로 지정해야 전체적인 화면에 출력된다.
+<br><br>
 
 > **CaaS Main** <div id='3.1.8.26' />
 
@@ -1603,7 +1678,7 @@ monitoring.db.type=mysql
 monitoring.db.dbname=PaastaMonitoring
 monitoring.db.username=root
 monitoring.db.password=password
-monitoring.db.host=10.0.161.100
+monitoring.db.host=xx.x.xxx.xxx
 monitoring.db.port=3306
 
 # SMTP
@@ -1611,10 +1686,10 @@ mail.smtp.host=smtp.naver.com
 mail.smtp.port=587
 mail.sender.password=xxxxx
 mail.sender=xxxx@naver.com
-mail.resource.url=http://54.65.181.81:8080
+mail.resource.url=http://xx.xx.xx.xx:8080
 
 # CaaS Info
-caas.monitoring.api.url = http://52.79.197.117:8080
+caas.monitoring.api.url = http://xx.xx.xx.xxx:8080
 ```
     
 ### 3.3.4. Package 구조 <div id='3.3.4' />
@@ -1673,7 +1748,7 @@ monitoring.db.type=mysql
 monitoring.db.dbname=PaastaMonitoring
 monitoring.db.username=root
 monitoring.db.password=password
-monitoring.db.host=10.0.161.100
+monitoring.db.host=xx.x.xxx.100
 monitoring.db.port=3306
 
 
@@ -1682,10 +1757,10 @@ mail.smtp.host=smtp.naver.com
 mail.smtp.port=587
 mail.sender.password=xxxxxx
 mail.sender=xxxxxx@naver.com
-mail.resource.url=http://54.65.181.81:8080
+mail.resource.url=http://xxx.xxx.xx.xx:8080
 
 # SaaS Info
-saas.pinpoint.url = http://52.79.224.122:8079
+saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 ```
     
 ### 3.4.4. Package 구조 <div id='3.4.4' />
