@@ -1686,7 +1686,7 @@ mail.smtp.host=smtp.naver.com
 mail.smtp.port=587
 mail.sender.password=xxxxx
 mail.sender=xxxx@naver.com
-mail.resource.url=http://xx.xx.xx.xx:8080
+mail.resource.url=http://xx.xx.xx.x:8080
 
 # CaaS Info
 caas.monitoring.api.url = http://xx.xx.xx.xxx:8080
