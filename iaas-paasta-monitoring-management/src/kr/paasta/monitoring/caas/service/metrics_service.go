@@ -752,7 +752,6 @@ func (s *MetricsService) GetWorkloadsInfoGraph(request model.MetricsRequest) ([]
 			var totUsage float64 = 0
 
 			for j := 0; j < workNodeCnt; j++ {
-				fmt.Printf("[%v][%v][%v]\n", k, j, i)
 				value, _ := strconv.ParseFloat(listTotData[k][j][i]["usage"], 64)
 				totUsage += value
 			}
@@ -1341,11 +1340,6 @@ func GetDivsionContiNameList(url string, namespace string, podname string, divis
 	}
 
 	str2 := string(data)
-
-	fmt.Println("GetDivsionContiNameList !!!!!!!!!!!!!!!!!!!!!!!11")
-	fmt.Println("pqUrl : " + pqUrl)
-	fmt.Println("str2 : " + str2)
-	fmt.Println("GetDivsionContiNameList !!!!!!!!!!!!!!!!!!!!!!!11")
 
 	jsonString1 := gjson.Get(str2, "data.result.#")
 
@@ -1987,8 +1981,6 @@ func WorkNodeMapMerge(
 				workNodeList[i].Disk = data["value"]
 			}
 		}
-
-		fmt.Printf("workNodeCpuUseList : %v\n", workNodeCpuUseList)
 
 		//NodeCpuUse
 		for _, data := range workNodeCpuUseList {

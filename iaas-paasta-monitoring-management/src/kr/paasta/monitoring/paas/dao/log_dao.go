@@ -53,7 +53,7 @@ func (log PaasLogDao) GetDefaultRecentLog(request model.LogMessage, paging bool)
 		return request, errMsg
 	}
 
-	fmt.Println("elastic request =====>>>>", request)
+	//fmt.Println("elastic request =====>>>>", request)
 
 	if exists {
 		reqQuery := elastic.NewBoolQuery()

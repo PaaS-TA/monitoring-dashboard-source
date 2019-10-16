@@ -506,7 +506,6 @@ func RenderJsonUnAuthResponse(data interface{}, status int, w http.ResponseWrite
 }
 
 func RenderJsonResponse(data interface{}, w http.ResponseWriter) {
-	fmt.Println("[RESPONSE]", data)
 	js, err := json.Marshal(data)
 	if err != nil {
 		log.Fatalln("Error writing JSON:", err)

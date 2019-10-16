@@ -314,7 +314,7 @@ func appNameList() (map[string]string, []byte, string) {
 func goroutinAppList(c chan ApplicationStat, waitGroup *sync.WaitGroup, appName string, agentId string, pinpointUrl string, agentCount *int64, serviceType string) {
 	defer waitGroup.Done()
 
-	from := strconv.FormatInt(time.Now().Add(-600*time.Second).UTC().Unix(), 10) + "000"
+	from := strconv.FormatInt(time.Now().Add(-60*time.Second).UTC().Unix(), 10) + "000"
 	to := strconv.FormatInt(time.Now().UTC().Unix(), 10) + "000"
 
 	// =================================================================================================
@@ -353,7 +353,7 @@ func goroutinAppList(c chan ApplicationStat, waitGroup *sync.WaitGroup, appName 
 		return
 	}
 
-	jpath = "charts.y.ACTIVE_TRACE_NORMAL.#.4"
+	jpath = "charts.y.ACTIVE_TRACE_FAST.#.3"
 	activeThread := getAvgReustData(data, jpath, 1)
 
 	// =================================================================================================
