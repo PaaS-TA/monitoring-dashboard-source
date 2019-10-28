@@ -103,39 +103,11 @@ func (s *AlarmService) GetAlarmUpdate(request []model.AlarmPolicyRequest) model.
 		fmt.Println(err1)
 	}
 
-	// 결과 출력
-	//data, err := ioutil.ReadAll(r.Body)
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//str2 := string(data)
-	//
-	//jsonString1 := gjson.Get(str2, "Threshold")
-	//jsonString2 := gjson.Get(str2, "MeasuringTime")
-	//jsonString3 := gjson.Get(str2, "AlarmMail")
-	//jsonString4 := gjson.Get(str2, "UseYn")
-	//
-	//temp := jsonString1.Array()
-	//measuringTime, _ := strconv.Atoi(jsonString2.String())
-	//email := jsonString3.String()
-	//emailUseYn := jsonString4.String()
-	//
-	//fmt.Println("email : " + email)
-	//fmt.Println("emailUseYn : " + emailUseYn)
-	//
-	//err1 := dao.InsertAlarmInfo(dbAccessObj, temp, measuringTime, email, emailUseYn)
-	//
-	//if err1 != nil {
-	//	fmt.Println(err)
-	//}
-
 	return err1
 }
 
 func (s *AlarmService) GetAlarmLog(searchDateFrom string, searchDateTo string, alarmType string, alarmStatus string, resolveStatus string) ([]model.AlarmLog, model.ErrMessage) {
 	var alarmLog []model.AlarmLog
-
-	//dbAccessObj := dao.GetdbAccessObj()
 
 	//alarm Info
 	alarmLogs, err := dao.GetBatchAlarmLog(s.txn, searchDateFrom, searchDateTo, alarmType, alarmStatus, resolveStatus)
@@ -179,10 +151,6 @@ func (s *AlarmService) GetAlarmLog(searchDateFrom string, searchDateTo string, a
 }
 
 func (s *AlarmService) GetSnsInfo() (interface{}, interface{}) {
-	//var alarmSns []model.BatchAlarmSnsRequest
-
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	alarmSns, err := dao.GetSnsInfo(s.txn)
 	if err != nil {
 		fmt.Println(err)
@@ -193,8 +161,6 @@ func (s *AlarmService) GetSnsInfo() (interface{}, interface{}) {
 }
 
 func (s *AlarmService) GetAlarmCount(searchDateFrom string, searchDateTo string) (model.AlarmCount, interface{}) {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	var alarmCount model.AlarmCount
 	alarmCount, err := dao.GetAlarmCount(s.txn, searchDateFrom, searchDateTo)
 
@@ -207,43 +173,32 @@ func (s *AlarmService) GetAlarmCount(searchDateFrom string, searchDateTo string)
 }
 
 func (s *AlarmService) GetlarmSnsSave(alarmSns model.BatchAlarmSnsRequest) interface{} {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	err := dao.GetAlarmSnsSave(s.txn, alarmSns)
 	return err
 }
 
 func (s *AlarmService) CreateAlarmResolve(request model.AlarmrRsolveRequest) interface{} {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	err := dao.CreateAlarmResolve(s.txn, request)
 	return err
 }
 
 func (s *AlarmService) UpdateAlarmSate(request model.AlarmrRsolveRequest) interface{} {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	err := dao.UpdateAlarmSate(s.txn, request)
 	return err
 }
 
 func (s *AlarmService) DeleteAlarmSnsChannel(id int) interface{} {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	err := dao.DeleteAlarmSnsChannel(s.txn, id)
 	return err
 }
 
 func (s *AlarmService) UpdateAlarmResolve(request model.AlarmrRsolveRequest) interface{} {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	err := dao.UpdateAlarmResolve(s.txn, request)
 	return err
 }
 
 func (s *AlarmService) GetAlarmSnsReceiver() ([]model.AlarmrReceiverResponse, interface{}) {
 	var alarmReceiver []model.AlarmrReceiverResponse
-	//dbAccessObj := dao.GetdbAccessObj()
 	alarmReceiver, err := dao.GetBatchAlarmReceiver(s.txn, "SNS")
 
 	if err != nil {
@@ -253,16 +208,12 @@ func (s *AlarmService) GetAlarmSnsReceiver() ([]model.AlarmrReceiverResponse, in
 }
 
 func (s *AlarmService) DeleteAlarmResolve(id uint64) interface{} {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	err := dao.DeleteAlarmResolve(s.txn, id)
 	return err
 
 }
 
 func (s *AlarmService) GetAlarmActionList(id int) ([]model.AlarmActionResponse, model.ErrMessage) {
-	//dbAccessObj := dao.GetdbAccessObj()
-
 	alarmResolves, err := dao.GetBatchAlarmResolve(s.txn, uint64(id))
 
 	alarmActionResponses := make([]model.AlarmActionResponse, len(alarmResolves))

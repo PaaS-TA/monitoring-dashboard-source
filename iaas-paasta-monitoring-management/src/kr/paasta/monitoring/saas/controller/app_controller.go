@@ -25,6 +25,7 @@ import (
 type SaasController struct {
 	txn         *gorm.DB
 	pinpointUrl string
+	config      map[string]string
 }
 
 type ApplicationList struct {
@@ -33,8 +34,10 @@ type ApplicationList struct {
 }
 
 func NewSaasController(txn *gorm.DB) *SaasController {
+	config, _ := util.ReadConfig(`config.ini`)
 	return &SaasController{
-		txn: txn,
+		txn:    txn,
+		config: config,
 	}
 }
 
@@ -82,7 +85,7 @@ func GetSaasController(txn *gorm.DB) *SaasController {
 }
 
 func (p *SaasController) GetApplicationList(w http.ResponseWriter, r *http.Request) {
-	applications, data, pinpointUrl := appNameList()
+	applications, data, pinpointUrl := appNameList(p.config)
 
 	resutChan := make(chan ApplicationStat, len(applications)*3)
 
@@ -175,7 +178,7 @@ func (p *SaasController) GetApplicationList(w http.ResponseWriter, r *http.Reque
 }
 
 func (p *SaasController) GetAgentStatus(w http.ResponseWriter, r *http.Request) {
-	applications, data, _ := appNameList()
+	applications, data, _ := appNameList(p.config)
 
 	agentStatus := AgentStatus{
 		AgentCnt:   0,
@@ -205,7 +208,7 @@ func (p *SaasController) GetAgentStatus(w http.ResponseWriter, r *http.Request) 
 }
 
 func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request) {
-	applications, data, pinpointUrl := appNameList()
+	applications, data, pinpointUrl := appNameList(p.config)
 
 	resutChan := make(chan ApplicationGaugeTot, len(applications)*3)
 
@@ -242,8 +245,6 @@ func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request
 	var avgSystemCpuRate float64 = 0
 	var avgHaepMemoryRate float64 = 0
 	var avgNoneHaepMemoryRate float64 = 0
-
-	//applicationGaugeTot := make([]ApplicationGaugeTot, agentCount, agentCount)
 
 	for k = 0; k < agentCount; k++ {
 		applicationGaugeTot := <-resutChan
@@ -285,9 +286,7 @@ func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request
 	util.RenderJsonResponse(resultData, w)
 }
 
-func appNameList() (map[string]string, []byte, string) {
-	config, _ := util.ReadConfig(`config.ini`)
-
+func appNameList(config map[string]string) (map[string]string, []byte, string) {
 	pinpointUrl := config["saas.pinpoint.url"]
 	url := pinpointUrl + "/getAgentList.pinpoint"
 
@@ -463,6 +462,23 @@ func getAvgReustData(data string, jpath string, unit float64) float64 {
 		resultData, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", resultData), 0)
 	}
 	return resultData
+}
+
+func (p *SaasController) RemoveApplication(w http.ResponseWriter, r *http.Request) {
+	pinpointWasUrl := p.config["saas.pinpointWas.url"]
+
+	fmt.Println("pinpointWasUrl : " + pinpointWasUrl)
+
+	applicationName := r.URL.Query().Get("applicationName")
+	agentId := r.URL.Query().Get("agentId")
+
+	result, err := getRestCall(pinpointWasUrl + "/admin/removeAgentId.pinpoint?applicationName=" + applicationName + "&agentId=" + agentId + "&password=admin")
+
+	if err != nil {
+		util.RenderJsonResponse(err, w)
+		return
+	}
+	util.RenderJsonResponse(result, w)
 }
 
 func getRestCallAvgReustData(url string, jpath string, unit float64) float64 {

@@ -43,18 +43,6 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	// SaaS Metrics
 	var applicationController *saasContoller.SaasController
 
-	//if sysType == utils.SYS_TYPE_IAAS {
-	//	loginController = controller.NewIaasLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType)
-	//	memberController = controller.NewIaasMemberController(openstack_provider, paasTxn, rdClient, sysType)
-	//} else if sysType == utils.SYS_TYPE_PAAS {
-	//	loginController = controller.NewPaasLoginController(cfProvider, paasTxn, rdClient, sysType)
-	//	memberController = controller.NewPaasMemberController(cfProvider, paasTxn, rdClient, sysType)
-	//} else if sysType == utils.SYS_TYPE_SAAS {
-	//	applicationController = saasContoller.GetSaasController(paasTxn)
-	//} else {
-	//	loginController = controller.NewLoginController(openstack_provider, monsClient, auth, cfProvider, paasTxn, rdClient, sysType)
-	//	memberController = controller.NewMemberController(openstack_provider, cfProvider, paasTxn, rdClient, sysType)
-	//}
 	loginController = controller.NewLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType, cfConfig)
 	memberController = controller.NewMemberController(openstack_provider, paasTxn, rdClient, sysType, cfConfig)
 
@@ -293,6 +281,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 			routes.SAAS_API_APPLICATION_LIST:   route(applicationController.GetApplicationList),
 			routes.SAAS_API_APPLICATION_STATUS: route(applicationController.GetAgentStatus),
 			routes.SAAS_API_APPLICATION_GAUGE:  route(applicationController.GetAgentGaugeTot),
+			routes.SAAS_API_APPLICATION_REMOVE: route(applicationController.RemoveApplication),
 
 			routes.SAAS_ALARM_INFO:     route(applicationController.GetAlarmInfo),
 			routes.SAAS_ALARM_UPDATE:   route(applicationController.GetAlarmUpdate),
@@ -419,42 +408,6 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	fmt.Println("Monit Application Started")
 	return HttpWrap(handler, rdClient, openstack_provider, cfConfig)
 }
-
-//CAAS 모니터링 테스트를 위한 임시방편
-//func CaasHandler() http.Handler {
-//	var metricsController *caasContoller.MetricController
-//
-//	var caasActions rata.Handlers
-//
-//	caasActions = rata.Handlers{
-//		routes.CAAS_K8S_CLUSTER_AVG: route(metricsController.GetClusterAvg),
-//		routes.CAAS_WORK_NODE_LIST:  route(metricsController.GetWorkNodeList),
-//		routes.CAAS_WORK_NODE_INFO:  route(metricsController.GetWorkNodeInfo),
-//		routes.CAAS_CONTIANER_LIST:  route(metricsController.GetContainerList),
-//		routes.CAAS_CONTIANER_INFO:  route(metricsController.GetContainerInfo),
-//		routes.CAAS_CONTIANER_LOG:   route(metricsController.GetContainerLog),
-//	}
-//
-//	var actions rata.Handlers
-//	var actionlist []rata.Handlers
-//
-//	var route rata.Routes
-//	var routeList []rata.Routes
-//
-//	actionlist = append(actionlist, caasActions)
-//	actions = getActions(actionlist)
-//
-//	//routeList = append(routeList, routes.Routes)
-//	routeList = append(routeList, routes.CaasRoutes)
-//	route = getRoutes(routeList)
-//
-//	handler, err := rata.NewRouter(route, actions)
-//	if err != nil {
-//		panic("unable to create router: " + err.Error())
-//	}
-//	fmt.Println("Caas Monit Application Started")
-//	return handler
-//}
 
 func getActions(list []rata.Handlers) rata.Handlers {
 	actions := make(map[string]http.Handler)

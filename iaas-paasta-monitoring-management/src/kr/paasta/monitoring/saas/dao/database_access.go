@@ -43,27 +43,13 @@ func init() {
 	CreateTable(dbAccessObj)
 }
 
-//func GetdbAccessObj() *gorm.DB {
-//	dbAccessObj, paasDbErr := gorm.Open(dbType, connectionString+"?charset=utf8&parseTime=true")
-//	if paasDbErr != nil {
-//		fmt.Println("err::", paasDbErr)
-//		return nil
-//	}
-//	return dbAccessObj
-//}
-
 func CreateTable(dbClient *gorm.DB) {
-	//defer dbClient.Close()
-
 	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{}, &model.BatchAlarmSns{}, &model.BatchAlarmExecutionResolve{})
 }
 
 // Alarm Info
 func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMessage) {
-	//defer dbClient.Close()
-
 	var alarmInfos []model.BatchAlarmInfo
-	//status := dbClient.Debug().Find(&alarmInfos)
 	status := dbClient.Debug().Table("batch_alarm_infos").Where("service_type = 'SaaS'").Find(&alarmInfos)
 
 	err := util.GetError().DbCheckError(status.Error)
@@ -76,8 +62,6 @@ func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMess
 
 //// 알람 수신자 조회
 func GetBatchAlarmReceiver(dbClient *gorm.DB, receiveType string) ([]model.BatchAlarmReceiver, model.ErrMessage) {
-	//defer dbClient.Close()
-
 	var alarmReceiver []model.BatchAlarmReceiver
 
 	status := dbClient.Debug().Table("batch_alarm_receivers").Where("service_type = 'SaaS' AND receive_type = '" + receiveType + "'").Find(&alarmReceiver)
@@ -92,8 +76,6 @@ func GetBatchAlarmReceiver(dbClient *gorm.DB, receiveType string) ([]model.Batch
 
 //// 알람 수신자 조회
 func GetBatchAlarmLog(dbClient *gorm.DB, searchDateFrom string, searchDateTo string, alarmType string, alarmStatus string, resolveStatus string) ([]model.BatchAlarmExecution, model.ErrMessage) {
-	//defer dbClient.Close()
-
 	var queryWhere string
 	queryWhere = ""
 
@@ -124,8 +106,6 @@ func GetBatchAlarmLog(dbClient *gorm.DB, searchDateFrom string, searchDateTo str
 }
 
 func GetBatchAlarmResolve(dbClient *gorm.DB, id uint64) ([]model.AlarmrRsolveResponse, model.ErrMessage) {
-	//defer dbClient.Close()
-
 	var alarmRsolves []model.AlarmrRsolveResponse
 	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Select(" resolve_id , alarm_action_desc,  reg_date").Where("excution_id = " + strconv.Itoa(int(id))).Find(&alarmRsolves)
 
@@ -211,8 +191,6 @@ func InsertAlarmInfo(dbClient *gorm.DB, request []model.AlarmPolicyRequest, emai
 }
 
 func GetSnsInfo(dbClient *gorm.DB) (model.BatchAlarmSnsRequest, model.ErrMessage) {
-	//defer dbClient.Close()
-
 	var alarmSns model.BatchAlarmSnsRequest
 	status := dbClient.Debug().Table("batch_alarm_sns").Where("origin_type = 'SaaS'").Find(&alarmSns)
 
@@ -225,8 +203,6 @@ func GetSnsInfo(dbClient *gorm.DB) (model.BatchAlarmSnsRequest, model.ErrMessage
 }
 
 func GetAlarmCount(dbClient *gorm.DB) (model.AlarmCount, model.ErrMessage) {
-	//defer dbClient.Close()
-
 	var alarmCnt int
 	status := dbClient.Debug().Table("batch_alarm_executions").Where("critical_status != 'Success' and service_type = 'SaaS'").Count(&alarmCnt)
 
@@ -241,8 +217,6 @@ func GetAlarmCount(dbClient *gorm.DB) (model.AlarmCount, model.ErrMessage) {
 }
 
 func GetAlarmSnsSave(dbClient *gorm.DB, alarmSns model.BatchAlarmSnsRequest) model.ErrMessage {
-	//defer dbClient.Close()
-
 	status := dbClient.Debug().Table("batch_alarm_sns").
 		Set("gorm:insert_option", "on duplicate key update modi_date = now(), modi_user = 'system', sns_id = '"+alarmSns.SnsId+"' , token = '"+alarmSns.Token+"', expl = '"+alarmSns.Expl+"' , sns_send_yn = '"+alarmSns.SnsSendYn+"'").Create(&alarmSns)
 	err := util.GetError().DbCheckError(status.Error)
@@ -254,8 +228,6 @@ func GetAlarmSnsSave(dbClient *gorm.DB, alarmSns model.BatchAlarmSnsRequest) mod
 }
 
 func UpdateAlarmSate(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model.ErrMessage {
-	//defer dbClient.Close()
-
 	var status *gorm.DB
 	if request.ResolveStatus == "3" {
 		status = dbClient.Debug().Table("batch_alarm_executions").Where("excution_id = ? ", request.Id).
@@ -273,8 +245,6 @@ func UpdateAlarmSate(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model
 }
 
 func CreateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model.ErrMessage {
-	//defer dbClient.Close()
-
 	var alarmExecutionResolve model.BatchAlarmExecutionResolve
 	alarmExecutionResolve.ExcutionId = request.Id
 	alarmExecutionResolve.AlarmActionDesc = request.AlarmActionDesc
@@ -290,8 +260,6 @@ func CreateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) mo
 }
 
 func UpdateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model.ErrMessage {
-	//defer dbClient.Close()
-
 	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Where("resolve_id = ? ", request.Id).
 		Updates(map[string]interface{}{"alarm_action_desc": request.AlarmActionDesc})
 
@@ -303,8 +271,6 @@ func UpdateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) mo
 }
 
 func DeleteAlarmResolve(dbClient *gorm.DB, id uint64) model.ErrMessage {
-	//defer dbClient.Close()
-
 	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Where("resolve_id = " + strconv.Itoa(int(id))).Delete(model.BatchAlarmExecutionResolve{})
 	err := util.GetError().DbCheckError(status.Error)
 	if err != nil {
@@ -314,8 +280,6 @@ func DeleteAlarmResolve(dbClient *gorm.DB, id uint64) model.ErrMessage {
 }
 
 func DeleteAlarmSnsChannel(dbClient *gorm.DB, id int) model.ErrMessage {
-	//defer dbClient.Close()
-
 	alarmSns := model.BatchAlarmSns{
 		ChannelId: id,
 	}

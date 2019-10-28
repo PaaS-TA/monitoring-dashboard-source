@@ -84,29 +84,19 @@ const (
 
 	PQ_WORK_NODE_CPU_ALLOC  = "sum(kube_node_status_allocatable_cpu_cores*100)by(node)"
 	PQ_WORK_NODE_MEMORY_USE = "node_memory_Active_bytes"
-	//PQ_WORK_NODE_MEMORY_USE = "(node_memory_MemTotal_bytes - (node_memory_MemFree_bytes" + PLUS + "node_memory_Buffers_bytes" + PLUS + "node_memory_Cached_bytes))"
 
-	//PQ_WORK_NODE_DISK_USE   = "sum(node_filesystem_size_bytes{job='node-exporter'})by(instance)"
 	PQ_WORK_NODE_DISK_USE  = "sum(node_filesystem_size_bytes-node_filesystem_free_bytes)by(instance)"
 	PQ_WORK_NODE_CONDITION = "count(kube_node_status_condition{condition='Ready',status='true'})by(node)"
 
-	//Workloads Container Metrics
-	/*
-		PQ_COTAINER_NAME_LIST  = "count(kube_$workloadName_metadata_generation)by(namespace,$workloadName)"
-		PQ_COTAINER_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD'image!=''}[5m]))by(namespace,pod_name,container_name)*100"
-	*/
-
 	//Pod Usage Metrics
-	PQ_POD_LIST       = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name,namespace)"
-	PQ_POD_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m]))by(pod_name,namespace)*100"
-	PQ_POD_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/1024/1024"
-	PQ_POD_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/1024/1024"
-	PQ_POD_DISK_USAGE = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/max(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name,namespace)*100"
-	//PQ_POD_MEMORY_USAGE = "(sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!=''})by(pod_name))*100"
+	PQ_POD_LIST         = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name,namespace)"
+	PQ_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m]))by(pod_name,namespace)*100"
+	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/1024/1024"
+	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/1024/1024"
+	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/max(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name,namespace)*100"
 	PQ_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 
 	//Container Usage Metrics
-	//	PQ_COTAINER_NAME_LIST  = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"
 	PQ_COTAINER_CPU_USE    = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)" //(MS)
 	PQ_COTAINER_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m])*100)by(namespace,pod_name,container_name)"
 	PQ_COTAINER_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
@@ -290,7 +280,6 @@ func (s *MetricsService) GetContainerInfo(request model.MetricsRequest) (model.C
 	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'}[5m]))by(namespace,pod_name,container_name)*100"
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	//pqMemoryUsage := "(sum(container_memory_working_set_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name))*100"
 	pqMemoryUsage := "avg(container_memory_working_set_bytes{ccontainer_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
@@ -330,9 +319,6 @@ func (s *MetricsService) GetContainerLog(request model.MetricsRequest) (string, 
 	k8sLog := GetContainerLog(s.k8sApiUrl+k8sLogUrl, s.k8sAdminToken)
 
 	fmt.Println(s.k8sApiUrl + k8sLogUrl)
-
-	//var containerLog model.K8sLog
-	//containerLog.Log = k8sLog
 
 	return k8sLog, nil
 }
@@ -541,7 +527,6 @@ func (s *MetricsService) GetPodInfo(request model.MetricsRequest) (model.Contain
 	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name='" + podName + "'}[5m]))by(pod_name)*100"
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	//pqMemoryUsage := "(sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name))/(sum(container_memory_max_usage_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name))*100"
 	pqMemoryUsage := "avg(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
@@ -570,8 +555,6 @@ func (s *MetricsService) GetWorkNodeInfoGraph(request model.MetricsRequest) ([]m
 	nodeName := request.Nodename
 	instance := request.Instance
 
-	//interval : currentTime between endTime(interval Time (sec))
-	//timeStep : timeSeries graph(timeStep Time (sec))
 	fromToTimeParmameter := util.GetPromqlFromToParameter(3600, "600")
 
 	/*
@@ -693,9 +676,6 @@ func (s *MetricsService) GetWorkloadsInfoGraph(request model.MetricsRequest) ([]
 	var nameSpace string
 	var pod_name string
 
-	//dataWLcpu := make([][]map[string]string, int(jsonString1.Int()))
-	//dataWLmemory := make([][]map[string]string, int(jsonString1.Int()))
-	//dataWLdisk := make([][]map[string]string, int(jsonString1.Int()))
 	dataWLcpu := make(chan []map[string]string, int(jsonString1.Int()))
 	dataWLmemory := make(chan []map[string]string, int(jsonString1.Int()))
 	dataWLdisk := make(chan []map[string]string, int(jsonString1.Int()))
@@ -931,8 +911,6 @@ func GetWorkNodeMemUsageList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -966,8 +944,6 @@ func GetWorkNodeCpuUsageList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1004,8 +980,6 @@ func GetWorkNodeDiskUseList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1040,8 +1014,6 @@ func GetWorkNodeCpuUseList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1080,8 +1052,6 @@ func GetWorkNodeMemUseList(url string) []map[string]string {
 
 	fmt.Println(url)
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1117,8 +1087,6 @@ func GetWorkNodeConditionList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1153,8 +1121,6 @@ func GetGraphDataMap(url string, division string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1205,8 +1171,6 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1331,8 +1295,6 @@ func GetDivsionContiNameList(url string, namespace string, podname string, divis
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1399,7 +1361,6 @@ func GetPodNameList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1432,8 +1393,6 @@ func GetPodCpuUseList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1465,8 +1424,6 @@ func GetPodCpuUsageList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1501,8 +1458,6 @@ func GetPodMemUseList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1533,8 +1488,6 @@ func GetPodMemUsageList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1567,8 +1520,6 @@ func GetPodDiskUseList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1600,8 +1551,6 @@ func GetPodPhaseList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1636,8 +1585,6 @@ func GetPodDiskUsageList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1676,10 +1623,6 @@ func GetContainerNameList(url string, request model.MetricsRequest) []map[string
 		//goroutine setting
 		runtime.GOMAXPROCS(5)
 		var wm sync.WaitGroup
-		//var workloadsMetrics model.WorkloadsContiSummary
-
-		//Workloads(WL) Container PromQl
-		//pqWLmetaDataList := "count(kube_deployment_metadata_generation)by(namespace, pod)"
 		pqWLmetaDataList := "count(kube_" + workloadName + "_metadata_generation)by(namespace," + workloadName + ")"
 
 		resp, err := http.Get(url + pqWLmetaDataList)
@@ -1687,7 +1630,6 @@ func GetContainerNameList(url string, request model.MetricsRequest) []map[string
 		if err != nil {
 			log.Println(err)
 		}
-		//defer resp.Body.Close()
 
 		// 결과 출력
 		data, err := ioutil.ReadAll(resp.Body)
@@ -1734,8 +1676,6 @@ func GetContainerCpuUseList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1769,8 +1709,6 @@ func GetContainerCpuUsageList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -1807,8 +1745,6 @@ func GetContainerMemUseList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1843,8 +1779,6 @@ func GetContainerMemUsageList(url string) []map[string]string {
 		log.Println(err)
 	}
 
-	//defer resp.Body.Close()
-
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -1877,8 +1811,6 @@ func GetContainerDiskUseList(url string) []map[string]string {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//defer resp.Body.Close()
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
@@ -2003,11 +1935,6 @@ func WorkNodeMapMerge(
 			}
 		}
 	}
-	//
-	//workNode.WorkNode = make([]model.WorkNodeList, len(workNodeList))
-	//for i := 0; i < len(workNodeList); i++ {
-	//	workNode.WorkNode[i] = workNodeList[i]
-	//}
 
 	return workNodeList
 }
@@ -2019,8 +1946,7 @@ func ContainerMapMerge(
 	containerMemUseList []map[string]string,
 	containerMemUsageList []map[string]string,
 	containerDiskUseList []map[string]string) []model.ContainerMetricList {
-	//
-	//containerMetric := model.ContainerMetric{}
+
 	var containerMetricList []model.ContainerMetricList
 
 	containerMetricList = make([]model.ContainerMetricList, len(containerNameList))
@@ -2066,11 +1992,6 @@ func ContainerMapMerge(
 			}
 		}
 	}
-
-	//containerMetric.ContainerMetric = make([]model.ContainerMetricList, len(containerMetricList))
-	//for i := 0; i < len(containerMetricList); i++ {
-	//	containerMetric.ContainerMetric[i] = containerMetricList[i]
-	//}
 
 	return containerMetricList
 }

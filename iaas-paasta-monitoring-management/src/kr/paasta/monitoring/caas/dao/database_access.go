@@ -35,36 +35,18 @@ func init() {
 	port := config["paas.monitoring.db.port"]
 
 	connectionString = fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s", userName, userPassword, "tcp", host, port, dbName, "")
-
-	//dbAccessObj, paasDbErr := gorm.Open(dbType, connectionString+"?charset=utf8&parseTime=true")
-	//if paasDbErr != nil {
-	//	fmt.Println("err::", paasDbErr)
-	//}
-	//CreateTable(dbAccessObj)
 }
 
-//func GetdbAccessObj() *gorm.DB {
-//	dbAccessObj, paasDbErr := gorm.Open(dbType, connectionString+"?charset=utf8&parseTime=true")
-//	if paasDbErr != nil {
-//		fmt.Println("err::", paasDbErr)
-//		return nil
-//	}
-//	return dbAccessObj
-//}
-
 func CreateTable(dbClient *gorm.DB) {
-	//defer dbClient.Close()
 	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{}, &model.BatchAlarmSns{}, &model.BatchAlarmExecutionResolve{})
 }
 
 // Alarm Info
 func GetBatchAlarmInfo(dbClient *gorm.DB) ([]model.BatchAlarmInfo, model.ErrMessage) {
 	var alarmInfos []model.BatchAlarmInfo
-	//status := dbClient.Debug().Find(&alarmInfos)
 	status := dbClient.Debug().Table("batch_alarm_infos").Where("service_type = 'CaaS'").Find(&alarmInfos)
 
 	err := util.GetError().DbCheckError(status.Error)
-	//defer dbClient.Close()
 
 	if err != nil {
 		return nil, err
@@ -78,7 +60,6 @@ func GetBatchAlarmReceiver(dbClient *gorm.DB, receiveType string) ([]model.Alarm
 	status := dbClient.Debug().Table("batch_alarm_receivers").Where("service_type = 'CaaS' AND receive_type = '" + receiveType + "'").Find(&alarmReceiver)
 
 	err := util.GetError().DbCheckError(status.Error)
-	//defer dbClient.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +92,6 @@ func GetBatchAlarmLog(dbClient *gorm.DB, searchDateFrom string, searchDateTo str
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +105,6 @@ func GetBatchAlarmResolve(dbClient *gorm.DB, id uint64) ([]model.AlarmrRsolveRes
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +122,6 @@ func InsertAlarmInfo(dbClient *gorm.DB, request []model.AlarmPolicyRequest, emai
 		batchAlarmInfo := model.BatchAlarmInfo{}
 		repeatTime := strconv.Itoa(data.RepeatTime)
 
-		//tempMap := data.Map()
-		//tempWaring, _ := strconv.Atoi(tempMap["Warning"].String())
-		//tempCritical, _ := strconv.Atoi(tempMap["Critical"].String())
-		//cronExpression := "*/" + tempMap["Delay"].String() + " * * * *"
 		batchAlarmInfo.ServiceType = data.OriginType
 		batchAlarmInfo.MetricType = data.AlarmType
 		batchAlarmInfo.WarningValue = data.WarningThreshold
@@ -191,7 +166,6 @@ func InsertAlarmInfo(dbClient *gorm.DB, request []model.AlarmPolicyRequest, emai
 
 	tx.Commit()
 
-	//defer dbClient.Close()
 	return err
 }
 
@@ -201,7 +175,6 @@ func GetSnsInfo(dbClient *gorm.DB) (interface{}, model.ErrMessage) {
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +195,6 @@ func GetAlarmCount(dbClient *gorm.DB, searchDateFrom string, searchDateTo string
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		return model.AlarmCount{}, err
 	}
@@ -238,7 +210,6 @@ func GetAlarmSnsSave(dbClient *gorm.DB, alarmSns model.BatchAlarmSnsRequest) mod
 		Set("gorm:insert_option", "on duplicate key update modi_date = now(), modi_user = 'system', sns_id = '"+alarmSns.SnsId+"',  token = '"+alarmSns.Token+"', expl = '"+alarmSns.Expl+"' , sns_send_yn = '"+alarmSns.SnsSendYn+"'").Create(&alarmSns)
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		fmt.Printf("error : %v\n", err)
 		return err
@@ -257,7 +228,6 @@ func UpdateAlarmSate(dbClient *gorm.DB, request model.AlarmrRsolveRequest) model
 	}
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		fmt.Printf("error : %v\n", err)
 	}
@@ -275,7 +245,6 @@ func CreateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) mo
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		fmt.Printf("error : %v\n", err)
 	}
@@ -288,7 +257,6 @@ func UpdateAlarmResolve(dbClient *gorm.DB, request model.AlarmrRsolveRequest) mo
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		fmt.Printf("error : %v\n", err)
 	}
@@ -299,7 +267,6 @@ func DeleteAlarmResolve(dbClient *gorm.DB, id uint64) model.ErrMessage {
 	status := dbClient.Debug().Table("batch_alarm_execution_resolves").Where("resolve_id = " + strconv.Itoa(int(id))).Delete(model.BatchAlarmExecutionResolve{})
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		fmt.Printf("error : %v\n", err)
 	}
@@ -314,7 +281,6 @@ func DeleteAlarmSnsChannel(dbClient *gorm.DB, id int) model.ErrMessage {
 
 	err := util.GetError().DbCheckError(status.Error)
 
-	//defer dbClient.Close()
 	if err != nil {
 		fmt.Printf("error : %v\n", err)
 	}

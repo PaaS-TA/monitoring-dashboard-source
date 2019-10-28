@@ -179,6 +179,7 @@ const (
 	SAAS_API_APPLICATION_LIST   = "SAAS_API_APPLICATION_LIST"
 	SAAS_API_APPLICATION_STATUS = "SAAS_API_APPLICATION_STATUS"
 	SAAS_API_APPLICATION_GAUGE  = "SAAS_API_APPLICATION_GAUGE"
+	SAAS_API_APPLICATION_REMOVE = "SAAS_API_APPLICATION_REMOVE"
 
 	SAAS_ALARM_INFO               = "SAAS_ALARM_INFO"
 	SAAS_ALARM_SNS_INFO           = "SAAS_ALARM_SNS_INFO"
@@ -487,4 +488,5 @@ var SaasRoutes = rata.Routes{
 	{Path: "/v2/saas/app/application/snsChannel/list", Method: "GET", Name: SAAS_ALARM_SNS_CHANNEL_LIST},
 	{Path: "/v2/saas/app/application/snsChannel/:id", Method: "DELETE", Name: SAAS_ALARM_SNS_CHANNEL_DELETE},
 	{Path: "/v2/saas/app/application/alarmAction/:id", Method: "GET", Name: SAAS_ALARM_ACTION_LIST},
+	{Path: "/v2/saas/app/application/removeAgentId", Method: "DELETE", Name: SAAS_API_APPLICATION_REMOVE},
 }
