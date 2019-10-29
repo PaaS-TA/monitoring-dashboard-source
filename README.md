@@ -331,7 +331,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-Monitoring\src\ iaas-paasta-monitoring-management
+        cd .\PaaS-TA-Monitoring\ iaas-paasta-monitoring-management
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -339,7 +339,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/iaas-paasta-monitoring-management 
+        cd ./PaaS-TA-Monitoring/iaas-paasta-monitoring-management 
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -381,7 +381,6 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         xcopy ./lib-bugFix-src/gophercloud/requests.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         xcopy ./lib-bugFix-src/gophercloud/results.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         xcopy ./lib-bugFix-src/gophercloud/client.go ./src/github.com/rackspace/gophercloud/openstack
-        xcopy ./lib-bugFix-src/go-cfclient/client.go ./src/github.com/cloudfoundry-community/go-cfclient
         ```
         <br/>
 
@@ -394,7 +393,6 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         cp ./lib-bugFix-src/gophercloud/requests.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         cp ./lib-bugFix-src/gophercloud/results.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         cp ./lib-bugFix-src/gophercloud/client.go ./src/github.com/rackspace/gophercloud/openstack
-        cp ./lib-bugFix-src/go-cfclient/client.go ./src/github.com/cloudfoundry-community/go-cfclient
         ```
         
         <br/><br/>
