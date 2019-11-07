@@ -1,4 +1,4 @@
-PaaS_TA_Monitoring-v4.6
+PaaS_TA_Monitoring-v5.6
 =======================
 
 
@@ -1091,8 +1091,9 @@ server.url = http://127.0.0.1:8080
 server.port = 8080
 
 #모니터링 시스템 사용 옵션 정보
-#( IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용 , CaaS : CaaS 만 사용, SaaS : SaaS 만 사용, ALL : 모두 사용)
-# 모두 사용하지 않고 조합시 ","로 구분 예) PaaS,CaaS
+#( IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용, ALL : IaaS, PaaS 모두 사용)
+#system.monitoring.type=PaaS
+#system.monitoring.type=IaaS
 system.monitoring.type=PaaS,CaaS,SaaS
 
 # Monasca RDB 접속 정보
@@ -1115,7 +1116,7 @@ paas.monitoring.db.type=mysql
 paas.monitoring.db.dbname=PaastaMonitoring
 paas.monitoring.db.username=root
 paas.monitoring.db.password=password
-paas.monitoring.db.host=xx.x.xxx.xxx
+paas.monitoring.db.host=localhost
 paas.monitoring.db.port=3306
 
 paas.metric.db.username =
@@ -1131,20 +1132,19 @@ default.domain=default
 default.username=admin
 default.password=cfmonit
 default.tenant_name=admin
-default.tenant_id=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+default.tenant_id=61e66f7d847e4951aa38452fe74c93eb
 identity.endpoint=http://xxx.xx.xxx.xxx:5000/v3
 keystone.url=http://xxx.xx.xxx.xxx:35357/v3
 
 # Monasca Api
-monasca.url=http://xxx.xx.xxx.xxx:8020/v2.0
-#monasca.url=http://xx.xx.xxx.xxx:8020/v2.0
+monasca.url=http://xxx.xx.xxx.xxxx:8020/v2.0
 monasca.connect.timeout=60
 monasca.secure.tls=false
 
 # Openstack Nova
-nova.target.url=http://xxx.xxx.xxx.xxx:8774
+nova.target.url=http://xxx.xx.xxx.xxx:8774
 nova.target.version=v2.1
-nova.target.tenant_id=xxxxxxxxxxxxxxxxxx
+nova.target.tenant_id=61e66f7d847e4951aa38452fe74c93eb
 
 # Openstack Keystone
 keystone.target.url=http://xxx.xx.xxx.xxx:35357
@@ -1164,8 +1164,8 @@ glance.target.version=v2
 
 # RabbitMQ
 rabbitmq.user=openstack
-rabbitmq.pass=xxxxx
-rabbitmq.ip=xx.68.xxx.xxx
+rabbitmq.pass=cfmonit
+rabbitmq.ip=xxx.xx.xxx.xxx
 rabbitmq.port=15672
 rabbitmq.target.node=rabbit@controller
 
@@ -1176,14 +1176,13 @@ paas.elastic.url=xx.x.xxx.xxx:9200
 # Bosh Info
 bosh.count=1
 bosh.0.name=micro-bosh
-bosh.0.ip=10.0.1.6
+bosh.0.ip=xx.x.x.x
 bosh.0.deployname=bosh
 
 # BOSH client
 bosh.client.api.address=https://xx.x.x.x:25555
 bosh.client.api.username=admin
-bosh.client.api.password=xxxxxxxxxxxxx
-#bosh.client.api.password=admin_password
+bosh.client.api.password=admin_password
 
 #disk mount point
 disk.mount.point=/,/var/vcap/data
@@ -1208,23 +1207,23 @@ paas.cf.client.apiaddress=https://api.xxx.xx.xxx.xxx.xip.io
 paas.cf.client.skipsslvalidation=true
 
 #redis
-redis.addr=xx.x.xxx.xx:6379
+redis.addr=xxx.x.xx.xxx:6379
 redis.password=password
 redis.db=0
 
 #Caas monitoring tool Prometheus
-prometheus.addr=http://xx.0.xxx.xxx:30090
+prometheus.addr=http://xx.x.xxx.xxx:30090
 
 #Caas k8s ApiServer URL
 kubernetesApi.addr=https://xx.x.x.xxx:8443
-kubernetes.admin.token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
+kubernetes.admin.token=
 
 #SaaS Pinpoint Url
-saas.pinpoint.url=http://xx.xxx.xx.xx:8079
+saas.pinpoint.url=http://xx.xxx.xxx.xx:8079
+saas.pinpointWas.url=http://xx.x.xx.xxx:8080
 
 paas.monitoring.cf.host=https://uaa.xx.xxx.xx.xx.xip.io
-
+caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
 ```
 
 ### 3.1.4. API Package 구조 <div id='3.1.4' />
