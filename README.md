@@ -1252,7 +1252,7 @@ caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
 
 > **Dashboard** <div id='3.1.8.2' />
 
-- 통합 Dashboard 화면에서는 IaaS의 Hypervisor 정보와 Openstack의 전반적인 자원 사용량 정보 그리고 PaaS의 Bosh, PaaS-TA, Container의 상태 정보, IaaS / PaaS에서 발생된 알람 건수를 보여준다.
+- 통합 Dashboard 화면에서는 PaaS의 Bosh, PaaS-TA, Container의 상태 정보, CaaS의 Cluster, Workload, Pod의 상태 정보, SaaS의 Application JVM 자원 상태 정보, PaaS / CaaS / SaaS에서 발생된 알람 건수를 보여준다.
 ![](images/02_Dashboard.png)<br/>
 <br><br>
 
