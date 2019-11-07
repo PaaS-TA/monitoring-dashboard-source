@@ -1,37 +1,36 @@
 package dao
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
+	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
+	mod "kr/paasta/monitoring-batch/model"
 	cb "kr/paasta/monitoring-batch/model/base"
 	"kr/paasta/monitoring-batch/util"
-	mod "kr/paasta/monitoring-batch/model"
-	"fmt"
 	"strconv"
 )
 
 type paasTaAlarmStruct struct {
-	influxClient 	client.Client
+	influxClient client.Client
 }
 
-
-func GetPaasTaAlarmDao(influxClient client.Client) *paasTaAlarmStruct{
+func GetPaasTaAlarmDao(influxClient client.Client) *paasTaAlarmStruct {
 
 	return &paasTaAlarmStruct{
-		influxClient: 	influxClient,
+		influxClient: influxClient,
 	}
 }
 
 //Server 상태 목록 조회
-func (f paasTaAlarmStruct) GetPaaSTaList(txn *gorm.DB) ([]mod.Vm, cb.ErrMessage){
+func (f paasTaAlarmStruct) GetPaaSTaList(txn *gorm.DB) ([]mod.Vm, cb.ErrMessage) {
 
 	vms := []mod.Vm{}
 
 	status := txn.Debug().Find(&vms)
 	err := util.GetError().DbCheckError(status.Error)
 
-	if err != nil{
-		fmt.Println("Error::", err )
+	if err != nil {
+		fmt.Println("Error::", err)
 	}
 
 	return vms, err
@@ -44,22 +43,21 @@ func (b paasTaAlarmStruct) GetPaastaAlarmPolicy(txn *gorm.DB) ([]mod.AlarmPolicy
 	status := txn.Debug().Model(&alarmPolicy).Where("origin_type = ? ", cb.ORIGIN_TYPE_PAASTA).Find(&alarmPolicy)
 
 	err := util.GetError().DbCheckError(status.Error)
-	if err != nil{
-		fmt.Println("Error::", err )
-		return   nil, err
+	if err != nil {
+		fmt.Println("Error::", err)
+		return nil, err
 	}
 
 	return alarmPolicy, nil
 }
 
-
-func (b paasTaAlarmStruct) GetPaasTaCpuUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage)  {
+func (b paasTaAlarmStruct) GetPaasTaCpuUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = cb.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -67,8 +65,8 @@ func (b paasTaAlarmStruct) GetPaasTaCpuUsage(request mod.VmReq) (_ client.Respon
 	// alarm measure time default : 120s
 	measureTime := "120s"
 
-	for _,value := range request.MeasureTimeList{
-		if value.Item == cb.ALARM_TYPE_CPU{
+	for _, value := range request.MeasureTimeList {
+		if value.Item == cb.ALARM_TYPE_CPU {
 			measureTime = strconv.Itoa(value.MeasureTime) + "s"
 		}
 	}
@@ -77,7 +75,7 @@ func (b paasTaAlarmStruct) GetPaasTaCpuUsage(request mod.VmReq) (_ client.Respon
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( cpuUsageSql , request.Ip, measureTime),
+		Command:  fmt.Sprintf(cpuUsageSql, request.Ip, measureTime),
 		Database: request.MetricDatabase,
 	}
 
@@ -85,19 +83,19 @@ func (b paasTaAlarmStruct) GetPaasTaCpuUsage(request mod.VmReq) (_ client.Respon
 
 	resp, err := b.influxClient.Query(q)
 
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (b paasTaAlarmStruct) GetPaasTaMemoryUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage)  {
+func (b paasTaAlarmStruct) GetPaasTaMemoryUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = cb.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -105,8 +103,8 @@ func (b paasTaAlarmStruct) GetPaasTaMemoryUsage(request mod.VmReq) (_ client.Res
 	// alarm measure time default : 120s
 	measureTime := "120s"
 
-	for _,value := range request.MeasureTimeList{
-		if value.Item == cb.ALARM_TYPE_MEMORY{
+	for _, value := range request.MeasureTimeList {
+		if value.Item == cb.ALARM_TYPE_MEMORY {
 			measureTime = strconv.Itoa(value.MeasureTime) + "s"
 		}
 	}
@@ -117,28 +115,26 @@ func (b paasTaAlarmStruct) GetPaasTaMemoryUsage(request mod.VmReq) (_ client.Res
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( memoryTotalSql + memoryFreeSql , request.Ip, measureTime, request.Ip, measureTime ),
+		Command:  fmt.Sprintf(memoryTotalSql+memoryFreeSql, request.Ip, measureTime, request.Ip, measureTime),
 		Database: request.MetricDatabase,
 	}
 
 	resp, err := b.influxClient.Query(q)
 
 	fmt.Println("Memory Sql==>%s", q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
 }
 
-
-
-func (b paasTaAlarmStruct) GetPaasTaDiskUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage)  {
+func (b paasTaAlarmStruct) GetPaasTaDiskUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = cb.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -146,8 +142,8 @@ func (b paasTaAlarmStruct) GetPaasTaDiskUsage(request mod.VmReq) (_ client.Respo
 	// alarm measure time default : 120s
 	measureTime := "120s"
 
-	for _,value := range request.MeasureTimeList{
-		if value.Item == cb.ALARM_TYPE_DISK{
+	for _, value := range request.MeasureTimeList {
+		if value.Item == cb.ALARM_TYPE_DISK {
 			measureTime = strconv.Itoa(value.MeasureTime) + "s"
 		}
 	}
@@ -156,25 +152,25 @@ func (b paasTaAlarmStruct) GetPaasTaDiskUsage(request mod.VmReq) (_ client.Respo
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( diskUsageSql , request.Ip, measureTime),
+		Command:  fmt.Sprintf(diskUsageSql, request.Ip, measureTime),
 		Database: request.MetricDatabase,
 	}
 	fmt.Println("Disk Sql==>", q)
 	resp, err := b.influxClient.Query(q)
 
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (b paasTaAlarmStruct) GetPaasTaRootDiskUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage)  {
+func (b paasTaAlarmStruct) GetPaasTaRootDiskUsage(request mod.VmReq) (_ client.Response, errMsg cb.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 			errMsg = cb.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -182,8 +178,8 @@ func (b paasTaAlarmStruct) GetPaasTaRootDiskUsage(request mod.VmReq) (_ client.R
 	// alarm measure time default : 120s
 	measureTime := "120s"
 
-	for _,value := range request.MeasureTimeList{
-		if value.Item == cb.ALARM_TYPE_DISK{
+	for _, value := range request.MeasureTimeList {
+		if value.Item == cb.ALARM_TYPE_DISK {
 			measureTime = strconv.Itoa(value.MeasureTime) + "s"
 		}
 	}
@@ -192,13 +188,13 @@ func (b paasTaAlarmStruct) GetPaasTaRootDiskUsage(request mod.VmReq) (_ client.R
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( diskUsageSql , request.Ip, measureTime),
+		Command:  fmt.Sprintf(diskUsageSql, request.Ip, measureTime),
 		Database: request.MetricDatabase,
 	}
 	fmt.Println("Disk Sql==>", q)
 	resp, err := b.influxClient.Query(q)
 
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)

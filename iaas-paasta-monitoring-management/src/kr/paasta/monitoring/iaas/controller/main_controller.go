@@ -1,35 +1,34 @@
 package controller
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
-	"kr/paasta/monitoring/utils"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/iaas/service"
+	"kr/paasta/monitoring/utils"
 	"net/http"
 )
 
 //Main Page Controller
-type OpenstackServices struct{
+type OpenstackServices struct {
 	OpenstackProvider model.OpenstackProvider
 	influxClient      client.Client
 }
 
-
 func NewMainController(openstackProvider model.OpenstackProvider, influxClient client.Client) *OpenstackServices {
 	return &OpenstackServices{
 		OpenstackProvider: openstackProvider,
-		influxClient: influxClient,
+		influxClient:      influxClient,
 	}
 }
 
 func (h *OpenstackServices) Main(w http.ResponseWriter, r *http.Request) {
 	model.MonitLogger.Debug("Main API Called")
 
-	url := "/public/dist/index.html"
+	url := "/public/index.html"
 	http.Redirect(w, r, url, 302)
 }
 
-func (s *OpenstackServices)OpenstackSummary(w http.ResponseWriter, r *http.Request){
+func (s *OpenstackServices) OpenstackSummary(w http.ResponseWriter, r *http.Request) {
 
 	provider, username, err := utils.GetOpenstackProvider(r)
 	projectResourceSummary, err := services.GetMainService(s.OpenstackProvider, provider, s.influxClient).GetOpenstackSummary(username)
@@ -37,7 +36,7 @@ func (s *OpenstackServices)OpenstackSummary(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		model.MonitLogger.Error("GetOpenstackResources error :", err)
 		utils.ErrRenderJsonResponse(err, w)
-	}else{
+	} else {
 		utils.RenderJsonResponse(projectResourceSummary, w)
 	}
 

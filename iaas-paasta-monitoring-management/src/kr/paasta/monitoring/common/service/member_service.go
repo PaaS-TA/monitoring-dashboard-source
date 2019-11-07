@@ -1,61 +1,78 @@
 package services
 
 import (
-	"github.com/rackspace/gophercloud"
-	"kr/paasta/monitoring/iaas/model"
-	cm "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/common/dao"
-	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
-	"github.com/go-redis/redis"
-	"kr/paasta/monitoring/utils"
+	"encoding/json"
 	"fmt"
+	"github.com/go-redis/redis"
+	"github.com/jinzhu/gorm"
+	"github.com/rackspace/gophercloud"
+	"io/ioutil"
+	"kr/paasta/monitoring/common/dao"
+	cm "kr/paasta/monitoring/common/model"
+	"kr/paasta/monitoring/iaas/model"
+	pm "kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/utils"
+	"net/http"
+	"net/url"
 	"strings"
-	"time"
 )
 
 type MemberService struct {
 	openstackProvider model.OpenstackProvider
-	CfProvider        cfclient.Config
-	txn *gorm.DB
+	//CfProvider        cfclient.Config
+	txn      *gorm.DB
 	RdClient *redis.Client
 }
 
-func GetMemberService(openstackProvider model.OpenstackProvider, cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client ) *MemberService {
+type UaaToken struct {
+	Token            string `json:"access_token"`
+	Scope            string `json:"scope"`
+	Expire           int64  `json:"expires_in"`
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+}
+type CaasBroker struct {
+	ResultCode string `json:"resultCode"`
+	Items      []Item
+}
+type Item struct {
+	UserId      string `json:"userId"`
+	AccountName string `json:"caasAccountName"`
+}
+
+func GetMemberService(openstackProvider model.OpenstackProvider, txn *gorm.DB, rdClient *redis.Client) *MemberService {
 	return &MemberService{
 		openstackProvider: openstackProvider,
-		CfProvider : cfProvider,
-		txn: txn,
+		//CfProvider : cfProvider,
+		txn:      txn,
 		RdClient: rdClient,
 	}
 }
 
-func GetIaasMemberService(openstackProvider model.OpenstackProvider, txn *gorm.DB,  rdClient *redis.Client ) *MemberService {
+func GetIaasMemberService(openstackProvider model.OpenstackProvider, txn *gorm.DB, rdClient *redis.Client) *MemberService {
 	return &MemberService{
 		openstackProvider: openstackProvider,
-		txn: txn,
-		RdClient: rdClient,
+		txn:               txn,
+		RdClient:          rdClient,
 	}
 }
 
-func GetPaasMemberService(cfProvider  cfclient.Config, txn *gorm.DB,  rdClient *redis.Client ) *MemberService {
+func GetPaasMemberService(txn *gorm.DB, rdClient *redis.Client) *MemberService {
 	return &MemberService{
-		CfProvider : cfProvider,
-		txn: txn,
+		//CfProvider : cfProvider,
+		txn:      txn,
 		RdClient: rdClient,
 	}
 }
 
 func (n MemberService) MemberJoinInfo() (val string) {
 
-
-
 	return ""
 }
 
-func (n MemberService) MemberJoinSave(req cm.UserInfo) (error) {
+func (n MemberService) MemberJoinSave(req cm.UserInfo) error {
 
-	 dbErr := dao.GetMemberDao(n.txn).MemberJoinSave(req, n.txn)
+	dbErr := dao.GetMemberDao(n.txn).MemberJoinSave(req, n.txn)
 
 	if dbErr != nil {
 		return dbErr
@@ -64,7 +81,7 @@ func (n MemberService) MemberJoinSave(req cm.UserInfo) (error) {
 	return nil
 }
 
-func (n MemberService) MemberAuthCheck(req cm.UserInfo) (result cm.UserInfo,  err error) {
+/*func (n MemberService) MemberAuthCheck(req cm.UserInfo) (result cm.UserInfo,  err error) {
 
 
 	//member info 로그인 아이디 패스워드를 회원디비에서 검색하여 iaas, paas 로그인 정보를 가지고 온다.
@@ -145,12 +162,11 @@ func (n MemberService) MemberAuthCheck(req cm.UserInfo) (result cm.UserInfo,  er
 
 
 	return result,  err
-}
-
+}*/
 
 func (n MemberService) MemberInfoCheck(req cm.UserInfo) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
 
-	result, _ , dbErr := dao.GetMemberDao(n.txn).MemberInfoCheck(req, n.txn)
+	result, _, dbErr := dao.GetMemberDao(n.txn).MemberInfoCheck(req, n.txn)
 
 	if dbErr != nil {
 		return result, provider, dbErr
@@ -159,10 +175,9 @@ func (n MemberService) MemberInfoCheck(req cm.UserInfo) (userInfo cm.UserInfo, p
 	return result, provider, dbErr
 }
 
-
 func (n MemberService) MemberInfoView(req cm.UserInfo) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
-	fmt.Println("MemberInfoView service req.userid",req.UserId)
-	result, _ , dbErr := dao.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
+	fmt.Println("MemberInfoView service req.userid", req.UserId)
+	result, _, dbErr := dao.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
 
 	if dbErr != nil {
 		return result, provider, dbErr
@@ -181,7 +196,7 @@ func (n MemberService) MemberInfoUpdate(req cm.UserInfo) (userInfo cm.UserInfo, 
 		return nullInfo, provider, dbErr
 	}
 
-	result, _ , dbErr := dao.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
+	result, _, dbErr := dao.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
 
 	if dbErr != nil {
 		return nullInfo, provider, dbErr
@@ -190,19 +205,18 @@ func (n MemberService) MemberInfoUpdate(req cm.UserInfo) (userInfo cm.UserInfo, 
 	return result, provider, dbErr
 }
 
-func (n MemberService) MemberInfoDelete(req cm.UserInfo) (cnt  int,  err error) {
+func (n MemberService) MemberInfoDelete(req cm.UserInfo) (cnt int, err error) {
 
-	result , dbErr := dao.GetMemberDao(n.txn).MemberInfoDelete(req, n.txn)
+	result, dbErr := dao.GetMemberDao(n.txn).MemberInfoDelete(req, n.txn)
 
 	if dbErr != nil {
-		return result,  dbErr
+		return result, dbErr
 	}
 
-	return result,  dbErr
+	return result, dbErr
 }
 
-
-func (s MemberService) GetIaasToken( apiRequest cm.UserInfo, reqCsrfToken string) string {
+func (s MemberService) GetIaasToken(apiRequest cm.UserInfo, reqCsrfToken string) string {
 	//get iaas token
 	s.openstackProvider.Username = apiRequest.IaasUserId
 	s.openstackProvider.Password = apiRequest.IaasUserPw
@@ -236,91 +250,65 @@ func (s MemberService) GetIaasToken( apiRequest cm.UserInfo, reqCsrfToken string
 	return result
 }
 
+func shallowDefaultTransport() *http.Transport {
+	defaultTransport := http.DefaultTransport.(*http.Transport)
+	return &http.Transport{
+		Proxy:                 defaultTransport.Proxy,
+		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
+		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
+	}
+}
 
-func (n MemberService) GetPaasToken(apiRequest cm.UserInfo,  reqCsrfToken string) string {
+func (n MemberService) CaasServiceCheck(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig) string {
 
-	n.CfProvider.Username = strings.TrimSpace(apiRequest.PaasUserId)
-	n.CfProvider.Password = strings.TrimSpace(apiRequest.PaasUserPw)
 	result := ""
-	//fmt.Println("paas Username :::>",len(n.CfProvider.Username),"</>",len(n.CfProvider.Password))
-	//fmt.Println("paas CfProvider ::: ",	n.CfProvider)
-	if len(n.CfProvider.Username) > 0 && len(n.CfProvider.Password) > 0 {
 
-		client, err := cfclient.NewClient(&n.CfProvider)
+	apiUrl := cfConfig.CaasBrokerHost
+	resource := "/users"
+	u, _ := url.ParseRequestURI(apiUrl)
+	u.Path = resource
+	urlStr := u.String() // "https://api.com/user/"
 
-		if err != nil {
-			fmt.Println("PaaS(cf) login result:", err.Error())
+	client := &http.Client{}
+	r, _ := http.NewRequest("GET", urlStr, nil) // URL-encoded payload
+	r.SetBasicAuth("admin", "PaaS-TA")
+	r.Header.Add("Accept", "application/json")
+	r.Header.Add("Content-Type", "application/json")
+	resp, _ := client.Do(r)
+	fmt.Println(resp.Status)
 
-			if strings.Contains(err.Error(), "Bad credentials") {
-				fmt.Println("bad_credentials")
-				return "bad_credentials"
-			} else if strings.Contains(err.Error(), "account has been locked") {
-				fmt.Println("account_locked")
-				return "account_locked"
-			} else {
-				fmt.Println("unexpected_fail: return empty string")
-				return ""
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+
+	var caasBroker CaasBroker
+	json.Unmarshal(bodyBytes, &caasBroker.Items)
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println(caasBroker)
+		return caasBroker.ResultCode
+	}
+	fmt.Println(caasBroker.Items)
+	for _, item := range caasBroker.Items {
+		//n.mergeAppResource(item)
+		if item.UserId == apiRequest.CaasUserId {
+
+			if strings.Contains(item.AccountName, "-admin") {
+				result = "adm"
 			}
 		}
-
-		if err != nil || len(n.CfProvider.Username) == 0 || len(n.CfProvider.Password) == 0 {
-			fmt.Println("paas error::", err.Error())
-			//utils.RenderJsonLogoutResponse("", w)
-			//utils.ErrRenderJsonResponse(err, w)
-			result = ""
-		} else {
-			token, tokenErr := client.GetToken()
-
-			fmt.Printf("cf-token=[%v], cf-tokenErr=[%v]\n", token, tokenErr)
-
-			apps, err1 := client.ListApps()
-
-			fmt.Printf("cf-apps=[%v], cf-appsErr=[%v]\n", apps, err1)
-
-			if err1 != nil {
-				fmt.Println("paas ListApps err ::: ", err1.Error())
-			} else {
-				//fmt.Println("paas ListApps client1 ::: ", client1)
-			}
-			apiRequest.PaasToken = strings.Replace(token, "bearer ", "", -1)
-			//result.PaasToken = token
-			//fmt.Println("paas token ::: ", apiRequest.PaasToken)
-			//fmt.Println("paas Scope ::: ",client.Config.Scope)
-
-			fmt.Printf("client.Config.Scope=[%v]\n", client.Config.Scope)
-
-			if len(client.Config.Scope) > 0 {
-				cfChk := false
-				for _, value := range client.Config.Scope {
-					if strings.Contains(value,"cloud_controller.admin") {
-						cfChk = true
-					}
-				}
-
-				if cfChk {
-					//redis 에 사용자 정보를 수정 저장한다.
-					//redis 에 사용자 정보를 저장한다.
-					rdresult := n.RdClient.Get(reqCsrfToken)
-					if rdresult.Val() == "" {
-						n.RdClient.HSet(reqCsrfToken, "paasUserId", n.CfProvider.Username)
-						n.RdClient.HSet(reqCsrfToken, "paasToken", apiRequest.PaasToken)
-						n.RdClient.HSet(reqCsrfToken, "paasAdminYn", 'Y')
-					}
-
-					result = apiRequest.PaasToken
-				} else {
-					return "not_admin_account"
-				}
-			} else {
-				result = ""
-			}
-		}
-	} else {
-		result = ""
 	}
 
 	return result
 }
+
+//func (n MemberService) mergeAppResource(item Item) Item {
+//
+//	return item
+//}
 
 func (n MemberService) MemberJoinCheckDuplicationIaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
 	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationIaasId(req, n.txn)
@@ -330,20 +318,28 @@ func (n MemberService) MemberJoinCheckDuplicationPaasId(req cm.UserInfo) (userIn
 	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationPaasId(req, n.txn)
 }
 
+//func (n MemberService) MemberJoinCheckDuplicationSaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
+//	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationSaasId(req, n.txn)
+//}
+
+func (n MemberService) MemberJoinCheckDuplicationCaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
+	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationCaasId(req, n.txn)
+}
+
 func (n MemberService) DeleteIaasToken(reqCsrfToken string) {
 
 	beforeToken := ""
 
 	val := n.RdClient.HGetAll(reqCsrfToken).Val()
-	for key, value := range val{
+	for key, value := range val {
 		if key == "iaasToken" {
 			beforeToken = value
 		}
 	}
 
 	if beforeToken != "" {
-		n.RdClient.HDel(reqCsrfToken,"iaasToken" )
-		n.RdClient.HDel(reqCsrfToken,"iaasUserId" )
+		n.RdClient.HDel(reqCsrfToken, "iaasToken")
+		n.RdClient.HDel(reqCsrfToken, "iaasUserId")
 	}
 }
 
@@ -352,15 +348,181 @@ func (n MemberService) DeletePaasToken(reqCsrfToken string) {
 	beforeToken := ""
 
 	val := n.RdClient.HGetAll(reqCsrfToken).Val()
-	for key, value := range val{
+	for key, value := range val {
 		if key == "paasToken" {
 			beforeToken = value
 		}
 	}
 
 	if beforeToken != "" {
-		n.RdClient.HDel(reqCsrfToken,"paasToken" )
-		n.RdClient.HDel(reqCsrfToken,"paasAdminYn" )
-		n.RdClient.HDel(reqCsrfToken,"paasUserId" )
+		n.RdClient.HDel(reqCsrfToken, "paasToken")
+		n.RdClient.HDel(reqCsrfToken, "paasAdminYn")
+		n.RdClient.HDel(reqCsrfToken, "paasUserId")
 	}
 }
+
+/*func (n MemberS/*ervice) DeleteSaasToken(reqCsrfToken string) {
+
+	beforeToken := ""
+
+	val := n.RdClient.HGetAll(reqCsrfToken).Val()
+	for key, value := range val{
+		if key == "saasToken" {
+			beforeToken = value
+		}
+	}
+
+	if beforeToken != "" {
+		n.RdClient.HDel(reqCsrfToken,"saasToken" )
+		n.RdClient.HDel(reqCsrfToken,"saasUserId" )
+	}
+}*/
+func (n MemberService) DeleteCaasToken(reqCsrfToken string) {
+
+	beforeToken := ""
+
+	val := n.RdClient.HGetAll(reqCsrfToken).Val()
+	for key, value := range val {
+		if key == "caasToken" {
+			beforeToken = value
+		}
+	}
+
+	if beforeToken != "" {
+		n.RdClient.HDel(reqCsrfToken, "caasToken")
+		n.RdClient.HDel(reqCsrfToken, "caasAdminYn")
+		n.RdClient.HDel(reqCsrfToken, "caasUserId")
+	}
+
+}
+
+///////////////////////test////////////////////////////////////////////
+//func (n MemberService) GetAppByGuid(cfConfig pm.CFConfig,guid string,hkey string) (cm.Resource, error) {
+//	var processResource cm.ProcessResource
+//	var resource cm.Resource
+//	apiUrl := "https://api.15.164.20.58.xip.io"
+//	path := "/v3/apps/"+guid+"/processes"
+//	u, _ := url.ParseRequestURI(apiUrl)
+//	u.Path = path
+//	urlStr := u.String() // "https://api.com/user/"
+//
+//
+//
+//	tp := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true},}
+//
+//	val := n.RdClient.HGetAll(hkey).Val()
+//	client := &http.Client{Transport: tp}
+//	r, _ := http.NewRequest("GET", urlStr,nil) // URL-encoded payload
+//	//r.Header.Add("Accept", "application/json")
+//	//r.Header.Add("Content-Type", "application/json")
+//	r.Header.Add("Authorization", "bearer "+val["paasToken"])
+//	//r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+//	fmt.Println(n.RdClient.HMGet(hkey,"paasToken").Val())
+//
+//	resp, err := client.Do(r)
+//
+//	if err != nil {
+//		return cm.Resource{}, errors.Wrap(err, "Error requesting apps")
+//	}
+//
+//
+//	fmt.Println(resp.Status)
+//
+//	bodyBytes, err := ioutil.ReadAll(resp.Body)
+//	if err != nil {
+//		fmt.Println(err)
+//		return cm.Resource{}, errors.Wrap(err, "Error reading app response body")
+//	}
+//	bodyString := string(bodyBytes)
+//	fmt.Println(bodyString)
+//
+//
+//
+//	json.Unmarshal(bodyBytes, &processResource)
+//	fmt.Println(processResource)
+//	fmt.Println("ccccccc")
+//	fmt.Println(processResource.Resources)
+//	fmt.Println("mmmmmmm")
+//	if resp.StatusCode != http.StatusOK {
+//		fmt.Println(processResource)
+//
+//	}
+//	//fmt.Println(processResource.Resources)
+//	for _, resource  = range processResource.Resources {
+//		//n.mergeAppResource(item)
+//		fmt.Println("pppppppppp")
+//		fmt.Println(resource)
+//		//return resource, nil
+//	}
+//	fmt.Println(resource)
+//	//json.Unmarshal(bodyBytes,  &processResource.Resources)
+//	//
+//	//if err != nil {
+//	//	return md.Process{}, errors.Wrap(err, "Error unmarshalling app")
+//	//}
+//	//
+//	//if resp.StatusCode != http.StatusOK {
+//	//	fmt.Println(processResource)
+//	//	//return uaaToken.ErrorDescription
+//	//}
+//
+//	return resource, nil
+//}
+//
+////func mergeAppResource(app md.AppResource) md.App {
+////	app.Entity.Guid = app.Meta.Guid
+////	app.Entity.CreatedAt = app.Meta.CreatedAt
+////	app.Entity.UpdatedAt = app.Meta.UpdatedAt
+////	app.Entity.SpaceData.Entity.Guid = app.Entity.SpaceData.Meta.Guid
+////	app.Entity.SpaceData.Entity.OrgData.Entity.Guid = app.Entity.SpaceData.Entity.OrgData.Meta.Guid
+////	return app.Entity
+////}
+//
+//func (n MemberService) UpdateApp(cfConfig pm.CFConfig,guid string, aur cm.ScaleProcess,hkey string) (cm.Resource, error) {
+//	var Resource cm.Resource
+//
+//	apiUrl := "https://api.15.164.20.58.xip.io"
+//	path := "/v3/processes/"+guid+"/actions/scale"
+//	//resource := fmt.Sprintf("/v3/apps/%s", guid)
+//	u, _ := url.ParseRequestURI(apiUrl)
+//	u.Path = path
+//	urlStr := u.String() // "https://api.com/user/"
+//
+//	buf := bytes.NewBuffer(nil)
+//	err := json.NewEncoder(buf).Encode(aur)
+//	if err != nil {
+//		return cm.Resource{}, err
+//	}
+//
+//	tp := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true},}
+//	val := n.RdClient.HGetAll(hkey).Val()
+//
+//	client := &http.Client{Transport: tp}
+//	r, _ := http.NewRequest("POST", urlStr,buf) // URL-encoded payload
+//	r.Header.Add("Accept", "application/json")
+//	r.Header.Add("Content-Type", "application/json")
+//	r.Header.Add("Authorization", "bearer "+val["paasToken"])
+//	//r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+//
+//	resp, err := client.Do(r)
+//
+//	//req := c.NewRequestWithBody("PUT", fmt.Sprintf("/v2/apps/%s", guid), buf)
+//	//resp, err := c.DoRequest(req)
+//	if err != nil {
+//		return cm.Resource{}, err
+//	}
+//	if resp.StatusCode != http.StatusCreated {
+//		return cm.Resource{}, fmt.Errorf("CF API returned with status code %d", resp.StatusCode)
+//	}
+//
+//	body, err := ioutil.ReadAll(resp.Body)
+//	defer resp.Body.Close()
+//	if err != nil {
+//		return cm.Resource{}, err
+//	}
+//	err = json.Unmarshal(body, &Resource)
+//	if err != nil {
+//		return cm.Resource{}, err
+//	}
+//	return Resource, nil
+//}

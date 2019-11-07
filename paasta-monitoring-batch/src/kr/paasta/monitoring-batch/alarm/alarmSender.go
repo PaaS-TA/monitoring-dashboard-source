@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	client "github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring-batch/dao"
 	mod "kr/paasta/monitoring-batch/model"
@@ -13,10 +13,11 @@ import (
 	"kr/paasta/monitoring-batch/util"
 	"net/smtp"
 	"strconv"
-	"time"
 	"strings"
 	"sync"
+	"time"
 )
+
 /*
 type Mail struct {
 	Sender  string
@@ -214,7 +215,7 @@ func (f AlarmService) AlarmSend(alarmSource cb.AlarmThreshold, alarmData cb.Alar
 }
 
 //Send Alarm Message To Telegram
-func (f AlarmService) SendTelegram (metricClient client.Client, txn *gorm.DB, alarmData cb.Alarm, message mod.MailContents) {
+func (f AlarmService) SendTelegram(metricClient client.Client, txn *gorm.DB, alarmData cb.Alarm, message mod.MailContents) {
 	alarmSns, err := dao.GetCommonDao(metricClient).GetAlarmSns(alarmData.OriginType, txn)
 	if len(alarmSns) < 1 {
 		return
@@ -291,9 +292,9 @@ func (f AlarmService) SendMail(subject string, body mod.MailContents, receiver [
 			fmt.Println("TLS client auth error :", err)
 			return
 		}
-	}else{
+	} else {
 		fmt.Println(">>>>>>>>>>>>>>> Sendmail STMP Mode")
-		client, err = smtp.Dial(smtpServer.Host+":"+smtpServer.Port)
+		client, err = smtp.Dial(smtpServer.Host + ":" + smtpServer.Port)
 		if err != nil {
 			fmt.Println("smtp connection & client create error :", err)
 			return
@@ -338,7 +339,7 @@ func (f AlarmService) SendMail(subject string, body mod.MailContents, receiver [
 
 	//client.Quit()
 	fmt.Println(">>>>>>>>Mail sent successfully")
-	defer func(){
+	defer func() {
 
 		if err := recover(); err != nil {
 			//fmt.Println("######## Mail sent catch panic")
@@ -375,7 +376,7 @@ func (f *AlarmService) buildMailMessage(subject string, mailContent mod.MailCont
 	mailForm += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
 	mailForm += "<style>"
 	mailForm += "#text_area:before{display: inline;content: '';width: 158.16px;height: 6px;background-color: #124379;position: absolute;top: 0;left: 0;z-index: 999;}"
-	mailForm += "#text_area p strong:before{display:inline-block;content:'';width:23px;height:24px;background:url(" + f.alarmConfig.MailResource + "/public/src/assets/images/email/ic_error.png) no-repeat;background-size:100%;vertical-align:bottom;margin-right:7px;}"
+	mailForm += "#text_area p strong:before{display:inline-block;content:'';width:23px;height:24px;background:url(" + f.alarmConfig.MailResource + "/public/resources/img/email/ic_error.png) no-repeat;background-size:100%;vertical-align:bottom;margin-right:7px;}"
 	mailForm += "</style>"
 	mailForm += "</head>"
 	mailForm += "<body style=\"*word-break:break-all;-ms-word-break:break-all;margin:0;padding:0;font-family:'Noto Sans', sans-serif;font-size:12px;color:#555;\">"
@@ -383,7 +384,7 @@ func (f *AlarmService) buildMailMessage(subject string, mailContent mod.MailCont
 	mailForm += "    <div class=\"email_form\" style=\"width: 708px;height: 361px;padding: 19px 30px;overflow: hidden;margin: 0 auto;display: block;background: #f8f8f8;\"><div class=\"form_area\" style=\"margin:0;padding:0\">"
 	mailForm += "        <div class=\"contents_area\" style=\"margin:0;padding:0\">"
 	mailForm += "            <div class=\"contents-header\" style=\"margin:0;padding:0;padding-bottom:25px;\">"
-	mailForm += "                <h2 style=\"margin:0;padding:0;font-family:'Noto Sans', sans-serif;font-size:12px;color:#555;\"><img src=\"" + f.alarmConfig.MailResource + "/public/src/assets/images/logo.png\" alt=\"monitorxpert\" style=\"border:0 none;width:279px;\"></h2>"
+	mailForm += "                <h2 style=\"margin:0;padding:0;font-family:'Noto Sans', sans-serif;font-size:12px;color:#555;\"><img src=\"" + f.alarmConfig.MailResource + "/public/resources/img/email/logo.png\" alt=\"monitorxpert\" style=\"border:0 none;width:279px;\"></h2>"
 	mailForm += "            </div>"
 	mailForm += "            <div class=\"contents-body\" style=\"margin:0;padding:0;position:relative;\">"
 	mailForm += "                <div id=\"text_area\" style=\"margin:0;padding:18px 18px 24px;padding-bottom:12px;border:1px solid #ddd;background:#fff;height:auto;border-top:6px solid #007dc4;\">"

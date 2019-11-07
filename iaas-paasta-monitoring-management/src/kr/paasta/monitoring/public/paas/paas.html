@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="bosh.html">B<span>osh</span></a></li>
+						<li><a href="paas.html" class="on">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
+						<li>
+							<a href="alarm_policy.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+								<li><a href="alarm_statis.html">Statistics</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<h3>PaaS</h3>
+					<div class="chartView" id="paasChart"></div>
+					<h4>Top Process<span id="paasTopTitle"></span></h4>
+					<div id="paasTop" class="topList">
+					</div>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="table style01">
+						<h4>PaaS Summary</h4>
+						<div id="paasSummary" class="summaryList"></div>
+						<div class="paging" style="display:none;">
+							<a href="javascript:void(0);">&lt;</a>
+							<span>
+								<a href="javascript:void(0);" class="on">1</a>
+								<a href="javascript:void(0);">2</a>
+								<a href="javascript:void(0);">3</a>
+								<a href="javascript:void(0);">4</a>
+								<a href="javascript:void(0);">5</a>
+								<a href="javascript:void(0);">6</a>
+								<a href="javascript:void(0);">7</a>
+								<a href="javascript:void(0);">8</a>
+								<a href="javascript:void(0);">9</a>
+								<a href="javascript:void(0);">10</a>
+							</span>
+							<a href="javascript:void(0);">&gt;</a>
+						</div>
+					</article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+			
+			<div id="chartWrap">
+				<h4><span class="chartTitle"></span></h4>
+				<ul class="chart">
+					<li>
+						<h5>CPU Usage</h5>
+						<div id="cpuUsageChart"></div>
+					</li>
+					<li>
+						<h5>CPU Load Average</h5>
+						<div id="cpuLoadChart"></div>
+					</li>
+					<li>
+						<h5>Memory Usage</h5>
+						<div id="memoryUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk Usage</h5>
+						<div id="diskUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk IO</h5>
+						<div id="diskIoChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Byte</h5>
+						<div id="networkByteChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Packtes</h5>
+						<div id="networkPacktesChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Drop</h5>
+						<div id="networkDropChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Error</h5>
+						<div id="networkErrorChart"></div>
+					</li>
+				</ul>
+				
+				<div class="logs">
+					<fieldset>
+						<div>
+							<label>Date</label>
+							<input type="date" id="date" placeholder="2019-05-09" style="width:220px;">
+							<label>Time</label>
+							<input type="time" id="sTime" value="00:00:00" style="width:180px;">
+							<em>~</em>
+							<input type="time" id="eTime" value="01:00:00" style="width:180px;">
+							<button class="reset">RESET</button>
+						</div>
+						<div>
+							<label>Message</label>
+							<input type="text" id="message" style="width:800px;">
+						</div>
+						<button class="logSearch">SEARCH</button>
+					</fieldset>
+					<div class="preText">
+						<pre></pre>
+					</div>
+					<div class="paging logPaging">
+						<a href="javascript:void(0);" class="move next">&lt;</a>
+						<span>
+						</span>
+						<a href="javascript:void(0);" class="move prev">&gt;</a>
+					</div>
+				</div>
+				<a href="javascript:void(0);" class="chartClosed"></a>
+			</div>
+			<div id="logWrap">
+
+			</div>
+
+		</div>
+		<!-- // Wrap -->
+
+		<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+		<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+		<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const paas = {
+					id : '',
+					logId : '',
+					logCnt : 1,
+					logPage : 1,
+					logSum : 1,
+
+					init() {
+						// Alarm Count
+						fnComm.alarmCount('paas');
+
+						// 오늘 날짜
+						var today = new Date();
+						var dd = today.getDate();
+						var mm = today.getMonth()+1;
+						var yyyy = today.getFullYear();
+
+						if(dd < 10) dd='0'+dd;
+						if(mm < 10) mm='0'+mm;
+
+						// LOG 검색 Default set
+						document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+						var hh = today.getHours();
+						var hs = today.getHours()-1;
+						var nn = today.getMinutes();
+						var ss = today.getSeconds();
+
+						if(hh < 10) hh='0'+hh;
+						if(hs < 10) hs='0'+hs;
+						if(nn < 10) nn='0'+nn;
+						if(ss < 10) ss='0'+ss;
+
+						document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+						document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+						
+						// paas 컨디션 차트
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
+						// paas Summary 리스트
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.paasSummaryList);
+					},
+					
+					paasSummaryList(data) {
+						//////////////////////////////////////////////////////////////////////
+						// paas Summary : 리스트
+						// Data Example //////////////////////////////////////////////////////
+						// address: "10.20.0.6"
+						// core: "8"
+						// cpuErrStat: "running"
+						// cpuUsage: 0.31
+						// dataDisk: 142462.5703125
+						// diskDataErrStat: "healthy"
+						// diskRootErrStat: "healthy"
+						// diskStatus: "healthy"
+						// id: "f2e1c906-34ae-4a13-581d-1d161cc516d6"
+						// memErrStat: "running"
+						// memoryUsage: 54.97
+						// name: "micro-paas"
+						// state: "running"
+						// totalDisk: 2818.65625
+						// totalMemory: 16046.84765625
+						//////////////////////////////////////////////////////////////////////
+						var target = document.getElementById('paasSummary');
+						
+						fnComm.removeHtml(target);
+	
+						data.data.forEach((value, idx)=>{
+							var html = '<div class="'+value.state+'">';
+							html += '	<div>';
+							html += '		<strong>'+value.name+'</strong>';
+							html += '		<em>'+value.address+'</em>';
+							html += '		<em>Core '+value.core+'</em>';
+							html += '	</div>';
+							html += '	<div>';
+							html += '		<dl>';
+							html += '			<dt>CPU Used</dt>';
+							html += '			<dd>'+fnComm.numberComma(2, value.cpuUsage)+' %</dd>';
+							html += '		</dl>';
+							html += '		<dl>';
+							html += '			<dt>Total Memory</dt>';
+							html += '			<dd>'+fnComm.numberComma(0, value.totalMemory)+' MB</dd>';
+							html += '		</dl>';
+							html += '		<dl>';
+							html += '			<dt>Memory Used</dt>';
+							html += '			<dd>'+fnComm.numberComma(2, value.memoryUsage)+' %</dd>';
+							html += '		</dl>';
+							html += '	</div>';
+							html += '	<div>';
+							html += '		<dl>';
+							html += '			<dt>Total Disk</dt>';
+							html += '			<dd>'+fnComm.numberComma(0, value.totalDisk)+' MB</dd>';
+							html += '		</dl>';
+							html += '		<dl>';
+							html += '			<dt>Disk Status</dt>';
+							html += '			<dd>'+value.diskStatus+'</dd>';
+							html += '		</dl>';
+							html += '	</div>';
+							html += '	<div class="summaryBtn" data-id="'+value.id+'"  data-name="'+value.name+'">';
+							html += '		<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="process"><span>Process</span></a>';
+							html += '		<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>';
+							html += '		<a href="javascript:void(0);" class="log"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>';
+							html += '	</div>';
+							html += '</div>';
+							
+							fnComm.appendHtml(target, html, 'div');
+
+							var article = target.childNodes.item(idx);
+							article.setAttribute('data-id', value.id);
+
+							if(idx === 0){
+								paas.id = value.id;
+								document.getElementById('paasTopTitle').innerHTML = value.name;
+							};
+						});
+						
+						// Set paas Top Process 
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/'+paas.id+'/memory?id=' + paas.id, paas.paasTopProcess );
+						
+						// Button Event (Process, Chart, Log)
+						var elm = document.querySelectorAll('.summaryBtn');
+						for(var i=0 ; i<elm.length ; i++){
+							// Process Event
+							elm[i].querySelector('.process').addEventListener('click', (e) => {
+								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
+								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+
+								fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/' + elmID + '/memory?id=' + paas.id, paas.paasTopProcess );
+								document.getElementById('paasTopTitle').innerHTML = elmName;
+							}, false);
+
+							// Chart Event
+							elm[i].querySelector('.chart').addEventListener('click', (e) => {
+								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
+								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+								document.querySelector('.chartTitle').innerHTML = elmName;
+								paas.chartView(elmID);
+							}, false);
+
+							// Log Event
+							elm[i].querySelector('.log').addEventListener('click', (e) => {
+								paas.logId = e.target.parentNode.parentNode.getAttribute('data-id');
+								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+								document.querySelector('.chartTitle').innerHTML = elmName;
+
+								paas.logView();
+							}, false);
+						};
+						
+						// Chart Close Event
+						document.querySelector('.chartClosed').addEventListener('click', (e) => {
+							document.getElementById('chartWrap').classList.toggle('on', false);
+						}, false);
+						
+						// LOG Reset Event
+						document.querySelector('.reset').addEventListener('click', (e) => {
+							// 오늘 날짜
+							var today = new Date();
+							var dd = today.getDate();
+							var mm = today.getMonth()+1;
+							var yyyy = today.getFullYear();
+
+							if(dd < 10) dd='0'+dd;
+							if(mm < 10) mm='0'+mm;
+
+							// LOG 검색 Default set
+							document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+							var hh = today.getHours();
+							var hs = today.getHours()-1;
+							var nn = today.getMinutes();
+							var ss = today.getSeconds();
+
+							if(hh < 10) hh='0'+hh;
+							if(hs < 10) hs='0'+hs;
+							if(nn < 10) nn='0'+nn;
+							if(ss < 10) ss='0'+ss;
+
+							document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+							document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+							document.getElementById('message').value = '';
+						}, false);
+						
+						// LOG Search Event
+						document.querySelector('.logSearch').addEventListener('click', (e) => {
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}&keyword=${document.getElementById('message').value}`;
+						
+							// Log 리스트
+							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+						}, false);
+					},
+	
+					paasTopProcess(data) {
+						//////////////////////////////////////////////////////////////////////
+						// paas Top Process : 리스트
+						// Data Example //////////////////////////////////////////////////////
+						// index: "1"
+						// memory: 449.203125
+						// pid: "27457"
+						// process: "java"
+						// time: "2018-11-13T05:41:02"
+						//////////////////////////////////////////////////////////////////////
+						var target = document.getElementById('paasTop');
+	
+						fnComm.removeHtml(target);
+	
+						data.forEach((value, idx)=>{
+							var html = '<div>';
+							html += '	<strong>'+value.index+'</strong>';
+							html += '	<div>';
+							html += '		<dl class="time">';
+							html += '			<dt><img src="../resources/img/icon_time.png" alt="time"></dt>';
+							html += '			<dd>'+value.time+'</dd>';
+							html += '		</dl>';
+							html += '		<dl class="pid">';
+							html += '			<dt><img src="../resources/img/icon_id.png" alt="pid"></dt>';
+							html += '			<dd>'+value.pid+'</dd>';
+							html += '		</dl>';
+							html += '		<dl class="process">';
+							html += '			<dt><img src="../resources/img/icon_process.png" alt="process"></dt>';
+							html += '			<dd>'+value.process+'</dd>';
+							html += '		</dl>';
+							html += '		<dl class="memory">';
+							html += '			<dt><img src="../resources/img/icon_memory.png" alt="memory"></dt>';
+							html += '			<dd>'+fnComm.numberComma(0, value.memory)+' MB</dd>';
+							html += '		</dl>';
+							html += '	</div>';
+							html += '</div>';
+	
+							fnComm.appendHtml(target, html, 'div');
+						});
+					},
+
+					chartView(elmID) {
+						document.getElementById('chartWrap').classList.toggle('on', true);
+						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
+
+						setTimeout(() => {
+							// CPU Usage 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/cpu/${elmID}/usages${fnComm.setTimer()}`, fnComm.detailChart, '#cpuUsageChart');
+
+							// CPU Load 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/cpu/${elmID}/loads${fnComm.setTimer()}`, fnComm.detailChart, '#cpuLoadChart');
+
+							// Memory Usage 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/memory/${elmID}/usages${fnComm.setTimer()}`, fnComm.detailChart, '#memoryUsageChart');
+
+							// Disk Usage 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/disk/${elmID}/usages${fnComm.setTimer()}`, fnComm.detailChart, '#diskUsageChart');
+
+							// Disk IO 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/disk/${elmID}/ios${fnComm.setTimer()}`, fnComm.detailChart, '#diskIoChart');
+
+							// Network IO Bytes 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/bytes${fnComm.setTimer()}`, fnComm.detailChart, '#networkByteChart');
+							
+							// Network IO Packets 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/packets${fnComm.setTimer()}`, fnComm.detailChart, '#networkPacktesChart');
+							
+							// Network IO Drop 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/drops${fnComm.setTimer()}`, fnComm.detailChart, '#networkDropChart');
+							
+							// Network IO Error 정보
+							fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/errors${fnComm.setTimer()}`, fnComm.detailChart, '#networkErrorChart');
+						},500);
+					},
+
+					logView() {
+						document.getElementById('chartWrap').classList.toggle('on', true);
+						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
+
+						setTimeout(() => {
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+						
+							// Log 리스트
+							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+						},500);
+					},
+
+					detailLog(data){
+						paas.logPage = 1;
+
+						if(data.messages !=  null){
+							paas.logCnt = Math.ceil(data.totalCount / 100);
+							paas.logSum = Math.ceil(paas.logCnt / 10);
+
+							if(paas.logCnt > 2){
+								document.querySelector('.logPaging').classList.toggle('on', true);
+							};
+							if(paas.logCnt > 10){
+								document.querySelector('.logPaging').classList.toggle('over', true);
+							};
+							
+							fnComm.removeHtml(document.querySelector('.logPaging span'));
+
+							for(var i=1; i<=paas.logCnt; i++){
+								var html = `<a href="javascript:void(0);" class="view" data-page="${i}">${i}</a>`;
+
+								fnComm.appendHtml(document.querySelector('.logPaging span'), html, 'span');
+							};
+
+							paas.logDraw(data);
+
+							// LOG Paging
+							var btn =  document.querySelectorAll('.logPaging span a');
+
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].removeEventListener('click', this);
+								btn[i].addEventListener('click', (e) => {
+									var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=${e.target.getAttribute('data-page')}&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+
+									console.log(e.target.getAttribute('data-page'));
+								
+									// Log 리스트
+									fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.logDraw);
+								}, false);
+							};
+
+							document.querySelector('.logPaging .next').removeEventListener('click', paas.nextBtn);
+							document.querySelector('.logPaging .prev').removeEventListener('click', paas.prevBtn);
+							
+							document.querySelector('.logPaging .next').addEventListener('click', paas.nextBtn);
+							
+							document.querySelector('.logPaging .prev').addEventListener('click', paas.prevBtn);
+						} else {
+
+						};
+					},
+
+					nextBtn(){
+						var btn =  document.querySelectorAll('.logPaging span a');
+
+						if(paas.logPage > 1){
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].classList.toggle('view', false);
+							};
+							paas.logPage--;
+							for(var j=((paas.logPage-1)*10); j<(paas.logPage*10) ; j++){
+								btn[j].classList.toggle('view', true);
+							};
+						};
+					},
+
+					prevBtn(){
+						var btn =  document.querySelectorAll('.logPaging span a');
+						
+						if(paas.logSum > paas.logPage){
+							for(var i=0 ; i<btn.length ; i++){
+								btn[i].classList.toggle('view', false);
+							};
+							paas.logPage++;
+							for(var j=((paas.logPage-1)*10); j<(paas.logPage*10) ; j++){
+								btn[j].classList.toggle('view', true);
+							};
+						};
+					},
+
+					logDraw(data){
+						var logText = '';
+						
+						data.messages.forEach((value)=>{
+							logText += `${value.time}<br>`;
+							logText += `${value.message}<br><br>`;
+						});
+
+						document.querySelector('.preText pre').innerHTML = logText;
+					}
+				}
+	
+				paas.init();
+			};
+		</script>
+	</body>
+</html>

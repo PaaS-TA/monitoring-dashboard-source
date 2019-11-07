@@ -1,25 +1,24 @@
 package dao
 
-
 import (
-	client "github.com/influxdata/influxdb/client/v2"
-	"kr/paasta/monitoring/utils"
-	"kr/paasta/monitoring/iaas/model"
 	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
+	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/utils"
 )
 
 type NodeDao struct {
-	influxClient 	client.Client
+	influxClient client.Client
 }
 
 func GetNodeDao(influxClient client.Client) *NodeDao {
-	return &NodeDao {
-		influxClient: 	influxClient,
+	return &NodeDao{
+		influxClient: influxClient,
 	}
 }
 
 // Node의 현재 CPU 사용률을 조회
-func (d NodeDao) GetNodeCpuUsage(request model.NodeReq)(_ client.Response, errMsg model.ErrMessage) {
+func (d NodeDao) GetNodeCpuUsage(request model.NodeReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 
@@ -27,25 +26,24 @@ func (d NodeDao) GetNodeCpuUsage(request model.NodeReq)(_ client.Response, errMs
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	cpuUsageSql := "select value from \"cpu.percent\"  where time > now() - 2m and hostname = '%s' order by time desc limit 1";
+	cpuUsageSql := "select value from \"cpu.percent\"  where time > now() - 2m and hostname = '%s' order by time desc limit 1"
 
 	var q client.Query
 
-	q = client.Query {
-		Command:  fmt.Sprintf( cpuUsageSql,
+	q = client.Query{
+		Command: fmt.Sprintf(cpuUsageSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
-
 	model.MonitLogger.Debug("GetNodeCpuUsage Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -53,7 +51,7 @@ func (d NodeDao) GetNodeCpuUsage(request model.NodeReq)(_ client.Response, errMs
 }
 
 // Node의 현재 CPU 사용률을 목록 조회
-func (d NodeDao) GetNodeCpuUsageList(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage) {
+func (d NodeDao) GetNodeCpuUsageList(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 
@@ -61,12 +59,12 @@ func (d NodeDao) GetNodeCpuUsageList(request model.DetailReq)(_ client.Response,
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	cpuUsageSql := "select mean(value) as usage from \"cpu.percent\"  where hostname = '%s' ";
+	cpuUsageSql := "select mean(value) as usage from \"cpu.percent\"  where hostname = '%s' "
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
 
@@ -76,16 +74,16 @@ func (d NodeDao) GetNodeCpuUsageList(request model.DetailReq)(_ client.Response,
 		cpuUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( cpuUsageSql,
-				  request.HostName, request.DefaultTimeRange, request.GroupBy),
+			Command: fmt.Sprintf(cpuUsageSql,
+				request.HostName, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
 	} else {
 
 		cpuUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
-		q = client.Query {
-			Command:  fmt.Sprintf( cpuUsageSql,
+		q = client.Query{
+			Command: fmt.Sprintf(cpuUsageSql,
 				request.HostName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
@@ -98,7 +96,7 @@ func (d NodeDao) GetNodeCpuUsageList(request model.DetailReq)(_ client.Response,
 }
 
 // Node의 현재 Memory 사용률을 조회
-func (d NodeDao) GetNodeMemoryUsageList(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage) {
+func (d NodeDao) GetNodeMemoryUsageList(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 
@@ -106,12 +104,12 @@ func (d NodeDao) GetNodeMemoryUsageList(request model.DetailReq)(_ client.Respon
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	memoryTotalSql := "select mean(value) as usage from \"mem.usable_perc\"  where hostname = '%s' ";
+	memoryTotalSql := "select mean(value) as usage from \"mem.usable_perc\"  where hostname = '%s' "
 	//memoryFreeSql := "select mean(value) as usage from \"mem.free_mb\"  where hostname = '%s' ";
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
@@ -123,16 +121,16 @@ func (d NodeDao) GetNodeMemoryUsageList(request model.DetailReq)(_ client.Respon
 		//memoryFreeSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( memoryTotalSql ,
+			Command: fmt.Sprintf(memoryTotalSql,
 				request.HostName, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		memoryTotalSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( memoryTotalSql ,
+			Command: fmt.Sprintf(memoryTotalSql,
 				request.HostName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
@@ -145,18 +143,18 @@ func (d NodeDao) GetNodeMemoryUsageList(request model.DetailReq)(_ client.Respon
 }
 
 //Node의 현재 CPU사용률을 조회한다.
-func (d NodeDao) GetNodeSwapMemoryFreeUsageList(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeSwapMemoryFreeUsageList(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	swapFreeUsageSql := "select mean(value) as usage from \"mem.swap_free_perc\"  where hostname = '%s' ";
+	swapFreeUsageSql := "select mean(value) as usage from \"mem.swap_free_perc\"  where hostname = '%s' "
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
 
@@ -166,17 +164,16 @@ func (d NodeDao) GetNodeSwapMemoryFreeUsageList(request model.DetailReq)(_ clien
 		swapFreeUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( swapFreeUsageSql,
+			Command: fmt.Sprintf(swapFreeUsageSql,
 				request.HostName, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		swapFreeUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
-
 		q = client.Query{
-			Command:  fmt.Sprintf( swapFreeUsageSql,
+			Command: fmt.Sprintf(swapFreeUsageSql,
 				request.HostName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
@@ -188,29 +185,26 @@ func (d NodeDao) GetNodeSwapMemoryFreeUsageList(request model.DetailReq)(_ clien
 	return utils.GetError().CheckError(*resp, err)
 }
 
-
-
 //Node의 현재 CPU사용률을 조회한다.
-func (d NodeDao) GetNodeCpuLoadList(request model.DetailReq, minute string)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeCpuLoadList(request model.DetailReq, minute string) (_ client.Response, errMsg model.ErrMessage) {
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	var cpuUsageSql string
-	if minute == "1m"{
-		cpuUsageSql = "select mean(value) as usage from \"load.avg_1_min\"  where hostname = '%s' ";
-	}else if minute == "5m"{
-		cpuUsageSql = "select mean(value) as usage from \"load.avg_5_min\"  where hostname = '%s' ";
-	}else if minute == "15m" {
-		cpuUsageSql = "select mean(value) as usage from \"load.avg_15_min\"  where hostname = '%s' ";
+	if minute == "1m" {
+		cpuUsageSql = "select mean(value) as usage from \"load.avg_1_min\"  where hostname = '%s' "
+	} else if minute == "5m" {
+		cpuUsageSql = "select mean(value) as usage from \"load.avg_5_min\"  where hostname = '%s' "
+	} else if minute == "15m" {
+		cpuUsageSql = "select mean(value) as usage from \"load.avg_15_min\"  where hostname = '%s' "
 	}
-
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
 
@@ -220,17 +214,16 @@ func (d NodeDao) GetNodeCpuLoadList(request model.DetailReq, minute string)(_ cl
 		cpuUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( cpuUsageSql,
+			Command: fmt.Sprintf(cpuUsageSql,
 				request.HostName, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		cpuUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
-
 		q = client.Query{
-			Command:  fmt.Sprintf( cpuUsageSql,
+			Command: fmt.Sprintf(cpuUsageSql,
 				request.HostName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
@@ -243,14 +236,14 @@ func (d NodeDao) GetNodeCpuLoadList(request model.DetailReq, minute string)(_ cl
 }
 
 //Node의 현재 Total Memory을 조회한다.
-func (d NodeDao) GetNodeMemoryUsage(request model.NodeReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeMemoryUsage(request model.NodeReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -260,14 +253,14 @@ func (d NodeDao) GetNodeMemoryUsage(request model.NodeReq)(_ client.Response, er
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( totalMemSql ,
+		Command: fmt.Sprintf(totalMemSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetNodeMemoryUsage Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -275,14 +268,14 @@ func (d NodeDao) GetNodeMemoryUsage(request model.NodeReq)(_ client.Response, er
 }
 
 //Node의 현재 Total Memory을 조회한다.
-func (d NodeDao) GetNodeTotalMemoryUsage(request model.NodeReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeTotalMemoryUsage(request model.NodeReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -292,14 +285,14 @@ func (d NodeDao) GetNodeTotalMemoryUsage(request model.NodeReq)(_ client.Respons
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( totalMemSql ,
+		Command: fmt.Sprintf(totalMemSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetNodeCpuUsage Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -307,47 +300,46 @@ func (d NodeDao) GetNodeTotalMemoryUsage(request model.NodeReq)(_ client.Respons
 }
 
 //Node의 현재 Total Memory을 조회한다.
-func (d NodeDao) GetNodeFreeMemoryUsage(request model.NodeReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeFreeMemoryUsage(request model.NodeReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	freeMemSql  := "select value from \"mem.free_mb\"  where time > now() - 2m and hostname = '%s' order by time desc limit 1;"
+	freeMemSql := "select value from \"mem.free_mb\"  where time > now() - 2m and hostname = '%s' order by time desc limit 1;"
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( freeMemSql ,
+		Command: fmt.Sprintf(freeMemSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetNodeCpuUsage Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return utils.GetError().CheckError(*resp, err)
 }
 
-
 //Node의 현재 Total Memory을 조회한다.
-func (d NodeDao) GetNodeTotalDisk(request model.NodeReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeTotalDisk(request model.NodeReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -357,30 +349,29 @@ func (d NodeDao) GetNodeTotalDisk(request model.NodeReq)(_ client.Response, errM
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( totalMemSql ,
+		Command: fmt.Sprintf(totalMemSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetNodeTotalDisk Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return utils.GetError().CheckError(*resp, err)
 }
 
-
 //Node의 현재 Total Memory을 조회한다.
-func (d NodeDao) GetNodeUsedDisk(request model.NodeReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeUsedDisk(request model.NodeReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -390,14 +381,14 @@ func (d NodeDao) GetNodeUsedDisk(request model.NodeReq)(_ client.Response, errMs
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( totalMemSql ,
+		Command: fmt.Sprintf(totalMemSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetNodeUsedDisk Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -405,31 +396,31 @@ func (d NodeDao) GetNodeUsedDisk(request model.NodeReq)(_ client.Response, errMs
 }
 
 //Monasca Agent Forwarder 현재 상태 조회
-func (d NodeDao) GetAgentProcessStatus(request model.NodeReq, processName string)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetAgentProcessStatus(request model.NodeReq, processName string) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	agentStatusSql  := "select value from \"supervisord.process.status\" where hostname = '%s' and supervisord_process = '%s' and time > now() - 2m order by time desc limit 1;"
+	agentStatusSql := "select value from \"supervisord.process.status\" where hostname = '%s' and supervisord_process = '%s' and time > now() - 2m order by time desc limit 1;"
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( agentStatusSql ,
+		Command: fmt.Sprintf(agentStatusSql,
 			request.HostName, processName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("AgentProcess Status Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -437,14 +428,14 @@ func (d NodeDao) GetAgentProcessStatus(request model.NodeReq, processName string
 }
 
 //VM Instance가 Running인 VM만 조회
-func (d NodeDao) GetAliveInstanceListByNodename(request model.NodeReq, allStatus bool)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetAliveInstanceListByNodename(request model.NodeReq, allStatus bool) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -460,38 +451,37 @@ func (d NodeDao) GetAliveInstanceListByNodename(request model.NodeReq, allStatus
 		6 : Power management suspend (S3 state)
 	*/
 	var instanceListStatusSql string
-	if allStatus == true{
-		instanceListStatusSql  = "select resource_id, value from \"vm.host_alive_status\" where time > now() - 2m and hostname = '%s' ;"
-	}else{
-		instanceListStatusSql  = "select resource_id, value from \"vm.host_alive_status\" where time > now() - 2m and hostname = '%s' and value = 0 ;"
+	if allStatus == true {
+		instanceListStatusSql = "select resource_id, value from \"vm.host_alive_status\" where time > now() - 2m and hostname = '%s' ;"
+	} else {
+		instanceListStatusSql = "select resource_id, value from \"vm.host_alive_status\" where time > now() - 2m and hostname = '%s' and value = 0 ;"
 	}
-
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( instanceListStatusSql ,
+		Command: fmt.Sprintf(instanceListStatusSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetInstanceList Sql======>", q)
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return utils.GetError().CheckError(*resp, err)
 }
 
-func (b NodeDao) GetMountPointList(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage)  {
+func (b NodeDao) GetMountPointList(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -500,36 +490,35 @@ func (b NodeDao) GetMountPointList(request model.DetailReq) (_ client.Response, 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( mountPointListSql,
-			  request.HostName),
+		Command: fmt.Sprintf(mountPointListSql,
+			request.HostName),
 		Database: model.MetricDBName,
 	}
 
 	model.MonitLogger.Debug("GetServiceFileSystems Sql======>", q)
 	resp, err := b.influxClient.Query(q)
 
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return utils.GetError().CheckError(*resp, err)
 }
 
-
 //Node의 현재 Total Memory을 조회한다.
-func (d NodeDao) GetNodeDiskUsage(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeDiskUsage(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	diskUsageSql  := "select mean(value) as usage from \"disk.space_used_perc\"  where hostname = '%s' and mount_point = '%s' "
+	diskUsageSql := "select mean(value) as usage from \"disk.space_used_perc\"  where hostname = '%s' and mount_point = '%s' "
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
 
 	var q client.Query
@@ -538,18 +527,17 @@ func (d NodeDao) GetNodeDiskUsage(request model.DetailReq)(_ client.Response, er
 		diskUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
+			Command: fmt.Sprintf(diskUsageSql,
 				request.HostName, request.MountPoint, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		diskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
-
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
-				request.HostName, request.MountPoint,  request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command: fmt.Sprintf(diskUsageSql,
+				request.HostName, request.MountPoint, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
 	}
@@ -561,19 +549,19 @@ func (d NodeDao) GetNodeDiskUsage(request model.DetailReq)(_ client.Response, er
 }
 
 //Node의 disk io read Kbyte를 조회한다.
-func (d NodeDao) GetNodeDiskIoReadKbyte(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeDiskIoReadKbyte(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	diskUsageSql  := "select mean(value) as usage from \"io.read_kbytes_sec\"  where hostname = '%s' and mount_point = '%s' "
+	diskUsageSql := "select mean(value) as usage from \"io.read_kbytes_sec\"  where hostname = '%s' and mount_point = '%s' "
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
 
 	var q client.Query
@@ -582,18 +570,17 @@ func (d NodeDao) GetNodeDiskIoReadKbyte(request model.DetailReq)(_ client.Respon
 		diskUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
+			Command: fmt.Sprintf(diskUsageSql,
 				request.HostName, request.MountPoint, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		diskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
-
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
-				request.HostName, request.MountPoint,  request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command: fmt.Sprintf(diskUsageSql,
+				request.HostName, request.MountPoint, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
 	}
@@ -604,21 +591,20 @@ func (d NodeDao) GetNodeDiskIoReadKbyte(request model.DetailReq)(_ client.Respon
 
 }
 
-
 //Node의 disk io read Kbyte를 조회한다.
-func (d NodeDao) GetNodeDiskIoWriteKbyte(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeDiskIoWriteKbyte(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	diskUsageSql  := "select mean(value) as usage from \"io.write_kbytes_sec\"  where hostname = '%s' and mount_point = '%s' "
+	diskUsageSql := "select mean(value) as usage from \"io.write_kbytes_sec\"  where hostname = '%s' and mount_point = '%s' "
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
 
 	var q client.Query
@@ -627,18 +613,17 @@ func (d NodeDao) GetNodeDiskIoWriteKbyte(request model.DetailReq)(_ client.Respo
 		diskUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
+			Command: fmt.Sprintf(diskUsageSql,
 				request.HostName, request.MountPoint, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		diskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
-
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
-				request.HostName, request.MountPoint,  request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command: fmt.Sprintf(diskUsageSql,
+				request.HostName, request.MountPoint, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
 	}
@@ -649,26 +634,24 @@ func (d NodeDao) GetNodeDiskIoWriteKbyte(request model.DetailReq)(_ client.Respo
 
 }
 
-
-
 //Node의 disk io read Kbyte를 조회한다.
-func (d NodeDao) GetNodeNetworkKbyte(request model.DetailReq , inOut, device string)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeNetworkKbyte(request model.DetailReq, inOut, device string) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	var diskUsageSql string
-	if inOut == "in"{
-		diskUsageSql  = "select sum(value)/1024 as usage from \"net.in_bytes_sec\"  where hostname = '%s' and device =~ /%s/"
-	}else if inOut == "out"{
-		diskUsageSql  = "select sum(value)/1024 as usage from \"net.out_bytes_sec\"  where hostname = '%s' and device =~ /%s/"
+	if inOut == "in" {
+		diskUsageSql = "select sum(value)/1024 as usage from \"net.in_bytes_sec\"  where hostname = '%s' and device =~ /%s/"
+	} else if inOut == "out" {
+		diskUsageSql = "select sum(value)/1024 as usage from \"net.out_bytes_sec\"  where hostname = '%s' and device =~ /%s/"
 	}
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
@@ -679,16 +662,16 @@ func (d NodeDao) GetNodeNetworkKbyte(request model.DetailReq , inOut, device str
 		diskUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
-				request.HostName, device,  request.DefaultTimeRange, request.GroupBy),
+			Command: fmt.Sprintf(diskUsageSql,
+				request.HostName, device, request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		diskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
+			Command: fmt.Sprintf(diskUsageSql,
 				request.HostName, device, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
@@ -701,23 +684,23 @@ func (d NodeDao) GetNodeNetworkKbyte(request model.DetailReq , inOut, device str
 }
 
 //Node의 Network Error를 조회한다.
-func (d NodeDao) GetNodeNetworkError(request model.DetailReq ,inOut, device string)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeNetworkError(request model.DetailReq, inOut, device string) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	var diskUsageSql string
-	if inOut == "in"{
-		diskUsageSql  = "select sum(value) as usage from \"net.in_errors_sec\"  where hostname = '%s' and device =~ /%s/"
-	}else if inOut == "out"{
-		diskUsageSql  = "select sum(value) as usage from \"net.out_errors_sec\"  where hostname = '%s' and device =~ /%s/"
+	if inOut == "in" {
+		diskUsageSql = "select sum(value) as usage from \"net.in_errors_sec\"  where hostname = '%s' and device =~ /%s/"
+	} else if inOut == "out" {
+		diskUsageSql = "select sum(value) as usage from \"net.out_errors_sec\"  where hostname = '%s' and device =~ /%s/"
 	}
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
@@ -728,17 +711,17 @@ func (d NodeDao) GetNodeNetworkError(request model.DetailReq ,inOut, device stri
 		diskUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
+			Command: fmt.Sprintf(diskUsageSql,
 				request.HostName, device,
 				request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 
 		diskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql,
+			Command: fmt.Sprintf(diskUsageSql,
 				request.HostName, device,
 				request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
@@ -752,23 +735,23 @@ func (d NodeDao) GetNodeNetworkError(request model.DetailReq ,inOut, device stri
 }
 
 //Node의 Network Dropped packets를 조회한다.
-func (d NodeDao) GetNodeNetworkDropPacket(request model.DetailReq , inOut, device string)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeNetworkDropPacket(request model.DetailReq, inOut, device string) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	var diskUsageSql string
-	if inOut == "in"{
-		diskUsageSql  = "select sum(value) as usage from \"net.in_packets_dropped_sec\"  where hostname = '%s'and device =~ /%s/ "
-	}else if inOut == "out"{
-		diskUsageSql  = "select sum(value) as usage from \"net.out_packets_dropped_sec\"  where hostname = '%s' and device =~ /%s/"
+	if inOut == "in" {
+		diskUsageSql = "select sum(value) as usage from \"net.in_packets_dropped_sec\"  where hostname = '%s'and device =~ /%s/ "
+	} else if inOut == "out" {
+		diskUsageSql = "select sum(value) as usage from \"net.out_packets_dropped_sec\"  where hostname = '%s' and device =~ /%s/"
 	}
 
 	model.MonitLogger.Debugf("defaultTimeRange: %s, timeRangeFrom: %s, timeRangeTo:%s", request.DefaultTimeRange, request.TimeRangeFrom, request.TimeRangeTo)
@@ -778,15 +761,15 @@ func (d NodeDao) GetNodeNetworkDropPacket(request model.DetailReq , inOut, devic
 		diskUsageSql += " and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql, request.HostName, device,
+			Command: fmt.Sprintf(diskUsageSql, request.HostName, device,
 				request.DefaultTimeRange, request.GroupBy),
 			Database: model.MetricDBName,
 		}
-	}else{
+	} else {
 		diskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 
 		q = client.Query{
-			Command:  fmt.Sprintf( diskUsageSql, request.HostName, device,
+			Command: fmt.Sprintf(diskUsageSql, request.HostName, device,
 				request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: model.MetricDBName,
 		}
@@ -797,26 +780,25 @@ func (d NodeDao) GetNodeNetworkDropPacket(request model.DetailReq , inOut, devic
 	return utils.GetError().CheckError(*resp, err)
 }
 
-
 //Node의 disk io read Kbyte를 조회한다.
-func (d NodeDao) GetNodeTopProcessByCpu(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeTopProcessByCpu(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	cpuTopProcessSql := "select mean(value) as usage from \"process.cpu_perc\"  where time > now() - 2m and hostname = '%s' group by process_name ";
+	cpuTopProcessSql := "select mean(value) as usage from \"process.cpu_perc\"  where time > now() - 2m and hostname = '%s' group by process_name "
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( cpuTopProcessSql,
+		Command: fmt.Sprintf(cpuTopProcessSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
@@ -824,7 +806,7 @@ func (d NodeDao) GetNodeTopProcessByCpu(request model.DetailReq)(_ client.Respon
 	model.MonitLogger.Debug("GetNodeTopProcessByCpu Sql==>", q)
 
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -832,26 +814,25 @@ func (d NodeDao) GetNodeTopProcessByCpu(request model.DetailReq)(_ client.Respon
 
 }
 
-
 //Node의 disk io read Kbyte를 조회한다.
-func (d NodeDao) GetNodeTopProcessByMemory(request model.DetailReq)(_ client.Response, errMsg model.ErrMessage){
+func (d NodeDao) GetNodeTopProcessByMemory(request model.DetailReq) (_ client.Response, errMsg model.ErrMessage) {
 
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
-	cpuTopProcessSql := "select mean(value) as usage from \"process.mem.rss_mbytes\"  where time > now() - 2m and hostname = '%s' group by process_name ";
+	cpuTopProcessSql := "select mean(value) as usage from \"process.mem.rss_mbytes\"  where time > now() - 2m and hostname = '%s' group by process_name "
 
 	var q client.Query
 
 	q = client.Query{
-		Command:  fmt.Sprintf( cpuTopProcessSql,
+		Command: fmt.Sprintf(cpuTopProcessSql,
 			request.HostName),
 		Database: model.MetricDBName,
 	}
@@ -859,10 +840,9 @@ func (d NodeDao) GetNodeTopProcessByMemory(request model.DetailReq)(_ client.Res
 	model.MonitLogger.Debug("GetNodeTopProcessByMemory Sql==>", q)
 
 	resp, err := d.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return utils.GetError().CheckError(*resp, err)
 }
-

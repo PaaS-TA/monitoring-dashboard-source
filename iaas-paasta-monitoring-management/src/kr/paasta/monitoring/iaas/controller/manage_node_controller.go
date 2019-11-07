@@ -1,15 +1,15 @@
 package controller
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
-	"kr/paasta/monitoring/utils"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/iaas/service"
+	"kr/paasta/monitoring/utils"
 	"net/http"
 )
 
 //Main Page Controller
-type OpenstackManageNode struct{
+type OpenstackManageNode struct {
 	OpenstackProvider model.OpenstackProvider
 	influxClient      client.Client
 }
@@ -17,11 +17,11 @@ type OpenstackManageNode struct{
 func NewManageNodeController(openstackProvider model.OpenstackProvider, influxClient client.Client) *OpenstackManageNode {
 	return &OpenstackManageNode{
 		OpenstackProvider: openstackProvider,
-		influxClient: influxClient,
+		influxClient:      influxClient,
 	}
 }
 
-func (s *OpenstackManageNode)ManageNodeSummary(w http.ResponseWriter, r *http.Request) {
+func (s *OpenstackManageNode) ManageNodeSummary(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.NodeReq
 	apiRequest.HostName = r.URL.Query().Get("hostname")
@@ -35,8 +35,7 @@ func (s *OpenstackManageNode)ManageNodeSummary(w http.ResponseWriter, r *http.Re
 	}
 }
 
-
-func (s *OpenstackManageNode)GetNodeList(w http.ResponseWriter, r *http.Request) {
+func (s *OpenstackManageNode) GetNodeList(w http.ResponseWriter, r *http.Request) {
 
 	provider, _, err := utils.GetOpenstackProvider(r)
 
@@ -48,7 +47,7 @@ func (s *OpenstackManageNode)GetNodeList(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (s *OpenstackManageNode)ManageRabbitMqSummary(w http.ResponseWriter, r *http.Request) {
+func (s *OpenstackManageNode) ManageRabbitMqSummary(w http.ResponseWriter, r *http.Request) {
 
 	provider, _, _ := utils.GetOpenstackProvider(r)
 	manageNodeSummary, err := services.GetManageNodeService(s.OpenstackProvider, provider, s.influxClient).GetRabbitMqSummary()
@@ -59,8 +58,7 @@ func (s *OpenstackManageNode)ManageRabbitMqSummary(w http.ResponseWriter, r *htt
 	}
 }
 
-
-func (s *OpenstackManageNode)GetTopProcessByCpu(w http.ResponseWriter, r *http.Request) {
+func (s *OpenstackManageNode) GetTopProcessByCpu(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.DetailReq
 	apiRequest.HostName = r.FormValue(":hostname")
@@ -74,7 +72,7 @@ func (s *OpenstackManageNode)GetTopProcessByCpu(w http.ResponseWriter, r *http.R
 	}
 }
 
-func (s *OpenstackManageNode)GetTopProcessByMemory(w http.ResponseWriter, r *http.Request) {
+func (s *OpenstackManageNode) GetTopProcessByMemory(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.DetailReq
 	apiRequest.HostName = r.FormValue(":hostname")

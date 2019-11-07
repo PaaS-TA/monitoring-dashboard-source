@@ -1,14 +1,14 @@
 package services
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
+	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/rackspace/gophercloud"
-	"kr/paasta/monitoring/utils"
 	"kr/paasta/monitoring/iaas/dao"
 	"kr/paasta/monitoring/iaas/integration"
 	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/utils"
 	"reflect"
-	"fmt"
 )
 
 type MainService struct {
@@ -17,15 +17,15 @@ type MainService struct {
 	influxClient      client.Client
 }
 
-func GetMainService(openstackProvider model.OpenstackProvider, provider *gophercloud.ProviderClient,influxClient client.Client) *MainService {
+func GetMainService(openstackProvider model.OpenstackProvider, provider *gophercloud.ProviderClient, influxClient client.Client) *MainService {
 	return &MainService{
 		openstackProvider: openstackProvider,
-		provider: provider,
-		influxClient: 	influxClient,
+		provider:          provider,
+		influxClient:      influxClient,
 	}
 }
 
-func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResources, error){
+func (n MainService) GetOpenstackSummary(userName string) (model.HypervisorResources, error) {
 
 	//Openstack Summary 정보 조회
 	openstackSummaryInfo, err := integration.GetNova(n.openstackProvider, n.provider).GetOpenstackResources()
@@ -45,7 +45,6 @@ func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResour
 		return openstackSummaryInfo, err
 	}
 
-
 	//Available Total Instance Get
 	userId, err := integration.GetKeystone(n.openstackProvider, n.provider).GetUserIdByName(userName)
 	if err != nil {
@@ -57,7 +56,7 @@ func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResour
 	projectLists, err := integration.GetKeystone(n.openstackProvider, n.provider).GetUserTenantList(userId)
 
 	var availableInstance int
-	for _, project := range projectLists{
+	for _, project := range projectLists {
 		limits, _ := integration.GetNova(n.openstackProvider, n.provider).GetProjectResourcesLimit(project.Id)
 		availableInstance += limits.InstancesLimit
 	}
@@ -73,8 +72,7 @@ func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResour
 	var crashedList []string
 	var powerOffList []string
 
-	for _, computeNode :=range NodeList {
-
+	for _, computeNode := range NodeList {
 
 		var request model.NodeReq
 		var instanceListResp client.Response
@@ -83,9 +81,9 @@ func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResour
 		instanceListResp, _ = dao.GetNodeDao(n.influxClient).GetAliveInstanceListByNodename(request, true)
 		instanceList, _ := utils.GetResponseConverter().InfluxConverterToMap(instanceListResp)
 
-		for _, value := range instanceList{
+		for _, value := range instanceList {
 			instanceGuid := reflect.ValueOf(value["resource_id"]).String()
-			if utils.StringArrayDistinct(instanceGuid, instanceGuidList) == false{
+			if utils.StringArrayDistinct(instanceGuid, instanceGuidList) == false {
 
 				instanceGuidList = append(instanceGuidList, instanceGuid)
 				/*
@@ -98,21 +96,21 @@ func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResour
 					5 : Crashed,
 					6 : Power management suspend (S3 state)
 				*/
-				if utils.TypeChecker_int(value["value"]).(int64) == -1{
+				if utils.TypeChecker_int(value["value"]).(int64) == -1 {
 					noStatusList = append(noStatusList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 0{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 0 {
 					runningList = append(runningList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 1{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 1 {
 					idleList = append(idleList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 2{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 2 {
 					pausedList = append(pausedList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 3{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 3 {
 					shutDownList = append(shutDownList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 4{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 4 {
 					shutOffList = append(shutOffList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 5{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 5 {
 					crashedList = append(crashedList, instanceGuid)
-				}else if utils.TypeChecker_int(value["value"]).(int64) == 6{
+				} else if utils.TypeChecker_int(value["value"]).(int64) == 6 {
 					powerOffList = append(powerOffList, instanceGuid)
 				}
 			}
@@ -120,7 +118,7 @@ func (n MainService) GetOpenstackSummary(userName string)(model.HypervisorResour
 	}
 
 	//VM의 상태 통계 정보 리턴
-	vmStatusList := utils.GetVmStatusCount(noStatusList,runningList,idleList, pausedList, shutDownList, shutOffList, crashedList, powerOffList)
+	vmStatusList := utils.GetVmStatusCount(noStatusList, runningList, idleList, pausedList, shutDownList, shutOffList, crashedList, powerOffList)
 
 	openstackSummaryInfo.VmTotalLimit = availableInstance
 	openstackSummaryInfo.VmRunning = len(runningList)

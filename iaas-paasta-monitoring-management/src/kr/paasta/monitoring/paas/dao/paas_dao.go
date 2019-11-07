@@ -3,7 +3,7 @@ package dao
 import (
 	"fmt"
 	"github.com/cihub/seelog"
-	"github.com/influxdata/influxdb/client/v2"
+	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/util"
@@ -144,13 +144,13 @@ func (p *PaasDao) GetMetricUsageByTime(request model.PaasRequest) (_ client.Resp
 	return util.GetError().CheckError(*resp, err)
 }
 
-func (p *PaasDao) GetPaasMemoryUsage(request model.PaasRequest)(_ client.Response, errMsg model.ErrMessage){
+func (p *PaasDao) GetPaasMemoryUsage(request model.PaasRequest) (_ client.Response, errMsg model.ErrMessage) {
 	var errLogMsg string
 	defer func() {
 		if r := recover(); r != nil {
 
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -161,16 +161,16 @@ func (p *PaasDao) GetPaasMemoryUsage(request model.PaasRequest)(_ client.Respons
 		memoryTotalSql += " and time > now() - %s group by time(%s);"
 		memoryFreeSql += " and time > now() - %s group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf(memoryTotalSql + memoryFreeSql,
+			Command: fmt.Sprintf(memoryTotalSql+memoryFreeSql,
 				request.Id, request.Args.(model.MemoryMetricArg).NameMemoryTotal, request.DefaultTimeRange, request.GroupBy,
 				request.Id, request.Args.(model.MemoryMetricArg).NameMemoryFree, request.DefaultTimeRange, request.GroupBy),
 			Database: p.InfraDtvmetricDataSource,
 		}
 	} else {
 		memoryTotalSql += " and time < now() - %s and time > now() - %s group by time(%s);"
-		memoryFreeSql  += " and time < now() - %s and time > now() - %s group by time(%s);"
+		memoryFreeSql += " and time < now() - %s and time > now() - %s group by time(%s);"
 		q = client.Query{
-			Command:  fmt.Sprintf(memoryTotalSql + memoryFreeSql,
+			Command: fmt.Sprintf(memoryTotalSql+memoryFreeSql,
 				request.Id, request.Args.(model.MemoryMetricArg).NameMemoryTotal, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy,
 				request.Id, request.Args.(model.MemoryMetricArg).NameMemoryFree, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: p.InfraDtvmetricDataSource,

@@ -1,23 +1,24 @@
 package controller
 
 import (
-	"net/http"
+	"encoding/json"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/service"
 	"kr/paasta/monitoring/paas/util"
-	"kr/paasta/monitoring/paas/model"
-	"fmt"
+	"net/http"
 	"strconv"
-	"encoding/json"
 )
+
 //Gorm Object Struct
 type AlarmService struct {
-	txn   *gorm.DB
+	txn *gorm.DB
 }
 
 func GetAlarmController(txn *gorm.DB) *AlarmService {
 	return &AlarmService{
-		txn:   txn,
+		txn: txn,
 	}
 }
 
@@ -33,15 +34,15 @@ func (h *AlarmService) GetAlarmList(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmRequest
 
-	apiRequest.PagingReq.PageIndex, _   = strconv.Atoi(r.FormValue("pageIndex"))		// Page 번호
-	apiRequest.PagingReq.PageItem, _    = strconv.Atoi(r.FormValue("pageItems"))		// Page당 보여주는 갯수
+	apiRequest.PagingReq.PageIndex, _ = strconv.Atoi(r.FormValue("pageIndex")) // Page 번호
+	apiRequest.PagingReq.PageItem, _ = strconv.Atoi(r.FormValue("pageItems"))  // Page당 보여주는 갯수
 
-	apiRequest.OriginType     = r.URL.Query().Get("originType")
-	apiRequest.ResolveStatus  = r.URL.Query().Get("resolveStatus")
+	apiRequest.OriginType = r.URL.Query().Get("originType")
+	apiRequest.ResolveStatus = r.URL.Query().Get("resolveStatus")
 	apiRequest.SearchDateFrom = r.URL.Query().Get("searchDateFrom")
-	apiRequest.SearchDateTo   = r.URL.Query().Get("searchDateTo")
-	apiRequest.AlarmType      = r.URL.Query().Get("alarmType")
-	apiRequest.Level          = r.URL.Query().Get("level")
+	apiRequest.SearchDateTo = r.URL.Query().Get("searchDateTo")
+	apiRequest.AlarmType = r.URL.Query().Get("alarmType")
+	apiRequest.Level = r.URL.Query().Get("level")
 
 	//service호출 (Gorm Obj 매개 변수)
 	alarms, err := service.GetAlarmService(h.txn).GetAlarmList(apiRequest, h.txn)
@@ -55,7 +56,9 @@ func (h *AlarmService) GetAlarmList(w http.ResponseWriter, r *http.Request) {
 func (h *AlarmService) GetAlarmListCount(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmRequest
-	apiRequest.ResolveStatus  = r.URL.Query().Get("resolveStatus")
+	apiRequest.ResolveStatus = r.URL.Query().Get("resolveStatus")
+	apiRequest.SearchDateFrom = r.URL.Query().Get("searchDateFrom")
+	apiRequest.SearchDateTo = r.URL.Query().Get("searchDateTo")
 
 	alarms, err := service.GetAlarmService(h.txn).GetAlarmListCount(apiRequest, h.txn)
 	if err != nil {
@@ -123,10 +126,8 @@ func (h *AlarmService) UpdateAlarm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
 func (h *AlarmService) CreateAlarmAction(w http.ResponseWriter, r *http.Request) {
-    //fmt.Println("enter CreateAlarmAction!!!")
+	//fmt.Println("enter CreateAlarmAction!!!")
 	var apiRequest model.AlarmActionRequest
 	err := json.NewDecoder(r.Body).Decode(&apiRequest)
 	if err != nil {
@@ -231,12 +232,12 @@ func (h *AlarmService) GetAlarmStatGraphService(w http.ResponseWriter, r *http.R
 	apiRequest.Period = r.URL.Query().Get("period")
 	apiRequest.Interval, _ = strconv.Atoi(r.URL.Query().Get("interval"))
 	apiRequest.Args = []model.AlarmStat{
-		{model.ORIGIN_TYPE_BOSH+"-"+model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, model.ORIGIN_TYPE_BOSH, ""},
-		{model.ORIGIN_TYPE_BOSH+"-"+model.ALARM_LEVEL_WARNING,	model.ALARM_LEVEL_WARNING, model.ORIGIN_TYPE_BOSH, ""},
-		{model.ORIGIN_TYPE_PAASTA+"-"+model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, model.ORIGIN_TYPE_PAASTA, ""},
-		{model.ORIGIN_TYPE_PAASTA+"-"+model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, model.ORIGIN_TYPE_PAASTA, ""},
-		{model.ORIGIN_TYPE_CONTAINER+"-"+model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, model.ORIGIN_TYPE_CONTAINER, ""},
-		{model.ORIGIN_TYPE_CONTAINER+"-"+model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, model.ORIGIN_TYPE_CONTAINER, ""}}
+		{model.ORIGIN_TYPE_BOSH + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, model.ORIGIN_TYPE_BOSH, ""},
+		{model.ORIGIN_TYPE_BOSH + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, model.ORIGIN_TYPE_BOSH, ""},
+		{model.ORIGIN_TYPE_PAASTA + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, model.ORIGIN_TYPE_PAASTA, ""},
+		{model.ORIGIN_TYPE_PAASTA + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, model.ORIGIN_TYPE_PAASTA, ""},
+		{model.ORIGIN_TYPE_CONTAINER + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, model.ORIGIN_TYPE_CONTAINER, ""},
+		{model.ORIGIN_TYPE_CONTAINER + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, model.ORIGIN_TYPE_CONTAINER, ""}}
 	result, err := service.GetAlarmService(h.txn).GetAlarmStatGraph(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
@@ -251,12 +252,12 @@ func (h *AlarmService) GetAlarmStatGraphMatrix(w http.ResponseWriter, r *http.Re
 	apiRequest.Period = r.URL.Query().Get("period")
 	apiRequest.Interval, _ = strconv.Atoi(r.URL.Query().Get("interval"))
 	apiRequest.Args = []model.AlarmStat{
-		{model.ALARM_TYPE_CPU+"-"+model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_CPU},
-		{model.ALARM_TYPE_CPU+"-"+model.ALARM_LEVEL_WARNING,	model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_CPU},
-		{model.ALARM_TYPE_MEMORY+"-"+model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_MEMORY},
-		{model.ALARM_TYPE_MEMORY+"-"+model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_MEMORY},
-		{model.ALARM_TYPE_DISK+"-"+model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_DISK},
-		{model.ALARM_TYPE_DISK+"-"+model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_DISK}}
+		{model.ALARM_TYPE_CPU + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_CPU},
+		{model.ALARM_TYPE_CPU + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_CPU},
+		{model.ALARM_TYPE_MEMORY + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_MEMORY},
+		{model.ALARM_TYPE_MEMORY + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_MEMORY},
+		{model.ALARM_TYPE_DISK + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_DISK},
+		{model.ALARM_TYPE_DISK + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_DISK}}
 	result, err := service.GetAlarmService(h.txn).GetAlarmStatGraph(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
@@ -284,5 +285,3 @@ func (h *AlarmService) GetPaasAlarmRealTimeList(w http.ResponseWriter, r *http.R
 	}
 	util.RenderJsonResponse(result, w)
 }
-
-

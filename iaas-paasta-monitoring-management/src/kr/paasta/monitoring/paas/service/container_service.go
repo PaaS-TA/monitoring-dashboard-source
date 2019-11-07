@@ -1,56 +1,56 @@
 package service
 
 import (
-	"github.com/jinzhu/gorm"
-	client "github.com/influxdata/influxdb/client/v2"
-	"kr/paasta/monitoring/paas/util"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/dao"
-	"reflect"
 	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/jinzhu/gorm"
+	"kr/paasta/monitoring/paas/dao"
+	"kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/paas/util"
 	"kr/paasta/monitoring/utils"
-	"sync"
-	"strconv"
+	"reflect"
 	"sort"
+	"strconv"
 	"strings"
+	"sync"
 )
 
 type ContainerService struct {
-	txn   *gorm.DB
-	influxClient 	client.Client
+	txn          *gorm.DB
+	influxClient client.Client
 	databases    model.Databases
 }
 
 func GetContainerService(txn *gorm.DB, influxClient client.Client, databases model.Databases) *ContainerService {
 	return &ContainerService{
-		txn:   txn,
-		influxClient: 	influxClient,
+		txn:          txn,
+		influxClient: influxClient,
 		databases:    databases,
 	}
 }
 
 //Cell에 배포된 App Container 배포 현황을 조회한다.
-func (h ContainerService) GetContainerDeploy()([]model.CellTileView, model.ErrMessage){
+func (h ContainerService) GetContainerDeploy() ([]model.CellTileView, model.ErrMessage) {
 
 	var cellInfos []model.CellTileView
 
 	cellList, err := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetCellList()
 
-	if err != nil{
+	if err != nil {
 		return cellInfos, err
 	}
 
-	cellMap   := getZoneCellList(cellList, h)
+	cellMap := getZoneCellList(cellList, h)
 
-	cellMapStruct , _ := mapToTreeStruct(cellMap, cellList, h)
+	cellMapStruct, _ := mapToTreeStruct(cellMap, cellList, h)
 
 	var cellInfoResult []model.CellTileView
 
 	//Cell Name Sorting 위해 For Loop
-	for _, cellInfo := range cellList{
+	for _, cellInfo := range cellList {
 
-		for _, cellMapInfo := range cellMapStruct{
-			if cellInfo.CellName == cellMapInfo.CellName{
+		for _, cellMapInfo := range cellMapStruct {
+			if cellInfo.CellName == cellMapInfo.CellName {
 				cellMapInfo.ZoneName = cellInfo.ZoneName
 				cellInfoResult = append(cellInfoResult, cellMapInfo)
 			}
@@ -61,29 +61,28 @@ func (h ContainerService) GetContainerDeploy()([]model.CellTileView, model.ErrMe
 	return cellInfoResult, nil
 }
 
-
 //DB의  Cell정보와 MetricDB의 Container정보를 조합하여 구조화된 Map 정보구성
 // cell -app1 - container1
 //            - container2
 //      - app2 - container3
-func getZoneCellList(cellInfos []model.ZoneCellInfo, b ContainerService) map[string]map[string]map[string]string{
+func getZoneCellList(cellInfos []model.ZoneCellInfo, b ContainerService) map[string]map[string]map[string]string {
 
 	cellMap := make(map[string]map[string]map[string]string)
 
 	//Zone에 존재하는 Cell들에 실행되고 있는 Container 목록을 받아온다.
-	for _, cellInfo := range cellInfos{
+	for _, cellInfo := range cellInfos {
 
 		containerResp, _ := dao.GetContainerDao(b.txn, b.influxClient, b.databases).GetCellContainersList(cellInfo.Ip)
 		valueList, _ := util.GetResponseConverter().InfluxConverterToMap(containerResp)
 
 		appMap := make(map[string]map[string]string)
-		for _ , value := range valueList{
+		for _, value := range valueList {
 
-			containerMap     := make(map[string]string)
-			appName 		 := reflect.ValueOf(value["application_name"]).String()
-			containerId 	 := reflect.ValueOf(value["container_interface"]).String()
-			if strings.Contains(containerId, model.CON_MTR_ID_PREFIX){
-				containerId = strings.Replace(containerId, model.CON_MTR_ID_PREFIX,"",1)
+			containerMap := make(map[string]string)
+			appName := reflect.ValueOf(value["application_name"]).String()
+			containerId := reflect.ValueOf(value["container_interface"]).String()
+			if strings.Contains(containerId, model.CON_MTR_ID_PREFIX) {
+				containerId = strings.Replace(containerId, model.CON_MTR_ID_PREFIX, "", 1)
 			}
 
 			applicationIndex := reflect.ValueOf(value["application_index"]).String()
@@ -91,12 +90,12 @@ func getZoneCellList(cellInfos []model.ZoneCellInfo, b ContainerService) map[str
 			containerMap[containerId] = applicationIndex
 
 			//동일한 App의 Container는 AppMap에 Append 처리 한다.
-			if exists, ok := appMap[appName]; ok{
+			if exists, ok := appMap[appName]; ok {
 				for k, v := range containerMap {
 					exists[k] = v
 					appMap[appName] = exists
 				}
-			}else{
+			} else {
 				appMap[appName] = containerMap
 			}
 
@@ -107,21 +106,21 @@ func getZoneCellList(cellInfos []model.ZoneCellInfo, b ContainerService) map[str
 	return cellMap
 }
 
-func mapToTreeStruct(mapData map[string]map[string]map[string]string, dbCellInfo []model.ZoneCellInfo, b ContainerService) ([]model.CellTileView, model.ErrMessage){
+func mapToTreeStruct(mapData map[string]map[string]map[string]string, dbCellInfo []model.ZoneCellInfo, b ContainerService) ([]model.CellTileView, model.ErrMessage) {
 
 	returnValue := make([]model.CellTileView, len(mapData))
-	cellInfo    := make([]model.CellTileView, len(mapData))
+	cellInfo := make([]model.CellTileView, len(mapData))
 
 	c := 0
 
-	for cellName, apps := range mapData{
+	for cellName, apps := range mapData {
 
 		var containerList []model.ContainerTileView
 		for appName, containerInfos := range apps {
 
 			var container model.ContainerTileView
 
-			for key, data := range containerInfos{
+			for key, data := range containerInfos {
 
 				container.AppName = appName
 				container.AppIndex = data
@@ -137,18 +136,18 @@ func mapToTreeStruct(mapData map[string]map[string]map[string]string, dbCellInfo
 	}
 
 	sortIdx := 0
-	for cellName, _ := range mapData{
-		for  _, info := range cellInfo{
+	for cellName, _ := range mapData {
+		for _, info := range cellInfo {
 			if cellName == info.CellName {
 
-				for _, data := range dbCellInfo{
-					if data.CellName == cellName{
+				for _, data := range dbCellInfo {
+					if data.CellName == cellName {
 						returnValue[sortIdx].Ip = data.Ip
 						break
 					}
 				}
 				returnValue[sortIdx].CellName = cellName
-				returnValue[sortIdx].ContainerTileView =  info.ContainerTileView
+				returnValue[sortIdx].ContainerTileView = info.ContainerTileView
 			}
 		}
 		sortIdx++
@@ -157,11 +156,11 @@ func mapToTreeStruct(mapData map[string]map[string]map[string]string, dbCellInfo
 	return returnValue, nil
 }
 
-func (h ContainerService) GetCellOverview(request model.ContainerReq)(model.OverviewCntRes, model.ErrMessage){
+func (h ContainerService) GetCellOverview(request model.ContainerReq) (model.OverviewCntRes, model.ErrMessage) {
 
 	var result model.OverviewCntRes
 
-	zoneList, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	zoneList, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -170,7 +169,7 @@ func (h ContainerService) GetCellOverview(request model.ContainerReq)(model.Over
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return result, err
 	}
@@ -198,11 +197,11 @@ func (h ContainerService) GetCellOverview(request model.ContainerReq)(model.Over
 	return result, nil
 }
 
-func (h ContainerService) GetCellOverviewStatusList(request model.ContainerReq)([]model.CellOverviewRes, model.ErrMessage){
+func (h ContainerService) GetCellOverviewStatusList(request model.ContainerReq) ([]model.CellOverviewRes, model.ErrMessage) {
 
 	var result []model.CellOverviewRes
 
-	zoneList, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	zoneList, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -211,7 +210,7 @@ func (h ContainerService) GetCellOverviewStatusList(request model.ContainerReq)(
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
@@ -225,20 +224,20 @@ func (h ContainerService) GetCellOverviewStatusList(request model.ContainerReq)(
 	}
 
 	// sort
-	if len(result) > 0{
+	if len(result) > 0 {
 		sort.Slice(result, func(i, j int) bool {
-			return result[i].CellName + result[i].Ip < result[j].CellName + result[j].Ip
+			return result[i].CellName+result[i].Ip < result[j].CellName+result[j].Ip
 		})
 	}
 
 	return result, nil
 }
 
-func (h ContainerService) GetContainerOverview(request model.ContainerReq)(model.OverviewCntRes, model.ErrMessage){
+func (h ContainerService) GetContainerOverview(request model.ContainerReq) (model.OverviewCntRes, model.ErrMessage) {
 
 	var result model.OverviewCntRes
 	zonelist, err := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetZoneList()
-	cellist, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	cellist, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -247,7 +246,7 @@ func (h ContainerService) GetContainerOverview(request model.ContainerReq)(model
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return result, err
 	}
@@ -262,7 +261,7 @@ func (h ContainerService) GetContainerOverview(request model.ContainerReq)(model
 		go func(wg *sync.WaitGroup, zone model.ZoneCellInfo) {
 			_, containers, _ := getZoneItemCount(cellist, zone.ZoneName)
 
-			for _, container := range containers{
+			for _, container := range containers {
 				var apiRequest model.ContainerReq
 				apiRequest.CellIp = container.Ip
 				apiRequest.AppName = container.AppName
@@ -270,7 +269,7 @@ func (h ContainerService) GetContainerOverview(request model.ContainerReq)(model
 
 				// select container monitoring
 				containerUsageRes, err := h.getContainerUsageState(apiRequest, serverThresholds)
-				if err != nil{
+				if err != nil {
 					fmt.Println(err)
 				}
 				containerUsageList = append(containerUsageList, containerUsageRes)
@@ -301,11 +300,11 @@ func (h ContainerService) GetContainerOverview(request model.ContainerReq)(model
 	return result, nil
 }
 
-func (h ContainerService) GetContainerOverviewStatusList(request model.ContainerReq)([]model.ContainerOverviewRes, model.ErrMessage){
+func (h ContainerService) GetContainerOverviewStatusList(request model.ContainerReq) ([]model.ContainerOverviewRes, model.ErrMessage) {
 
 	var result []model.ContainerOverviewRes
 	zonelist, err := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetZoneList()
-	cellist, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	cellist, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -314,7 +313,7 @@ func (h ContainerService) GetContainerOverviewStatusList(request model.Container
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
@@ -328,7 +327,7 @@ func (h ContainerService) GetContainerOverviewStatusList(request model.Container
 		go func(wg *sync.WaitGroup, zone model.ZoneCellInfo) {
 			_, containers, _ := getZoneItemCount(cellist, zone.ZoneName)
 
-			for _, container := range containers{
+			for _, container := range containers {
 				var apiRequest model.ContainerReq
 				apiRequest.CellIp = container.Ip
 				apiRequest.AppName = container.AppName
@@ -337,7 +336,7 @@ func (h ContainerService) GetContainerOverviewStatusList(request model.Container
 				// select container monitoring
 				containerUsageRes, err := h.getContainerUsageState(apiRequest, serverThresholds)
 
-				if err != nil{
+				if err != nil {
 					fmt.Println(err)
 				}
 				containerUsageRes.ZoneName = zone.ZoneName
@@ -357,17 +356,16 @@ func (h ContainerService) GetContainerOverviewStatusList(request model.Container
 	}
 
 	// sort
-	if len(result) > 0{
+	if len(result) > 0 {
 		sort.Slice(result, func(i, j int) bool {
-			return result[i].ZoneName + result[i].CellName + result[i].AppName + result[i].AppIndex < result[j].ZoneName + result[j].CellName + result[j].AppName + result[j].AppIndex
+			return result[i].ZoneName+result[i].CellName+result[i].AppName+result[i].AppIndex < result[j].ZoneName+result[j].CellName+result[j].AppName+result[j].AppIndex
 		})
 	}
 
 	return result, nil
 }
 
-
-func (h ContainerService) GetContainerSummary(request model.ContainerReq, searchZone string )(model.ContainerSummaryPagingRes, model.ErrMessage){
+func (h ContainerService) GetContainerSummary(request model.ContainerReq, searchZone string) (model.ContainerSummaryPagingRes, model.ErrMessage) {
 	var pagingResult model.ContainerSummaryPagingRes
 
 	var result []model.ContainerSummary
@@ -375,16 +373,16 @@ func (h ContainerService) GetContainerSummary(request model.ContainerReq, search
 	zonelist, err := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetZoneList()
 
 	if searchZone != "" {
-		for _, tmpZone := range zonelist{
-			if strings.Contains(tmpZone.ZoneName, searchZone){
+		for _, tmpZone := range zonelist {
+			if strings.Contains(tmpZone.ZoneName, searchZone) {
 				tmpZoneList = append(tmpZoneList, tmpZone)
 			}
 		}
-	}else{
+	} else {
 		tmpZoneList = zonelist
 	}
 
-	cellist, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	cellist, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -393,7 +391,7 @@ func (h ContainerService) GetContainerSummary(request model.ContainerReq, search
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return pagingResult, err
 	}
@@ -415,20 +413,20 @@ func (h ContainerService) GetContainerSummary(request model.ContainerReq, search
 			res.ContainerCnt = strconv.Itoa(len(containers))
 			res.AppCnt = strconv.Itoa(appcnt)
 
-			for _, container := range containers{
+			for _, container := range containers {
 
-					var apiRequest model.ContainerReq
-					apiRequest.CellIp = container.Ip
-					apiRequest.AppName = container.AppName
-					apiRequest.AppIndex = container.AppIndex
+				var apiRequest model.ContainerReq
+				apiRequest.CellIp = container.Ip
+				apiRequest.AppName = container.AppName
+				apiRequest.AppIndex = container.AppIndex
 
-					// select container monitoring
-					containerUsageRes, err := h.getContainerUsageState(apiRequest, serverThresholds)
-					if err != nil{
-						fmt.Println(err)
-					}
-					containerUsageList = append(containerUsageList, containerUsageRes)
-					totalContainerUsageList = append(totalContainerUsageList, containerUsageRes)
+				// select container monitoring
+				containerUsageRes, err := h.getContainerUsageState(apiRequest, serverThresholds)
+				if err != nil {
+					fmt.Println(err)
+				}
+				containerUsageList = append(containerUsageList, containerUsageRes)
+				totalContainerUsageList = append(totalContainerUsageList, containerUsageRes)
 			}
 
 			totalCnt, failedCnt, criticalCnt, warningCnt := len(containerUsageList), 0, 0, 0
@@ -455,7 +453,7 @@ func (h ContainerService) GetContainerSummary(request model.ContainerReq, search
 	wg.Wait()
 
 	// sort
-	if len(result) > 0{
+	if len(result) > 0 {
 		sort.Slice(result, func(i, j int) bool {
 			return result[i].ZoneName < result[j].ZoneName
 		})
@@ -501,11 +499,11 @@ func (h ContainerService) GetContainerSummary(request model.ContainerReq, search
 	return pagingResult, nil
 }
 
-func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([]model.ContainerRelationshipRes, model.ErrMessage){
+func (h ContainerService) GetContainerRelationship(request model.ContainerReq) ([]model.ContainerRelationshipRes, model.ErrMessage) {
 
 	var result []model.ContainerRelationshipRes
 	zonelist, err := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetZoneList()
-	cellist, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	cellist, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -514,7 +512,7 @@ func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return result, err
 	}
@@ -528,7 +526,7 @@ func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([
 			var wg sync.WaitGroup
 			wg.Add(len(cells))
 
-			for _,cell := range  cells {
+			for _, cell := range cells {
 				go func(wg *sync.WaitGroup, cell model.ZoneCellInfo) {
 					var res model.ContainerRelationshipRes
 
@@ -540,8 +538,8 @@ func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([
 					if len(containers) > 0 {
 						var appInfoList []model.AppStatusInfo
 
-						for _, container := range containers{
-							if cell.CellName == container.CellName{
+						for _, container := range containers {
+							if cell.CellName == container.CellName {
 								var apiRequest model.ContainerReq
 								apiRequest.CellIp = container.Ip
 								apiRequest.AppName = container.AppName
@@ -549,7 +547,7 @@ func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([
 								apiRequest.ContainerName = container.ContainerId
 								// select container monitoring
 								containerUsageRes, err := h.getContainerUsageState(apiRequest, serverThresholds)
-								if err != nil{
+								if err != nil {
 									fmt.Println(err)
 								}
 
@@ -594,14 +592,14 @@ func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([
 	}
 
 	// sort
-	if len(result) > 0{
+	if len(result) > 0 {
 		sort.Slice(result, func(i, j int) bool {
 			return result[i].CellName < result[j].CellName
 		})
 
-		for _, value := range result{
+		for _, value := range result {
 			sort.Slice(value.AppInfoList, func(i, j int) bool {
-				return value.AppInfoList[i].AppName + value.AppInfoList[i].AppIndex < value.AppInfoList[j].AppName + value.AppInfoList[j].AppIndex
+				return value.AppInfoList[i].AppName+value.AppInfoList[i].AppIndex < value.AppInfoList[j].AppName+value.AppInfoList[j].AppIndex
 			})
 		}
 	}
@@ -609,11 +607,11 @@ func (h ContainerService) GetContainerRelationship(request model.ContainerReq)([
 	return result, nil
 }
 
-func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([]model.ContainerRelationshipRes, model.ErrMessage){
+func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq) ([]model.ContainerRelationshipRes, model.ErrMessage) {
 
 	var result []model.ContainerRelationshipRes
 
-	cellist, err := GetContainerService(h.txn,h.influxClient, h.databases).GetContainerDeploy()
+	cellist, err := GetContainerService(h.txn, h.influxClient, h.databases).GetContainerDeploy()
 
 	if err != nil {
 		fmt.Println(err)
@@ -622,7 +620,7 @@ func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([
 
 	//임계치 설정정보를 조회한다.
 	serverThresholds, err := dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return result, err
 	}
@@ -631,7 +629,7 @@ func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([
 	var wg sync.WaitGroup
 	wg.Add(len(cellist))
 
-	for _,cell := range  cellist {
+	for _, cell := range cellist {
 		go func(wg *sync.WaitGroup, cell model.CellTileView) {
 			var res model.ContainerRelationshipRes
 
@@ -642,7 +640,7 @@ func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([
 			if len(cell.ContainerTileView) > 0 {
 				var appInfoList []model.AppStatusInfo
 
-				for _, container := range cell.ContainerTileView{
+				for _, container := range cell.ContainerTileView {
 
 					var apiRequest model.ContainerReq
 					apiRequest.CellIp = cell.Ip
@@ -651,7 +649,7 @@ func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([
 					apiRequest.ContainerName = container.ContainerId
 					// select container monitoring
 					containerUsageRes, err := h.getContainerUsageState(apiRequest, serverThresholds)
-					if err != nil{
+					if err != nil {
 						fmt.Println(err)
 					}
 
@@ -693,16 +691,15 @@ func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([
 	}
 	wg.Wait()
 
-
 	// sort
-	if len(result) > 0{
+	if len(result) > 0 {
 		sort.Slice(result, func(i, j int) bool {
 			return result[i].CellName < result[j].CellName
 		})
 
-		for _, value := range result{
+		for _, value := range result {
 			sort.Slice(value.AppInfoList, func(i, j int) bool {
-				return value.AppInfoList[i].AppName + value.AppInfoList[i].AppIndex < value.AppInfoList[j].AppName + value.AppInfoList[j].AppIndex
+				return value.AppInfoList[i].AppName+value.AppInfoList[i].AppIndex < value.AppInfoList[j].AppName+value.AppInfoList[j].AppIndex
 			})
 		}
 	}
@@ -710,7 +707,7 @@ func (h ContainerService) GetPaasMainContainerView(request model.ContainerReq)([
 	return result, nil
 }
 
-func (h ContainerService) getCellUsageList(cellList []model.CellTileView, serverThresholds []model.AlarmPolicyResponse) ([]model.CellOverviewRes, model.ErrMessage){
+func (h ContainerService) getCellUsageList(cellList []model.CellTileView, serverThresholds []model.AlarmPolicyResponse) ([]model.CellOverviewRes, model.ErrMessage) {
 	var resultList []model.CellOverviewRes
 
 	var wg sync.WaitGroup
@@ -732,53 +729,52 @@ func (h ContainerService) getCellUsageList(cellList []model.CellTileView, server
 
 			// get cell id for paas detail view
 			cellIdResp, _ := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetCellIdForDetail(request)
-			cellId, _   := util.GetResponseConverter().InfluxConverterToMap(cellIdResp)
+			cellId, _ := util.GetResponseConverter().InfluxConverterToMap(cellIdResp)
 			if len(cellId) > 0 {
 				result.CellId = cellId[0]["id"].(string)
 			}
 
-			cpuUsage  := utils.GetDataFloatFromInterfaceSingle(cpuData)
-			memTot    := utils.GetDataFloatFromInterfaceSingle(memTotData)
-			memFree   := utils.GetDataFloatFromInterfaceSingle(memFreeData)
-			memUsage  := utils.RoundFloatDigit2(100 - ((memFree/memTot)*100))
-			diskTotal   := utils.GetDataFloatFromInterfaceSingle(diskTotalData)
-			diskUsage    := utils.GetDataFloatFromInterfaceSingle(diskUsageData)
+			cpuUsage := utils.GetDataFloatFromInterfaceSingle(cpuData)
+			memTot := utils.GetDataFloatFromInterfaceSingle(memTotData)
+			memFree := utils.GetDataFloatFromInterfaceSingle(memFreeData)
+			memUsage := utils.RoundFloatDigit2(100 - ((memFree / memTot) * 100))
+			diskTotal := utils.GetDataFloatFromInterfaceSingle(diskTotalData)
+			diskUsage := utils.GetDataFloatFromInterfaceSingle(diskUsageData)
 
 			result.Core = strconv.Itoa(len(cpuCoreData))
 			result.CpuUsage = utils.RoundFloat(cpuUsage, 2)
-			result.TotalDisk = diskTotal/ model.MB
-			result.TotalMemory = memTot/ model.MB
+			result.TotalDisk = diskTotal / model.MB
+			result.TotalMemory = memTot / model.MB
 			if memUsage < 0 {
 				result.MemoryUsage = 0
-			}else{
+			} else {
 				result.MemoryUsage = memUsage
 			}
 
-
-			if result.Core == "0" || result.TotalMemory == 0{
-				result.State, result.CellState ,result.CpuState, result.MemoryState= model.STATE_FAILED, model.STATE_FAILED, model.STATE_FAILED, model.STATE_FAILED
+			if result.Core == "0" || result.TotalMemory == 0 {
+				result.State, result.CellState, result.CpuState, result.MemoryState = model.STATE_FAILED, model.STATE_FAILED, model.STATE_FAILED, model.STATE_FAILED
 			}
 
 			if result.TotalDisk == 0 {
 				result.DiskStatus, result.CellState, result.TotalDiskState = model.STATE_FAILED, model.STATE_FAILED, model.STATE_FAILED
 			}
 
-			if result.State != model.STATE_FAILED{
+			if result.State != model.STATE_FAILED {
 				var alarmStatus []string
 
-				cpuStatus := util.GetAlarmStatusByServiceName( model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_CPU, result.CpuUsage, serverThresholds )
-				memStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_MEMORY, result.MemoryUsage, serverThresholds )
+				cpuStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_CPU, result.CpuUsage, serverThresholds)
+				memStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_MEMORY, result.MemoryUsage, serverThresholds)
 
 				if cpuStatus != "" {
 					alarmStatus = append(alarmStatus, cpuStatus)
 					result.CpuState = cpuStatus
-				}else{
+				} else {
 					result.CpuState = model.STATE_RUNNING
 				}
 				if memStatus != "" {
 					alarmStatus = append(alarmStatus, memStatus)
 					result.MemoryState = memStatus
-				}else{
+				} else {
 					result.MemoryState = model.STATE_RUNNING
 				}
 
@@ -790,13 +786,13 @@ func (h ContainerService) getCellUsageList(cellList []model.CellTileView, server
 				}
 			}
 
-			if result.DiskStatus != model.STATE_FAILED{
+			if result.DiskStatus != model.STATE_FAILED {
 				var diskStatusList []string
-				diskStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_DISK, diskUsage, serverThresholds )
+				diskStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_DISK, diskUsage, serverThresholds)
 				if diskStatus != "" {
 					diskStatusList = append(diskStatusList, diskStatus)
 					result.TotalDiskState = diskStatus
-				}else{
+				} else {
 					result.TotalDiskState = model.DISK_STATE_NORMAL
 				}
 
@@ -810,12 +806,12 @@ func (h ContainerService) getCellUsageList(cellList []model.CellTileView, server
 
 			if result.State == model.STATE_RUNNING && result.DiskStatus == model.DISK_STATE_NORMAL {
 				result.CellState = model.STATE_RUNNING
-			}else if result.CellState != model.STATE_FAILED {
+			} else if result.CellState != model.STATE_FAILED {
 				var statusList []string
 				statusList = append(statusList, result.State)
 				if result.DiskStatus == model.DISK_STATE_NORMAL {
 					statusList = append(statusList, model.STATE_RUNNING)
-				}else{
+				} else {
 					statusList = append(statusList, result.DiskStatus)
 				}
 				result.CellState = util.GetMaxAlarmLevel(statusList)
@@ -842,7 +838,7 @@ func (h ContainerService) GetCellSummaryMetricData(request model.ContainerReq) (
 	for i := 0; i < 6; i++ {
 		go func(wg *sync.WaitGroup, index int) {
 			switch index {
-			case 0 :
+			case 0:
 				request.MetricName = model.MTR_CPU_CORE
 				request.Time = "1m"
 				request.SqlQuery = "select value from cf_metrics where ip = '%s' and time > now() - %s and metricname =~ /%s/ group by metricname order by time desc limit 1;"
@@ -850,7 +846,7 @@ func (h ContainerService) GetCellSummaryMetricData(request model.ContainerReq) (
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 1 :
+			case 1:
 				request.MetricName = model.MTR_CPU_CORE
 				request.Time = "1m"
 				request.SqlQuery = "select mean(value) as value from cf_metrics where ip = '%s' and time > now() - %s and metricname =~ /%s/ ;"
@@ -858,23 +854,23 @@ func (h ContainerService) GetCellSummaryMetricData(request model.ContainerReq) (
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 2 :
+			case 2:
 				request.MetricName = model.MTR_MEM_TOTAL
 				request.Time = "1m"
 				request.SqlQuery = "select mean(value) as value from cf_metrics where ip = '%s' and time > now() - %s and metricname = '%s' ;"
-				memTotalResp , err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetCellSummaryData(request)
+				memTotalResp, err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetCellSummaryData(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 3 :
+			case 3:
 				request.MetricName = model.MTR_MEM_FREE
 				request.Time = "1m"
 				request.SqlQuery = "select mean(value) as value from cf_metrics where ip = '%s' and time > now() - %s and metricname = '%s' ;"
-				memFreeResp , err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetCellSummaryData(request)
+				memFreeResp, err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetCellSummaryData(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 4 :
+			case 4:
 				request.MetricName = model.MTR_DISK_TOTAL
 				request.Time = "1m"
 				request.SqlQuery = "select mean(value) as value from cf_metrics where ip = '%s' and time > now() - %s and metricname = '%s' ;"
@@ -882,7 +878,7 @@ func (h ContainerService) GetCellSummaryMetricData(request model.ContainerReq) (
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 5 :
+			case 5:
 				request.MetricName = model.MTR_DISK_USAGE
 				request.Time = "1m"
 				request.SqlQuery = "select mean(value) as value from cf_metrics where ip = '%s' and time > now() - %s and metricname = '%s' ;"
@@ -901,33 +897,33 @@ func (h ContainerService) GetCellSummaryMetricData(request model.ContainerReq) (
 
 	if len(errs) > 0 {
 		var returnErrMessage string
-		for _, err := range errs{
+		for _, err := range errs {
 			returnErrMessage = returnErrMessage + " " + err["Message"].(string)
 		}
 		errMessage := model.ErrMessage{
-			"Message": returnErrMessage ,
+			"Message": returnErrMessage,
 		}
 		return nil, nil, nil, nil, nil, nil, errMessage
 	}
 
-	cpuCore, _   := util.GetResponseConverter().InfluxConverterToMap(cpuCoreResp)
-	memTotal, _   := utils.GetResponseConverter().InfluxConverter(memTotalResp)
-	memFree,  _   := utils.GetResponseConverter().InfluxConverter(memFreeResp)
-	diskTotal, _   := utils.GetResponseConverter().InfluxConverter(diskTotalResp)
-	cpuUsage, _   := utils.GetResponseConverter().InfluxConverter(cpuResp)
-	diskUsage, _   := utils.GetResponseConverter().InfluxConverter(diskUsageResp)
+	cpuCore, _ := util.GetResponseConverter().InfluxConverterToMap(cpuCoreResp)
+	memTotal, _ := utils.GetResponseConverter().InfluxConverter(memTotalResp)
+	memFree, _ := utils.GetResponseConverter().InfluxConverter(memFreeResp)
+	diskTotal, _ := utils.GetResponseConverter().InfluxConverter(diskTotalResp)
+	cpuUsage, _ := utils.GetResponseConverter().InfluxConverter(cpuResp)
+	diskUsage, _ := utils.GetResponseConverter().InfluxConverter(diskUsageResp)
 
 	return cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage, nil
 }
 
-func getZoneItemCount(cellInfoList []model.CellTileView, zoneName string) ([]model.ZoneCellInfo, []model.ContainerTileView, int){
+func getZoneItemCount(cellInfoList []model.CellTileView, zoneName string) ([]model.ZoneCellInfo, []model.ContainerTileView, int) {
 
 	var cells []model.ZoneCellInfo
 	var containers []model.ContainerTileView
 	var apps []string
 
-	for _, cell := range cellInfoList{
-		if zoneName == cell.ZoneName{
+	for _, cell := range cellInfoList {
+		if zoneName == cell.ZoneName {
 
 			var tmpCell model.ZoneCellInfo
 			tmpCell.CellName = cell.CellName
@@ -935,7 +931,7 @@ func getZoneItemCount(cellInfoList []model.CellTileView, zoneName string) ([]mod
 			cells = append(cells, tmpCell)
 
 			if cell.ContainerTileView != nil {
-				for _,container := range cell.ContainerTileView {
+				for _, container := range cell.ContainerTileView {
 					container.Ip = cell.Ip
 					container.CellName = cell.CellName
 					containers = append(containers, container)
@@ -944,11 +940,11 @@ func getZoneItemCount(cellInfoList []model.CellTileView, zoneName string) ([]mod
 		}
 	}
 
-	if len(containers) > 0{
-		for _, app := range containers{
+	if len(containers) > 0 {
+		for _, app := range containers {
 			var existChk bool = false
 			if len(apps) > 0 {
-				for _,name := range apps{
+				for _, name := range apps {
 					if app.AppName == name {
 						existChk = true
 					}
@@ -963,14 +959,14 @@ func getZoneItemCount(cellInfoList []model.CellTileView, zoneName string) ([]mod
 	return cells, containers, len(apps)
 }
 
-func getContainerAppCount(appList []model.AppStatusInfo) int{
+func getContainerAppCount(appList []model.AppStatusInfo) int {
 
 	var apps []string
 
-	for _, app := range appList{
+	for _, app := range appList {
 		var existChk bool = false
 		if len(apps) > 0 {
-			for _,name := range apps{
+			for _, name := range apps {
 				if app.AppName == name {
 					existChk = true
 				}
@@ -984,8 +980,7 @@ func getContainerAppCount(appList []model.AppStatusInfo) int{
 	return len(apps)
 }
 
-
-func (h ContainerService) getContainerUsageState(request model.ContainerReq, serverThresholds []model.AlarmPolicyResponse) (model.ContainerOverviewRes, model.ErrMessage){
+func (h ContainerService) getContainerUsageState(request model.ContainerReq, serverThresholds []model.AlarmPolicyResponse) (model.ContainerOverviewRes, model.ErrMessage) {
 
 	var result model.ContainerOverviewRes
 
@@ -1005,29 +1000,29 @@ func (h ContainerService) getContainerUsageState(request model.ContainerReq, ser
 	result.DiskUsage = utils.GetDataFloatFromInterfaceSingle(diskData)
 
 	var alarmStatus []string
-	cpuStatus := util.GetAlarmStatusByServiceName( model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_CPU, result.CpuUsage, serverThresholds )
-	if cpuStatus != ""{
-		result.CpuState= cpuStatus
-	}else{
-		result.CpuState= model.STATE_RUNNING
+	cpuStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_CPU, result.CpuUsage, serverThresholds)
+	if cpuStatus != "" {
+		result.CpuState = cpuStatus
+	} else {
+		result.CpuState = model.STATE_RUNNING
 	}
-	alarmStatus = append(alarmStatus,cpuStatus)
+	alarmStatus = append(alarmStatus, cpuStatus)
 
-	memStatus := util.GetAlarmStatusByServiceName( model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_MEMORY, result.MemoryUsage, serverThresholds )
-	if memStatus != ""{
-		result.MemoryState= memStatus
-	}else{
-		result.MemoryState= model.STATE_RUNNING
+	memStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_MEMORY, result.MemoryUsage, serverThresholds)
+	if memStatus != "" {
+		result.MemoryState = memStatus
+	} else {
+		result.MemoryState = model.STATE_RUNNING
 	}
-	alarmStatus = append(alarmStatus,memStatus)
+	alarmStatus = append(alarmStatus, memStatus)
 
-	diskStatus := util.GetAlarmStatusByServiceName( model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_DISK, result.DiskUsage, serverThresholds )
-	if diskStatus != ""{
-		result.DiskState= diskStatus
-	}else{
-		result.DiskState= model.STATE_RUNNING
+	diskStatus := util.GetAlarmStatusByServiceName(model.ORIGIN_TYPE_CONTAINER, model.ALARM_TYPE_DISK, result.DiskUsage, serverThresholds)
+	if diskStatus != "" {
+		result.DiskState = diskStatus
+	} else {
+		result.DiskState = model.STATE_RUNNING
 	}
-	alarmStatus = append(alarmStatus,diskStatus)
+	alarmStatus = append(alarmStatus, diskStatus)
 
 	result.Status = util.GetMaxAlarmLevel(alarmStatus)
 
@@ -1039,7 +1034,7 @@ func (h ContainerService) getContainerUsageState(request model.ContainerReq, ser
 }
 
 func (h ContainerService) GetContainerummaryMetricData(request model.ContainerReq) (map[string]interface{}, map[string]interface{}, map[string]interface{}, model.ErrMessage) {
-	var cpuResp, memResp, diskResp  client.Response
+	var cpuResp, memResp, diskResp client.Response
 	var errs []model.ErrMessage
 	var err model.ErrMessage
 	var wg sync.WaitGroup
@@ -1048,21 +1043,21 @@ func (h ContainerService) GetContainerummaryMetricData(request model.ContainerRe
 		go func(wg *sync.WaitGroup, index int) {
 
 			switch index {
-			case 0 :
+			case 0:
 				request.MetricName = "cpu_usage_total"
 				request.Service = model.ALARM_TYPE_CPU
 				cpuResp, err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetContainerUsage(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 1 :
+			case 1:
 				request.MetricName = "memory_usage"
 				request.Service = model.ALARM_TYPE_MEMORY
 				memResp, err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetContainerUsage(request)
 				if err != nil {
 					errs = append(errs, err)
 				}
-			case 2 :
+			case 2:
 				request.MetricName = "disk_usage"
 				request.Service = model.ALARM_TYPE_DISK
 				diskResp, err = dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetContainerUsage(request)
@@ -1081,26 +1076,26 @@ func (h ContainerService) GetContainerummaryMetricData(request model.ContainerRe
 	//==========================================================================
 	if len(errs) > 0 {
 		var returnErrMessage string
-		for _, err := range errs{
+		for _, err := range errs {
 			returnErrMessage = returnErrMessage + " " + err["Message"].(string)
 		}
 		errMessage := model.ErrMessage{
-			"Message": returnErrMessage ,
+			"Message": returnErrMessage,
 		}
 		return nil, nil, nil, errMessage
 	}
 	//==========================================================================
 
-	cpuUsage, _   := utils.GetResponseConverter().InfluxConverter(cpuResp)
-	memUsage, _   := utils.GetResponseConverter().InfluxConverter(memResp)
-	diskUsage, _  := utils.GetResponseConverter().InfluxConverter(diskResp)
+	cpuUsage, _ := utils.GetResponseConverter().InfluxConverter(cpuResp)
+	memUsage, _ := utils.GetResponseConverter().InfluxConverter(memResp)
+	diskUsage, _ := utils.GetResponseConverter().InfluxConverter(diskResp)
 
-	return cpuUsage,memUsage, diskUsage, nil
+	return cpuUsage, memUsage, diskUsage, nil
 }
 
-func (h ContainerService) GetPaasContainerUsages(request model.ContainerReq)(result []map[string]interface{}, err model.ErrMessage){
+func (h ContainerService) GetPaasContainerUsages(request model.ContainerReq) (result []map[string]interface{}, err model.ErrMessage) {
 
-	for _,item := range request.Item{
+	for _, item := range request.Item {
 		request.MetricName = item.Name
 
 		resp, err := dao.GetContainerDao(h.txn, h.influxClient, h.databases).GetPaasContainerDetailUsages(request)
@@ -1108,9 +1103,9 @@ func (h ContainerService) GetPaasContainerUsages(request model.ContainerReq)(res
 		if err != nil {
 			fmt.Println(err)
 			return result, err
-		}else {
+		} else {
 			usage, _ := utils.GetResponseConverter().InfluxConverterList(resp, item.ResName)
-			result = append(result, usage )
+			result = append(result, usage)
 		}
 	}
 

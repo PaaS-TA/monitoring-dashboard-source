@@ -1,26 +1,25 @@
 package dao
 
 import (
+	"fmt"
+	"github.com/influxdata/influxdb1-client/v2"
 	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/util"
-	"fmt"
-	"github.com/influxdata/influxdb/client/v2"
 )
 
 type serverDtvMetricStruct struct {
 	model.MetricsRequest
-	influxClient 	client.Client
+	influxClient             client.Client
 	InfraDtvmetricDataSource string
 }
 
 func GetMetricsDao(influxClient client.Client, ds string) *serverDtvMetricStruct {
 
 	return &serverDtvMetricStruct{
-		influxClient: 	influxClient,
+		influxClient:             influxClient,
 		InfraDtvmetricDataSource: ds,
 	}
 }
-
 
 func (b serverDtvMetricStruct) GetDiskIOList(request model.MetricsRequest, metricname string) (_ client.Response, errMsg model.ErrMessage) {
 	var errLogMsg string
@@ -28,45 +27,44 @@ func (b serverDtvMetricStruct) GetDiskIOList(request model.MetricsRequest, metri
 		if r := recover(); r != nil {
 			fmt.Println("GetDiskIOList error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	var totalDiskIORdSql string
 	if request.Origin == "bos" {
-		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM bosh_metrics WHERE origin = '%s' and metricname = '%s'";
+		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM bosh_metrics WHERE origin = '%s' and metricname = '%s'"
 	} else if request.Origin == "ctl" {
-		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'";
+		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'"
 	} else if request.Origin == "ctn" {
-		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'";
+		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'"
 	} else if request.Origin == "app" {
-		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM container_metrics WHERE container_id = '%s' and \"name\" = '%s'";
+		totalDiskIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM container_metrics WHERE container_id = '%s' and \"name\" = '%s'"
 	}
 
 	var q client.Query
 	if request.DefaultTimeRange != "" {
 		totalDiskIORdSql += " and time > now() - %s  group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf( totalDiskIORdSql, request.ServiceName, metricname, request.DefaultTimeRange, request.GroupBy),
+			Command:  fmt.Sprintf(totalDiskIORdSql, request.ServiceName, metricname, request.DefaultTimeRange, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
-	}else{
+	} else {
 		totalDiskIORdSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf( totalDiskIORdSql, request.ServiceName, metricname, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command:  fmt.Sprintf(totalDiskIORdSql, request.ServiceName, metricname, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
 	}
 	//fmt.Printf("DiskIO %s  ", metricname)
 	//fmt.Println("Sql==> ", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
 }
-
 
 func (b serverDtvMetricStruct) GetNetworkIOUsageList(request model.MetricsRequest, metricname string) (_ client.Response, errMsg model.ErrMessage) {
 	var errLogMsg string
@@ -74,40 +72,40 @@ func (b serverDtvMetricStruct) GetNetworkIOUsageList(request model.MetricsReques
 		if r := recover(); r != nil {
 			fmt.Println("GetNetworkIOUsageList error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	var totalNetworkIORdSql string
 	if request.Origin == "bos" {
-		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM bosh_metrics WHERE origin = '%s' and metricname = '%s'";
+		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM bosh_metrics WHERE origin = '%s' and metricname = '%s'"
 	} else if request.Origin == "ctl" {
-		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'";
+		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'"
 	} else if request.Origin == "ctn" {
-		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'";
+		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM cf_metrics WHERE job = '%s' and metricname = '%s'"
 	} else if request.Origin == "app" {
-		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM container_metrics WHERE container_id = '%s' and \"name\" = '%s'";
+		totalNetworkIORdSql = "SELECT derivative(mean(value), 30s) as totalUsage FROM container_metrics WHERE container_id = '%s' and \"name\" = '%s'"
 	}
 
 	var q client.Query
 	if request.DefaultTimeRange != "" {
 		totalNetworkIORdSql += " and time > now() - %s  group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf( totalNetworkIORdSql, request.ServiceName, metricname, request.DefaultTimeRange, request.GroupBy),
+			Command:  fmt.Sprintf(totalNetworkIORdSql, request.ServiceName, metricname, request.DefaultTimeRange, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
-	}else{
+	} else {
 		totalNetworkIORdSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf( totalNetworkIORdSql, request.ServiceName, metricname, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command:  fmt.Sprintf(totalNetworkIORdSql, request.ServiceName, metricname, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
 	}
 	//fmt.Printf("NetworkIO %s  ", metricname)
 	//fmt.Println("Sql==> ", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
@@ -119,7 +117,7 @@ func (b serverDtvMetricStruct) GetTopProcessList(request model.MetricsRequest) (
 		if r := recover(); r != nil {
 			fmt.Println("GetTopProcessList error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -137,25 +135,23 @@ func (b serverDtvMetricStruct) GetTopProcessList(request model.MetricsRequest) (
 	if request.DefaultTimeRange != "" {
 		totalTopProcessRdSql += " and time > now() - %s  group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf( totalTopProcessRdSql, request.ServiceName, request.Addr, request.DefaultTimeRange, request.GroupBy),
+			Command:  fmt.Sprintf(totalTopProcessRdSql, request.ServiceName, request.Addr, request.DefaultTimeRange, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
-	}else{
+	} else {
 		totalTopProcessRdSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 		q = client.Query{
-			Command: fmt.Sprintf( totalTopProcessRdSql, request.ServiceName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command:  fmt.Sprintf(totalTopProcessRdSql, request.ServiceName, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
 	}
 	//fmt.Println("TopProcess Sql==> ", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
 }
-
-
 
 //Container(Application) Resource info - Cpu, Memory, Disk
 func (b serverDtvMetricStruct) GetApplicationResources(request model.MetricsRequest) (_ client.Response, errMsg model.ErrMessage) {
@@ -165,18 +161,18 @@ func (b serverDtvMetricStruct) GetApplicationResources(request model.MetricsRequ
 		if r := recover(); r != nil {
 			fmt.Println("GetApplicationResources error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	appResourceSql := "SELECT \"name\", value  FROM \"container_metrics\" WHERE application_id = '%s' AND application_index = '%s'  AND (\"name\" = 'cpu_usage_total' OR \"name\" = 'memory_usage' OR \"name\" = 'disk_usage') and time > now() - %s;"
 	q := client.Query{
-		Command: fmt.Sprintf( appResourceSql, request.ServiceName, request.Index, request.DefaultTimeRange),
+		Command:  fmt.Sprintf(appResourceSql, request.ServiceName, request.Index, request.DefaultTimeRange),
 		Database: b.InfraDtvmetricDataSource,
 	}
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
@@ -189,18 +185,18 @@ func (b serverDtvMetricStruct) GetApplicationResourcesAll(request model.MetricsR
 		if r := recover(); r != nil {
 			fmt.Println("GetApplicationResources error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	appResourceSql := "SELECT application_id, application_index, \"name\", value  FROM \"container_metrics\" WHERE application_index != ''  AND (\"name\" = 'cpu_usage_total' OR \"name\" = 'memory_usage' OR \"name\" = 'disk_usage') and time > now() - %s limit %s;"
 	q := client.Query{
-		Command: fmt.Sprintf( appResourceSql, request.DefaultTimeRange, request.Index),
+		Command:  fmt.Sprintf(appResourceSql, request.DefaultTimeRange, request.Index),
 		Database: b.InfraDtvmetricDataSource,
 	}
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
@@ -213,7 +209,7 @@ func (b serverDtvMetricStruct) GetAppCpuUsage(request model.MetricsRequest) (_ c
 		if r := recover(); r != nil {
 			fmt.Println("GetCpuVariation error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -223,20 +219,19 @@ func (b serverDtvMetricStruct) GetAppCpuUsage(request model.MetricsRequest) (_ c
 	if request.DefaultTimeRange != "" {
 		cpuVariationSql += " and time > now() - %s group by time(%s);"
 		q = client.Query{
-			Command:  fmt.Sprintf( cpuVariationSql, request.ServiceName, request.Index, request.DefaultTimeRange, request.GroupBy),
+			Command:  fmt.Sprintf(cpuVariationSql, request.ServiceName, request.Index, request.DefaultTimeRange, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
-	}else{
+	} else {
 		cpuVariationSql += " and time < now() - %s and time > now() - %s group by time(%s);"
 		q = client.Query{
-			Command:  fmt.Sprintf( cpuVariationSql, request.ServiceName,  request.Index, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+			Command:  fmt.Sprintf(cpuVariationSql, request.ServiceName, request.Index, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
-
 		}
 	}
 	fmt.Println("GetAppCpuVariation", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 	return util.GetError().CheckError(*resp, err)
@@ -249,30 +244,30 @@ func (b serverDtvMetricStruct) GetAppMemoryUsage(request model.MetricsRequest) (
 		if r := recover(); r != nil {
 			fmt.Println("GetMemoryVariation error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	//Unit : byte
-	memVariationSql := "select mean(value)/mean(app_mem) * 100 as value from container_metrics where \"name\" = 'memory_usage' and application_id = '%s' and application_index = '%s' ";
+	memVariationSql := "select mean(value)/mean(app_mem) * 100 as value from container_metrics where \"name\" = 'memory_usage' and application_id = '%s' and application_index = '%s' "
 	var q client.Query
 	if request.DefaultTimeRange != "" {
 		memVariationSql += " and time > now() - %s group by time(%s);"
 		q = client.Query{
-			Command:  fmt.Sprintf( memVariationSql, request.ServiceName, request.Index, request.DefaultTimeRange, request.GroupBy),
+			Command:  fmt.Sprintf(memVariationSql, request.ServiceName, request.Index, request.DefaultTimeRange, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
-	}else{
+	} else {
 		memVariationSql += " and time < now() - %s and time > now() - %s group by time(%s);"
 		q = client.Query{
 			Command:  fmt.Sprintf(memVariationSql, request.ServiceName, request.Index, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
 	}
-	fmt.Println("GetAppMemoryVariation:",q)
+	fmt.Println("GetAppMemoryVariation:", q)
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
@@ -286,21 +281,21 @@ func (b serverDtvMetricStruct) GetAppDiskUsage(request model.MetricsRequest) (_ 
 		if r := recover(); r != nil {
 			fmt.Println("GetMemoryVariation error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
 
 	//Unit : byte
-	memVariationSql := "select mean(value)/mean(app_disk) * 100 as value from container_metrics where \"name\" = 'disk_usage' and application_id = '%s' and application_index = '%s' ";
+	memVariationSql := "select mean(value)/mean(app_disk) * 100 as value from container_metrics where \"name\" = 'disk_usage' and application_id = '%s' and application_index = '%s' "
 	var q client.Query
 	if request.DefaultTimeRange != "" {
 		memVariationSql += " and time > now() - %s group by time(%s);"
 		q = client.Query{
-			Command:  fmt.Sprintf( memVariationSql, request.ServiceName, request.Index, request.DefaultTimeRange, request.GroupBy),
+			Command:  fmt.Sprintf(memVariationSql, request.ServiceName, request.Index, request.DefaultTimeRange, request.GroupBy),
 			Database: b.InfraDtvmetricDataSource,
 		}
-	}else{
+	} else {
 		memVariationSql += " and time < now() - %s and time > now() - %s group by time(%s);"
 		q = client.Query{
 			Command:  fmt.Sprintf(memVariationSql, request.ServiceName, request.Index, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
@@ -309,13 +304,12 @@ func (b serverDtvMetricStruct) GetAppDiskUsage(request model.MetricsRequest) (_ 
 	}
 
 	resp, err := b.influxClient.Query(q)
-	if err != nil{
+	if err != nil {
 		errLogMsg = err.Error()
 	}
 
 	return util.GetError().CheckError(*resp, err)
 }
-
 
 //Network Rx of Container(Application)
 func (b serverDtvMetricStruct) GetAppNetworkKByte(request model.MetricsRequest, name string) (_ client.Response, errMsg model.ErrMessage) {
@@ -324,7 +318,7 @@ func (b serverDtvMetricStruct) GetAppNetworkKByte(request model.MetricsRequest, 
 		if r := recover(); r != nil {
 			fmt.Println("GetAppNetworkRxVariation error :", errLogMsg)
 			errMsg = model.ErrMessage{
-				"Message": errLogMsg ,
+				"Message": errLogMsg,
 			}
 		}
 	}()
@@ -333,7 +327,7 @@ func (b serverDtvMetricStruct) GetAppNetworkKByte(request model.MetricsRequest, 
 	//Get Container_Interface
 	containerInterface := "select * from container_metrics where \"name\" = 'cpu_usage_total' and application_id = '%s' and application_index = '%s' and time > now() - 1m"
 	q = client.Query{
-		Command:  fmt.Sprintf( containerInterface, request.ServiceName, request.Index),
+		Command:  fmt.Sprintf(containerInterface, request.ServiceName, request.Index),
 		Database: b.InfraDtvmetricDataSource,
 	}
 
@@ -342,26 +336,26 @@ func (b serverDtvMetricStruct) GetAppNetworkKByte(request model.MetricsRequest, 
 
 	if len(result["data"].([]map[string]interface{})) > 0 {
 		container_interface := result["data"].([]map[string]interface{})[0]["container_interface"]
-		networkSql := "select non_negative_derivative(sum(value),30s)/1024 as value from container_metrics where \"name\" = '%s' and container_id = '%s'";
+		networkSql := "select non_negative_derivative(sum(value),30s)/1024 as value from container_metrics where \"name\" = '%s' and container_id = '%s'"
 		if request.DefaultTimeRange != "" {
 			networkSql += " and time > now() - %s  group by time(%s);"
 			q = client.Query{
-				Command:  fmt.Sprintf( networkSql,  name, container_interface,  request.DefaultTimeRange, request.GroupBy),
+				Command:  fmt.Sprintf(networkSql, name, container_interface, request.DefaultTimeRange, request.GroupBy),
 				Database: b.InfraDtvmetricDataSource,
 			}
-		}else{
+		} else {
 			networkSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
 			q = client.Query{
-				Command:  fmt.Sprintf( networkSql, name, container_interface, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
+				Command:  fmt.Sprintf(networkSql, name, container_interface, request.TimeRangeFrom, request.TimeRangeTo, request.GroupBy),
 				Database: b.InfraDtvmetricDataSource,
 			}
 		}
 		resp, err = b.influxClient.Query(q)
-		fmt.Println("GetAppNetworkKByte::",q)
-		if err != nil{
+		fmt.Println("GetAppNetworkKByte::", q)
+		if err != nil {
 			errLogMsg = err.Error()
 		}
-	}else {
+	} else {
 		errLogMsg = "There is no result for your request. Please try again or check the request data."
 	}
 	return util.GetError().CheckError(*resp, err)

@@ -18,13 +18,7 @@ PaaS_TA_Monitoring-v4.6
 	        * [Intellij – GO Application 환경 설정](#2.3.1.4)
 	        * [소스 다운로드](#2.3.1.5)
 	        * [IaaS-PaaS-Monitoring Application 구성](#2.3.1.6)
-	        * [Server Start](#2.3.1.7)
-	    * [Front-End 환경설정 (Windows / Ubuntu)](#2.3.2)
-	        * [NodeJS Install](#2.3.2.1)
-	        * [bower Install](#2.3.2.2)
-	        * [Dependencies Module Download](#2.3.2.3)
-	        * [UI Source Build](#2.3.2.4)
-	        * [Server 구동](#2.3.2.5)
+	        * [Server Start](#2.3.1.7)	    
 3. [IaaS-PaaS Monitoring Application 구성](#3)	    
     * [IaaS-PaaS-Monitoring](#3.1)
         * [관련 Table 목록 및 구조](#3.1.1)
@@ -62,7 +56,25 @@ PaaS_TA_Monitoring-v4.6
             * [Alarm Policy](#3.1.8.22)
             * [Alarm Status](#3.1.8.23)
             * [Alarm Status Detail](#3.1.8.24)
-            * [Alarm Statistics](#3.1.8.25)
+            * [Alarm Statistics](#3.1.8.25)            
+            * [CaaS Main](#3.1.8.26)
+            * [CaaS Cluster](#3.1.8.27)
+            * [CaaS Cluster Detail](#3.1.8.28)
+            * [CaaS WorkLoads](#3.1.8.29)
+            * [CaaS WorkLoads Detail](#3.1.8.30)
+            * [CaaS Pod](#3.1.8.31)
+            * [CaaS Pod Detail](#3.1.8.32)
+            * [CaaS Container Log](#3.1.8.33)
+            * [CaaS Alarm Policy](#3.1.8.34)
+            * [CaaS Alarm Status](#3.1.8.35)
+            * [CaaS Alarm Status Detail](#3.1.8.36)
+            * [SaaS Main](#3.1.8.37)
+            * [SaaS PINPOINT](#3.1.8.38)
+            * [SaaS Alarm Policy](#3.1.8.39)
+            * [SaaS Alarm Status](#3.1.8.40)
+            * [CaaS SaaS Status Detail](#3.1.8.41)
+            
+            
     * [PaaS-TA Monitoring Batch](#3.2)
         * [관련 Table 목록 및 구조](#3.2.1)
         * [Component 정보](#3.2.2)
@@ -71,7 +83,29 @@ PaaS_TA_Monitoring-v4.6
         * [Package 간 호출 구조](#3.2.5)
         * [Alarm Message](#3.2.6)
             * [e-mail](#3.2.6.1)
-            * [telegram](#3.2.6.2)
+            * [telegram](#3.2.6.2)    
+            
+            
+    * [CaaS Monitoring Batch](#3.3)
+        * [관련 Table 목록 및 구조](#3.3.1)
+        * [Component 정보](#3.3.2)
+        * [설정 정보](#3.3.3)
+        * [Package 구조](#3.3.4)
+        * [Package 간 호출 구조](#3.3.5)
+        * [Alarm Message](#3.3.6)
+        * [e-mail](#3.3.6.1)
+        * [telegram](#3.3.6.2)
+                
+                                                
+    * [SaaS Monitoring Batch](#3.4)
+        * [관련 Table 목록 및 구조](#3.4.1)
+        * [Component 정보](#3.4.2)
+        * [설정 정보](#3.4.3)
+        * [Package 구조](#3.4.4)
+        * [Package 간 호출 구조](#3.4.5)
+        * [Alarm Message](#3.4.6)
+        * [e-mail](#3.4.6.1)
+        * [telegram](#3.4.6.2)                    
     
 <br /><br /><br />
 
@@ -83,7 +117,7 @@ PaaS_TA_Monitoring-v4.6
 
 ### 1.1.1. 목적 <div id='1.1.1' />
 
-> 본 문서는 Paas-TA 프로젝트의 IaaS, PaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
+> 본 문서는 Paas-TA 프로젝트의 IaaS, PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
 
 <br />
 
@@ -98,7 +132,7 @@ PaaS_TA_Monitoring-v4.6
 - https://git-scm.com
 - github.com/tedsuo/ifrit
 - github.com/tedsuo/rata
-- github.com/influxdata/influxdb/client/v2
+- github.com/influxdata/influxdb1-client/v2
 - github.com/rackspace/gophercloud
 - github.com/cloudfoundry-community/go-cfclient
 - github.com/go-redis/redis
@@ -114,13 +148,16 @@ PaaS_TA_Monitoring-v4.6
 - github.com/stretchr/testify
 - github.com/cloudfoundry-community/gogobosh
 - github.com/go-telegram-bot-api/telegram-bot-api
+- github.com/thoas/go-funk
+- get github.com/tidwall/gjson
+- gopkg.in/gomail.v2
 <br /><br /><br />
 
 #   2. IaaS-PaaS Monitoring Application 환경 설정 <div id='2' />
 
 ##  2.1. 개요 <div id='2.1' />
 
-> 클라우드 서비스(IaaS/PaaS) 통합 운영관리 기술 개발 프로젝트의 IaaS-PaaS-Monitoring 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 IaaS-PaaS-Monitoring 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
 <br />
 
 ##  2.2. 개발환경 사전 설치 사항 <div id='2.2' />
@@ -134,7 +171,7 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
 - OS : Window/Ubuntu
-- Golang : 1.8.3
+- Golang : 1.12.6
 - Dependencies :  github.com/tedsuo/ifrit
                   github.com/tedsuo/rata
                   github.com/influxdata/influxdb/client/v2
@@ -153,10 +190,10 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
                   github.com/stretchr/testify
                   github.com/cloudfoundry-community/gogobosh
                   github.com/go-telegram-bot-api/telegram-bot-api
-- IDE : Intellij IDEA 2017.
+- IDE : Intellij IDEA 2019.
 - 형상관리: Git
 ```
-※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2017.1 이하에서 환경 구성이 가능하다.
+※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
 
 <br/>
 
@@ -190,7 +227,7 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
 
 - *Intellij IDEA 설치(Windows)*
     
-    idealC-2017.2.5.exe 더블클릭하여 설치를 실행한다.<br/>
+    idealC-2019.2.3.exe 더블클릭하여 설치를 실행한다.<br/>
     ![](images/2.2.3_1.png)<br/>
     
     'Next' 버튼 클릭<br/>
@@ -213,7 +250,7 @@ IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca S
 - *Intellij IDEA 설치(Ubuntu)*
 ```
 cd download
-sudo tar xvzf ideaIC-2017.1.6.tar.gz
+sudo tar xvzf ideaIC-2019.2.3.tar.gz
 ```
 
 <br/><br/>
@@ -294,7 +331,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-Monitoring\src\ iaas-paasta-monitoring-management
+        cd .\PaaS-TA-Monitoring\ iaas-paasta-monitoring-management
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -302,7 +339,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/iaas-paasta-monitoring-management 
+        cd ./PaaS-TA-Monitoring/iaas-paasta-monitoring-management 
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -312,9 +349,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         ```
         go get github.com/tedsuo/ifrit
         go get github.com/tedsuo/rata
-        go get github.com/influxdata/influxdb/client/v2
+        go get github.com/influxdata/influxdb1-client/v2
         go get github.com/rackspace/gophercloud
-        go get github.com/cloudfoundry-community/go-cfclient
         go get github.com/go-redis/redis
         go get github.com/go-sql-driver/mysql
         go get github.com/jinzhu/gorm
@@ -327,6 +363,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         go get github.com/onsi/gomega
         go get github.com/stretchr/testify
         go get github.com/cloudfoundry-community/gogobosh
+        go get github.com/thoas/go-funk
+        go get github.com/tidwall/gjson
         ```
         <br/>
     
@@ -343,7 +381,6 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         xcopy ./lib-bugFix-src/gophercloud/requests.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         xcopy ./lib-bugFix-src/gophercloud/results.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         xcopy ./lib-bugFix-src/gophercloud/client.go ./src/github.com/rackspace/gophercloud/openstack
-        xcopy ./lib-bugFix-src/go-cfclient/client.go ./src/github.com/cloudfoundry-community/go-cfclient
         ```
         <br/>
 
@@ -356,7 +393,6 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         cp ./lib-bugFix-src/gophercloud/requests.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         cp ./lib-bugFix-src/gophercloud/results.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         cp ./lib-bugFix-src/gophercloud/client.go ./src/github.com/rackspace/gophercloud/openstack
-        cp ./lib-bugFix-src/go-cfclient/client.go ./src/github.com/cloudfoundry-community/go-cfclient
         ```
         
         <br/><br/>
@@ -386,7 +422,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         go get github.com/tedsuo/ifrit
         go get github.com/go-sql-driver/mysql
         go get github.com/jinzhu/gorm
-        go get github.com/influxdata/influxdb/client/v2
+        go get github.com/influxdata/influxdb1-client/v2
         go get github.com/cloudfoundry-community/gogobosh
         go get golang.org/x/oauth2
         go get golang.org/x/net/context
@@ -396,6 +432,80 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
         go get golang.org/x/sys/unix
         go get github.com/go-telegram-bot-api/telegram-bot-api
         go get github.com/go-redis/redis
+        ```
+        <br/>        
+    
+        - src 디렉토리에 Dependency 소스들이 다운로드 되어 있음을 확인한다.<br/>
+        ![](images/2.4.1_8.png)<br/>
+        
+        <br/><br/>
+
+    - paasta-caas-monitoring-batch Dependency Module Download
+    
+        Power Shall 또는 Terminal 을 실행한다.
+    
+        - Path 설정 (Windows)<br/>
+        ```
+        cd \...\IaaS-PaaS-Monitoring\src\paasta-caas-monitoring-batch
+        set GOPATH='현재 디렉토리 경로"
+        set PATH=%PATH%;%GOPATH%bin;
+        ```
+        <br/>
+    
+        - Path 설정 (Ubuntu)<br/>
+        ```
+        cd .../IaaS-PaaS-Monitoring/src/paasta-caas-monitoring-batch
+        export GOPATH=$PWD
+        export PATH=$GOPATH/bin:$PATH
+        ```
+        <br/>
+            
+        - Power Shall 또는 Terminal 에 아래와 같이 실행한다. (공통)<br/>
+        ```
+        go get github.com/go-sql-driver/mysql
+        go get github.com/jinzhu/gorm
+        go get github.com/mileusna/crontab
+        go get github.com/thoas/go-funk
+        go get github.com/tidwall/gjson
+        go get gopkg.in/gomail.v2
+        go get github.com/go-telegram-bot-api/telegram-bot-api
+        ```
+        <br/>        
+    
+        - src 디렉토리에 Dependency 소스들이 다운로드 되어 있음을 확인한다.<br/>
+        ![](images/2.4.1_8.png)<br/>
+        
+        <br/><br/>
+
+    - paasta-saas-monitoring-batch Dependency Module Download
+    
+        Power Shall 또는 Terminal 을 실행한다.
+    
+        - Path 설정 (Windows)<br/>
+        ```
+        cd \...\IaaS-PaaS-Monitoring\src\paasta-saas-monitoring-batch
+        set GOPATH='현재 디렉토리 경로"
+        set PATH=%PATH%;%GOPATH%bin;
+        ```
+        <br/>
+    
+        - Path 설정 (Ubuntu)<br/>
+        ```
+        cd .../IaaS-PaaS-Monitoring/src/paasta-saas-monitoring-batch
+        export GOPATH=$PWD
+        export PATH=$GOPATH/bin:$PATH
+        ```
+        <br/>
+            
+        - Power Shall 또는 Terminal 에 아래와 같이 실행한다. (공통)<br/>
+        ```
+        go get github.com/go-sql-driver/mysql
+        go get github.com/jinzhu/gorm
+        go get github.com/mileusna/crontab
+        go get github.com/thoas/go-funk
+        go get github.com/tidwall/gjson
+        go get gopkg.in/gomail.v2
+        go get github.com/go-telegram-bot-api/telegram-bot-api
         ```
         <br/>        
     
@@ -420,96 +530,15 @@ go run main.go
 ```
 <br/>
 
-### 2.3.2. Front-End 환경설정 (Windows / Ubuntu) <div id='2.3.2' />
-> **NodeJS Install** <div id='2.3.2.1' />
-- NodeJS 다운로드 URL
-    + https://nodejs.org/en/
-<br/>
-
-- NodeJS 설치 (Windows)
-    - “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_01.png)<br/>
-
-    - “I accept the terms in the License Agreement” 를 선택 후 “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_02.png)<br/>
-
-    - 설치할 경로를 지정 후 “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_03.png)<br/>
-
-    - “Next” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_04.png)<br/>
-
-    - “Install” 버튼을 클릭한다.<br/>
-    ![](images/nodejs_install_05.png)<br/>
-    <br/>
-    ![](images/nodejs_install_06.png)<br/>
-
-    - “Finish” 버튼을 클릭 후 설치를 마친다.<br/>
-    ![](images/nodejs_install_07.png)<br/>
-    
-    <br/><br/>
-
-- NodeJS 설치 (Ubuntu)
-```
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-<br/>
-
-> **bower Install** <div id='2.3.2.2' />
-```
-npm install -g bower
-```
-<br/>
-
-> **Dependencies Module Download** <div id='2.3.2.3' />
-```
-npm install
-bower install
-```
-![](images/dependency_module_download.png)<br/>
-<br/><br/>
-
-> **UI Source Build** <div id='2.3.2.4' />
-
-- Windows
-```
-cd \...\IaaS-Monitoring\src\paasta-monitoring-management\src\kr\paasta\monitoring\pubilc
-gulp package
-```
-
-- Ubuntu
-```
-cd /.../IaaS-PaaS-Monitoring/src/paasta-monitoring-management/src/kr/paasta/monitoring/pubilc
-gulp package
-```
-<br/><br/>
-
-> **Server 구동** <div id='2.3.2.5' />
-
-- Windows
-```
-cd \...\IaaS-Monitoring\src\paasta-monitoring-management\src\kr\paasta\monitoring\pubilc
-gulp serve
-```
-
-- Ubuntu
-```
-cd /.../IaaS-PaaS-Monitoring/src/paasta-monitoring-management/src/kr/paasta/monitoring/pubilc
-gulp serve
-```
-<br/><br/>
-
-# 3. IaaS-PaaS Monitoring Application 구성 <div id='3' />
-IaaS-PaaS Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다. 
-&nbsp;&nbsp;&nbsp; ![](images/IaaS_PaaS-TA_Monitoring_architecture.png)
+# 3. Paas-Ta Monitoring Application 구성 <div id='3' />
+Paas-Ta Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다. 
+&nbsp;&nbsp;&nbsp; ![](images/PaasTa_Monitoring_architecture.png)
 그림 1. PaaS-TA Monitoring 구성도
 
-## 3.1. IaaS-PaaS-Monitoring <div id='3.1' />
+## 3.1. Paas-Ta Monitoring <div id='3.1' />
 
 ### 3.1.1. 관련 Table 목록 및 구조 <div id='3.1.1' />
-IaaS-PaaS Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database를 생성하여 사용한다. ‘PasstaMonitoring’ Database는 Server 실행시  Table을 자동으로 생성한다. PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database를 생성하여 사용한다. ‘PasstaMonitoring’ Database는 Server 실행시  Table을 자동으로 생성한다. PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
 
 > **관련 Table 목록** <div id='3.1.1.1' />
 
@@ -534,7 +563,7 @@ IaaS-PaaS Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Databa
 
 <br/>
 
-\<IaaS Monitoring Database\>
+\<PaaS Monitoring Database\>
 
 |Table명|설명|
 |:--------|:--------|
@@ -550,6 +579,19 @@ IaaS-PaaS Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Databa
 |member_infos|회원정보|
 |vms|PaaS-TA VM 정보|
 |zones|PaaS-TA Zone 정보|
+
+<br/>
+
+\<CaaS SaaS Monitoring Database\>
+
+|Table명|설명|
+|:--------|:--------|
+|batch_alarm_infos|Alarm 임계치 및 스케쥴 정보를 설정한다.|
+|batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
+|batch_alarm_executions|발생된 알람 정보.|
+|batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
+|batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
+
 
 <br/><br/>
 
@@ -993,6 +1035,18 @@ IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리�
     ![](images/paas_monitoring_architecture.png)<br/>
     <br/>
 
+- CaaS Monitoring
+
+    다음 그림은 CaaS 모니터링의 좀더 상세한 구조를 보여준다.<br/>
+    ![](images/caas_monitoring_architecture.png)<br/>
+    <br/>
+    
+- SaaS Monitoring
+
+    다음 그림은 SaaS 모니터링의 좀더 상세한 구조를 보여준다.<br/>
+    ![](images/saas_monitoring_architecture.png)<br/>
+    <br/>    
+
 <br/><br/>
 
 
@@ -1033,126 +1087,144 @@ IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리�
 
 ### 3.1.3. 설정 정보 <div id='3.1.3' />
 ```
-server.url = http://monitapi.115.68.151.188.xip.io
+server.url = http://127.0.0.1:8080
 server.port = 8080
 
-# 모니터링 시스템 사용 옵션 정보
-# IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용, ALL : IaaS, PaaS 모두 사용
-system.monitoring.type=ALL
+#모니터링 시스템 사용 옵션 정보
+#( IaaS : IaaS 만 사용 , PaaS : PaaS 만 사용 , CaaS : CaaS 만 사용, SaaS : SaaS 만 사용, ALL : 모두 사용)
+# 모두 사용하지 않고 조합시 ","로 구분 예) PaaS,CaaS
+system.monitoring.type=PaaS,CaaS,SaaS
 
 # Monasca RDB 접속 정보
 iaas.monitoring.db.type=mysql
 iaas.monitoring.db.dbname=mon
-iaas.monitoring.db.username=username
-iaas.monitoring.db.password=password
-iaas.monitoring.db.host=xxx.xxx.xxx.xxx
-iaas.monitoring.db.port=3306
+iaas.monitoring.db.username=root
+iaas.monitoring.db.password=wofl07
+iaas.monitoring.db.host=xx.xxx.xxx.xxx
+iaas.monitoring.db.port=33067
 
-# IaaS InfluxDB
+# InfluxDB
 iaas.metric.db.username =
 iaas.metric.db.password =
-iaas.metric.db.url=http://xxx.xxx.xxx.xxx:xxxx
+iaas.metric.db.url=http://xxx.xx.xxx.xxx:8086
+
 iaas.metric.db.name=mon
 
 # PaaS RDB 접속 정보
 paas.monitoring.db.type=mysql
 paas.monitoring.db.dbname=PaastaMonitoring
-paas.monitoring.db.username=username
+paas.monitoring.db.username=root
 paas.monitoring.db.password=password
-paas.monitoring.db.host= xxx.xxx.xxx.xxx
+paas.monitoring.db.host=xx.x.xxx.xxx
 paas.monitoring.db.port=3306
 
-# PaaS InfluxDB
 paas.metric.db.username =
 paas.metric.db.password =
-paas.metric.db.url = http://xxx.xxx.xxx.xxx:8086
+paas.metric.db.url = http://xx.x.xxx.xxx:8086
 paas.metric.db.name.paasta=cf_metric_db
 paas.metric.db.name.bosh=bosh_metric_db
 paas.metric.db.name.container=container_metric_db
+
 # Openstack Admin
 default.region=RegionOne
 default.domain=default
-default.username=username
-default.password=password
+default.username=admin
+default.password=cfmonit
 default.tenant_name=admin
-default.tenant_id=9c1a27e20412473b843dbf32bdec2390
-identity.endpoint=http://xxx.xxx.xxx.xxx:5000/v3        → Keystone Endpoint
-keystone.url=http://xxx.xxx.xxx.xxx:35357/v3           → Keystone URL
+default.tenant_id=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+identity.endpoint=http://xxx.xx.xxx.xxx:5000/v3
+keystone.url=http://xxx.xx.xxx.xxx:35357/v3
 
 # Monasca Api
-monasca.url=http://xxx.xxx.xxx.xxx:8020/v2.0
+monasca.url=http://xxx.xx.xxx.xxx:8020/v2.0
+#monasca.url=http://xx.xx.xxx.xxx:8020/v2.0
 monasca.connect.timeout=60
 monasca.secure.tls=false
 
 # Openstack Nova
 nova.target.url=http://xxx.xxx.xxx.xxx:8774
 nova.target.version=v2.1
-nova.target.tenant_id=9c1a27e20412473b843dbf32bdec2390
+nova.target.tenant_id=xxxxxxxxxxxxxxxxxx
 
 # Openstack Keystone
-keystone.target.url=http://xxx.xxx.xxx.xxx:35357
+keystone.target.url=http://xxx.xx.xxx.xxx:35357
 keystone.target.version=v3
 
 # Openstack Neutron
-neutron.target.url=http://xxx.xxx.xxx.xxx:9696
+neutron.target.url=http://xxx.xx.xxx.xxx:9696
 neutron.target.version=v2.0
 
 # Openstack Cinder
-cinder.target.url=http://xxx.xxx.xxx.xxx:8776
+cinder.target.url=http://xxx.xx.xxx.xxx:8776
 cinder.target.version=v2
 
 # Openstack Glance
-glance.target.url=http://xxx.xxx.xxx.xxx:9191
+glance.target.url=http://xxx.xx.xxx.xxx:9191
 glance.target.version=v2
 
 # RabbitMQ
-rabbitmq.user=user
-rabbitmq.pass=password
-rabbitmq.ip=xxx.xxx.xxx.xxx
+rabbitmq.user=openstack
+rabbitmq.pass=xxxxx
+rabbitmq.ip=xx.68.xxx.xxx
 rabbitmq.port=15672
 rabbitmq.target.node=rabbit@controller
 
 # Elasticsearch URL
-iaas.elastic.url=xxx.xxx.xxx.xxx:9200
-paas.elastic.url=elastic.xxx.xxx.xxx.xxx.xip.io
+iaas.elastic.url=xx.x.xxx.xxx:9200
+paas.elastic.url=xx.x.xxx.xxx:9200
 
 # Bosh Info
 bosh.count=1
 bosh.0.name=micro-bosh
-bosh.0.ip=xxx.xxx.xxx.xxx
+bosh.0.ip=10.0.1.6
 bosh.0.deployname=bosh
 
-# Bosh client
-bosh.client.api.address=https://xxx.xxx.xxx.xxx:25555
-bosh.client.api.username=username
-bosh.client.api.password=password
+# BOSH client
+bosh.client.api.address=https://xx.x.x.x:25555
+bosh.client.api.username=admin
+bosh.client.api.password=xxxxxxxxxxxxx
+#bosh.client.api.password=admin_password
 
-# Disk mount point
+#disk mount point
 disk.mount.point=/,/var/vcap/data
 disk./.resp.json.name=/
 disk./var/vcap/data.resp.json.name=data
 
-# Disk io mount point
+#disk io mount point
 disk.io.mount.point=/,/var/vcap/data
 disk.io./.read.json.name=/-read
 disk.io./.write.json.name=/-write
 disk.io./var/vcap/data.read.json.name=data-read
 disk.io./var/vcap/data.write.json.name=data-write
 
-# Network monitor item
+#network monitor item
 network.monitor.item=eth0
 
 # Time difference(hour)
 gmt.time.gap=9
 
-# Cloud Foundry Provider
-paas.cf.client.apiaddress=https://api.monit.paasta-dev.com
+#cfProvider
+paas.cf.client.apiaddress=https://api.xxx.xx.xxx.xxx.xip.io
 paas.cf.client.skipsslvalidation=true
-    
-# redis
-redis.addr=xxx.xxx.xxx.xxx:xxxx
+
+#redis
+redis.addr=xx.x.xxx.xx:6379
 redis.password=password
 redis.db=0
+
+#Caas monitoring tool Prometheus
+prometheus.addr=http://xx.0.xxx.xxx:30090
+
+#Caas k8s ApiServer URL
+kubernetesApi.addr=https://xx.x.x.xxx:8443
+kubernetes.admin.token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
+
+#SaaS Pinpoint Url
+saas.pinpoint.url=http://xx.xxx.xx.xx:8079
+
+paas.monitoring.cf.host=https://uaa.xx.xxx.xx.xx.xip.io
+
 ```
 
 ### 3.1.4. API Package 구조 <div id='3.1.4' />
@@ -1166,8 +1238,6 @@ redis.db=0
 ### 3.1.6. UI Package 구조 <div id='3.1.6' />
 ![](images/ui_package.png)<br/>
 <br/>
-![](images/ui_package2.png)<br/>
-<br/>
 
 ### 3.1.7. UI Package 간 호출 구조 <div id='3.1.7' />
 ![](images/ui_package_call.png)<br/>
@@ -1176,8 +1246,8 @@ redis.db=0
 ### 3.1.8. 화면 <div id='3.1.8' />
 > **Login** <div id='3.1.8.1' />
 
-- 로그인 화면으로 IaaS / PaaS 통합 회원 ID/PW를 사용하여 Login을 한다.<br>
-(시스템 및 사용자별 IaaS/PaaS 인증)
+- 로그인 화면으로 IaaS / PaaS / CaaS / SaaS 통합 회원 ID/PW를 사용하여 Login을 한다.<br>
+(시스템 및 사용자별 IaaS/PaaS /CaaS/SaaS 인증)
 ![](images/login.png)<br/>
 <br><br>
 
@@ -1338,6 +1408,103 @@ redis.db=0
     ※ 로컬 개발환경에서는 [출력]을 클릭할 경우 화면 깨짐 현상이 나타난다. 그 이유는 CSS경로를 서버로 설정되어 있어서 발생한다. 따라서 로컬 개발환경에서 확인 할 경우 빌드(gulp package) 후 localhost:8080로 접속하면 정상적으로 출력 화면이 보인다.
     ![](images/alarm_stat_print.png)<br>
     ※ 출력시 인쇄 화면이 나타나면 레이아웃으로 가로방향으로 지정해야 전체적인 화면에 출력된다.
+<br><br>
+
+> **CaaS Main** <div id='3.1.8.26' />
+
+- CaaS Main 화면에는 Cluster 사용율, Deployment Replica Status, Stateful Replica Status,  DaemonSet Status, Pod Container Status 정보를 보여준다.<br>
+![](images/24_caas_main.png)<br>
+<br><br>
+
+> **CaaS Cluster** <div id='3.1.8.27' />
+
+- CaaS Cluster 화면에는 Cluster 사용율, Cluster의 WorkNode CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/25_caas_cluster.png)<br>
+<br><br>
+
+> **CaaS Cluster Detail** <div id='3.1.8.28' />
+
+- CaaS Cluster 상세화면에는 선택된 WorkNode의 POD, CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/26_caas_cluster_chart.png)<br>
+<br><br>
+
+> **CaaS WorkLoads** <div id='3.1.8.29' />
+
+- CaaS Workloads 화면에는 Workload 상태정보 및 Workload(deployment, statefulset, daemonset)별 CPU, Memory, Disy 사용률 정보를 보여준다.<br>
+![](images/27_caas_workload.png)<br>
+<br><br>
+
+> **CaaS WorkLoads Detail** <div id='3.1.8.30' />
+
+- CaaS WorkLoads 상세화면에는 선택된 Workload의 Container 별 CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/28_caas_workload_chart.png)<br>
+<br><br>
+
+> **CaaS Pod** <div id='3.1.8.31' />
+
+- CaaS Pod 화면에는 Pod의 상태 정봐 및 Pod 별 CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/29_caas_pod.png)<br>
+<br><br>
+
+> **CaaS Pod Detail** <div id='3.1.8.32' />
+
+- CaaS Pod 상세화면에는 선택된 Pod의 Container 별 CPU, Memory, Disk 사용율 정보 목록을 보여준다.<br>
+![](images/30_caas_pod_chart.png)<br>
+<br><br>
+
+> **CaaS Container Log** <div id='3.1.8.33' />
+
+- CaaS Container Log 화면에는 선택된 Container 의 CPU, Memory, Disk 사용율 정보 및 로그 정보를 보여준다.<br>
+![](images/31_caas_container_log.png)<br>
+<br><br>
+
+> **CaaS Alarm Policy** <div id='3.1.8.34' />
+
+- Alarm Policy 화면에는 Pod의 CPU, Memory, Disk별 임계치 및 알람수신자, 측정시간 정보를 보여준다. 또한 Telegram 수신 정보를 보여준다.
+![](images/32_caas_alarm_policy.png)<br>
+<br><br>
+
+> **CaaS Alarm Status** <div id='3.1.8.35' />
+
+- Alarm Status 화면에는 설정한 임계치를 벗어나 발생된 알람 정보를 목록으로 보여준다.
+![](images/33_caas_alarm_status.png)<br>
+<br><br>
+
+> **CaaS Alarm Status Detail** <div id='3.1.8.36' />
+
+- Alarm Status Detail 화면에는 발생된 알람 정보를 보여주고 또한 조치한 내역이 있을 경우 조치 내역도 보여준다.
+![](images/34_caas_alarm_status_detail.png)<br>
+<br><br>
+
+> **SaaS Main** <div id='3.1.8.37' />
+
+- SaaS Main 화면에는 Cluster 사용율, Deployment Replica Status, Stateful Replica Status,  DaemonSet Status, Pod Container Status 정보를 보여준다.<br>
+![](images/35_saas_main.png)<br>
+<br><br>
+
+> **SaaS PINPOINT** <div id='3.1.8.38' />
+
+- SaaS PINPOINT 화면에는 선택된 Application의 PINPOINT APM 데시보드 화면을 보여준다.<br>
+![](images/36_saas_pinpoint.png)<br>
+<br><br>
+
+> **SaaS Alarm Policy** <div id='3.1.8.39' />
+
+- Alarm Policy 화면에는 Pod의 CPU, Memory, Disk별 임계치 및 알람수신자, 측정시간 정보를 보여준다. 또한 Telegram 수신 정보를 보여준다.
+![](images/37_saas_alarm_policy.png)<br>
+<br><br>
+
+> **SaaS Alarm Status** <div id='3.1.8.40' />
+
+- Alarm Status 화면에는 설정한 임계치를 벗어나 발생된 알람 정보를 목록으로 보여준다.
+![](images/38_saas_alarm_status.png)<br>
+<br><br>
+
+> **CaaS SaaS Status Detail** <div id='3.1.8.41' />
+
+- Alarm Status Detail 화면에는 발생된 알람 정보를 보여주고 또한 조치한 내역이 있을 경우 조치 내역도 보여준다.
+![](images/39_saas_alarm_status_detail.png)<br>
+<br><br>
 
 ## 3.2. PaaS-TA Monitoring Batch <div id='3.2' />
 PaaS-TA-Monitoring-Batch는 Table 및 기초 Data를 구성하며, Influx에서 CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다. AutoScale 시 PortalDB에서 AutoScale 정보를 읽어 임계치를 초과한 경우 PaaS-TA Portal에 Scale In/Out 요청을 한다.
@@ -1471,4 +1638,144 @@ redis.db=0
 > **telegram** <div id='3.2.6.2' />
 
 ![](images/telegram.png)
+<br><br><br>
+
+## 3.3. CaaS Monitoring Batch <div id='3.3' />
+CaaS-Monitoring-Batch는 Table 및 기초 Data를 구성하며, Prometheus Metric CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다.
+
+### 3.3.1. 관련 Table 목록 및 구조 <div id='3.3.1' />
+CaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. CaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+
+\<PasstaMonitoring Database\>
+
+|Table명|설명|
+|:--------|:--------|
+|batch_alarm_infos|Alarm 임계치 및 스케쥴 정보를 설정한다.|
+|batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
+|batch_alarm_executions|발생된 알람 정보.|
+|batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
+|batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
+
+![](images/caas_batch_architecture.png)
+그림 1. Monitoring-Batch 구성도
+<br><br><br>
+
+### 3.3.2. Component 정보 <div id='3.3.2' />
+|Component|설명|
+|:--------|:--------|
+|Pod Alarm Collector|Pod Metric 정보(CPU/Memory/Disk) 상태 정보를 읽어 정의된 임계치 초과시 관리자에게 Alarm 발송한다.|
+|Update SNS Alarm Target|알람 발생시 알람 전송받을 Telegram 채널에 등록된 사용자 ID를 PasstaMonitoring Database에 동기화 처리를 한다.|
+
+<br>
+
+### 3.3.3. 설정 정보 <div id='3.3.3' />
+```
+# monitoring RDB 접속 정보
+monitoring.db.type=mysql
+monitoring.db.dbname=PaastaMonitoring
+monitoring.db.username=root
+monitoring.db.password=password
+monitoring.db.host=xx.x.xxx.xxx
+monitoring.db.port=3306
+
+# SMTP
+mail.smtp.host=smtp.naver.com
+mail.smtp.port=587
+mail.sender.password=xxxxx
+mail.sender=xxxx@naver.com
+mail.resource.url=http://xx.xx.xx.x:8080
+
+# CaaS Info
+caas.monitoring.api.url = http://xx.xx.xx.xxx:8080
+```
+    
+### 3.3.4. Package 구조 <div id='3.3.4' />
+![](images/caas_batch_package.png)
+<br><br><br>
+
+### 3.3.5. Package 간 호출 구조 <div id='3.3.5' />
+![](images/caas_batch_package_call.png)
+<br><br><br>
+
+### 3.3.6. Alarm Message <div id='3.3.6' />
+
+> **e-mail** <div id='3.3.6.1' />
+
+![](images/caas_email.png)
+<br><br><br>
+
+> **telegram** <div id='3.3.6.2' />
+
+![](images/caas_telegram.png)
+<br><br><br>
+
+
+## 3.4. SaaS Monitoring Batch <div id='3.4' />
+SaaS-Monitoring-Batch는 Table 및 기초 Data를 구성하며, PINPOINT Metric System CPU/JVM CPU/Heap Memory 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다.
+
+### 3.4.1. 관련 Table 목록 및 구조 <div id='3.4.1' />
+SaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. SaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+
+\<PasstaMonitoring Database\>
+
+|Table명|설명|
+|:--------|:--------|
+|batch_alarm_infos|Alarm 임계치 및 스케쥴 정보를 설정한다.|
+|batch_alarm_receivers|Alarm 수신 정보를 설정한다.|
+|batch_alarm_executions|발생된 알람 정보.|
+|batch_alarm_execution_resolves|Alarm 메시지를 전송 받은 관리자가 알람 접수 후 해결 과정을 기술한다. (이슈관리)|
+|batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
+
+![](images/saas_batch_architecture.png)
+그림 1. Monitoring-Batch 구성도
+<br><br><br>
+
+### 3.4.2. Component 정보 <div id='3.4.2' />
+|Component|설명|
+|:--------|:--------|
+|Application Alarm Collector|Application Metric 정보(System CPU/JVM CPU/Heap Memory) 상태 정보를 읽어 정의된 임계치 초과시 관리자에게 Alarm 발송한다.|
+|Update SNS Alarm Target|알람 발생시 알람 전송받을 Telegram 채널에 등록된 사용자 ID를 PasstaMonitoring Database에 동기화 처리를 한다.|
+
+<br>
+
+### 3.4.3. 설정 정보 <div id='3.4.3' />
+```
+# monitoring RDB 접속 정보
+monitoring.db.type=mysql
+monitoring.db.dbname=PaastaMonitoring
+monitoring.db.username=root
+monitoring.db.password=password
+monitoring.db.host=xx.x.xxx.100
+monitoring.db.port=3306
+
+
+# SMTP
+mail.smtp.host=smtp.naver.com
+mail.smtp.port=587
+mail.sender.password=xxxxxx
+mail.sender=xxxxxx@naver.com
+mail.resource.url=http://xxx.xxx.xx.xx:8080
+
+# SaaS Info
+saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
+```
+    
+### 3.4.4. Package 구조 <div id='3.4.4' />
+![](images/saas_batch_package.png)
+<br><br><br>
+
+### 3.4.5. Package 간 호출 구조 <div id='3.4.5' />
+![](images/saas_batch_package_call.png)
+<br><br><br>
+
+### 3.4.6. Alarm Message <div id='3.4.6' />
+
+> **e-mail** <div id='3.4.6.1' />
+
+![](images/saas_email.png)
+<br><br><br>
+
+> **telegram** <div id='3.4.6.2' />
+
+![](images/saas_telegram.png)
 <br><br><br>

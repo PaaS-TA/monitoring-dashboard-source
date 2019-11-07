@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li><a href="../paas/index.html">PaaS</a></li>
+					<li><a href="../saas/index.html">SaaS</a></li>
+					<li><a href="../caas/index.html">CaaS</a></li>
+					<li><a href="../iaas/index.html">IaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="cluster.html" class="on">C<span>luster</span></a></li>
+						<li><a href="workloads.html">W<span>orkloads</span></a></li>
+						<li><a href="pod.html">P<span>od</span></a></li>
+						<li>
+							<a href="alarm_definition.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_definition.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="gaugeWrap">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<h3>Master</h3>
+					<div class="gaugeChart" id="cpuUsage"></div>
+					<div class="gaugeChart" id="memoryUsage"></div>
+					<div class="gaugeChart" id="diskUsage"></div>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="table style01">
+						<h4>Worker Node List</h4>
+						<div id="workerNode" class="summaryList"></div>
+						<div class="paging" style="display:none;">
+							<a href="javascript:void(0);">&lt;</a>
+							<span>
+								<a href="javascript:void(0);" class="on">1</a>
+								<a href="javascript:void(0);">2</a>
+								<a href="javascript:void(0);">3</a>
+								<a href="javascript:void(0);">4</a>
+								<a href="javascript:void(0);">5</a>
+								<a href="javascript:void(0);">6</a>
+								<a href="javascript:void(0);">7</a>
+								<a href="javascript:void(0);">8</a>
+								<a href="javascript:void(0);">9</a>
+								<a href="javascript:void(0);">10</a>
+							</span>
+							<a href="javascript:void(0);">&gt;</a>
+						</div>
+					</article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+			
+			<div id="chartWrap">
+				<div class="chart on">
+					<h4><span class="chartTitle"></span></h4>
+					<ul class="one">
+						<li>
+							<h5>Worker Node Info</h5>
+							<div id="nodeChart" class="gaugeChart"></div>
+						</li>
+					</ul>
+					<h5>Worker Node Log</h5>
+					<div class="tableList">
+						<table>
+							<caption>Worker Node Log</caption>
+							<thead>
+								<tr>
+									<th width="28%">Time</th>
+									<th width="18%">Pod Count</th>
+									<th width="18%">CPU<br>(ms)</th>
+									<th width="18%">Memory<br>(MB)</th>
+									<th width="18%">Disk<br>(GB)</th>
+								</tr>
+							</thead>
+							<tbody id="containerlist">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<a href="javascript:void(0);" class="chartClosed"></a>
+			</div>
+
+		</div>
+		<!-- // Wrap -->
+
+		<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+		<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+		<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const caasCluster = {
+					data: [],
+
+					init() {
+						// Alarm Count
+					fnComm.alarmCount('caas');
+						
+						// Cluster Usage 데이터로드
+						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/clusterAvg', caasCluster.gaugeList);
+						
+						// Cluster Overview 데이터로드
+						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerNodeList', caasCluster.workLoads);
+					},
+
+					gaugeList(data){
+						// CPU Usage 차트
+						fnComm.gaugeChart(data.CpuUsage, 'Cpu Usage', '#cpuUsage');
+
+						// Memory Usage 차트
+						fnComm.gaugeChart(data.MemoryUsage, 'Memory Usage', '#memoryUsage');
+
+						// Disk Usage 차트
+						fnComm.gaugeChart(data.DiskUsage, 'Disk Usage', '#diskUsage');
+					},
+
+					workLoads(data) {
+						// Data Example //////////////////////////////////////////////////////
+						// Cpu: "94"
+						// CpuUsage: "8.0"
+						// Disk: "14.92"
+						// Instance: "10.128.0.12:9100"
+						// Memory: "957.7"
+						// MemoryUsage: "26.1"
+						// NameSpace: "prometheus"
+						// NodeName: "gke-standard-cluster-1-default-pool-00e08454-1dvb"
+						// Ready: "TRUE"
+						//////////////////////////////////////////////////////////////////////
+						var target = document.getElementById('workerNode');
+						
+						fnComm.removeHtml(target);
+	
+						data.forEach((value, idx)=>{
+							var html = `<div class="${value.Ready}">
+								<div>
+									<strong>${value.NodeName}</strong>
+									<em>${value.NameSpace}</em>
+								</div>
+								<div>
+									<dl class="color1" title="CPU">
+										<dt>C</dt>
+										<dd>${value.Cpu} ms</dd>
+									</dl>
+									<dl class="color2" title="Memory">
+										<dt>M</dt>
+										<dd>${value.Memory} MB</dd>
+									</dl>
+									<dl class="color3" title="Disk">
+										<dt>D</dt>
+										<dd>${value.Disk} GB</dd>
+									</dl>
+									<dl>
+										<dt>CPU Usage</dt>
+										<dd>${value.CpuUsage} %</dd>
+									</dl>
+									<dl>
+										<dt>Memory Usage</dt>
+										<dd>${value.MemoryUsage} %</dd>
+									</dl>
+								</div>
+								<div class="summaryBtn" data-name="${value.NodeName}" data-inst="${value.Instance}">
+									<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+								</div>
+							</div>`
+	
+							fnComm.appendHtml(target, html, 'div');
+						});
+
+						// Application Pinpoint Event (Chart)
+						var elm = document.querySelectorAll('.summaryBtn');
+						for(var i=0 ; i<elm.length ; i++){
+							// Worker Node Info Event
+							elm[i].querySelector('.chart').addEventListener('click', (e) => {
+								if(e.target.nodeName == 'A'){
+									var elmName = e.target.parentNode.getAttribute('data-name');
+									var elmInst = e.target.parentNode.getAttribute('data-inst');
+								} else {
+									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+									var elmInst = e.target.parentNode.parentNode.getAttribute('data-inst');
+								};
+								
+								document.querySelector('.chartTitle').innerHTML = elmName;
+
+								fnComm.loadData('GET', fnComm.url + `caas/monitoring/workerNodeGraph?NodeName=${elmName}&Instance=${elmInst}`, caasCluster.nodeInfo);
+								
+								// Workloads Container list 데이터로드
+								fnComm.loadData('GET', fnComm.url + `caas/monitoring/workerNodeGraphList?NodeName=${elmName}&Instance=${elmInst}`, caasCluster.containerlist);
+								//caasCluster.nodeInfo(elmName);
+							}, false);
+						};
+							
+						// Chart Close Event
+						document.querySelector('.chartClosed').addEventListener('click', (e) => {
+							document.getElementById('chartWrap').classList.toggle('on', false);
+						}, false);
+					},
+
+					nodeInfo(data){
+						document.getElementById('chartWrap').classList.toggle('on', true);
+
+						setTimeout(() => {
+							// CPU Usage 정보
+							fnComm.detailChart(data, '#nodeChart');
+						},500);
+					},
+
+					containerlist(data) {
+						console.log(data);
+						// CpuUsage: "1425.42"
+						// DiskUsage: "12.64"
+						// MemoryUsage: "765.4"
+						// PodUsage: "7"
+						// Time: "2019-08-29 00:38:51"
+						
+						var target = document.getElementById('containerlist');
+						
+						fnComm.removeHtml(target);
+
+						data.forEach(value => {
+							var html = `<tr>
+											<td>${value.Time}</td>
+											<td>${value.PodUsage}</td>
+											<td>${value.CpuUsage}</td>
+											<td>${value.MemoryUsage}</td>
+											<td>${value.DiskUsage}</td>
+										</tr>`;
+							
+							fnComm.appendHtml(target, html, 'tbody');
+						});
+
+						// Container Event (Log)
+						var elm = document.querySelectorAll('.contName');
+						for(var i=0 ; i<elm.length ; i++){
+							// Pod Node Info Event
+							elm[i].addEventListener('click', (e) => {
+								var containerName = e.target.parentNode.getAttribute('title');
+								console.log(containerName);
+								var nameSpace = e.target.parentNode.getAttribute('data-sp');
+								console.log(nameSpace);
+								var podName = e.target.parentNode.getAttribute('data-po');
+								console.log(podName);
+								
+								//document.querySelector('.chartTitle').innerHTML = elmName;
+							
+								// Container Chart 데이터로드
+								fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfo?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, pod.containerChart);
+								
+								// Container Log 데이터로드
+								fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, pod.containerLog);
+							}, false);
+						};
+					},
+				}
+	
+				caasCluster.init();
+			};
+		</script>
+	</body>
+</html>

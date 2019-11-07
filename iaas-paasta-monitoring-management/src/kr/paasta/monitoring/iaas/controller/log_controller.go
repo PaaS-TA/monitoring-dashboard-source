@@ -1,7 +1,7 @@
 package controller
 
 import (
-	client "github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"gopkg.in/olivere/elastic.v3"
 	"kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/iaas/service"
