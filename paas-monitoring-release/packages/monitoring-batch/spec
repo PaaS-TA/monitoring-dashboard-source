@@ -1,8 +1,0 @@
----
-name: monitoring-batch
-
-dependencies:
-- golang
-
-files:
-- monitoring-batch/**/*

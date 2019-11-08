@@ -1,7 +1,0 @@
----
-name: mariadb
-
-dependencies: []
-
-files:
-  - mariadb/mariadb-10.1.36-linux-x86_64.tar.gz

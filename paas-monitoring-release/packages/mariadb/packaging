@@ -1,6 +1,0 @@
-# abort script on any command that exits with a non zero value
-set -e
-
-SRC_NAME=mariadb-10.1.36
-
-cp -r ${BOSH_COMPILE_TARGET}/mariadb/$SRC_NAME-linux-x86_64.tar.gz ${BOSH_INSTALL_TARGET}

@@ -1,3 +1,0 @@
-set -e -x
-
-cp -a pidutils.sh ${BOSH_INSTALL_TARGET}
