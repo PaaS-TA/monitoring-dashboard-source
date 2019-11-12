@@ -1,6 +1,6 @@
 
 const fnComm = {
-	url : 'http://15.164.210.67:8080/v2/',
+	url : '/v2/',
 	timeRange : '1440',
 	timeRefresh : '1d',
 	defaultTimeRange : '15m',
