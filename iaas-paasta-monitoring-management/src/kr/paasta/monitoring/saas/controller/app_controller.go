@@ -87,14 +87,14 @@ func GetSaasController(txn *gorm.DB) *SaasController {
 func (p *SaasController) GetApplicationList(w http.ResponseWriter, r *http.Request) {
 	applications, data, pinpointUrl := appNameList(p.config)
 
-	resutChan := make(chan ApplicationStat, len(applications)*3)
-
-	var waitGroup sync.WaitGroup
-	var agentCount int64 = 0
-
 	pAppName, _ := r.URL.Query()["appName"]
 	pSortKey, _ := r.URL.Query()["sortKey"]
 	pSortVal, _ := r.URL.Query()["sortVal"]
+
+	resutChan := make(chan ApplicationStat, getMakeChannelCount(applications, pAppName, string(data)))
+
+	var waitGroup sync.WaitGroup
+	var agentCount int64 = 0
 
 	for appName, _ := range applications {
 		agentIds := gjson.Get(string(data), appName+".#.agentId")
@@ -177,6 +177,21 @@ func (p *SaasController) GetApplicationList(w http.ResponseWriter, r *http.Reque
 	util.RenderJsonResponse(ApplicationList{PinpointUrl: pinpointUrl, Data: applicationStats}, w)
 }
 
+func getMakeChannelCount(applications map[string]string, pAppName []string, data string) int {
+	count := 0
+	for appName, _ := range applications {
+		agentIds := gjson.Get(data, appName+".#.agentId")
+		if pAppName != nil && len(pAppName[0]) > 0 {
+			if strings.Contains(appName, pAppName[0]) {
+				count += len(agentIds.Array())
+			}
+		} else {
+			count += len(agentIds.Array())
+		}
+	}
+	return count
+}
+
 func (p *SaasController) GetAgentStatus(w http.ResponseWriter, r *http.Request) {
 	applications, data, _ := appNameList(p.config)
 
@@ -210,7 +225,7 @@ func (p *SaasController) GetAgentStatus(w http.ResponseWriter, r *http.Request) 
 func (p *SaasController) GetAgentGaugeTot(w http.ResponseWriter, r *http.Request) {
 	applications, data, pinpointUrl := appNameList(p.config)
 
-	resutChan := make(chan ApplicationGaugeTot, len(applications)*3)
+	resutChan := make(chan ApplicationGaugeTot, getMakeChannelCount(applications, nil, string(data)))
 
 	var waitGroup sync.WaitGroup
 	var agentCount int64 = 0
