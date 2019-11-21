@@ -17,10 +17,10 @@
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
 
 				<ul class="global">
-					<li><a href="../paas/index.html">PaaS</a></li>
-					<li><a href="../saas/index.html">SaaS</a></li>
-					<li><a href="../caas/index.html">CaaS</a></li>
-					<li><a href="../iaas/index.html">IaaS</a></li>
+					<li class="PaaS"><a href="../paas/index.html">PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../iaas/index.html">IaaS</a></li>
 				</ul>
 				
 				<!-- Navigation -->
@@ -183,7 +183,7 @@
 					fnComm.alarmCount('caas');
 
 					// Alarm Policy, Measuring Time, Alarm Receiver Address
-					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmLog`, alarm.alarmStatus);
+					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmLog?alarmType=${document.getElementById('type2').value}&alarmStatus=${document.getElementById('type3').value}&resolveStatus=${document.getElementById('type4').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
 					
 					// 오늘 날짜
 					var today = new Date();
@@ -202,113 +202,129 @@
 				},
 
 				alarmStatus(data) {
+					console.log(data);
 					var target = document.getElementById('statusList');
 					
 					fnComm.removeHtml(target);
 
-					data.forEach((value, idx) => {
-						//////////////////////////////////////////////////////////////////////
-						// id: 333
-						// issue: "[warning] CaaS PodName : fluentd-gcp-v3.2.0-g7l59 현재사용률 MEMORY (30.51%), 임계값 (30)%"
-						// nameSpace: "kube-system"
-						// podName: "fluentd-gcp-v3.2.0-g7l59"
-						// regDate: "2019-09-16 09:56:50"
-						// resolveStatus: "1"
-						// resolveStatusName: "Alarm 발생"
-						// status: "Warning"
-						//////////////////////////////////////////////////////////////////////
+					if(data.length > 0){
+						data.forEach((value, idx) => {
+							//////////////////////////////////////////////////////////////////////
+							// id: 333
+							// issue: "[warning] CaaS PodName : fluentd-gcp-v3.2.0-g7l59 현재사용률 MEMORY (30.51%), 임계값 (30)%"
+							// nameSpace: "kube-system"
+							// podName: "fluentd-gcp-v3.2.0-g7l59"
+							// regDate: "2019-09-16 09:56:50"
+							// resolveStatus: "1"
+							// resolveStatusName: "Alarm 발생"
+							// status: "Warning"
+							//////////////////////////////////////////////////////////////////////
+							
+							var html = '<div class="'+value.status.toLowerCase()+'">';
+							html += '	<div>';
+							html += '		<strong title="'+value.issue+'">'+value.issue+'</strong>';
+							html += '	</div>';
+							html += '	<div>';
+							html += '		<dl>';
+							html += '			<dt>Pod Name</dt>';
+							html += '			<dd>'+value.podName+'</dd>';
+							html += '		</dl>';
+							html += '		<dl>';
+							html += '			<dt>Name Space</dt>';
+							html += '			<dd>'+value.nameSpace+'</dd>';
+							html += '		</dl>';
+							html += '		<dl>';
+							html += '			<dt>Date</dt>';
+							html += '			<dd>'+value.regDate+'</dd>';
+							html += '		</dl>';
+							html += '	</div>';
+							html += '	<ul class="historyWrap data-read'+value.id+'">';
+							html += '	</ul>';
+							html += '	<div class="receipt">';
+							html += '		<textarea></textarea>';
+							html += '		<div>';
+							html += '			<button class="saveBtn" data-id="'+value.id+'">SAVE (조치내용만 입력)</button>';
+							html += '			<button class="complBtn" data-id="'+value.id+'">COMPLETE (조치내용도 함께 입력)</button>';
+							html += '		</div>';
+							html += '	</div>';
+							html += '	<div class="summaryBtn" data-id="'+value.id+'"  data-name="'+value.name+'">';
+							html += '		<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="Receipt"><span>Receipt</span></a>';
+							html += '	</div>';
+							html += '</a>';
+							
+							fnComm.appendHtml(target, html, 'div');
+							
+							fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmAction/${value.id}`, alarm.history, value.resolveStatus);
+						});
+					
+						// Button Event (receipt)
+						var elm = document.querySelectorAll('.process');
+						for(var i=0 ; i<elm.length ; i++){
+							elm[i].addEventListener('click', (e) => {
+								e.target.parentNode.parentNode.previousSibling.previousSibling.classList.toggle('on');
+							}, false);
+						};
+					
+						// receipt 코멘트 저장 및 컴플릿
+						var saveBtn = document.querySelectorAll('.saveBtn');
+						var complBtn = document.querySelectorAll('.complBtn');
+						for(var i=0 ; i<saveBtn.length ; i++){
+							saveBtn[i].addEventListener('click', (e) => {
+								var actionPush = `{"id":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
+
+								fnComm.saveData('PUT', `${fnComm.url}caas/monitoring/alarmStatus/${e.target.getAttribute('data-id')}`, '{"resolveStatus":"2"}', 'false');
+
+								fnComm.saveData('POST', `${fnComm.url}caas/monitoring/alarmAction`, actionPush);
+
+								e.target.parentNode.previousSibling.previousSibling.value = '';
+							}, false);
+
+							complBtn[i].addEventListener('click', (e) => {
+								var actionPush = `{"id":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
+
+								fnComm.saveData('PUT', `${fnComm.url}caas/monitoring/alarmStatus/${e.target.getAttribute('data-id')}`, '{"resolveStatus":"3"}', 'false');
+
+								fnComm.saveData('POST', `${fnComm.url}caas/monitoring/alarmAction`, actionPush);
+
+								e.target.parentNode.previousSibling.previousSibling.value = '';
+							}, false);
+						};
 						
-						var html = '<div class="'+value.status.toLowerCase()+'">';
-						html += '	<div>';
-						html += '		<strong title="'+value.issue+'">'+value.issue+'</strong>';
-						html += '	</div>';
-						html += '	<div>';
-						html += '		<dl>';
-						html += '			<dt>Alarm Type</dt>';
-						html += '			<dd>'+value.resolveStatusName+'</dd>';
-						html += '		</dl>';
-						html += '		<dl>';
-						html += '			<dt>Origin Type</dt>';
-						html += '			<dd>'+value.podName+'</dd>';
-						html += '		</dl>';
-						html += '		<dl>';
-						html += '			<dt>Origin Name</dt>';
-						html += '			<dd>'+value.nameSpace+'</dd>';
-						html += '		</dl>';
-						html += '	</div>';
-						html += '	<ul class="historyWrap data-read'+value.id+'">';
-						html += '	</ul>';
-						html += '	<div class="receipt">';
-						html += '		<textarea></textarea>';
-						html += '		<div>';
-						html += '			<button class="saveBtn" data-id="'+value.id+'">SAVE (조치내용만 입력)</button>';
-						html += '			<button class="complBtn" data-id="'+value.id+'">COMPLETE (조치내용도 함께 입력)</button>';
-						html += '		</div>';
-						html += '	</div>';
-						html += '	<div class="summaryBtn" data-id="'+value.id+'"  data-name="'+value.name+'">';
-						html += '		<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="Receipt"><span>Receipt</span></a>';
-						html += '	</div>';
-						html += '</a>';
-						
+						if(alarm.flag){
+							alarm.flag = false;
+							alarm.event();
+						};
+					} else {
+						var html = `<div class="none">최근 한달간 알람이 없습니다.</div>`;
+							
 						fnComm.appendHtml(target, html, 'div');
-						
-						fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmAction/${value.id}`, alarm.history, value.id);
-					});
-					
-					// Button Event (receipt)
-					var elm = document.querySelectorAll('.process');
-					for(var i=0 ; i<elm.length ; i++){
-						elm[i].addEventListener('click', (e) => {
-							e.target.parentNode.parentNode.previousSibling.previousSibling.classList.toggle('on');
-						}, false);
-					};
-				
-					// receipt 코멘트 저장 및 컴플릿
-					var saveBtn = document.querySelectorAll('.saveBtn');
-					var complBtn = document.querySelectorAll('.complBtn');
-					for(var i=0 ; i<saveBtn.length ; i++){
-						saveBtn[i].addEventListener('click', (e) => {
-							var actionPush = `{"id":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
-
-							fnComm.saveData('PUT', `${fnComm.url}caas/monitoring/alarmStatus/${e.target.getAttribute('data-id')}`, '{"resolveStatus":"2"}', 'false');
-
-							fnComm.saveData('POST', `${fnComm.url}caas/monitoring/alarmAction`, actionPush);
-
-							e.target.parentNode.previousSibling.previousSibling.value = '';
-						}, false);
-
-						complBtn[i].addEventListener('click', (e) => {
-							var actionPush = `{"id":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
-
-							fnComm.saveData('PUT', `${fnComm.url}caas/monitoring/alarmStatus/${e.target.getAttribute('data-id')}`, '{"resolveStatus":"3"}', 'false');
-
-							fnComm.saveData('POST', `${fnComm.url}caas/monitoring/alarmAction`, actionPush);
-
-							e.target.parentNode.previousSibling.previousSibling.value = '';
-						}, false);
-					};
-					
-					if(alarm.flag){
-						alarm.flag = false;
-						alarm.event();
-					};
+					}
 				},
 
 				history(data, list){
 					if(data.length > 0){
 						data.forEach(value => {
-							var target = document.querySelector('.data-read'+value.alarmId);
+							var target = document.querySelector(`.data-read${value.alarmId}`);
 
-							var html = '<li>';
-							html += '	<p>';
-							html += '		<input type="text" title="'+value.alarmActionDesc+'" value="'+value.alarmActionDesc+'">';
-							html += '		<em>'+value.regDate+'</em>';
-							html += '	</p>';
-							html += '	<div data-id="'+value.id+'">';
-							html += '		<button class="update" data-id="'+value.id+'" onClick="hisChange(this);">Update</button>';
-							html += '		<button class="delete" data-id="'+value.id+'" onClick="hisDelete(this);">Deledte</button>';
-							html += '	</div>';
-							html += '</li>';
+							var status = '';
+
+							if(list == 2){
+								status = `<strong class="ing">조 치</strong>`;
+							} else if(list == 3){
+								status = `<strong class="end">완 료</strong>`;
+							};
+
+							var html = `<li>
+								<p>
+									${status}
+									<input type="text" title="${value.alarmActionDesc}" value="${value.alarmActionDesc}">
+									<em>${value.regDate}</em>
+								</p>
+								<div data-id="${value.id}">
+									<button class="update" data-id="${value.id}" onClick="hisChange(this);">Update</button>
+									<button class="delete" data-id="${value.id}" onClick="hisDelete(this);">Deledte</button>
+								</div>
+							</li>`;
 
 							fnComm.appendHtml(target, html, 'li');
 						});
@@ -317,7 +333,7 @@
 
 				event(){
 					document.querySelector('.search').addEventListener('click', (e) => {
-						fnComm.loadData('GET', `${fnComm.url}saas/app/application/alarmLog?alarmType=${document.getElementById('type2').value}&alarmStatus=${document.getElementById('type3').value}&resolveStatus=${document.getElementById('type4').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
+						fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmLog?alarmType=${document.getElementById('type2').value}&alarmStatus=${document.getElementById('type3').value}&resolveStatus=${document.getElementById('type4').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
 					}, false);
 				},
 			}

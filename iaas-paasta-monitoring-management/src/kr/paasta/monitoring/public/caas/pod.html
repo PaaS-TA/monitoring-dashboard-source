@@ -16,10 +16,10 @@
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
 
 				<ul class="global">
-					<li><a href="../paas/index.html">PaaS</a></li>
-					<li><a href="../saas/index.html">SaaS</a></li>
-					<li><a href="../caas/index.html">CaaS</a></li>
-					<li><a href="../iaas/index.html">IaaS</a></li>
+					<li class="PaaS"><a href="../paas/index.html">PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../iaas/index.html">IaaS</a></li>
 				</ul>
 				
 				<!-- Navigation -->
@@ -231,8 +231,6 @@
 					},
 
 					podStatus(data){
-						console.log(data);
-
 						fnComm.countUp(document.getElementById('statusTotal'), data.Total);
 						fnComm.countUp(document.getElementById('statusRunning'), data.Running);
 						fnComm.countUp(document.getElementById('statusPending'), data.Pending);
@@ -317,10 +315,14 @@
 						document.querySelector('.chartClosed').addEventListener('click', (e) => {
 							document.getElementById('chartWrap').classList.toggle('on', false);
 						}, false);
+							
+						// LOG Close Event
+						document.querySelector('.logClosed').addEventListener('click', (e) => {
+							document.querySelector('.logWrap').classList.toggle('on', false);
+						}, false);
 					},
 
 					nodeInfo(data){
-						console.log(data);
 						document.getElementById('chartWrap').classList.toggle('on', true);
 
 						setTimeout(() => {
@@ -329,7 +331,6 @@
 					},
 
 					containerlist(data) {
-						console.log(data);
 						// ContainerName: "fluentd-gcp-scaler"
 						// Cpu: "22522.09"
 						// CpuUsage: "0.66"
@@ -345,15 +346,15 @@
 
 						data.forEach(value => {
 							var html = `<tr>
-											<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
-											<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
-											<td class="left" title="${value.PodName}">${value.PodName}</td>
-											<td>${value.Cpu}</td>
-											<td>${value.Memory}</td>
-											<td>${value.Disk}</td>
-											<td>${value.CpuUsage}</td>
-											<td>${value.MemoryUsage}</td>
-										</tr>`;
+								<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
+								<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
+								<td class="left" title="${value.PodName}">${value.PodName}</td>
+								<td>${value.Cpu}</td>
+								<td>${value.Memory}</td>
+								<td>${value.Disk}</td>
+								<td>${value.CpuUsage}</td>
+								<td>${value.MemoryUsage}</td>
+							</tr>`;
 							
 							fnComm.appendHtml(target, html, 'tbody');
 						});
@@ -364,13 +365,8 @@
 							// Pod Node Info Event
 							elm[i].addEventListener('click', (e) => {
 								var containerName = e.target.parentNode.getAttribute('title');
-								console.log(containerName);
 								var nameSpace = e.target.parentNode.getAttribute('data-sp');
-								console.log(nameSpace);
 								var podName = e.target.parentNode.getAttribute('data-po');
-								console.log(podName);
-								
-								//document.querySelector('.chartTitle').innerHTML = elmName;
 							
 								// Container Chart 데이터로드
 								fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, pod.containerChart);

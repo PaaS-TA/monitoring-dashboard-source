@@ -16,11 +16,11 @@
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
 
 				<ul class="global">
-					<li><a href="../paas/index.html">PaaS</a></li>
-					<li><a href="../saas/index.html">SaaS</a></li>
-					<li><a href="../caas/index.html">CaaS</a></li>
-					<li><a href="../iaas/index.html">IaaS</a></li>
-				</ul>
+						<li class="PaaS"><a href="index.html">PaaS</a></li>
+						<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+						<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+						<li class="IaaS"><a href="../iaas/index.html">IaaS</a></li>
+					</ul>
 				
 				<!-- Navigation -->
 				<nav>
@@ -215,9 +215,8 @@
 						</div>
 						<button class="logSearch">SEARCH</button>
 					</fieldset>
-					<div class="preText">
-						<pre></pre>
-					</div>
+					<ul class="preText">
+					</ul>
 					<div class="paging logPaging">
 						<a href="javascript:void(0);" class="move next">&lt;</a>
 						<span>
@@ -267,7 +266,9 @@
 						var nn = today.getMinutes();
 						var ss = today.getSeconds();
 
+						if(hh < 10) hh='0'+hh;
 						if(hs < 10) hs='0'+hs;
+						if(nn < 10) nn='0'+nn;
 						if(ss < 10) ss='0'+ss;
 
 						document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
@@ -280,7 +281,6 @@
 					},
 					
 					boshSummaryList(data) {
-						console.log(data);
 						//////////////////////////////////////////////////////////////////////
 						// BOSH Summary : 리스트
 						// Data Example //////////////////////////////////////////////////////
@@ -368,7 +368,6 @@
 
 									fnComm.loadData('GET', `${fnComm.url}paas/bosh/topprocess/${elmID}/memory`, bosh.boshTopProcess );
 
-									console.log(elmName);
 
 									document.getElementById('boshTopTitle').innerHTML = elmName;
 								}, false);
@@ -427,18 +426,15 @@
 							
 							// LOG Search Event
 							document.querySelector('.logSearch').addEventListener('click', (e) => {
-								var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}&keyword=${document.getElementById('message').value}`;
-
-								console.log(logParameter);
+								var logParameter = `?id=${bosh.logId}&logType=bosh&pageIndex=1&pageItems=1000&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
 							
 								// Log 리스트
-								fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+								fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.detailLog);
 							}, false);
 						};
 					},
 	
 					boshTopProcess(data) {
-						console.log(data);
 						//////////////////////////////////////////////////////////////////////
 						// BOSH Top Process : 리스트
 						// Data Example //////////////////////////////////////////////////////
@@ -518,111 +514,28 @@
 						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
 
 						setTimeout(() => {
-							var logParameter = `?id=${bosh.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-
-							console.log(logParameter);
+							var logParameter = `?id=${bosh.logId}&logType=bosh&pageIndex=1&pageItems=1000&period=5m`;
 						
 							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.detailLog);
+							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, bosh.detailLog);
 						},500);
 					},
 
 					detailLog(data){
-						bosh.logPage = 1;
-
 						if(data.messages !=  null){
-
-							bosh.logCnt = Math.ceil(data.totalCount / 100);
-							bosh.logSum = Math.ceil(bosh.logCnt / 10);
-
-							if(bosh.logCnt > 2){
-								document.querySelector('.logPaging').classList.toggle('on', true);
-							};
-							if(bosh.logCnt > 10){
-								document.querySelector('.logPaging').classList.toggle('over', true);
-							};
+							var target = document.querySelector('.preText');
+	
+							fnComm.removeHtml(target);
 							
-							fnComm.removeHtml(document.querySelector('.logPaging span'));
+							data.messages.forEach((value)=>{
+								var html = `<li>${value.time}<br>${value.message}</li>`;
 
-							for(var i=1; i<=bosh.logCnt; i++){
-								var html = `<a href="javascript:void(0);" class="view" data-page="${i}">${i}</a>`;
-
-								fnComm.appendHtml(document.querySelector('.logPaging span'), html, 'span');
-							};
-
-							bosh.logDraw(data);
-
-							// LOG Paging
-							var btn =  document.querySelectorAll('.logPaging span a');
-
-							for(var i=0 ; i<btn.length ; i++){
-								btn[i].removeEventListener('click', this);
-								btn[i].addEventListener('click', (e) => {
-									var logParameter = `?id=${bosh.logId}&logType=cf&pageIndex=${e.target.getAttribute('data-page')}&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-
-									console.log(e.target.getAttribute('data-page'));
-								
-									// Log 리스트
-									fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.logDraw);
-									
-							var logParameter = `?id=${bosh.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-
-							console.log(logParameter);
-						
-							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.detailLog);
-								}, false);
-							};
-
-							document.querySelector('.logPaging .next').removeEventListener('click', bosh.nextBtn);
-							document.querySelector('.logPaging .prev').removeEventListener('click', bosh.prevBtn);
-							
-							document.querySelector('.logPaging .next').addEventListener('click', bosh.nextBtn);
-							
-							document.querySelector('.logPaging .prev').addEventListener('click', bosh.prevBtn);
+								fnComm.appendHtml(target, html, 'ul');
+							});
 						} else {
-							document.querySelector('.preText pre').innerHTML = 'No Log'
+							document.querySelector('.preText').innerHTML = 'No Log'
 						};
 					},
-
-					nextBtn(){
-						var btn =  document.querySelectorAll('.logPaging span a');
-
-						if(bosh.logPage > 1){
-							for(var i=0 ; i<btn.length ; i++){
-								btn[i].classList.toggle('view', false);
-							};
-							bosh.logPage--;
-							for(var j=((bosh.logPage-1)*10); j<(bosh.logPage*10) ; j++){
-								btn[j].classList.toggle('view', true);
-							};
-						};
-					},
-
-					prevBtn(){
-						var btn =  document.querySelectorAll('.logPaging span a');
-
-						if(bosh.logSum > bosh.logPage){
-							for(var i=0 ; i<btn.length ; i++){
-								btn[i].classList.toggle('view', false);
-							};
-							bosh.logPage++;
-							for(var j=((bosh.logPage-1)*10); j<(bosh.logPage*10) ; j++){
-								btn[j].classList.toggle('view', true);
-							};
-						};
-					},
-
-					logDraw(data){
-						var logText = '';
-						
-						data.messages.forEach((value)=>{
-							logText += `${value.time}<br>`;
-							logText += `${value.message}<br><br>`;
-						});
-
-						document.querySelector('.preText pre').innerHTML = logText;
-					}
 				}
 	
 				bosh.init();

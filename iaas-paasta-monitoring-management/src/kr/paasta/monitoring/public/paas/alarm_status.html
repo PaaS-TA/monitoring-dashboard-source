@@ -16,10 +16,10 @@
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
 
 				<ul class="global">
-					<li><a href="../paas/index.html">PaaS</a></li>
-					<li><a href="../saas/index.html">SaaS</a></li>
-					<li><a href="../caas/index.html">CaaS</a></li>
-					<li><a href="../iaas/index.html">IaaS</a></li>
+					<li class="PaaS"><a href="index.html">PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../iaas/index.html">IaaS</a></li>
 				</ul>
 				
 				<!-- Navigation -->
@@ -205,13 +205,10 @@
 					document.getElementById('date1').value = `${yyyy}-${nn}-${dd}`;
 					document.getElementById('date2').value = `${yyyy}-${mm}-${dd}`;
 
-					console.log(`${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`);
-
 					fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, alarm.alarmStatus);
 				},
 
 				alarmStatus(data) {
-					console.log(data);
 					var target = document.getElementById('statusList');
 					
 					fnComm.removeHtml(target);
@@ -267,7 +264,7 @@
 										<dd>${value.alarmSendDate}</dd>
 									</dl>
 								</div>
-								<ul class="historyWrap data-read="${value.id}">
+								<ul class="historyWrap data-read${value.id}">
 								</ul>
 								<div class="receipt">
 									<textarea></textarea>
@@ -283,7 +280,7 @@
 							
 							fnComm.appendHtml(target, html, 'div');
 							
-							fnComm.loadData('GET', `${fnComm.url}paas/alarm/status/${value.id}`, alarm.history, value.id);
+							fnComm.loadData('GET', `${fnComm.url}paas/alarm/status/${value.id}`, alarm.history, value.resolveStatus);
 						});
 						
 						// Button Event (receipt)
@@ -335,12 +332,24 @@
 					// regDate: "2019-09-06 16:01:02"
 					// regUser: "system"
 
+					var resolveStatus = data.resolveStatus;
+					console.log(data.resolveStatus);
+
 					if(data.data.length > 0){
 						data.data.forEach(value => {
-							var target = document.querySelector('.data-read'+value.alarmId);
+							var target = document.querySelector(`.data-read${value.alarmId}`);
+
+							var status = '';
+
+							if(resolveStatus == 2){
+								status = `<strong class="ing">조 치</strong>`;
+							} else if(list == 3){
+								status = `<strong class="end">완 료</strong>`;
+							};
 
 							var html = `<li>
 								<p>
+									${status}
 									<input type="text" title="${value.alarmActionDesc}" value="${value.alarmActionDesc}">
 									<em>${value.regDate}</em>
 								</p>
@@ -350,14 +359,14 @@
 								</div>
 							</li>`;
 
-							fnComm.appendHtml(target, html, 'li');
+							fnComm.appendHtml(target, html, 'ul');
 						});
 					};
 				},
 
 				event(){
 					document.querySelector('.search').addEventListener('click', (e) => {
-						fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType="${document.getElementById('type1').value}"&alarmType=${document.getElementById('type2').value}"&resolveStatus="${document.getElementById('type4').value}"&level="${document.getElementById('type3').value}"&searchDateFrom="${document.getElementById('date1').value}"&searchDateTo="${document.getElementById('date2').value}"`, alarm.alarmStatus);
+						fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
 					}, false);
 				},
 			}

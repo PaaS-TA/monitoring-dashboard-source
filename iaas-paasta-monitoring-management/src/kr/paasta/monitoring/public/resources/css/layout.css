@@ -80,9 +80,10 @@ header {position:absolute; top:0; left:0; z-index:100; width:90px; height:100%; 
 header:hover {width:150px;}
 header h1 {overflow:hidden; margin-bottom:100px; text-align:center;}
 
-header .global {position:absolute; top:-50px; left:200px; width:480px; padding:0 60px 0 20px; background:#444; border-radius:50px;}
-header .global li {float:left; width:100px; text-align:center;}
-header .global li a {display:block; height:100px; color:#fff; font-size:16px; line-height:150px; white-space:nowrap;}
+header .global {position:absolute; top:0; left:200px; width:600px;}
+header .global li {display:none; width:120px; text-align:center;}
+header .global li a {display:block; height:72px; color:#333; font-size:18px; line-height:72px; white-space:nowrap; transition:.5s;}
+header .global li a:hover {color:#fff; background:#45b1ff;}
 
 header nav {text-align:center;}
 header nav > ul {display:inline-block; width:100%;}
@@ -103,7 +104,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #container {position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; display:flex; min-width:1580px; padding-left:90px; background:#fafafa;}
 
 .contentsLeft {position:relative; flex:1; width:450px; padding:20px 30px; border-right:1px solid #eee;}
-.contentsLeft h3 {margin-top:60px; font-size:24px; color:#ccc; font-weight:400; text-align:center;}
+.contentsLeft h3 {margin-top:90px; font-size:24px; color:#ccc; font-weight:400; text-align:center;}
 .contentsLeft h4 {margin-top:60px; font-size:26px; color:#333; font-weight:100; line-height:60px; text-align:center;}
 .contentsLeft h4 span {position:relative; display:inline-block; margin-left:15px; padding-left:15px; height:60px; color:#f576c3; text-align:center; text-transform:uppercase;}
 .contentsLeft h4 span:after {content:'|'; position:absolute; top:0; left:0; font-size:14px; color:#ddd; line-height:60px;}
@@ -184,7 +185,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #contents .timePop .refresh {overflow:hidden; padding:15px;}
 #contents .timePop .btnWrap {padding-top:10px;}
 
-#contents nav {position:absolute; top:20px; left:0; width:100%; padding:0 30px;}
+#contents nav {position:fixed; top:0; right:0; z-index:50; width:100%; padding:10px 30px; background:#fff; border-bottom:2px solid #eee;}
 #contents nav > a {float:left; display:none;}
 #contents nav ul {float:right;}
 #contents nav ul li {position:relative; float:left; margin-left:50px;}
@@ -203,7 +204,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #contents nav ul li .logout span {position:absolute; top:0; right:0; z-index:99; width:60px; padding:7px; font-size:12px; color:#f4256c; text-align:center; border:1px solid #f4256c; background:#fff; opacity:0; transition:.5s;}
 #contents nav ul li .logout:hover span {opacity:1;}
 
-#contents article {position:relative; margin-top:50px;}
+#contents article {position:relative; margin-top:30px;}
 #contents article h4 {display:inline-block; width:100%; height:60px; margin-top:30px; font-size:26px; font-weight:100; line-height:60px;}
 #contents article h4:first-child {margin-top:0;}
 #contents article h4 strong {color:#40cecd; font-size:26px; font-weight:300;}
@@ -331,7 +332,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .tableList tbody tr td.left {text-align:left;}
 
 
-.statusSearch {overflow:hidden; padding-top:40px; text-align:center;}
+.statusSearch {overflow:hidden; padding-top:20px; text-align:center;}
 .statusSearch select {width:80%; margin-top:15px;}
 .statusSearch span {display:inline-block; width:80%; margin-top:15px; color:#999; font-size:18px; line-height:40px;}
 .statusSearch span:first-of-type {margin-top:50px;}
@@ -371,7 +372,10 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .statusList > div .historyWrap {margin-top:15px; overflow:hidden;}
 .statusList > div .historyWrap li {overflow:hidden; padding:5px 0; border-top:1px solid #f0f0f0;}
 .statusList > div .historyWrap li p {float:left; width:85%; color:#333; font-size:14px; line-height:20px;}
-.statusList > div .historyWrap li p input {float:left; width:85%; height:20px; padding:0; overflow:hidden; font-size:14px; text-overflow:ellipsis; white-space:nowrap; border:0;}
+.statusList > div .historyWrap li p strong {float:left; width:7%; color:#333; font-size:14px; line-height:20px; text-align:center;}
+.statusList > div .historyWrap li p strong.ing {color:#c048c8; border:1px solid #c048c8;}
+.statusList > div .historyWrap li p strong.end {color:#82BE38; border:1px solid #82BE38;}
+.statusList > div .historyWrap li p input {float:left; width:78%; height:20px; padding:0 0 0 10px; overflow:hidden; font-size:14px; line-height:20px; text-overflow:ellipsis; white-space:nowrap; border:0;}
 .statusList > div .historyWrap li p em {float:right; font-size:12px; color:#999;}
 .statusList > div .historyWrap li div {float:right;}
 .statusList > div .historyWrap li div button {float:left; width:55px; height:20px; color:#fff; font-size:12px; line-height:20px; background:#d45959;}
@@ -397,7 +401,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .ovChart {height:250px;}
 
 .statusBlock {overflow:hidden;}
-.statusBlock > div {float:left; width:25%; padding-top:50px;}
+.statusBlock > div {float:left; width:25%;}
 .statusBlock > div:nth-child(2n+1) {margin-left:0;}
 .statusBlock > div h5 {text-align:center;}
 .statusBlock > div ul {overflow:hidden; padding-top:5px;}
@@ -407,7 +411,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .statusBlock > div ul li.bg3 {color:#45b1ff;}
 .statusBlock > div ul li.bg4 {color:#e91a61;}
 .statusBlock > div ul li span {display:block; font-size:12px; font-weight:100;}
-.statusBlock > div ul li strong {display:block; height:44px; font-size:40px; font-weight:100; line-height:44px;}
+.statusBlock > div ul li strong {display:block; height:44px; font-size:30px; font-weight:100; line-height:44px;}
 
 /**********************************/
 
@@ -425,14 +429,15 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #chartWrap .chart > ul.four > li {float:left; width:22%; margin-left:3%; margin-top:25px;}
 #chartWrap .chart > ul.four > li:nth-child(3n+1) {margin-left:3%;}
 #chartWrap .chart > ul.four > li:nth-child(4n+1) {margin-left:0;}
-#chartWrap .chart li h5 {margin:0; color:#666; font-size:18px; font-weight:200; text-align:center; line-height:34px;}
-#chartWrap .chart > li div {width:100%; height:150px; padding-right:15px;}
-#chartWrap .chart > li div svg {overflow:visible !important;}
+#chartWrap .chart li h5 {margin:0; color:#666; font-size:20px; font-weight:200; text-align:center; line-height:34px;}
+#chartWrap .chart > li div {width:100%; height:180px; padding-right:15px;}
+#chartWrap .chart > ul.one > li div {height:230px;}
+#chartWrap .chart > ul > li div svg {overflow:visible !important;}
 #chartWrap .chartClosed {position:absolute; top:20px; right:20px; width:70px; height:70px;}
 #chartWrap .chartClosed:before {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(45deg);}
 #chartWrap .chartClosed:after {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(-45deg);}
 
-#chartWrap .chart h5 {height:40px; padding-left:15px; margin:50px 0 15px; color:#222; font-size:20px; font-weight:100; text-align:center; line-height:40px;}
+#chartWrap .chart h5 {height:40px; padding-left:15px; margin:30px 0 10px; color:#222; font-size:20px; font-weight:100; text-align:center; line-height:40px;}
 #chartWrap .chart .tableList {height:300px; overflow-y:scroll; overflow-x:hidden;}
 
 #chartWrap .chart.gauge {display:block;}
@@ -460,8 +465,8 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 #chartWrap .logs fieldset div button:hover {color:#f576c3;border:1px solid #f576c3;}
 #chartWrap .logs fieldset .logSearch {position:absolute; top:0; right:0; width:83px; height:83px; font-size:14px; color:#fff; font-weight:300; background:#222;}
 #chartWrap .logs fieldset .logSearch:hover {background:#f576c3;}
-#chartWrap .preText {width:1000px; margin:40px auto 0;}
-#chartWrap .preText pre {overflow:hidden; overflow-y:scroll; height:500px; padding:30px; font-family:'Courier New'; color:#fff; font-weight:300; line-height:24px; border:1px solid #eee; background:#333; white-space:pre-wrap;}
+#chartWrap .preText {width:1000px; margin:40px auto 0; overflow:hidden; overflow-y:scroll; height:500px; padding:30px; font-family:'Courier New'; color:#fff; font-weight:300; line-height:24px; border:1px solid #eee; background:#333; white-space:pre-wrap;}
+#chartWrap .preText li {margin-bottom:30px;}
 
 #chartWrap .logWrap {position:absolute; top:100px; right:-100%; width:1000px; height:600px; padding:0 60px 60px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1); transition:.5s;}
 #chartWrap .logWrap.on {right:30px;}
@@ -554,7 +559,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .fail {color:#c048c8;}
 
 .alarmPolicy .contentsLeft h4 {text-align:left;}
-.alarmPolicy .contentsLeft h4:first-child {margin-top:60px;}
+.alarmPolicy .contentsLeft h4:first-child {margin-top:90px;}
 /* Alarm History */
 .alarmHistory {display:none;}
 .alarmHistory ul {overflow:hidden;}
