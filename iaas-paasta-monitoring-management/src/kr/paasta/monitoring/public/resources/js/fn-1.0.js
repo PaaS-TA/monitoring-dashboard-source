@@ -1,6 +1,6 @@
 
 const fnComm = {
-	url : 'http://54.180.155.28:8080/v2/',
+	url : '/v2/',
 	timeRange : '1440',
 	timeRefresh : '1d',
 	defaultTimeRange : '15m',
@@ -39,8 +39,7 @@ const fnComm = {
 					sessionStorage.setItem('login', true);
 					sessionStorage.setItem('user', user);
 					sessionStorage.setItem('mail', JSON.parse(request.responseText).userEmail);
-					sessionStorage.setItem('sysType', JSON.parse(request.responseText).sysType);
-					document.location.href = 'index.html';
+					document.location.href = 'paas/index.html';
 				} else {
 					fnComm.alertPopup('ERROR', JSON.parse(request.responseText).message);
 				};
@@ -116,6 +115,7 @@ const fnComm = {
 			request.onreadystatechange = () => {
 				if (request.readyState === XMLHttpRequest.DONE){
 					if(request.status === 200){
+						console.log(request);
 						if(JSON.parse(request.responseText).totalCnt > 0){
 							document.querySelector('.alarmView').classList.toggle('on', true);
 							document.querySelector('.alarmView span').innerHTML = JSON.parse(request.responseText).totalCnt;
@@ -124,21 +124,17 @@ const fnComm = {
 								location.href = 'alarm_status.html';
 							});
 
-							//fnComm.timeSetting();
+							fnComm.timeSetting();
 						} else {
 							document.querySelector('.alarmView').classList.toggle('on', false);
 						}
+					} else {
+						fnComm.alertPopup('ERROR', JSON.parse(request.responseText).message, fnComm.winReCall);
 					};
 				};
 			};
 
 			request.send();
-
-			var type = sessionStorage.getItem('sysType').split(',');
-
-			for(var i=0 ; i<type.length ; i++){
-				document.querySelector(`.global .${type[i]}`).style.display= 'inline-block';
-			};
 		
 			// logout 이벤트
 			document.querySelector('.logout').addEventListener('click', (e) => {
@@ -201,9 +197,9 @@ const fnComm = {
 			if (request.readyState === XMLHttpRequest.DONE){
 				if(request.status === 200 && request.responseText != ''){
 					callbackFunction(JSON.parse(request.responseText), list);
-				} else if(request.status === 401){
-					sessionStorage.clear();
-					document.location.href = '../login.html';
+				} else {
+					//sessionStorage.clear();
+					//document.location.href = '../login.html';
 				};
 			};
 		};
@@ -331,31 +327,18 @@ const fnComm = {
 	// Window ReCall
 	/////////////////////////////////////////////////////////////////////////////////////
 	winReCall(){
-		console.log(window.location.href);
-		if(window.location.href.indexOf('paas') != -1 || window.location.href.indexOf('caas') != -1 || window.location.href.indexOf('saas') != -1){
-			window.location.href = '../login.html';
-		} else {
-			window.location.href = 'login.html';
-		};
+		window.location.href = '../login.html';
 	},
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// Count UP
-	/////////////////////////////////////////////////////////////////////////////////////
     countUp(el, num) {
 		var cnt = 0;
-		var dif = 0;
-		
+
 		var thisID = setInterval(function(){
-			if(cnt < num){
-				dif = num - cnt;
-
-				if(dif > 0) {
-					cnt += Math.ceil(dif / 5);
-				};
-
+			if(num > cnt){
+				cnt++;
+				
 				el.innerHTML = cnt;
-			} else {
+			} else if(num == cnt) {
 				clearInterval(thisID);
 			};
 		}, 20);
