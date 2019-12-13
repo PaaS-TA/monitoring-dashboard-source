@@ -101,7 +101,7 @@ func main() {
 	var iaaSInfluxServerClient client.Client
 	var iaasElasticClient *elastic.Client
 	var openstackProvider model.OpenstackProvider
-	var monClient monascaclient.Client
+	var monClient *monascaclient.Client
 	var auth gophercloud.AuthOptions
 
 	// paas client
@@ -141,13 +141,13 @@ func main() {
 		CaasBrokerHost: config["caas.monitoring.broker.host"],
 	}
 	//IaaS Connection Info
-	//if sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_IAAS {
-	//	iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
-	//	if err != nil {
-	//		log.Println(err)
-	//		os.Exit(-1)
-	//	}
-	//}
+	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
+		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
+		if err != nil {
+			log.Println(err)
+			os.Exit(-1)
+		}
+	}
 	//
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_PAAS) {
 		fmt.Println("sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS")
@@ -161,11 +161,20 @@ func main() {
 	// Route Path 정보와 처리 서비스 연결
 	var handler http.Handler
 
-	handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-		iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, monClient, auth, databases,
-		rdClient, sysType, boshClient, cfConfig)
-	if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
-		log.Fatalln(err)
+	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
+		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
+			rdClient, sysType, boshClient, cfConfig)
+		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
+			log.Fatalln(err)
+		}
+	} else {
+		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, monascaclient.Client{}, auth, databases,
+			rdClient, sysType, boshClient, cfConfig)
+		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 }

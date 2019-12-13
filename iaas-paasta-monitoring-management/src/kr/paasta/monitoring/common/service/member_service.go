@@ -245,7 +245,7 @@ func (s MemberService) GetIaasToken(apiRequest cm.UserInfo, reqCsrfToken string)
 		}
 
 		//utils.RenderJsonLogoutResponse(provider.TokenID, w)
-		result = provider.TokenID
+		//result = provider.TokenID
 	}
 	return result
 }

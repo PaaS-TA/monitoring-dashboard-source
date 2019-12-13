@@ -243,15 +243,6 @@ var _ = Describe("Controller BeforeSuite", func() {
 		rdClient := redis.NewClient(&redis.Options{
 			Addr:     config["redis.addr"],
 			Password: config["redis.password"],
-			//DB:       0,  // use default DB
-			//Addr:     "localhost:6379",
-			//Password: "", // no password set
-			//DB:       0,  // use default DB
-			//DialTimeout:  10 * time.Second,
-			//ReadTimeout:  30 * time.Second,
-			//WriteTimeout: 30 * time.Second,
-			//PoolSize:     10,
-			//PoolTimeout:  30 * time.Second,
 		})
 
 		sysType := config["system.monitoring.type"]
