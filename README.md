@@ -1684,13 +1684,21 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 
 ## 3.5. Paas-Ta Monitoring Guide Agent 구성 <div id='3.5' />
 
+<br>
+
 ### 3.5.1. 개요 <div id='3.5.1' />
 > 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 Monitoring 시스템에서 Metric 데이터를 수집하고 TSDB(InfluxDB)로 저장하기위한 Guide용 Agent에 대한 설치 및 구성에 대해 설명한다.
 
+<br>
+
 ### 3.5.2. PaaS Metrics Agent 개발환경 구성 <div id='3.5.2' />
+
+<br>
 
 #### 3.5.2.1. bosh-metrics-agent 개요 <div id='3.5.2.1' />
 bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 Bosh Director, PaaS-TA vms 에 구성되는 Metrics Agent.
+
+<br>
 
 #### 3.5.2.2. bosh-metrics-agent 개발환경 구성 <div id='3.5.2.2' />
 
@@ -1717,7 +1725,10 @@ bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 
 ```
 ※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
 
+<br>
+
 #### 3.5.2.3. bosh-metrics-agent release 구성 <div id='3.5.2.3' />
+
 PaSTA-Release -> paasta-monitoring -> paasta-monitoring-agent.tgz 에 반영되어 Deploy 해야 한다.
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
