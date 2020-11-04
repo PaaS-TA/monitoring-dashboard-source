@@ -219,7 +219,7 @@
 					},
 					
 					contSummaryList(data) {
-						console.log(data.data);
+						//console.log(data.data);
 						//////////////////////////////////////////////////////////////////////
 						// appCnt: "0"
 						// cellCnt: "1"
@@ -284,6 +284,7 @@
 							if(idx === 0){
 								// Set Relation 
 								fnComm.loadData('GET', fnComm.url + 'paas/container/relationship/' + value.zoneName, cont.contRelation );
+
 							};
 						});
 						
@@ -301,7 +302,7 @@
 	
 					contRelation(data) {
 						var target = document.getElementById('cellCollection');
-						console.log(data);
+						//console.log(data);
 
 						if(data === null || data.length <= 0){ // cell 데이터 없을 시 중지
 							target.innerHTML = '<p>No Data</p>';
@@ -311,20 +312,30 @@
 							fnComm.removeHtml(target);
 
 							document.getElementById('cellRelation').innerHTML = data[0].zoneName;
-		
+
+							var blankCheck = false;
+							for(var i=0; i<data.length ;i++) {
+								if (data[i].containers !== null && data[i].containers != "")
+									blankCheck = true;
+							}
+
+							//containers 존재하지 않을 경우 팝업 표시
+							if(!blankCheck){
+								target.innerHTML = '<p>No Data</p>';
+
+								fnComm.alertPopup('NOTICE', 'No Containers Data!');
+
+								return false;
+							}
+
 							data.forEach((value, idx)=>{
 								var html = '<dl>';
 								html += '<dt>'+value.cellName+'</dt>';
 								html += '<dd>';
 
-								// containers 데이터 없을 시 중지
-								if(value.containers === null || value.containers.length <= 0){
-									target.innerHTML = '<p>No Data</p>';
 
-									fnComm.alertPopup('NOTICE', 'No Containers Data!');
-
-									return false;
-								} else {
+								// containers 데이터가 있는 경우만 cell 표시
+								if(value.containers !== null){
 									value.containers.forEach((value, idx)=>{
 										//////////////////////////////////////////////////////////////////////
 										// appIndex: "0"
@@ -345,10 +356,10 @@
 										html += '	</div>';
 										html += '</a>';
 									});
-								};
-								
+								}
+
 								html += '</dd></dl>';
-								
+
 								fnComm.appendHtml(target, html, 'div');
 							});
 							
