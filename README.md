@@ -105,12 +105,12 @@ PaaS_TA_Monitoring-v5.0.0
         * [Alarm Message](#3.4.6)
         * [e-mail](#3.4.6.1)
         * [telegram](#3.4.6.2)                    
-4. [Monitoring Guide Agent 구성](#4)
-    * [개요](#4.1)
-    * [PaaS Metrics Agent 개발환경 구성](#4.2)
-        * [bosh-metrics-agent 개요](#4.2.1)
-        * [bosh-metrics-agent 개발환경 구성](#4.2.2)
-        * [bosh-metrics-agent release 구성](#4.2.3)
+    * [Monitoring Guide Agent 구성](#3.5)
+        * [개요](#3.5.1)
+        * [PaaS Metrics Agent 개발환경 구성](#3.5.2)
+            * [bosh-metrics-agent 개요](#3.5.2.1)
+            * [bosh-metrics-agent 개발환경 구성](#3.5.2.2)
+            * [bosh-metrics-agent release 구성](#3.5.2.3)
 <br /><br /><br />
 
 #   1. 개요 <div id='1' />
@@ -1682,18 +1682,20 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 ![](images/saas_telegram.png)
 <br><br><br>
 
-# 4. Paas-Ta Monitoring Guide Agent 구성 <div id='4' />
+## 3.5. Paas-Ta Monitoring Guide Agent 구성 <div id='3.5' />
 
-## 4.1. 개요 <div id='4.1' />
+### 3.5.1. 개요 <div id='3.5.1' />
 > 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 Monitoring 시스템에서 Metric 데이터를 수집하고 TSDB(InfluxDB)로 저장하기위한 Guide용 Agent에 대한 설치 및 구성에 대해 설명한다.
 <br />
 
-## 4.2. PaaS Metrics Agent 개발환경 구성 <div id='4.2' />
+### 3.5.2. PaaS Metrics Agent 개발환경 구성 <div id='3.5.2' />
+<br />
 
-### 4.2.1. bosh-metrics-agent 개요 <div id='4.2.1' />
+#### 3.5.2.1. bosh-metrics-agent 개요 <div id='3.5.2.1' />
 bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 Bosh Director, PaaS-TA vms 에 구성되는 Metrics Agent.
+<br />
 
-### 4.2.2. bosh-metrics-agent 개발환경 구성 <div id='4.2.2' />
+#### 3.5.2.2. bosh-metrics-agent 개발환경 구성 <div id='3.5.2.2' />
 
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
@@ -1720,7 +1722,7 @@ bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 
 
 <br/>
 
-### 4.2.3. bosh-metrics-agent release 구성 <div id='4.2.3' />
+#### 3.5.2.3. bosh-metrics-agent release 구성 <div id='3.5.2.3' />
 PaSTA-Release -> paasta-monitoring -> paasta-monitoring-agent.tgz 에 반영되어 Deploy 해야 한다.
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
