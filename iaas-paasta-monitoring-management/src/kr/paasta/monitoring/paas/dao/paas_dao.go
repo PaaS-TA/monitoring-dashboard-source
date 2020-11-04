@@ -51,7 +51,7 @@ func (p *PaasDao) GetPaasCfMetrics(ip string) (_ client.Response, errMsg model.E
 	}()
 
 	sql := "select time, id, ip, metricname, origin, value from cf_metrics " +
-		"where time > now() - 1m and ip = '%s' group by metricname order by time desc limit 1"
+		"where time > now() - 3m and ip = '%s' group by metricname order by time desc limit 1"
 
 	var q client.Query
 	q = client.Query{

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/cloudfoundry-community/gogobosh"
-	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/service"
@@ -83,6 +83,7 @@ func (p *PaasController) GetPaasSummary(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		util.RenderJsonResponse(err, w)
 	}
+
 	util.RenderJsonResponse(result, w)
 }
 
@@ -390,11 +391,35 @@ func (p *PaasController) GetPaasAllOverview(w http.ResponseWriter, r *http.Reque
 		util.RenderJsonResponse(err, w)
 	}
 
-	result.Total = result.Total + resList.Total + boshOverview.Total
-	result.Running = result.Running + resList.Running + boshOverview.Running
-	result.Critical = result.Critical + resList.Critical + boshOverview.Critical
-	result.Warning = result.Warning + resList.Warning + boshOverview.Warning
-	result.Failed = result.Failed + resList.Failed + boshOverview.Failed
+	resultTotal, _ := strconv.Atoi(result.Total)
+	resultRunning, _ := strconv.Atoi(result.Running)
+	resultCritical, _ := strconv.Atoi(result.Critical)
+	resultWarning, _ := strconv.Atoi(result.Warning)
+	resultFailed, _ := strconv.Atoi(result.Failed)
+
+	resListTotal, _ := strconv.Atoi(resList.Total)
+	resListRunning, _ := strconv.Atoi(resList.Running)
+	resListCritical, _ := strconv.Atoi(resList.Critical)
+	resListWarning, _ := strconv.Atoi(resList.Warning)
+	resListFailed, _ := strconv.Atoi(resList.Failed)
+
+	boshOverviewTotal, _ := strconv.Atoi(boshOverview.Total)
+	boshOverviewRunning, _ := strconv.Atoi(boshOverview.Running)
+	boshOverviewCritical, _ := strconv.Atoi(boshOverview.Critical)
+	boshOverviewWarning, _ := strconv.Atoi(boshOverview.Warning)
+	boshOverviewFailed, _ := strconv.Atoi(boshOverview.Failed)
+
+	resultTotal = resultTotal + resListTotal + boshOverviewTotal
+	resultRunning = resultRunning + resListRunning + boshOverviewRunning
+	resultCritical = resultCritical + resListCritical + boshOverviewCritical
+	resultWarning = resultWarning + resListWarning + boshOverviewWarning
+	resultFailed = resultFailed + resListFailed + boshOverviewFailed
+
+	result.Total = strconv.Itoa(resultTotal)
+	result.Running = strconv.Itoa(resultRunning)
+	result.Critical = strconv.Itoa(resultCritical)
+	result.Warning = strconv.Itoa(resultWarning)
+	result.Failed = strconv.Itoa(resultFailed)
 
 	util.RenderJsonResponse(result, w)
 }
