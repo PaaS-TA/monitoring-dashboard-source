@@ -6,7 +6,7 @@ PaaS_TA_Monitoring-v5.0.0
         * [목적](#1.1.1)
         * [범위](#1.1.2)
         * [참고자료](#1.1.3)
-2. [IaaS-PaaS Monitoring Application 환경 설정](#2)
+2. [PaaS-TA Monitoring Application 환경 설정](#2)
     * [개요](#2.1)
     * [개발환경 사전 설치 사항](#2.2)
 	* [개발환경 구성](#2.3)
@@ -18,7 +18,7 @@ PaaS_TA_Monitoring-v5.0.0
 	        * [소스 다운로드](#2.3.1.5)
 	        * [IaaS-PaaS-Monitoring Application 구성](#2.3.1.6)
 	        * [Server Start](#2.3.1.7)	    
-3. [IaaS-PaaS Monitoring Application 구성](#3)	    
+3. [PaaS-TA Monitoring Application 구성](#3)	    
     * [IaaS-PaaS-Monitoring](#3.1)
         * [관련 Table 목록 및 구조](#3.1.1)
             * [관련 Table 목록](#3.1.1.1)
@@ -154,7 +154,7 @@ PaaS_TA_Monitoring-v5.0.0
 - gopkg.in/gomail.v2
 <br /><br /><br />
 
-#   2. IaaS-PaaS Monitoring Application 환경 설정 <div id='2' />
+#   2. PaaS-TA Monitoring Application 환경 설정 <div id='2' />
 
 ##  2.1. 개요 <div id='2.1' />
 
@@ -531,7 +531,7 @@ go run main.go
 ```
 <br/>
 
-# 3. Paas-Ta Monitoring Application 구성 <div id='3' />
+# 3. Paas-TA Monitoring Application 구성 <div id='3' />
 Paas-Ta Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다. 
 &nbsp;&nbsp;&nbsp; ![](images/PaasTa_Monitoring_architecture.png)
 그림 1. PaaS-TA Monitoring 구성도
@@ -1679,16 +1679,20 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 ![](images/saas_telegram.png)
 <br><br><br>
 
-## 4.1. 개요 <div id='3.4' />
-> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 Monitoring 시스템에서 Metric 데이터를 수집하고 TSDB(InfluxDB)로 저장하기위한 가이드용 Agent에 대한 설치 및 구성에 대해 설명한다.
+# 4. Paas-Ta Monitoring Guide Agent 구성 <div id='4' />
+
+## 4.1. 개요 <div id='4.1' />
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 Monitoring 시스템에서 Metric 데이터를 수집하고 TSDB(InfluxDB)로 저장하기위한 Guide용 Agent에 대한 설치 및 구성에 대해 설명한다.
 <br />
 
-## 4.2. 개발환경 구성 <div id='2.3' />
+## 4.2. PaaS 개발환경 구성 <div id='4.2' />
+
+### 4.2.1. bosh-metrics-agent 개발환경 구성 <div id='4.2.1' />
 
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
 - OS : Ubuntu
-- Golang : 1.12.6
+- Golang : 1.15.3
 - Dependencies :  github.com/tedsuo/ifrit
                   github.com/tedsuo/rata
                   github.com/influxdata/influxdb/client/v2
@@ -1707,8 +1711,8 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
                   github.com/stretchr/testify
                   github.com/cloudfoundry-community/gogobosh
                   github.com/go-telegram-bot-api/telegram-bot-api
-- IDE : Intellij IDEA 2019.
-- 형상관리: Git
+- IDE : GoLand(유료), Intellij IDEA 2019(무료), Visual Studio Code(무료), etc... 중 택일.
+- 형상관리: Git, etc... 중 택일.
 ```
 ※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
 
