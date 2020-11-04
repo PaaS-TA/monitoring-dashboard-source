@@ -1691,29 +1691,31 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
-- OS : Ubuntu
+- OS : Ubuntu 16.04
 - Golang : 1.15.3
-- Dependencies :  github.com/tedsuo/ifrit
-                  github.com/tedsuo/rata
+- Dependencies :  code.cloudfoundry.org/lager
+		  code.cloudfoundry.org/debugserver
+		  code.cloudfoundry.org/runtimeschema/cc_messages/flags
+                  github.com/tedsuo/ifrit
+		  github.com/tedsuo/ifrit/grouper
+		  github.com/tedsuo/ifrit/sigmon
                   github.com/influxdata/influxdb/client/v2
-                  github.com/rackspace/gophercloud
-                  github.com/cloudfoundry-community/go-cfclient
-                  github.com/go-redis/redis
-                  github.com/go-sql-driver/mysql
-                  github.com/jinzhu/gorm
-                  github.com/cihub/seelog
-                  github.com/monasca/golang-monascaclient/monascaclient
-                  github.com/gophercloud/gophercloud/
-                  github.com/alexedwards/scs
-                  gopkg.in/olivere/elastic.v3
-                  github.com/onsi/ginkgo
-                  github.com/onsi/gomega
-                  github.com/stretchr/testify
-                  github.com/cloudfoundry-community/gogobosh
-                  github.com/go-telegram-bot-api/telegram-bot-api
+		  github.com/shirou/gopsutil/cpu
+		  github.com/shirou/gopsutil/disk
+	          github.com/shirou/gopsutil/host
+	          github.com/shirou/gopsutil/load
+	          github.com/shirou/gopsutil/mem
+	          github.com/shirou/gopsutil/net
+	          github.com/shirou/gopsutil/process
 - IDE : GoLand(유료), Intellij IDEA 2019(무료), Visual Studio Code(무료), etc... 중 택일.
 - 형상관리: Git, etc... 중 택일.
 ```
 ※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
 
 <br/>
+
+### 4.2.2. bosh-metrics-agent release 구성 <div id='4.2.2' />
+PaSTA-Release -> paasta-monitoring -> paasta-monitoring-agent.tgz 에 반영되어 Deploy 해야 한다.
+
+( PaaS-TA v5.0 패키지 파일 다운로드 참조)
+- https://paas-ta.kr/download/package
