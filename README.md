@@ -105,7 +105,7 @@ PaaS_TA_Monitoring-v5.0.0
         * [Alarm Message](#3.4.6)
         * [e-mail](#3.4.6.1)
         * [telegram](#3.4.6.2)                    
-4. [Monitoring Test Agent 구성](#4)
+4. [Monitoring Guide Agent 구성](#4)
     * [개요](#4.1)
     * [개발환경 사전 설치 사항](#4.2)
 <br /><br /><br />
@@ -1050,30 +1050,6 @@ IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리�
 
 <br/><br/>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### 3.1.2. Component 정보 <div id='3.1.2' />
 | Component|설명|
 |:--------|:--------|
@@ -1702,3 +1678,38 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 
 ![](images/saas_telegram.png)
 <br><br><br>
+
+## 4.1. 개요 <div id='3.4' />
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 Monitoring 시스템에서 Metric 데이터를 수집하고 TSDB(InfluxDB)로 저장하기위한 가이드용 Agent에 대한 설치 및 구성에 대해 설명한다.
+<br />
+
+## 4.2. 개발환경 구성 <div id='2.3' />
+
+> 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
+```
+- OS : Ubuntu
+- Golang : 1.12.6
+- Dependencies :  github.com/tedsuo/ifrit
+                  github.com/tedsuo/rata
+                  github.com/influxdata/influxdb/client/v2
+                  github.com/rackspace/gophercloud
+                  github.com/cloudfoundry-community/go-cfclient
+                  github.com/go-redis/redis
+                  github.com/go-sql-driver/mysql
+                  github.com/jinzhu/gorm
+                  github.com/cihub/seelog
+                  github.com/monasca/golang-monascaclient/monascaclient
+                  github.com/gophercloud/gophercloud/
+                  github.com/alexedwards/scs
+                  gopkg.in/olivere/elastic.v3
+                  github.com/onsi/ginkgo
+                  github.com/onsi/gomega
+                  github.com/stretchr/testify
+                  github.com/cloudfoundry-community/gogobosh
+                  github.com/go-telegram-bot-api/telegram-bot-api
+- IDE : Intellij IDEA 2019.
+- 형상관리: Git
+```
+※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
+
+<br/>
