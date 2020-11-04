@@ -1716,3 +1716,6 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 
 ### 4.2.2. bosh-metrics-agent release 구성 <div id='4.2.2' />
 PaSTA-Release -> paasta-monitoring -> paasta-monitoring-agent.tgz 에 반영되어 Deploy 해야 한다.
+
+( PaaS-TA v5.0 패키지 파일 다운로드 참조)
+- https://paas-ta.kr/download/package
