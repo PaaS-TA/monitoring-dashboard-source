@@ -10,7 +10,6 @@ import (
 
 	"code.cloudfoundry.org/lager"
 	influxdb "github.com/influxdata/influxdb/client/v2"
-	//influxdb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
