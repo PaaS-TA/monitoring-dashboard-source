@@ -63,7 +63,6 @@ type influxdbStorage struct {
 	readyToFlush    func() bool
 }
 
-//TEST
 //====================================================================================
 // Container Metrics Metadata from REP (127.0.0.1:1800/v1/containers)
 type ContainerMetricsMetadata struct {
