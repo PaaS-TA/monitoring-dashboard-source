@@ -18,29 +18,19 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
-	/*"k8s.io/klog/v2"*/
-	"net/http"
-
-	/*"errors"*/
 	"flag"
 	"fmt"
-	/*"io/ioutil"*/
+	"io/ioutil"
 	"net"
-	/*"net/http"*/
-
-	/*"net/url"*/
+	"net/http"
 	"os"
-	/*"os/exec"*/
+	"regexp"
 	"strings"
 	"sync"
 	"time"
 
 	info "github.com/google/cadvisor/info/v1"
 	"github.com/google/cadvisor/storage"
-	/*"github.com/google/cadvisor/version"*/
-
-	/*influxdb "github.com/influxdb/influxdb/client"*/
 	influxdb "github.com/influxdata/influxdb/client/v2"
 )
 
@@ -210,27 +200,6 @@ func new() (storage.StorageDriver, error) {
 	}
 	fmt.Println("##### local network address 2 :", instanceIp)
 	//=================================================================================
-	/*
-		var cellIp string
-		addrs, err := net.InterfaceAddrs()
-		if err != nil {
-			return nil, err
-		}
-
-		for _, address := range addrs {
-			// check the address type and if it is not a loopback the display it
-			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-
-				fmt.Println("address :", address.Network())
-				fmt.Println("ipnet :", ipnet.IP)
-
-				if ipnet.IP.To4() != nil {
-					cellIp = ipnet.IP.String()
-					fmt.Println("cellIp:", ipnet.IP.String())
-				}
-
-			}
-		}*/
 
 	return newStorage(
 		hostname,
@@ -261,37 +230,6 @@ func newStorage(
 	isSecure bool,
 	bufferDuration time.Duration,
 ) (*influxdbStorage, error) {
-	/*url := &url.URL{
-		Scheme: "http",
-		Host:   influxdbHost,
-	}
-	if isSecure {
-		url.Scheme = "https"
-	}
-
-	config := &influxdb.Config{
-		URL:       *url,
-		Username:  username,
-		Password:  password,
-		UserAgent: fmt.Sprintf("%v/%v", "cAdvisor", version.Info["version"]),
-	}
-	client, err := influxdb.NewClient(*config)
-	if err != nil {
-		return nil, err
-	}
-
-	ret := &influxdbStorage{
-		client:          client,
-		machineName:     machineName,
-		cellIp:          cellIp,
-		database:        database,
-		retentionPolicy: retentionPolicy,
-		bufferDuration:  bufferDuration,
-		lastWrite:       time.Now(),
-		points:          make([]*influxdb.Point, 0),
-	}
-	ret.readyToFlush = ret.defaultReadyToFlush
-	return ret, nil*/
 	// Make client
 	client, err := influxdb.NewUDPClient(influxdb.UDPConfig{
 		Addr: influxdbHost,
@@ -368,7 +306,6 @@ func (self *influxdbStorage) containerMetricsMedataData() []ContainerMetricsMeta
 	resp, respErr := client.Get("https://127.0.0.1:1800/v1/containers")
 	if respErr != nil {
 		fmt.Println("##### get Container Metrics Metadata respErr:", respErr)
-		//glog.Error("##### get Container Metrics Metadata request err:", err)
 	}
 	defer resp.Body.Close()
 	//fmt.Println("##### get Container Metrics Metadata resp:", resp)
@@ -382,12 +319,13 @@ func (self *influxdbStorage) containerMetricsMedataData() []ContainerMetricsMeta
 		fmt.Println("##### get Container Metrics Metadata request err:", err)
 		//glog.Error("##### get Container Metrics Metadata request err:", err)
 	}*/
+
 	if resp != nil {
 		//rawdata, _ := ioutil.ReadAll(resp.Body)
 		//fmt.Println("##### Response Data :", string(rawdata))
 
 		var containermetrics []ContainerMetricsMetadata
-		//rawdata := []byte("[{\"limits\":{\"fds\":16384,\"mem\":1024,\"disk\":1024},\"usage_metrics\":{\"memory_usage_in_bytes\":230674432,\"disk_usage_in_bytes\":173891584,\"time_spent_in_cpu\":29331153300},\"container_id\":\"770e2059-b934-4dfe-7871-e4f9\",\"interface_id\":\"wggd5cu4rlph-0\",\"application_id\":\"21ed5b0e-2cda-4b0f-8e9d-4fa5fbb80088\",\"application_index\":\"0\",\"application_name\":\"spring-music-pinpoint-1\",\"application_uris\":[\"spring-music-pinpoint-1-unexpected-tasmaniandevil-sf.182.252.135.97.xip.io\"]}]")
+		//bytes := []byte("[{\"limits\":{\"fds\":16384,\"mem\":1024,\"disk\":1024},\"usage_metrics\":{\"memory_usage_in_bytes\":230674432,\"disk_usage_in_bytes\":173891584,\"time_spent_in_cpu\":29331153300},\"container_id\":\"770e2059-b934-4dfe-7871-e4f9\",\"interface_id\":\"wggd5cu4rlph-0\",\"application_id\":\"21ed5b0e-2cda-4b0f-8e9d-4fa5fbb80088\",\"application_index\":\"0\",\"application_name\":\"spring-music-pinpoint-1\",\"application_uris\":[\"spring-music-pinpoint-1-unexpected-tasmaniandevil-sf.182.252.135.97.xip.io\"]}]")
 		json.Unmarshal(bytes, &containermetrics)
 
 		/*fmt.Println("##### Container Metrics Metadata :", containermetrics, len(containermetrics))
@@ -401,7 +339,7 @@ func (self *influxdbStorage) containerMetricsMedataData() []ContainerMetricsMeta
 			fmt.Println("##### Container Metrics app usage-disk :", metrics.UsageMetrics.DiskUsageInBytes)
 			fmt.Println("##### Container Metrics app usage-cpu(second) :", metrics.UsageMetrics.TimeSpentInCPU.Seconds())
 		}*/
-		fmt.Println("!@#$!%!@#%", containermetrics)
+		//fmt.Println("!@#$!%!@#%", containermetrics)
 		return containermetrics
 	}
 	return nil
@@ -426,15 +364,9 @@ func (s *influxdbStorage) containerFilesystemStatsToPoints(
 		fieldsFsUsage := map[string]interface{}{
 			fieldValue: float64(fsStat.Usage),
 		}
-		/*pointFsUsage := &influxdb.Point{
-			Measurement: serContainerMeausement,
-			Tags:        tagsFsUsage,
-			Fields:      fieldsFsUsage,
-		}*/
 		pointFsUsage, err := influxdb.NewPoint(serContainerMeausement, tagsFsUsage, fieldsFsUsage)
 		if err != nil {
-			fmt.Println(err)
-			/*glog.Fatalf("Failed to create NewPoint for FieldsFsUsage: %v", err)*/
+			fmt.Printf("Failed to create NewPoint for pointFsUsage: %v\n", err)
 		}
 
 		tagsFsLimit := map[string]string{
@@ -447,83 +379,22 @@ func (s *influxdbStorage) containerFilesystemStatsToPoints(
 		fieldsFsLimit := map[string]interface{}{
 			fieldValue: float64(fsStat.Limit),
 		}
-		/*pointFsLimit := &influxdb.Point{
-			Measurement: serContainerMeausement,
-			Tags:        tagsFsLimit,
-			Fields:      fieldsFsLimit,
-		}*/
 		pointFsLimit, err := influxdb.NewPoint(serContainerMeausement, tagsFsLimit, fieldsFsLimit)
 		if err != nil {
-			fmt.Println(err)
-			/*glog.Fatalf("Failed to create NewPoint for FieldsFsLimit: %v", err)*/
+			fmt.Printf("Failed to create NewPoint for pointFsLimit: %v\n", err)
 		}
 
 		points = append(points, pointFsUsage, pointFsLimit)
 	}
 
-	//s.tagPoints(cInfo, stats, points)
-
 	return points
 }
-
-// Set tags and timestamp for all points of the batch.
-// Points should inherit the tags that are set for BatchPoints, but that does not seem to work.
-/*func (s *influxdbStorage) tagPoints(cInfo *info.ContainerInfo, stats *info.ContainerStats, points []*influxdb.Point) {
-	// Use container alias if possible
-	var containerName string
-	if len(cInfo.ContainerReference.Aliases) > 0 {
-		containerName = cInfo.ContainerReference.Aliases[0]
-	} else {
-		containerName = cInfo.ContainerReference.Name
-	}
-
-	commonTags := map[string]string{
-		tagMachineName:   s.machineName,
-		tagContainerName: containerName,
-	}
-	for i := 0; i < len(points); i++ {
-		// merge with existing tags if any
-		addTagsToPoint(points[i], commonTags)
-		addTagsToPoint(points[i], cInfo.Spec.Labels)
-		points[i].Time = stats.Timestamp
-	}
-}*/
 
 func (s *influxdbStorage) containerStatsToPoints(
 	cInfo *info.ContainerInfo,
 	containerMetric ContainerMetricsMetadata,
 	stats *info.ContainerStats,
 ) (points []*influxdb.Point) {
-	/*
-		// CPU usage: Total usage in nanoseconds
-		points = append(points, makePoint(serCpuUsageTotal, stats.Cpu.Usage.Total))
-
-		// CPU usage: Time spend in system space (in nanoseconds)
-		points = append(points, makePoint(serCpuUsageSystem, stats.Cpu.Usage.System))
-
-		// CPU usage: Time spent in user space (in nanoseconds)
-		points = append(points, makePoint(serCpuUsageUser, stats.Cpu.Usage.User))
-
-		// CPU usage per CPU
-		for i := 0; i < len(stats.Cpu.Usage.PerCpu); i++ {
-			point := makePoint(serCpuUsagePerCpu, stats.Cpu.Usage.PerCpu[i])
-			tags := map[string]string{"instance": fmt.Sprintf("%v", i)}
-			addTagsToPoint(point, tags)
-
-			points = append(points, point)
-		}
-
-		// Load Average
-		points = append(points, makePoint(serLoadAverage, stats.Cpu.LoadAverage))
-
-		// Network Stats
-		points = append(points, makePoint(serRxBytes, stats.Network.RxBytes))
-		points = append(points, makePoint(serRxErrors, stats.Network.RxErrors))
-		points = append(points, makePoint(serTxBytes, stats.Network.TxBytes))
-		points = append(points, makePoint(serTxErrors, stats.Network.TxErrors))
-
-		// Referenced Memory
-		points = append(points, makePoint(serReferencedMemory, stats.ReferencedMemory))*/
 
 	// CPU Usage
 	points = append(points, makePoint(s.machineName, s.cellIp, cInfo.Name, serCpuUsageTotal, containerMetric, containerMetric.UsageMetrics.TimeSpentInCPU.Seconds()))
@@ -551,147 +422,8 @@ func (s *influxdbStorage) containerStatsToPoints(
 		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serTxDropped, containerMetric, float64(stats.Network.Interfaces[i].TxDropped)))
 	}
 
-	//s.tagPoints(cInfo, stats, points)
-
 	return points
 }
-
-/*func (s *influxdbStorage) memoryStatsToPoints(
-	cInfo *info.ContainerInfo,
-	stats *info.ContainerStats,
-) (points []*influxdb.Point) {
-	// Memory Usage
-	points = append(points, makePoint(serMemoryUsage, stats.Memory.Usage))
-	// Maximum memory usage recorded
-	points = append(points, makePoint(serMemoryMaxUsage, stats.Memory.MaxUsage))
-	//Number of bytes of page cache memory
-	points = append(points, makePoint(serMemoryCache, stats.Memory.Cache))
-	// Size of RSS
-	points = append(points, makePoint(serMemoryRss, stats.Memory.RSS))
-	// Container swap usage
-	points = append(points, makePoint(serMemorySwap, stats.Memory.Swap))
-	// Size of memory mapped files in bytes
-	points = append(points, makePoint(serMemoryMappedFile, stats.Memory.MappedFile))
-	// Working Set Size
-	points = append(points, makePoint(serMemoryWorkingSet, stats.Memory.WorkingSet))
-	// Number of memory usage hits limits
-	points = append(points, makePoint(serMemoryFailcnt, stats.Memory.Failcnt))
-
-	// Cumulative count of memory allocation failures
-	memoryFailuresTags := map[string]string{
-		"failure_type": "pgfault",
-		"scope":        "container",
-	}
-	memoryFailurePoint := makePoint(serMemoryFailure, stats.Memory.ContainerData.Pgfault)
-	addTagsToPoint(memoryFailurePoint, memoryFailuresTags)
-	points = append(points, memoryFailurePoint)
-
-	memoryFailuresTags["failure_type"] = "pgmajfault"
-	memoryFailurePoint = makePoint(serMemoryFailure, stats.Memory.ContainerData.Pgmajfault)
-	addTagsToPoint(memoryFailurePoint, memoryFailuresTags)
-	points = append(points, memoryFailurePoint)
-
-	memoryFailuresTags["failure_type"] = "pgfault"
-	memoryFailuresTags["scope"] = "hierarchical"
-	memoryFailurePoint = makePoint(serMemoryFailure, stats.Memory.HierarchicalData.Pgfault)
-	addTagsToPoint(memoryFailurePoint, memoryFailuresTags)
-	points = append(points, memoryFailurePoint)
-
-	memoryFailuresTags["failure_type"] = "pgmajfault"
-	memoryFailurePoint = makePoint(serMemoryFailure, stats.Memory.HierarchicalData.Pgmajfault)
-	addTagsToPoint(memoryFailurePoint, memoryFailuresTags)
-	points = append(points, memoryFailurePoint)
-
-	//s.tagPoints(cInfo, stats, points)
-
-	return points
-}*/
-
-/*func (s *influxdbStorage) hugetlbStatsToPoints(
-	cInfo *info.ContainerInfo,
-	stats *info.ContainerStats,
-) (points []*influxdb.Point) {
-
-	for pageSize, hugetlbStat := range stats.Hugetlb {
-		tags := map[string]string{
-			"page_size": pageSize,
-		}
-
-		// Hugepage usage
-		point := makePoint(setHugetlbUsage, hugetlbStat.Usage)
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-
-		//Maximum hugepage usage recorded
-		point = makePoint(setHugetlbMaxUsage, hugetlbStat.MaxUsage)
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-
-		// Number of hugepage usage hits limits
-		point = makePoint(setHugetlbFailcnt, hugetlbStat.Failcnt)
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-	}
-
-	//s.tagPoints(cInfo, stats, points)
-
-	return points
-}*/
-
-/*func (s *influxdbStorage) perfStatsToPoints(
-	cInfo *info.ContainerInfo,
-	stats *info.ContainerStats,
-) (points []*influxdb.Point) {
-
-	for _, perfStat := range stats.PerfStats {
-		point := makePoint(serPerfStat, perfStat.Value)
-		tags := map[string]string{
-			"cpu":           fmt.Sprintf("%v", perfStat.Cpu),
-			"name":          perfStat.Name,
-			"scaling_ratio": fmt.Sprintf("%v", perfStat.ScalingRatio),
-		}
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-	}
-
-	//s.tagPoints(cInfo, stats, points)
-
-	return points
-}*/
-
-/*func (s *influxdbStorage) resctrlStatsToPoints(
-	cInfo *info.ContainerInfo,
-	stats *info.ContainerStats,
-) (points []*influxdb.Point) {
-
-	// Memory bandwidth
-	for nodeID, rdtMemoryBandwidth := range stats.Resctrl.MemoryBandwidth {
-		tags := map[string]string{
-			"node_id": fmt.Sprintf("%v", nodeID),
-		}
-		point := makePoint(serResctrlMemoryBandwidthTotal, rdtMemoryBandwidth.TotalBytes)
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-
-		point = makePoint(serResctrlMemoryBandwidthLocal, rdtMemoryBandwidth.LocalBytes)
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-	}
-
-	// Cache
-	for nodeID, rdtCache := range stats.Resctrl.Cache {
-		tags := map[string]string{
-			"node_id": fmt.Sprintf("%v", nodeID),
-		}
-		point := makePoint(serResctrlLLCOccupancy, rdtCache.LLCOccupancy)
-		addTagsToPoint(point, tags)
-		points = append(points, point)
-	}
-
-	//s.tagPoints(cInfo, stats, points)
-
-	return points
-}*/
 
 func (s *influxdbStorage) OverrideReadyToFlush(readyToFlush func() bool) {
 	s.readyToFlush = readyToFlush
@@ -719,8 +451,6 @@ func (s *influxdbStorage) AddStats(cInfo *info.ContainerInfo, stats *info.Contai
 			containerName = cInfo.Name
 		}
 		//fmt.Println("================ containerName :", containerName)
-
-		// here, container id is seperation process, because need to containerMetricsMetadata function call control
 
 		//===================================================================
 		// Container Metrics Metadata from REP (127.0.0.1:1800/v1/containers)
@@ -755,67 +485,39 @@ func (s *influxdbStorage) AddStats(cInfo *info.ContainerInfo, stats *info.Contai
 		}
 		//===================================================================
 
-		s.points = append(s.points, s.containerStatsToPoints(cInfo, containerMetric, stats)...)
-		/*s.points = append(s.points, s.memoryStatsToPoints(cInfo, stats)...)
-		s.points = append(s.points, s.hugetlbStatsToPoints(cInfo, stats)...)
-		s.points = append(s.points, s.perfStatsToPoints(cInfo, stats)...)
-		s.points = append(s.points, s.resctrlStatsToPoints(cInfo, stats)...)*/
-		s.points = append(s.points, s.containerFilesystemStatsToPoints(cInfo, stats)...)
-		if s.readyToFlush() {
-			pointsToFlush = s.points
-			s.points = make([]*influxdb.Point, 0)
-			s.lastWrite = time.Now()
+		// here, container id is seperation process, because need to containerMetricsMetadata function call control
+		expression := regexp.MustCompile(".service|.swap|.scope|.slice")
+		expCheck := expression.MatchString(cInfo.Name)
+		println(cInfo.Name)
+		println(expCheck)
+
+		// If ".service|.swap|.scope|.slice" is included in the container name, do not include it.
+		if !expCheck {
+			s.points = append(s.points, s.containerStatsToPoints(cInfo, containerMetric, stats)...)
+			s.points = append(s.points, s.containerFilesystemStatsToPoints(cInfo, stats)...)
+			if s.readyToFlush() {
+				pointsToFlush = s.points
+				s.points = make([]*influxdb.Point, 0)
+				s.lastWrite = time.Now()
+			}
 		}
 	}()
 	if len(pointsToFlush) > 0 {
-		/*points := make([]influxdb.Point, len(pointsToFlush))
-		for i, p := range pointsToFlush {
-			points[i] = *p
-		}
-
-		batchTags := map[string]string{tagMachineName: s.machineName}
-		bp := influxdb.BatchPoints{
-			Points:          points,
-			Database:        s.database,
-			RetentionPolicy: s.retentionPolicy,
-			Tags:            batchTags,
-			Time:            stats.Timestamp,
-		}
-		response, err := s.client.Write(bp)
-		if err != nil || checkResponseForErrors(response) != nil {
-			return fmt.Errorf("failed to write stats to influxDb - %s", err)
-		}*/
-
-		/*ticker := time.NewTicker(30 * time.Second)
-		defer ticker.Stop()
-		var stopChan chan bool = nil*/
-
 		bp, err := influxdb.NewBatchPoints(influxdb.BatchPointsConfig{
 			Database:  s.database,
 			Precision: "s",
 		})
 		if err != nil {
-			fmt.Println(err)
-			/*glog.Fatalf("Failed to create NewBatchPoint: %v", err)*/
+			fmt.Printf("Failed to create NewBatchPoint: %v\n", err)
 		}
 
-		//points := make([]influxdb.Point, len(pointsToFlush))
 		for _, p := range pointsToFlush {
-			//points[i] = *p
-			//fmt.Println("point to save at database ",self.database, i, p)
 			bp.AddPoint(p)
 		}
 		err = s.client.Write(bp)
 		if err != nil {
-			fmt.Println(err)
-			/*glog.Fatalf("Failed to send point to influxdb: %v", err)*/
+			fmt.Printf("Failed to send point to influxdb: %v\n", err)
 		}
-
-		/*select {
-		case <-ticker.C:
-		case <-stopChan:
-			return nil
-		}*/ //end select
 	}
 	return nil
 }
@@ -863,55 +565,13 @@ func makePoint(machineName, cellIp, containerName, name string, containerMetric 
 		}
 	}
 
-	/*return &influxdb.Point{
-		//Measurement: name,
-		Measurement: serContainerMeausement,
-		Tags:        tags,
-		Fields:      fields,
-	}*/
 	mkPoint, err := influxdb.NewPoint(serContainerMeausement, tags, fields)
 	if err != nil {
-		fmt.Println(err)
-		/*glog.Fatalf("Failed to create NewPoint for FieldsFsLimit: %v", err)*/
+		fmt.Printf("Failed to create NewPoint for mkPoint: %v\n", err)
 	}
 
 	return mkPoint
 }
-
-// Adds additional tags to the existing tags of a point
-/*func addTagsToPoint(point *influxdb.Point, tags map[string]string) {
-	if point.Tags == nil {
-		point.Tags = tags
-	} else {
-		for k, v := range tags {
-			point.Tags[k] = v
-		}
-	}
-}*/
-
-// Checks response for possible errors
-/*func checkResponseForErrors(response *influxdb.Response) error {
-	const msg = "failed to write stats to influxDb - %s"
-
-	if response != nil && response.Err != nil {
-		return fmt.Errorf(msg, response.Err)
-	}
-	if response != nil && response.Results != nil {
-		for _, result := range response.Results {
-			if result.Err != nil {
-				return fmt.Errorf(msg, result.Err)
-			}
-			if result.Series != nil {
-				for _, row := range result.Series {
-					if row.Err != nil {
-						return fmt.Errorf(msg, row.Err)
-					}
-				}
-			}
-		}
-	}
-	return nil
-}*/
 
 // Some stats have type unsigned integer, but the InfluxDB client accepts only signed integers.
 func toSignedIfUnsigned(value interface{}) interface{} {
