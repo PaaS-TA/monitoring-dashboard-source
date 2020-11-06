@@ -1,4 +1,4 @@
-PaaS_TA_Monitoring-v5.0.0 : push test
+PaaS_TA_Monitoring-v5.0.0
 =======================
 
 1. [개요](#1)
