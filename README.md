@@ -1729,7 +1729,7 @@ bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 
 
 #### 3.5.2.3. bosh-metrics-agent release 구성 <div id='3.5.2.3' />
 
-PaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> paasta-monitoring-agent.tgz -> metrics_agent.tgz 에 반영되어 Deploy 해야 한다.
+PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> paasta-monitoring-agent.tgz -> metrics_agent.tgz 에 반영되어 Deploy 해야 한다.
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
 - https://paas-ta.kr/download/package
