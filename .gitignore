@@ -1,0 +1,15 @@
+# ignore files
+*.log
+*.test
+*.iml
+*.swp
+*.backup
+*.bak
+
+# ignore folders
+bosh-metrics-agent/.idea/
+bosh-metrics-agent/src/code.cloudfoundry.org/
+bosh-metrics-agent/src/github.com/
+bosh-metrics-agent/src/golang.org/
+bosh-metrics-agent/bin/
+bosh-metrics-agent/pkg/
