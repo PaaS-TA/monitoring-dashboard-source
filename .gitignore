@@ -1,0 +1,22 @@
+# ignore files
+*.log
+*.test
+*.iml
+*.swp
+*.backup
+*.bak
+
+# ignore folders
+bosh-metrics-agent/.idea/
+bosh-metrics-agent/src/code.cloudfoundry.org/
+bosh-metrics-agent/src/github.com/
+bosh-metrics-agent/src/golang.org/
+bosh-metrics-agent/bin/
+bosh-metrics-agent/pkg/
+
+paasta-monitoring-portal/.idea/
+paasta-monitoring-portal/src/gopkg.in/
+paasta-monitoring-portal/src/github.com/
+paasta-monitoring-portal/src/golang.org/
+paasta-monitoring-portal/bin/
+paasta-monitoring-portal/pkg/
