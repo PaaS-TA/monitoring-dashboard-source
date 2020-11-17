@@ -7,7 +7,7 @@
 *.bak
 *.vscode
 
-# Folders ignored in root.
+# Folders ignored in root
 .idea/
 
 # Folders ignored in bosh-metrics-agent.
