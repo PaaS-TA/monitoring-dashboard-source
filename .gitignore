@@ -7,6 +7,9 @@
 *.bak
 *.vscode
 
+# Folders ignored in root.
+.idea/
+
 # Folders ignored in bosh-metrics-agent.
 paasta-agents/bosh-metrics-agent/.idea/
 paasta-agents/bosh-metrics-agent/src/code.cloudfoundry.org/
@@ -29,7 +32,6 @@ paasta-agents/rep/src/google.golang.org/
 paasta-agents/rep/src/gopkg.in/
 
 # Folders ignored in paasta-monitoring-portal.
-
 paasta-monitoring-portal/src/github.com/alexedwards/
 paasta-monitoring-portal/src/github.com/bmizerany/
 paasta-monitoring-portal/src/github.com/cihub/
@@ -50,12 +52,9 @@ paasta-monitoring-portal/src/github.com/stretchr/
 paasta-monitoring-portal/src/github.com/tedsuo/
 paasta-monitoring-portal/src/github.com/thoas/
 paasta-monitoring-portal/src/github.com/tidwall/
-
-
 paasta-monitoring-portal/src/golang.org/x/
 paasta-monitoring-portal/src/gopkg.in/olivere/
 paasta-monitoring-portal/src/gopkg.in/yaml.v2/
-
 paasta-monitoring-portal/bin/
 paasta-monitoring-portal/pkg/
 
