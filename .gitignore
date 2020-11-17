@@ -6,17 +6,20 @@
 *.backup
 *.bak
 
-# ignore folders
-bosh-metrics-agent/.idea/
-bosh-metrics-agent/src/code.cloudfoundry.org/
-bosh-metrics-agent/src/github.com/
-bosh-metrics-agent/src/golang.org/
-bosh-metrics-agent/bin/
-bosh-metrics-agent/pkg/
+# Folders ignored in bosh-metrics-agent.
+paasta-agents/bosh-metrics-agent/.idea/
+paasta-agents/bosh-metrics-agent/src/code.cloudfoundry.org/
+paasta-agents/bosh-metrics-agent/src/github.com/
+paasta-agents/bosh-metrics-agent/src/golang.org/
+paasta-agents/bosh-metrics-agent/bin/
+paasta-agents/bosh-metrics-agent/pkg/
 
-paasta-monitoring-portal/.idea/
-paasta-monitoring-portal/src/gopkg.in/
-paasta-monitoring-portal/src/github.com/
-paasta-monitoring-portal/src/golang.org/
-paasta-monitoring-portal/bin/
-paasta-monitoring-portal/pkg/
+# Folders ignored in rep.
+paasta-agents/rep/.idea/
+paasta-agents/rep/bin/
+paasta-agents/rep/pkg/
+paasta-agents/rep/src/code.cloudfoundry.org/
+paasta-agents/rep/src/github.com/
+paasta-agents/rep/src/golang.org/
+paasta-agents/rep/src/google.golang.org/
+paasta-agents/rep/src/gopkg.in/
