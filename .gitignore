@@ -25,12 +25,15 @@ paasta-agents/rep/src/google.golang.org/
 paasta-agents/rep/src/gopkg.in/
 
 # Folders ignored in paasta-monitoring-portal.
-paasta-monitoring-portal/
-paasta-monitoring-portal/bin/
-paasta-monitoring-portal/pkg/
-paasta-monitoring-portal/src/
 paasta-monitoring-portal/src/github.com/
 paasta-monitoring-portal/src/golang.org/
 paasta-monitoring-portal/src/gopkg.in/
+paasta-monitoring-portal/lib-bugFix-src/
 
+
+# Folders ignored in iaas-paasta-monitoring-management.
+iaas-paasta-monitoring-management/src/github.com/
+iaas-paasta-monitoring-management/src/golang.org/
+iaas-paasta-monitoring-management/src/gopkg.in/
+iaas-paasta-monitoring-management/lib-bugFix-src/
 
