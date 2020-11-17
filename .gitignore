@@ -5,6 +5,7 @@
 *.swp
 *.backup
 *.bak
+*.vscode
 
 # Folders ignored in bosh-metrics-agent.
 paasta-agents/bosh-metrics-agent/.idea/
@@ -13,6 +14,9 @@ paasta-agents/bosh-metrics-agent/src/github.com/
 paasta-agents/bosh-metrics-agent/src/golang.org/
 paasta-agents/bosh-metrics-agent/bin/
 paasta-agents/bosh-metrics-agent/pkg/
+
+# Folders ignored in cadvisor.
+paasta-agents/cadvisor/.idea/
 
 # Folders ignored in rep.
 paasta-agents/rep/.idea/
