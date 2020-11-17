@@ -16,10 +16,10 @@ PaaS_TA_Monitoring-v5.1.0
 	        * [golang 설치](#2.3.1.3)
 	        * [Intellij – GO Application 환경 설정](#2.3.1.4)
 	        * [소스 다운로드](#2.3.1.5)
-	        * [IaaS-PaaS-Monitoring Application 구성](#2.3.1.6)
+	        * [PaaS-TA-Monitoring Application 구성](#2.3.1.6)
 	        * [Server Start](#2.3.1.7)	    
 3. [PaaS-TA Monitoring Application 구성](#3)	    
-    * [IaaS-PaaS-Monitoring](#3.1)
+    * [PaaS-TA-Monitoring-Portal](#3.1)
         * [관련 Table 목록 및 구조](#3.1.1)
             * [관련 Table 목록](#3.1.1.1)
             * [실시간 모니터링 기반 데이터 수집 정보](#3.1.1.2)
@@ -121,13 +121,13 @@ PaaS_TA_Monitoring-v5.1.0
 
 ### 1.1.1. 목적 <div id='1.1.1' />
 
-> 본 문서는 Paas-TA 프로젝트의 IaaS, PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
+> 본 문서는 Paas-TA 프로젝트의 PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
 
 <br />
 
 ###  1.1.2. 범위 <div id='1.1.2' />
 
-> 본 문서의 범위는 IaaS, PaaS, CaaS, SaaS 시스템 상태를 조회하고, 임계치 정보와의 비교를 통해 관리자에게 관련 정보를 전달하는 방법에 대한 내용으로 한정되어 있다.
+> 본 문서의 범위는 PaaS, CaaS, SaaS 시스템 상태를 조회하고, 임계치 정보와의 비교를 통해 관리자에게 관련 정보를 전달하는 방법에 대한 내용으로 한정되어 있다.
 
 <br />
 
@@ -161,11 +161,11 @@ PaaS_TA_Monitoring-v5.1.0
 
 ##  2.1. 개요 <div id='2.1' />
 
-> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 IaaS-PaaS-Monitoring 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 PaaS-TA-Monitoring-Portal 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
 <br />
 
 ##  2.2. 개발환경 사전 설치 사항 <div id='2.2' />
-IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca Server 및 Monasca Client가 설치되어 있어야 합니다.
+PaaS-TA-Monitoring-Portal 시스템에는 선행작업(Prerequisites)으로 Monasca Server 및 Monasca Client가 설치되어 있어야 합니다.
 > **[Monasca - Server](./Monasca_Server.md)**
 
 > **[Monasca - Client](./Monasca_Client.md)**
@@ -296,7 +296,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 ```
 <br/><br/>
 
-> **IaaS-PaaS-Monitoring Application 구성** <div id='2.3.1.6' />
+> **PaaS-TA-Monitoring Application 구성** <div id='2.3.1.6' />
 
 - Project 열기
 
@@ -320,8 +320,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     ![](images/2.4.1_5.png)<br/>
  
     - Global GOPATH 우측 + 버튼을 클릭하여 "C:\Go\bin" 설정한다.<br/> 
-    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-Monitoring\src\paasta-monitoring-batch" 로 설정한다.<br/>
-    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-Monitoring\src\paasta-monitoring-management" 로 설정한다.<br/>
+    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-TA-Monitoring\paasta-monitoring-batch" 로 설정한다.<br/>
+    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-TA-Monitoring\paasta-monitoring-management" 로 설정한다.<br/>
     - IntellJ 를 재시작한다.<br/>
     ![](images/2.4.1_6.png)
 
@@ -329,13 +329,13 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
 - Dependencies Module 다운로드 
 
-    - iaas-paasta-monitoring-management Dependency Module Download
+    - paasta-monitoring-portal Dependency Module Download
 
         Power Shell 또는 Terminal 을 실행한다.
 
         - Path 설정 (Windows)<br/>
         ```
-        cd .\PaaS-TA-Monitoring\ iaas-paasta-monitoring-management
+        cd .\PaaS-TA-Monitoring\ paasta-monitoring-portal
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -343,7 +343,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd ./PaaS-TA-Monitoring/iaas-paasta-monitoring-management 
+        cd ./PaaS-TA-Monitoring/paasta-monitoring-portal 
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -407,7 +407,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-PaaS-Monitoring\src\paasta-monitoring-batch
+        cd \...\PaaS-TA-Monitoring\paasta-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -415,7 +415,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/paasta-monitoring-batch
+        cd .../PaaS-TA-Monitoring/paasta-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -450,7 +450,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-PaaS-Monitoring\src\paasta-caas-monitoring-batch
+        cd \...\PaaS-TA-Monitoring\paasta-caas-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -458,7 +458,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/paasta-caas-monitoring-batch
+        cd .../PaaS-TA-Monitoring/paasta-caas-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -487,7 +487,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-PaaS-Monitoring\src\paasta-saas-monitoring-batch
+        cd \...\PaaS-TA-Monitoring\paasta-saas-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -495,7 +495,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/paasta-saas-monitoring-batch
+        cd .../PaaS-TA-Monitoring/paasta-saas-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -522,14 +522,14 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
 - Windows
 ```
-cd \...\IaaS-Monitoring\src\paasta-monitoring-management\src\kr\paasta\monitoring
+cd \...\PaaS-TA-Monitoring\paasta-monitoring-portal\src\kr\paasta\monitoring
 go run main.go
 ```
 <br/>
     
 - Ubuntu
 ```
-cd /.../IaaS-PaaS-Monitoring/src/paasta-monitoring-management/src/kr/paasta/monitoring
+cd /.../PaaS-TA-Monitoring/paasta-monitoring-portal/src/kr/paasta/monitoring
 go run main.go
 ```
 <br/>
@@ -601,7 +601,7 @@ Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database
 
 
 > **실시간 모니터링 기반 데이터 수집 정보** <div id='3.1.1.2' />
-IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리고 Network 등의 자원 상태를 모니터링 하기 위하여 agent를 통해 지속적으로 데이터를 수집하여 시계열 데이터베이스에 저장한다. 저장된 데이터를 기반으로 관리자는 IaaS, PaaS 환경에 대한 상태를 모니터링 할 수 있다.
+PaaS-TA-Monitoring-Portal은 구성된 PaaS 환경의 CPU, Memory, Disk 그리고 Network 등의 자원 상태를 모니터링 하기 위하여 agent를 통해 지속적으로 데이터를 수집하여 시계열 데이터베이스에 저장한다. 저장된 데이터를 기반으로 관리자는 PaaS 환경에 대한 상태를 모니터링 할 수 있다.
 
 - Measurement 리스트
 
