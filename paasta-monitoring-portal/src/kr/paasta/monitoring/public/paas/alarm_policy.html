@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS-TA Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li class="PaaS"><a href="index.html">PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../dist/index.html#/iaas/main">IaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="paas.html">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html">C<span>ontainer</span></a></li>
+						<li>
+							<a href="alarm_policy.html" class="on">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+								<li><a href="alarm_statis.html">Statistics</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="alarmPolicy">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<h4>Alarm Policy</h4>
+					<div class="listSearch">
+						<select id="type">
+							<option value="bos">Bosh</option>
+							<option value="pas">Paas-TA</option>
+							<option value="con">Container</option>
+						</select>
+					</div>
+					<div class="alarmSetting">
+						<dl class="cpu inputWrap" data-id="cpu">
+							<dt>CPU</dt>
+							<dd class="warning">
+								<strong>Warning</strong>
+								<input type="text" class="wData">
+								<span>% 이상</span>
+							</dd>
+							<dd class="critical">
+								<strong>Critical</strong>
+								<input type="text" class="cData">
+								<span>% 이상</span>
+							</dd>
+							<dd class="repeat">
+								<strong>Repeat Time</strong>
+								<input type="text" class="rData">
+								<span>분</span>
+							</dd>
+						</dl>
+						<dl class="memory inputWrap" data-id="memory">
+							<dt>Memory</dt>
+							<dd class="warning">
+								<strong>Warning</strong>
+								<input type="text" class="wData">
+								<span>% 이상</span>
+							</dd>
+							<dd class="critical">
+								<strong>Critical</strong>
+								<input type="text" class="cData">
+								<span>% 이상</span>
+							</dd>
+							<dd class="repeat">
+								<strong>Repeat Time</strong>
+								<input type="text" class="rData">
+								<span>분</span>
+							</dd>
+						</dl>
+						<dl class="disk inputWrap" data-id="disk">
+							<dt>Disk</dt>
+							<dd class="warning">
+								<strong>Warning</strong>
+								<input type="text" class="wData">
+								<span>% 이상</span>
+							</dd>
+							<dd class="critical">
+								<strong>Critical</strong>
+								<input type="text" class="cData">
+								<span>% 이상</span>
+							</dd>
+							<dd class="repeat">
+								<strong>Repeat Time</strong>
+								<input type="text" class="rData">
+								<span>분</span>
+							</dd>
+						</dl>
+					</div>
+					<h4>Measuring Time
+						<div class="inputRange">
+							<input type="range" class="mData" name="points" min="30" max="960" step="30" value="30" oninput="document.getElementById('mValue').value = this.value;">
+							<input type="text" id="mValue" value="0">
+						</div>
+					</h4>
+					<h4>Alarm Receiver Address<input type="checkbox" id="mail" value="Y"><label for="mail">OFF</label></h4>
+					<fieldset>
+						<input type="text" placeholder="Address" class="mailAddress">
+						<em>@</em>
+						<input type="text" placeholder="Domain" class="mailDomain">
+						<select id="mailSelect">
+							<option value="">직접입력</option>
+							<option value="gmail.com">gmail</option>
+							<option value="yahoo.com">yahoo</option>
+							<option value="hotmail.com">hotmail</option>
+							<option value="naver.com">naver</option>
+							<option value="nate.com">nate</option>
+							<option value="daum.net">daum</option>
+						</select>
+					</fieldset>
+					<div class="btnWrap center">
+						<button class="save">SAVE</button>
+					</div>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="push">
+                        <h4>Alarm SNS Channel (Telegram)<input type="checkbox" id="sns" value="N"><label for="sns">OFF</label></h4>
+                        <div class="snsBot">
+							<p class="noneSns">Telegram 에 등록된 Bot 채널이 없습니다.</p>
+							<div class="snsWrap" id="snsList">
+								<p class="snsInfo">Telegram 메신져에서 아래 아이디를 검색 후 Bot 채널에 참여 하시면 알람 메세지를 받을 수 있습니다.</p>
+								<div class="snsInfo list">
+									<span id="snsId">@all_paasta_sns_alarm</span>
+									<em id="snsDe">전체 SNS 알람 수신</em>
+								</div>
+								<button>DELETE</button>
+							</div>
+							<div class="snsWrap">
+								<p>Telegram 메신져에서 @BotFather 채널에 참여 후 /newbot 명령으로 알람 Bot을 생성하여 아래 등록해주시기 바랍니다.<a href="#">등록방법</a></p>
+								<fieldset>
+									<select id="dvSelect">
+										<option value="all">All</option>
+										<option value="bos">Bosh</option>
+										<option value="pas">PaaS-TA</option>
+										<option value="con">Container</option>
+									</select>
+									<input type="text" placeholder="Bot ID" class="snsid">
+									<input type="text" placeholder="Token Value" class="token">
+									<input type="text" placeholder="Description" class="expl">
+									<button class="regist">REGIST</button>
+								</fieldset>
+							</div>
+                        </div>
+                    </article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+
+		</div>
+		<!-- // Wrap -->
+
+	</body>
+	
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	
+	<script type="text/javascript">
+		window.onload = () => {
+			const alarm = {
+				id : 'bos',
+				data : [],
+				flag : true,
+
+				init() {
+					// Alarm Count
+					fnComm.alarmCount('paas');
+					
+					// Alarm Policy, Measuring Time, Alarm Receiver Address
+					fnComm.loadData('GET', `${fnComm.url}paas/alarm/policies`, alarm.alarmPolicies);
+
+					// Alarm SNS Channel
+					fnComm.loadData('GET', `${fnComm.url}paas/alarm/sns/channel/list`, alarm.alarmChannel);
+				},
+
+				alarmPolicies(data) {
+					
+					if(alarm.flag){
+						alarm.data = data; // 데이터 저장
+						alarm.flag = false;
+
+						// Alarm Policy 타입 셀렉트
+						document.getElementById('type').addEventListener('change', (e) => {
+							alarm.id = e.target.value;
+							alarm.alarmPolicies();
+						}, false);
+						
+						// Alarm Receiver 메일 셀렉트
+						document.getElementById('mailSelect').addEventListener('change', (e) => {
+							document.querySelector('.mailDomain').value = e.target.value;
+						}, false);
+
+						// Alarm Policy 저장
+						document.querySelector('.save').addEventListener('click', (e) => {
+							alarm.alarmPolicySave();
+						}, false);
+					};
+
+					alarm.data.forEach((value, idx) => {
+						//////////////////////////////////////////////////////////////////////
+						// alarmType: "cpu"
+						// comment: "Initial Data"
+						// criticalThreshold: 90
+						// id: 4
+						// mailAddress: "adminUser@gmail.com"
+						// mailSendYn: "Y"
+						// measureTime: 600
+						// originType: "bos"
+						// repeatTime: 10
+						// warningThreshold: 85
+						//////////////////////////////////////////////////////////////////////
+
+						var target = document.querySelectorAll('.inputWrap');
+
+						if(alarm.id === value.originType){
+							document.querySelector('.'+value.alarmType+' .wData').value = value.warningThreshold;
+							document.querySelector('.'+value.alarmType+' .cData').value = value.criticalThreshold;
+							document.querySelector('.'+value.alarmType+' .rData').value = value.repeatTime;
+							document.querySelector('.mData').value = value.measureTime;
+							document.getElementById('mValue').value = value.measureTime;
+							document.querySelector('.mailAddress').value = (value.mailAddress).split('@')[0];
+							document.querySelector('.mailDomain').value = (value.mailAddress).split('@')[1];
+							
+							for(var i=0; i< document.getElementById('mailSelect').options.length; i++){
+								if(document.getElementById('mailSelect').options[i].value == (value.mailAddress).split('@')[1]){
+									document.getElementById('mailSelect').options[i].selected = true;
+								};
+							};
+
+							if(value.mailSendYn == 'Y'){
+								document.getElementById('mail').value = 'Y';
+								document.getElementById('mail').setAttribute('checked', 'checked');
+							} else {
+								document.getElementById('mail').value = 'N';
+								document.getElementById('mail').removeAttribute('checked');
+							};
+						};
+					});
+				},
+
+				alarmPolicySave(){
+					var policyData = '[';
+
+					// Alarm Policy 데이터 저장
+					var target = document.querySelectorAll('.alarmSetting > dl');
+					var wTarget = document.querySelectorAll('.wData');
+					var cTarget = document.querySelectorAll('.cData');
+					var rTarget = document.querySelectorAll('.rData');
+
+					for(var i=0; i<target.length; i++){
+						policyData += `{
+							"originType":"${document.getElementById('type').value}",
+							"alarmType":"${target[i].getAttribute('data-id')}",
+							"warningThreshold":${wTarget[i].value},
+							"criticalThreshold":${cTarget[i].value},
+							"repeatTime":${rTarget[i].value},
+							"measureTime":${document.getElementById('mValue').value}
+						},`;
+					};
+					
+					// Alarm Receiver 알림 여부
+					if(document.getElementById('mail').checked == true){ 
+						var mailYN = 'Y';
+					} else {
+						var mailYN = 'N';
+					};
+
+					// Alarm SNS 알림 여부
+					if(document.getElementById('sns').checked == true){
+						var snsYN = 'Y';
+					} else {
+						var snsYN = 'N';
+					};
+
+					// Alarm Receiver Address 데이터 저장
+					policyData += `{
+						"originType":"${document.getElementById('type').value}",
+						"mailAddress":"${document.querySelector('.mailAddress').value}@${document.querySelector('.mailDomain').value}",
+						"mailSendYn":"${mailYN}",
+						"snsSendYn":"${snsYN}"
+					}]`;
+
+					console.log(policyData.replace(/(\s*)/g,''));
+
+					fnComm.saveData('PUT', `${fnComm.url}paas/alarm/policy`, policyData.replace(/(\s*)/g,''));
+				},
+
+				alarmChannel(data){
+					console.log(data);
+					if(data != 'undefined' && data != null && data != ''){
+						document.querySelector('.noneSns').style.display = 'none';
+						document.querySelector('.snsWrap').style.display = 'block';
+
+						document.getElementById('snsId').innerHTML = data.snsId;
+						document.getElementById('snsDe').innerHTML = data.expl;
+						
+						if(data.snsSendYn == 'Y'){
+							document.getElementById('sns').value = 'Y';
+							document.getElementById('sns').setAttribute('checked', 'checked');
+						} else {
+							document.getElementById('sns').value = 'N';
+							document.getElementById('sns').removeAttribute('checked');
+						};
+					} else {
+						document.querySelector('.noneSns').style.display = 'block';
+						document.querySelector('.snsWrap').style.display = 'none';
+					};
+					
+
+					// Alarm Channel 등록
+					document.querySelector('.regist').addEventListener('click', (e) => {
+						alarm.alarmChannelSave();
+					}, false);
+				},
+
+				alarmChannelSave(){
+					if(document.getElementById('sns').checked == true){
+						document.getElementById('sns').value = 'Y';
+					} else {
+						document.getElementById('sns').value = 'N';
+					};
+
+					var channelData = `{"originType":"${document.getElementById('dvSelect').value}",
+						"snsId":"${document.querySelector('.snsid').value}",
+						"token":"${document.querySelector('.token').value}",
+						"expl":"${document.querySelector('.expl').value}",
+						"snsSendYn":"${document.getElementById('sns').value}"
+					}`
+
+					fnComm.saveData('POST', `${fnComm.url}paas/alarm/sns/channel`, channelData.replace(/(\s*)/g,''));
+				},
+			}
+
+			alarm.init();
+		};
+	</script>
+</html>

@@ -25,15 +25,36 @@ paasta-agents/rep/src/google.golang.org/
 paasta-agents/rep/src/gopkg.in/
 
 # Folders ignored in paasta-monitoring-portal.
-paasta-monitoring-portal/src/github.com/
-paasta-monitoring-portal/src/golang.org/
-paasta-monitoring-portal/src/gopkg.in/
-paasta-monitoring-portal/lib-bugFix-src/
+
+paasta-monitoring-portal/src/github.com/alexedwards/
+paasta-monitoring-portal/src/github.com/bmizerany/
+paasta-monitoring-portal/src/github.com/cihub/
+paasta-monitoring-portal/src/github.com/cloudfoundry-community/
+paasta-monitoring-portal/src/github.com/go-redis/
+paasta-monitoring-portal/src/github.com/go-sql-driver/
+paasta-monitoring-portal/src/github.com/gophercloud/
+paasta-monitoring-portal/src/github.com/hpcloud/
+paasta-monitoring-portal/src/github.com/influxdata/
+paasta-monitoring-portal/src/github.com/jinzhu/
+paasta-monitoring-portal/src/github.com/kr/
+paasta-monitoring-portal/src/github.com/mitchellh/
+paasta-monitoring-portal/src/github.com/monasca/
+paasta-monitoring-portal/src/github.com/niemeyer/
+paasta-monitoring-portal/src/github.com/onsi/
+paasta-monitoring-portal/src/github.com/rackspace/
+paasta-monitoring-portal/src/github.com/stretchr/
+paasta-monitoring-portal/src/github.com/tedsuo/
+paasta-monitoring-portal/src/github.com/thoas/
+paasta-monitoring-portal/src/github.com/tidwall/
 
 
-# Folders ignored in iaas-paasta-monitoring-management.
-iaas-paasta-monitoring-management/src/github.com/
-iaas-paasta-monitoring-management/src/golang.org/
-iaas-paasta-monitoring-management/src/gopkg.in/
-iaas-paasta-monitoring-management/lib-bugFix-src/
+paasta-monitoring-portal/src/golang.org/x/
+paasta-monitoring-portal/src/gopkg.in/olivere/
+paasta-monitoring-portal/src/gopkg.in/yaml.v2/
+
+paasta-monitoring-portal/bin/
+paasta-monitoring-portal/pkg/
+
+
+
 

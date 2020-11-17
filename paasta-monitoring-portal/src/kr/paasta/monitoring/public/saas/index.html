@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS-TA Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li class="PaaS"><a href="../paas/index.html">PaaS</a></li>
+					<li class="SaaS"><a href="index.html">SaaS</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../dist/index.html#/iaas/main">IaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html" class="on">A<span>pplication</span></a></li>
+						<li>
+							<a href="alarm_policy.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="alarmStatus">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<fieldset class="statusSearch">
+						<!--
+						<h4>Sort List</h4>
+						<div class="listSearch">
+							<button class="date" data-sort="c">CPU</button>
+							<button class="date" data-sort="m">Memory</button>
+							<button class="date" data-sort="d">Disk</button>
+						</div>
+						-->
+						<h4>Search List</h4>
+						<div class="listSearch">
+							<!--
+							<select id="appColumn">
+								<option>컬럼</option>
+							</select>
+							-->
+							<input type="text" class="searchTxt" value="" placeholder="검색어">
+						</div>
+						<div class="listBtns">
+							<a href="javascript:void(0);" class="search">SEARCH</a>
+						</div>
+					</fieldset>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="table style01">
+						<h4>Application List</h4>
+						<table class="tableList">
+							<thead>
+								<tr>
+									<th>Agent Name</th>
+									<th>Memory Heap<br>(MB)</th>
+									<th>Non Noe Heap<br>(MB)</th>
+									<th>JVM CPU<br>(%)</th>
+									<th>System CPU<br>(%)</th>
+									<th>Active Thread</th>
+									<th>Response Time<br>(ms)</th>
+								</tr>
+							</thead>
+							<tbody id="appList">
+							</tbody>
+						</table>
+						<div class="paging" style="display:none;">
+							<a href="javascript:void(0);">&lt;</a>
+							<span>
+								<a href="javascript:void(0);" class="on">1</a>
+								<a href="javascript:void(0);">2</a>
+								<a href="javascript:void(0);">3</a>
+								<a href="javascript:void(0);">4</a>
+								<a href="javascript:void(0);">5</a>
+								<a href="javascript:void(0);">6</a>
+								<a href="javascript:void(0);">7</a>
+								<a href="javascript:void(0);">8</a>
+								<a href="javascript:void(0);">9</a>
+								<a href="javascript:void(0);">10</a>
+							</span>
+							<a href="javascript:void(0);">&gt;</a>
+						</div>
+					</article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+			
+			<div id="pinWrap">		
+				<div class="pin">
+					<iframe id="pinFrame" src="" frameborder="0"></iframe>
+				</div>
+				<a href="javascript:void(0);" class="chartClosed"></a>
+			</div>
+
+		</div>
+		<!-- // Wrap -->
+
+		<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const saas = {
+					url : '',
+					data : [],
+					reload : true,
+
+					init() {
+						// Alarm Count
+					fnComm.alarmCount('saas');
+						
+						// SaaS Application 목록
+						fnComm.loadData('GET', `${fnComm.url}saas/app/application/list`, saas.applicationList);
+					},
+					
+					applicationList(data) {
+						saas.url = data.pinpointUrl;
+						saas.data = data.data;
+						console.log(saas.data);
+						//////////////////////////////////////////////////////////////////////
+						// Application List : 리스트
+						// Data Example //////////////////////////////////////////////////////
+						// activeThread: 3
+						// agentId: "app-in-docker"
+						// appName: "quickapp"
+						// haepMemory: 128.28
+						// jvmCpuRate: 0.1
+						// noneHeapMemory: 63.91
+						// responseTime: 0
+						// serviceType: "TOMCAT"
+						// systemCpuRate: 0.22
+						//////////////////////////////////////////////////////////////////////
+						var target = document.getElementById('appList');
+						
+						fnComm.removeHtml(target);
+	
+						saas.data.forEach((value)=>{
+							var html = `<tr>
+								<td><a href="javascript:void(0);" class="link" data-id="${value.appName}@${value.serviceType}">${value.appName}</a></td>
+								<td>${value.haepMemory}</td>
+								<td>${value.noneHeapMemory}</td>
+								<td>${value.jvmCpuRate}</td>
+								<td>${value.systemCpuRate}</td>
+								<td>${value.activeThread}</td>
+								<td>${value.responseTime}</td>
+							</tr>`;
+							
+							fnComm.appendHtml(target, html, 'tbody');
+						});
+						
+						// Application Pinpoint Event (Process, Chart, Log)
+						var elm = document.querySelectorAll('.link');
+						for(var i=0 ; i<elm.length ; i++){
+
+							// Pinpoint Open Event
+							elm[i].addEventListener('click', (e) => {
+								var elmID = e.target.getAttribute('data-id');
+								saas.pinPoint(elmID);
+							}, false);
+						};
+
+						if(saas.reload){
+							// SaaS Application 목록 검색 조회
+							document.querySelector('.search').addEventListener('click', (e) => {
+								fnComm.loadData('GET', `${fnComm.url}saas/app/application/list?appName=${document.querySelector('.searchTxt').value}`, saas.applicationList);
+							}, false);
+
+								
+							// Chart Event
+							document.querySelector('.chartClosed').addEventListener('click', (e) => {
+								document.getElementById('pinWrap').classList.toggle('on', false);
+							}, false);
+
+							saas.reload = false;
+						};
+					},
+
+					sortList() {
+						saas.data.sort(function(a,b) {
+							return parseFloat(a[sortData]) - parseFloat(b[sortData]);
+						});
+
+						saas.applicationList(saas.data);
+					},
+
+					pinPoint(elmID) {
+						document.getElementById('pinFrame').setAttribute('src', `${saas.url}/#/main/${elmID}/5m/${saas.toDayTime()}`);
+
+						document.getElementById('pinWrap').classList.toggle('on', true);
+					},
+
+					toDayTime() {
+						// 현재 날짜 시각
+						var today = new Date();
+						var year = today.getFullYear();
+						var month = '00'+(today.getMonth()+1);
+						var day = '00'+today.getDate();
+						var hours = '00'+today.getHours();
+						var minutes = '00'+today.getMinutes();
+						var seconds = '00'+today.getSeconds();
+
+						return `${year}-${month.substring(month.length-2)}-${day.substring(day.length-2)}-${hours.substring(hours.length-2)}-${minutes.substring(minutes.length-2)}-${seconds.substring(seconds.length-2)}`;
+					},
+				}
+	
+				saas.init();
+			};
+		</script>
+	</body>
+</html>
