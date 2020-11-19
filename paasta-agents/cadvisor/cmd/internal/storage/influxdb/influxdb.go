@@ -198,7 +198,7 @@ func new() (storage.StorageDriver, error) {
 			}
 		}
 	}
-	fmt.Println("##### local network address 2 :", instanceIp)
+	//fmt.Println("##### local network address 2 :", instanceIp)
 	//=================================================================================
 
 	return newStorage(
@@ -488,8 +488,8 @@ func (s *influxdbStorage) AddStats(cInfo *info.ContainerInfo, stats *info.Contai
 		// here, container id is seperation process, because need to containerMetricsMetadata function call control
 		expression := regexp.MustCompile(".service|.swap|.scope|.slice")
 		expCheck := expression.MatchString(cInfo.Name)
-		println(cInfo.Name)
-		println(expCheck)
+		//println(cInfo.Name)
+		//println(expCheck)
 
 		// If ".service|.swap|.scope|.slice" is included in the container name, do not include it.
 		if !expCheck {
