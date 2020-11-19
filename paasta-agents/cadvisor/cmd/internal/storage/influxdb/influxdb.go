@@ -308,28 +308,18 @@ func (self *influxdbStorage) containerMetricsMedataData() []ContainerMetricsMeta
 		fmt.Println("##### get Container Metrics Metadata respErr:", respErr)
 	}
 	defer resp.Body.Close()
-	//fmt.Println("##### get Container Metrics Metadata resp:", resp)
-	//fmt.Println("##### get Container Metrics Metadata resp.Body:", resp.Body)
 
-	bytes, _ := ioutil.ReadAll(resp.Body)
-	//str := string(bytes) // bytes -> string
-	//fmt.Println(str)
+	bytes, bytesErr := ioutil.ReadAll(resp.Body)
+	if bytesErr != nil {
+		fmt.Println("##### get Container Metrics Metadata request bytesErr:", bytesErr)
+	}
 
-	/*if err != nil {
-		fmt.Println("##### get Container Metrics Metadata request err:", err)
-		//glog.Error("##### get Container Metrics Metadata request err:", err)
-	}*/
-
-	if resp != nil {
-		//rawdata, _ := ioutil.ReadAll(resp.Body)
-		//fmt.Println("##### Response Data :", string(rawdata))
-
+	if bytes != nil {
 		var containermetrics []ContainerMetricsMetadata
 		//bytes := []byte("[{\"limits\":{\"fds\":16384,\"mem\":1024,\"disk\":1024},\"usage_metrics\":{\"memory_usage_in_bytes\":230674432,\"disk_usage_in_bytes\":173891584,\"time_spent_in_cpu\":29331153300},\"container_id\":\"770e2059-b934-4dfe-7871-e4f9\",\"interface_id\":\"wggd5cu4rlph-0\",\"application_id\":\"21ed5b0e-2cda-4b0f-8e9d-4fa5fbb80088\",\"application_index\":\"0\",\"application_name\":\"spring-music-pinpoint-1\",\"application_uris\":[\"spring-music-pinpoint-1-unexpected-tasmaniandevil-sf.182.252.135.97.xip.io\"]}]")
 		json.Unmarshal(bytes, &containermetrics)
 
-		/*fmt.Println("##### Container Metrics Metadata :", containermetrics, len(containermetrics))
-		for _, metrics :=range containermetrics{
+		/*for _, metrics :=range containermetrics{
 			fmt.Println("##### Container Metrics container id :", metrics.Container_Id)
 			fmt.Println("##### Container Metrics app id :", metrics.Application_Id)
 			fmt.Println("##### Container Metrics app name :", metrics.Application_Name)
@@ -339,7 +329,6 @@ func (self *influxdbStorage) containerMetricsMedataData() []ContainerMetricsMeta
 			fmt.Println("##### Container Metrics app usage-disk :", metrics.UsageMetrics.DiskUsageInBytes)
 			fmt.Println("##### Container Metrics app usage-cpu(second) :", metrics.UsageMetrics.TimeSpentInCPU.Seconds())
 		}*/
-		//fmt.Println("!@#$!%!@#%", containermetrics)
 		return containermetrics
 	}
 	return nil
