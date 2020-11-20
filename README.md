@@ -119,10 +119,6 @@ PaaS_TA_Monitoring-v5.0.0
                 * [cadvisor 개발환경 구성](#3.5.2.2.2)
                 * [cadvisor release 구성](#3.5.2.2.3)
                     
-            * [rep](#3.5.2.3)
-                * [rep 개요](#3.5.2.3.1)
-                * [rep 개발환경 구성](#3.5.2.3.2)
-                * [rep release 구성](#3.5.2.3.3)
 	    
 <br /><br /><br />
 
@@ -1790,69 +1786,5 @@ PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> paasta-mon
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
 - https://paas-ta.kr/download/package
-<br><br><br>
-
-#### 3.5.2.3. rep <div id='3.5.2.3' />
-##### 3.5.2.3.1. rep 개요 <div id='3.5.2.3.1' />
-rep은 PaaS 환경에 Container를 생성하기 위한 상태 확인 및 이벤트 처리 지원 하며, PaaS-TA 배포 시 diego-cell에 구성되는 Agent.
-
-<br>
-
-##### 3.5.2.3.2. rep 개발환경 구성 <div id='3.5.2.3.2' />
-
-> 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
-```
-- OS : Ubuntu 18.04
-- Golang : 1.14.9
-- Dependencies : code.cloudfoundry.org/bbs
-                 code.cloudfoundry.org/bbs/models
-                 code.cloudfoundry.org/cfhttp
-                 code.cloudfoundry.org/clock
-                 code.cloudfoundry.org/consuladapter
-                 code.cloudfoundry.org/debugserver
-                 code.cloudfoundry.org/diego-logging-client
-                 code.cloudfoundry.org/executor
-                 code.cloudfoundry.org/executor/initializer
-                 code.cloudfoundry.org/go-loggregator/runtimeemitter
-                 code.cloudfoundry.org/lager
-                 code.cloudfoundry.org/lager/lagerflags
-                 code.cloudfoundry.org/localip
-                 code.cloudfoundry.org/locket
-                 code.cloudfoundry.org/locket/lock
-                 code.cloudfoundry.org/locket/metrics/helpers
-                 code.cloudfoundry.org/locket/models
-                 code.cloudfoundry.org/operationq
-                 code.cloudfoundry.org/rep
-                 code.cloudfoundry.org/rep/auctioncellrep
-                 code.cloudfoundry.org/rep/cmd/rep/config
-                 code.cloudfoundry.org/rep/evacuation
-                 code.cloudfoundry.org/rep/evacuation/evacuation_context
-                 code.cloudfoundry.org/rep/generator
-                 code.cloudfoundry.org/rep/handlers
-                 code.cloudfoundry.org/rep/harmonizer
-                 code.cloudfoundry.org/rep/maintain
-                 code.cloudfoundry.org/tlsconfig
-                 github.com/hashicorp/consul/api
-                 github.com/nu7hatch/gouuid
-                 github.com/tedsuo/ifrit
-                 github.com/tedsuo/ifrit/grouper
-                 github.com/tedsuo/ifrit/sigmon
-                 github.com/tedsuo/rata
-                 code.cloudfoundry.org/garden/client (// Adde for PaaS-TA) 
- 
-- IDE : GoLand(유료), Intellij IDEA 2019(무료), Visual Studio Code(무료), etc... 중 택일.
-- 형상관리: Git, etc... 중 택일.
-```
-※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
-
-<br>
-
-##### 3.5.2.3.3. rep release 구성 <div id='3.5.2.3.3' />
-
-PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> diego-release-2.47.0.tgz -> rep.tgz 에 반영되어 Deploy 해야 한다.
-
-( PaaS-TA v5.0 패키지 파일 다운로드 참조)
-- https://paas-ta.kr/download/package
-
 
 <br><br><br>
