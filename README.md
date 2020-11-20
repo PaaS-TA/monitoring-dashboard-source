@@ -1865,7 +1865,7 @@ PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> diego-rele
 
 ### 3.6.1. curator <div id='3.6.1' />
 #### 3.6.1.1 curator 개요 <div id='3.6.1.1' />
-> curator는 Elasticsearch의 인덱스 관리를 위한 어플리케이션이다. 
+> curator는 Elasticsearch의 인덱스 관리를 위한 어플리케이션이다. logsearch-boshrelease 패키지 내에 curator가 포함 되어있다. PaaS-TA 배포 시 logsearch의 maintenance에 설치된다.
 
 <br>
 
