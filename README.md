@@ -122,9 +122,9 @@ PaaS_TA_Monitoring-v5.1.0
                 * [rep release 구성](#3.5.2.3.3)
 		
     * [Elasticsearch curator](#3.6)
-         * [curator](#3.6.1)
-	    * [curator 개요](#3.6.1.1)
-	    * [curator release 구성](#3.6.1.2)
+        * [curator](#3.6.1)
+            * [curator 개요](#3.6.1.1)
+            * [curator release 구성](#3.6.1.2)
 <br />
 
 #   1. 개요 <div id='1' />
