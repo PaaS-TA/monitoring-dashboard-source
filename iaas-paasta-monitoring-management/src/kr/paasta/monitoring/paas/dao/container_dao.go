@@ -74,7 +74,7 @@ func (b ContainerDao) GetCellContainersList(cellIp string) (_ client.Response, e
 
 	q = client.Query{
 		Command: fmt.Sprintf(getContainerListSql,
-			cellIp, "60s"),
+			cellIp, "120s"),
 		Database: b.databases.ContainerDatabase,
 	}
 
@@ -141,9 +141,9 @@ func (b ContainerDao) GetContainerUsage(request model.ContainerReq) (_ client.Re
 	}
 
 	if request.Service == model.ALARM_TYPE_CPU {
-		sql += " and time > now() - 90s  group by time(1m) "
+		sql += " and time > now() - 120s  group by time(1m) "
 	} else {
-		sql += " and time > now() - 90s "
+		sql += " and time > now() - 120s "
 	}
 	sql += ");"
 
