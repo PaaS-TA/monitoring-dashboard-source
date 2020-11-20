@@ -120,7 +120,11 @@ PaaS_TA_Monitoring-v5.1.0
                 * [rep 개요](#3.5.2.3.1)
                 * [rep 개발환경 구성](#3.5.2.3.2)
                 * [rep release 구성](#3.5.2.3.3)
-            
+		
+    * [Elasticsearch curator](#3.6)
+	    * [curator](#3.6.1)
+	    	* [curator 개요](#3.6.1.1)
+		* [curator release 구성](#3.6.1.2)
 <br />
 
 #   1. 개요 <div id='1' />
@@ -1850,4 +1854,26 @@ PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> diego-rele
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
 - https://paas-ta.kr/download/package
+
+
+<br><br><br>
+
+
+## 3.6. Elasticsearch curator 구성 <div id='3.6' />
+
+<br>
+
+#### 3.6.1. curator <div id='3.6.1' />
+##### 3.6.1.1 curator 개요 <div id='3.6.1.1' />
+> curator는 Elasticsearch의 인덱스 관리를 위한 어플리케이션이다. 
+
+<br>
+
+##### 3.6.1.2 curator release 구성 <div id='3.6.1.2' />
+
+PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> logsearch-boshrelease-209.0.1.tgz -> curator.tgz 에 반영되어 Deploy 해야 한다.
+
+( PaaS-TA v5.0 패키지 파일 다운로드 참조)
+- https://paas-ta.kr/download/package
+
 <br><br><br>
