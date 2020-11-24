@@ -6,6 +6,7 @@
 *.backup
 *.bak
 *.vscode
+*.exe
 
 # Folders ignored in root
 .idea/
