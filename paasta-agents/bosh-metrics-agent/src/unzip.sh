@@ -1,3 +1,3 @@
-unzip code.cloudfoundry.org.zip
-unzip github.com.zip
-unzip golang.org.zip
+#!/usr/bin/env bash
+
+for file in `ls *.zip`; do unzip "${file}"; done
