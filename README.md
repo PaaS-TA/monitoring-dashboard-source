@@ -104,13 +104,22 @@ PaaS_TA_Monitoring-v5.0.0
         * [Package 간 호출 구조](#3.4.5)
         * [Alarm Message](#3.4.6)
         * [e-mail](#3.4.6.1)
-        * [telegram](#3.4.6.2)                    
+        * [telegram](#3.4.6.2)
+	
     * [Monitoring Guide Agent 구성](#3.5)
         * [개요](#3.5.1)
         * [PaaS Metrics Agent 개발환경 구성](#3.5.2)
-            * [bosh-metrics-agent 개요](#3.5.2.1)
-            * [bosh-metrics-agent 개발환경 구성](#3.5.2.2)
-            * [bosh-metrics-agent release 구성](#3.5.2.3)
+            * [bosh-metric-agent](#3.5.2.1)
+                * [bosh-metrics-agent 개요](#3.5.2.1.1)
+                * [bosh-metrics-agent 개발환경 구성](#3.5.2.1.2)
+                * [bosh-metrics-agent release 구성](#3.5.2.1.3)
+        
+            * [cadvisor](#3.5.2.2)
+                * [cadvisor 개요](#3.5.2.2.1)
+                * [cadvisor 개발환경 구성](#3.5.2.2.2)
+                * [cadvisor release 구성](#3.5.2.2.3)
+                    
+	    
 <br /><br /><br />
 
 #   1. 개요 <div id='1' />
@@ -1695,12 +1704,13 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 
 <br>
 
-#### 3.5.2.1. bosh-metrics-agent 개요 <div id='3.5.2.1' />
+#### 3.5.2.1. bosh-metric-agent <div id='3.5.2.1' />
+##### 3.5.2.1.1. bosh-metrics-agent 개요 <div id='3.5.2.1.1' />
 bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 Bosh Director, PaaS-TA vms 에 구성되는 Metrics Agent.
 
 <br>
 
-#### 3.5.2.2. bosh-metrics-agent 개발환경 구성 <div id='3.5.2.2' />
+##### 3.5.2.1.2 bosh-metrics-agent 개발환경 구성 <div id='3.5.2.1.2' />
 
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
@@ -1727,10 +1737,54 @@ bosh-metrics-agent는 PaaS 환경에 Monitoring을 하고자 PaaS-TA 배포 시 
 
 <br>
 
-#### 3.5.2.3. bosh-metrics-agent release 구성 <div id='3.5.2.3' />
+##### 3.5.2.1.3 bosh-metrics-agent release 구성 <div id='3.5.2.1.3' />
 
 PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> paasta-monitoring-agent.tgz -> metrics_agent.tgz 에 반영되어 Deploy 해야 한다.
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
 - https://paas-ta.kr/download/package
+<br><br><br>
+
+#### 3.5.2.2. cAdvisor <div id='3.5.2.2' />
+##### 3.5.2.2.1. cAdvisor 개요 <div id='3.5.2.2.1' />
+cAdvisor는 PaaS 환경에 Container Monitoring을 하는 용도이며, PaaS-TA 배포 시 diego-cell에 구성되는 Metrics Agent.
+
+<br>
+
+##### 3.5.2.2.2. cAdvisor 개발환경 구성 <div id='3.5.2.2.2' />
+
+> 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
+```
+- OS : Ubuntu 16.04
+- Golang : 1.14.9
+- go.mod PATH : cmd/go.mod
+- Dependencies : github.com/Rican7/retry v0.1.1-0.20160712041035-272ad122d6e5
+                 github.com/Shopify/sarama v1.8.0
+                 github.com/abbot/go-http-auth v0.0.0-20140618235127-c0ef4539dfab
+                 github.com/eapache/go-resiliency v1.0.1-0.20160104191539-b86b1ec0dd42 // indirect
+                 github.com/eapache/queue v1.0.2 // indirect
+                 github.com/garyburd/redigo v0.0.0-20150301180006-535138d7bcd7
+                 github.com/influxdata/influxdb v1.8.3
+                 github.com/mesos/mesos-go v0.0.7-0.20180413204204-29de6ff97b48
+                 github.com/pquerna/ffjson v0.0.0-20171002144729-d49c2bc1aa13 // indirect
+                 github.com/prometheus/client_golang v1.7.1
+                 golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+                 google.golang.org/api v0.15.0
+                 gopkg.in/olivere/elastic.v2 v2.0.12
+                 k8s.io/klog/v2 v2.2.0
+                 k8s.io/utils v0.0.0-20200414100711-2df71ebbae66  
+- IDE : GoLand(유료), Intellij IDEA 2019(무료), Visual Studio Code(무료), etc... 중 택일.
+- 형상관리: Git, etc... 중 택일.
+```
+※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
+
+<br>
+
+##### 3.5.2.2.3. cAdvisor release 구성 <div id='3.5.2.2.3' />
+
+PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> paasta-monitoring-agent.tgz -> cadvisor.tgz 에 반영되어 Deploy 해야 한다.
+
+( PaaS-TA v5.0 패키지 파일 다운로드 참조)
+- https://paas-ta.kr/download/package
+
 <br><br><br>
