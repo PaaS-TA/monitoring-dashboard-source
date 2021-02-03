@@ -1875,5 +1875,4 @@ PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> logsearch-
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
 - https://paas-ta.kr/download/package
-
 <br><br><br>
