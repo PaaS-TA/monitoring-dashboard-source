@@ -1,0 +1,119 @@
+@charset "UTF-8";
+
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+@page {size:landscape;}
+
+*, :before, :after { margin: 0; padding: 0; border:0; font-style: normal; vertical-align: top; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; outline: none;}
+
+table {width:100%; border-collapse: collapse; border-spacing: 0; table-layout: fixed;}
+th, td {vertical-align:middle; word-break: break-word; white-space: nowrap;}
+ul, ol, dl { list-style: none; word-break: keep-all; word-break: break-word; }
+hr { display: none; }
+caption, figcaption, legend { overflow: hidden; position: absolute; z-index:-1; height:0; visibility: hidden; }
+
+h1, h2, h3, h4, h5, h6, strong {font-weight:500;}
+
+a { color: #333; text-decoration: none; }
+a:hover, a:focus { text-decoration: none; }
+
+button { padding: 0; border: 0; cursor: pointer; background: none; vertical-align: middle; appearance: none; font-family: "Noto Sans KR", "맑은 고딕", sans-serif; color: #747474; outline: none; }
+
+select { appearance: none; color: #747474; vertical-align: middle; border-radius: 0; font-family: "Noto Sans KR", "맑은 고딕", sans-serif; }
+select:disabled { background-color: #f2f2f2; color: #999; }
+select::-ms-expand { display: none; }
+
+.select_wrap {position:relative; z-index:0; height:36px;}
+.select_wrap select {width:100%; height:36px; opacity: 0; padding-left:7px; padding-right:40px; font-size:16px; line-height:34px;}
+.select_wrap select + label {position:absolute; top:0; left:0; z-index:-1; width:100%; height:36px; padding-left:10px; font-size:16px; line-height:34px; background-color:#fff; border:1px solid #d1d1d1; cursor: pointer;}
+.select_wrap select + label:after {content:''; position:absolute; top:9px; right:10px; width:12px; height:12px; border-bottom:1px solid #999; border-right:1px solid #999; transform: rotate(45deg); transition: .5s;}
+.select_wrap select:focus + label {border:1px solid #40cecd;}
+.select_wrap select:focus + label:after {top:15px; transform: rotate(-135deg);}
+
+input { margin: 0; padding: 0; font-family: inherit; font-size: inherit; color: #333; line-height: 17px; vertical-align: top; -webkit-appearance: none; border-radius: 0; outline: none;}
+input[type="text"],
+input[type="password"],
+input[type="tel"],
+input[type="file"] {height:36px; padding:0 10px; font-size:16px; font-weight:100; line-height:34px; background-color:#fff; border:1px solid #d1d1d1; box-sizing:border-box; -webkit-appearance:none; border-radius: 0;}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="file"]:focus { border: 1px solid #40cecd; }
+input[type="text"]:disabled,
+input[type="text"][readonly],
+input[type="password"]:disabled,
+input[type="password"][readonly],
+input[type="tel"]:disabled,
+input[type="tel"][readonly],
+input[type="file"]:disabled,
+input[type="file"][readonly] { background-color: #f2f2f2; color: #999; }
+
+input[type="radio"] {position:absolute; z-index:-1; visibility:hidden; width: 18px; height: 18px; }
+
+input[type="checkbox"] {position:absolute; z-index:-1; visibility:hidden; width: 18px; height: 18px; }
+
+input[type="checkbox"] + label {position:relative; display:inline-block; overflow:hidden; width: 18px; height: 18px; text-indent:-9999em; border:1px solid #ccc; vertical-align: middle; cursor: pointer;}
+input[type="checkbox"]:checked + label {border:1px solid #40cecd;}
+input[type="checkbox"]:checked + label:after {content:''; position:absolute; top:0; left:5px; width:6px; height:12px; border-right:2px solid #40cecd; border-bottom:2px solid #40cecd; transform:rotate(45deg);}
+
+input[type="radio"] + label {position:relative; display:inline-block; overflow:hidden; height:18px; padding-left:22px;  color:#444; font-size:14px; line-height:18px; vertical-align:middle; cursor:pointer;}
+input[type="radio"] + label:after {content:''; position:absolute; left:0; top:0; width:18px; height:18px; text-indent:-9999em; border:1px solid #ccc; border-radius:9px;}
+input[type="radio"]:checked + label {color:#000;}
+input[type="radio"]:checked + label:after {border:1px solid #000;}
+input[type="radio"]:checked + label:before {content:''; position:absolute; left:4px; top:4px; width:10px; height:10px; text-indent:-9999em; background:#000; border-radius:6px;}
+
+input[type="radio"].noText + label {position:relative; display:inline-block; overflow:hidden; width: 18px; height: 18px; text-indent:-9999em; border:1px solid #ccc; vertical-align: middle; cursor: pointer;}
+input[type="radio"].noText:checked + label {border:1px solid #40cecd;}
+input[type="radio"].noText:checked + label:after {content:''; position:absolute; top:0; left:5px; width:6px; height:12px; border-right:2px solid #40cecd; border-bottom:2px solid #40cecd; transform:rotate(45deg);}
+
+textarea { -webkit-appearance: none; border-radius: 0; border:1px solid #d1d1d1; color: #222; font-weight:300; background: #fff; padding: 15px 10px; font-family: "Noto Sans KR", "맑은 고딕", sans-serif; font-size: 16px; width: 100%; min-height: 80px; box-sizing: border-box; resize: none;}
+
+::placeholder {color: #a1a2a6; font-weight:100; opacity: 1;}
+:-ms-input-placeholder {color: #a1a2a6; font-weight:100;}
+::-ms-input-placeholder {color: #a1a2a6; font-weight:100;}
+
+body { font-family: "Noto Sans KR", "맑은 고딕", sans-serif; font-weight:300; font-size: 16px; color: #222; line-height: normal; background: #e7ebf6 url(../img/nav_bg.png) repeat-y 0 0; -webkit-text-size-adjust: 100%; -moz-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+
+/* 요소 숨김 */
+.blind { overflow: hidden; position: absolute; z-index:-1; height:0; visibility: hidden; }
+
+#container {overflow:hidden; width:100%; padding-top:56px; display:flex;}
+
+#contents {overflow:hidden; flex:1; padding:0 30px 30px;}
+
+.location {display:none;}
+
+/* BOARD SEARCH */
+.boshChart .listSearch {display:none;}
+.boshChart .listBtns {display:none;}
+
+/* Bosh Chart */
+.boshChart {overflow:hidden; padding-bottom:40px;}
+.boshChart .list {overflow:hidden; display:flex; width:100%; flex-wrap: wrap; justify-content:center;}
+.boshChart .list li {width:30%; height:250px; margin-left:2%; margin-top:40px;}
+.boshChart .list li:nth-child(3n+1) {margin-left:0;}
+.boshChart .list li h5 {height:30px; font-size:17px; font-weight:100; text-align:center; line-height:30px;}
+.boshChart .list.static li {overflow:hidden; width:100%; height:auto; margin-top:0; margin-left:0; padding:40px 0 30px;; border-top:1px solid #e0e0e0}
+.boshChart .list.static li:first-child {border-top:0;}
+.boshChart .list.static li h5 {float:left; width:100%; margin-bottom:15px; font-size:30px;}
+.boshChart .list.static li > div {float:right; width:65%;}
+.boshChart .list.static li > div:first-of-type {float:left; width:35% !important; display:flex; padding:0 !important;}
+.boshChart .list.static li > div dl {flex:1; padding-top:30px; text-align:center;}
+.boshChart .list.static li > div dl dt {color:#222; font-size:20px; font-weight:500;}
+.boshChart .list.static li > .total dl dd {color:#ccc; font-size:80px; font-weight:300;}
+.boshChart .list.static li > .total dl.warning dt {color:#fba602;}
+.boshChart .list.static li > .total dl.warning dd {color:#fba602;}
+.boshChart .list.static li > .total dl.critical dt {color:#e91a61;}
+.boshChart .list.static li > .total dl.critical dd {color:#e91a61;}
+.boshChart .list.static li > .double dl dt {margin-bottom:15px;}
+.boshChart .list.static li > .double dl dd {width:80%; height:50px; margin:0 auto; color:#ccc; font-size:14px !important; font-weight:300; line-height:50px;}
+.boshChart .list.static li > .double dl dd:first-of-type {border-bottom:1px solid #e0e0e0;}
+.boshChart .list.static li > .double dl dd span {display:inline-block; width:auto !important;}
+.boshChart .list.static li > .double dl dd strong {display:inline-block; width:auto !important; font-size:26px; text-align:right;}
+.boshChart .list.static li > .double dl dd.warning.on {color:#fba602;}
+.boshChart .list.static li > .double dl dd.critical.on {color:#e91a61;}
+
+.running {color:#55c554;}
+.warning {color:#fba602;}
+.critical {color:#e91a61;}
+.fail {color:#c048c8;}

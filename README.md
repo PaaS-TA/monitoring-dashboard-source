@@ -1,4 +1,4 @@
-PaaS_TA_Monitoring-v5.0.0
+PaaS_TA_Monitoring-v5.5.0
 =======================
 
 1. [개요](#1)
@@ -16,10 +16,10 @@ PaaS_TA_Monitoring-v5.0.0
 	        * [golang 설치](#2.3.1.3)
 	        * [Intellij – GO Application 환경 설정](#2.3.1.4)
 	        * [소스 다운로드](#2.3.1.5)
-	        * [IaaS-PaaS-Monitoring Application 구성](#2.3.1.6)
+	        * [PaaS-TA-Monitoring Application 구성](#2.3.1.6)
 	        * [Server Start](#2.3.1.7)	    
 3. [PaaS-TA Monitoring Application 구성](#3)	    
-    * [IaaS-PaaS-Monitoring](#3.1)
+    * [PaaS-TA-Monitoring-Portal](#3.1)
         * [관련 Table 목록 및 구조](#3.1.1)
             * [관련 Table 목록](#3.1.1.1)
             * [실시간 모니터링 기반 데이터 수집 정보](#3.1.1.2)
@@ -73,7 +73,6 @@ PaaS_TA_Monitoring-v5.0.0
             * [SaaS Alarm Status](#3.1.8.40)
             * [CaaS SaaS Status Detail](#3.1.8.41)
             
-            
     * [PaaS-TA Monitoring Batch](#3.2)
         * [관련 Table 목록 및 구조](#3.2.1)
         * [Component 정보](#3.2.2)
@@ -84,7 +83,6 @@ PaaS_TA_Monitoring-v5.0.0
             * [e-mail](#3.2.6.1)
             * [telegram](#3.2.6.2)    
             
-            
     * [CaaS Monitoring Batch](#3.3)
         * [관련 Table 목록 및 구조](#3.3.1)
         * [Component 정보](#3.3.2)
@@ -94,8 +92,7 @@ PaaS_TA_Monitoring-v5.0.0
         * [Alarm Message](#3.3.6)
         * [e-mail](#3.3.6.1)
         * [telegram](#3.3.6.2)
-                
-                                                
+                                                 
     * [SaaS Monitoring Batch](#3.4)
         * [관련 Table 목록 및 구조](#3.4.1)
         * [Component 정보](#3.4.2)
@@ -104,8 +101,8 @@ PaaS_TA_Monitoring-v5.0.0
         * [Package 간 호출 구조](#3.4.5)
         * [Alarm Message](#3.4.6)
         * [e-mail](#3.4.6.1)
-        * [telegram](#3.4.6.2)
-	
+        * [telegram](#3.4.6.2)                    
+        
     * [Monitoring Guide Agent 구성](#3.5)
         * [개요](#3.5.1)
         * [PaaS Metrics Agent 개발환경 구성](#3.5.2)
@@ -119,8 +116,16 @@ PaaS_TA_Monitoring-v5.0.0
                 * [cadvisor 개발환경 구성](#3.5.2.2.2)
                 * [cadvisor release 구성](#3.5.2.2.3)
                     
-	    
-<br /><br /><br />
+            * [rep](#3.5.2.3)
+                * [rep 개요](#3.5.2.3.1)
+                * [rep 개발환경 구성](#3.5.2.3.2)
+                * [rep release 구성](#3.5.2.3.3)
+		
+    * [Elasticsearch curator](#3.6)
+        * [curator](#3.6.1)
+            * [curator 개요](#3.6.1.1)
+            * [curator release 구성](#3.6.1.2)
+<br />
 
 #   1. 개요 <div id='1' />
 
@@ -130,13 +135,13 @@ PaaS_TA_Monitoring-v5.0.0
 
 ### 1.1.1. 목적 <div id='1.1.1' />
 
-> 본 문서는 Paas-TA 프로젝트의 IaaS, PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
+> 본 문서는 Paas-TA 프로젝트의 PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
 
 <br />
 
 ###  1.1.2. 범위 <div id='1.1.2' />
 
-> 본 문서의 범위는 IaaS, PaaS, CaaS, SaaS 시스템 상태를 조회하고, 임계치 정보와의 비교를 통해 관리자에게 관련 정보를 전달하는 방법에 대한 내용으로 한정되어 있다.
+> 본 문서의 범위는 PaaS, CaaS, SaaS 시스템 상태를 조회하고, 임계치 정보와의 비교를 통해 관리자에게 관련 정보를 전달하는 방법에 대한 내용으로 한정되어 있다.
 
 <br />
 
@@ -170,11 +175,11 @@ PaaS_TA_Monitoring-v5.0.0
 
 ##  2.1. 개요 <div id='2.1' />
 
-> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 IaaS-PaaS-Monitoring 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 PaaS-TA-Monitoring-Portal 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
 <br />
 
 ##  2.2. 개발환경 사전 설치 사항 <div id='2.2' />
-IaaS-PaaS-Monitoring 시스템에는 선행작업(Prerequisites)으로 Monasca Server 및 Monasca Client가 설치되어 있어야 합니다.
+PaaS-TA-Monitoring-Portal 시스템에는 선행작업(Prerequisites)으로 Monasca Server 및 Monasca Client가 설치되어 있어야 합니다.
 > **[Monasca - Server](./Monasca_Server.md)**
 
 > **[Monasca - Client](./Monasca_Client.md)**
@@ -305,7 +310,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 ```
 <br/><br/>
 
-> **IaaS-PaaS-Monitoring Application 구성** <div id='2.3.1.6' />
+> **PaaS-TA-Monitoring Application 구성** <div id='2.3.1.6' />
 
 - Project 열기
 
@@ -329,8 +334,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     ![](images/2.4.1_5.png)<br/>
  
     - Global GOPATH 우측 + 버튼을 클릭하여 "C:\Go\bin" 설정한다.<br/> 
-    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-Monitoring\src\paasta-monitoring-batch" 로 설정한다.<br/>
-    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-Monitoring\src\paasta-monitoring-management" 로 설정한다.<br/>
+    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-TA-Monitoring\paasta-monitoring-batch" 로 설정한다.<br/>
+    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-TA-Monitoring\paasta-monitoring-management" 로 설정한다.<br/>
     - IntellJ 를 재시작한다.<br/>
     ![](images/2.4.1_6.png)
 
@@ -338,13 +343,13 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
 - Dependencies Module 다운로드 
 
-    - iaas-paasta-monitoring-management Dependency Module Download
+    - paasta-monitoring-portal Dependency Module Download
 
         Power Shell 또는 Terminal 을 실행한다.
 
         - Path 설정 (Windows)<br/>
         ```
-        cd .\PaaS-TA-Monitoring\ iaas-paasta-monitoring-management
+        cd .\PaaS-TA-Monitoring\ paasta-monitoring-portal
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -352,7 +357,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd ./PaaS-TA-Monitoring/iaas-paasta-monitoring-management 
+        cd ./PaaS-TA-Monitoring/paasta-monitoring-portal 
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -416,7 +421,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-PaaS-Monitoring\src\paasta-monitoring-batch
+        cd \...\PaaS-TA-Monitoring\paasta-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -424,7 +429,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/paasta-monitoring-batch
+        cd .../PaaS-TA-Monitoring/paasta-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -459,7 +464,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-PaaS-Monitoring\src\paasta-caas-monitoring-batch
+        cd \...\PaaS-TA-Monitoring\paasta-caas-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -467,7 +472,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/paasta-caas-monitoring-batch
+        cd .../PaaS-TA-Monitoring/paasta-caas-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -496,7 +501,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\IaaS-PaaS-Monitoring\src\paasta-saas-monitoring-batch
+        cd \...\PaaS-TA-Monitoring\paasta-saas-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -504,7 +509,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../IaaS-PaaS-Monitoring/src/paasta-saas-monitoring-batch
+        cd .../PaaS-TA-Monitoring/paasta-saas-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -531,14 +536,14 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
 - Windows
 ```
-cd \...\IaaS-Monitoring\src\paasta-monitoring-management\src\kr\paasta\monitoring
+cd \...\PaaS-TA-Monitoring\paasta-monitoring-portal\src\kr\paasta\monitoring
 go run main.go
 ```
 <br/>
     
 - Ubuntu
 ```
-cd /.../IaaS-PaaS-Monitoring/src/paasta-monitoring-management/src/kr/paasta/monitoring
+cd /.../PaaS-TA-Monitoring/paasta-monitoring-portal/src/kr/paasta/monitoring
 go run main.go
 ```
 <br/>
@@ -610,7 +615,7 @@ Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database
 
 
 > **실시간 모니터링 기반 데이터 수집 정보** <div id='3.1.1.2' />
-IaaS-PaaS-Monitoring은 구성된 IaaS, PaaS 환경의 CPU, Memory, Disk 그리고 Network 등의 자원 상태를 모니터링 하기 위하여 agent를 통해 지속적으로 데이터를 수집하여 시계열 데이터베이스에 저장한다. 저장된 데이터를 기반으로 관리자는 IaaS, PaaS 환경에 대한 상태를 모니터링 할 수 있다.
+PaaS-TA-Monitoring-Portal은 구성된 PaaS 환경의 CPU, Memory, Disk 그리고 Network 등의 자원 상태를 모니터링 하기 위하여 agent를 통해 지속적으로 데이터를 수집하여 시계열 데이터베이스에 저장한다. 저장된 데이터를 기반으로 관리자는 PaaS 환경에 대한 상태를 모니터링 할 수 있다.
 
 - Measurement 리스트
 
@@ -1786,5 +1791,88 @@ PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> paasta-mon
 
 ( PaaS-TA v5.0 패키지 파일 다운로드 참조)
 - https://paas-ta.kr/download/package
+<br><br><br>
 
+#### 3.5.2.3. rep <div id='3.5.2.3' />
+##### 3.5.2.3.1. rep 개요 <div id='3.5.2.3.1' />
+rep은 PaaS 환경에 Container를 생성하기 위한 상태 확인 및 이벤트 처리 지원 하며, PaaS-TA 배포 시 diego-cell에 구성되는 Agent.
+
+<br>
+
+##### 3.5.2.3.2. rep 개발환경 구성 <div id='3.5.2.3.2' />
+
+> 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
+```
+- OS : Ubuntu 18.04
+- Golang : 1.14.9
+- Dependencies : code.cloudfoundry.org/bbs
+                 code.cloudfoundry.org/bbs/models
+                 code.cloudfoundry.org/cfhttp
+                 code.cloudfoundry.org/clock
+                 code.cloudfoundry.org/consuladapter
+                 code.cloudfoundry.org/debugserver
+                 code.cloudfoundry.org/diego-logging-client
+                 code.cloudfoundry.org/executor
+                 code.cloudfoundry.org/executor/initializer
+                 code.cloudfoundry.org/go-loggregator/runtimeemitter
+                 code.cloudfoundry.org/lager
+                 code.cloudfoundry.org/lager/lagerflags
+                 code.cloudfoundry.org/localip
+                 code.cloudfoundry.org/locket
+                 code.cloudfoundry.org/locket/lock
+                 code.cloudfoundry.org/locket/metrics/helpers
+                 code.cloudfoundry.org/locket/models
+                 code.cloudfoundry.org/operationq
+                 code.cloudfoundry.org/rep
+                 code.cloudfoundry.org/rep/auctioncellrep
+                 code.cloudfoundry.org/rep/cmd/rep/config
+                 code.cloudfoundry.org/rep/evacuation
+                 code.cloudfoundry.org/rep/evacuation/evacuation_context
+                 code.cloudfoundry.org/rep/generator
+                 code.cloudfoundry.org/rep/handlers
+                 code.cloudfoundry.org/rep/harmonizer
+                 code.cloudfoundry.org/rep/maintain
+                 code.cloudfoundry.org/tlsconfig
+                 github.com/hashicorp/consul/api
+                 github.com/nu7hatch/gouuid
+                 github.com/tedsuo/ifrit
+                 github.com/tedsuo/ifrit/grouper
+                 github.com/tedsuo/ifrit/sigmon
+                 github.com/tedsuo/rata
+                 code.cloudfoundry.org/garden/client (// Adde for PaaS-TA) 
+ 
+- IDE : GoLand(유료), Intellij IDEA 2019(무료), Visual Studio Code(무료), etc... 중 택일.
+- 형상관리: Git, etc... 중 택일.
+```
+※ Intellij IDEA 는 Commnuity와 Ultimate 버전이 있는데, Community 버전은 Free이고, Ultimate 버전은 은 30-day trial버전이다. Community는 Version 2019.2 이하에서 환경 구성이 가능하다.
+
+<br>
+
+##### 3.5.2.3.3. rep release 구성 <div id='3.5.2.3.3' />
+
+PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> diego-release-2.47.0.tgz -> rep.tgz 에 반영되어 Deploy 해야 한다.
+
+( PaaS-TA v5.0 패키지 파일 다운로드 참조)
+- https://paas-ta.kr/download/package
+
+
+<br><br><br>
+
+
+## 3.6. Elasticsearch curator 구성 <div id='3.6' />
+
+<br>
+
+### 3.6.1. curator <div id='3.6.1' />
+#### 3.6.1.1 curator 개요 <div id='3.6.1.1' />
+> curator는 Elasticsearch의 인덱스 관리를 위한 어플리케이션이다. logsearch-boshrelease 패키지 내에 curator가 포함 되어있다. PaaS-TA 배포 시 logsearch의 maintenance에 설치된다.
+
+<br>
+
+#### 3.6.1.2 curator release 구성 <div id='3.6.1.2' />
+
+PaaSTA-Release(패키지 파일 다운로드) -> paasta-monitoring -> logsearch-boshrelease-209.0.1.tgz -> curator.tgz 에 반영되어 Deploy 해야 한다.
+
+( PaaS-TA v5.0 패키지 파일 다운로드 참조)
+- https://paas-ta.kr/download/package
 <br><br><br>

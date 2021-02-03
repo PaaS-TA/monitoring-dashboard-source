@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS-TA Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li class="PaaS"><a href="index.html">PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../dist/index.html#/iaas/main">IaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="bosh.html">B<span>osh</span></a></li>
+						<li><a href="paas.html">P<span>aaS</span></a></li>
+						<li><a href="cont.html" class="on">C<span>ontainer</span></a></li>
+						<li>
+							<a href="alarm_policy.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+								<li><a href="alarm_statis.html">Statistics</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<h3>Container</h3>
+					<div class="chartView" id="contChart"></div>
+					<h3>Cell</h3>
+					<div class="chartView" id="paasChart"></div>
+					<h4>Cell & Container Relationship<span id="cellRelation"></span></h4>
+					<div id="cellCollection" class="cellCollection">
+						<p>No Data</p>
+					</div>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="table style01">
+						<h4>Container Summary</h4>
+						<div id="contSummary" class="summaryList"></div>
+						<div class="paging" style="display:none;">
+							<a href="javascript:void(0);">&lt;</a>
+							<span>
+								<a href="javascript:void(0);" class="on">1</a>
+								<a href="javascript:void(0);">2</a>
+								<a href="javascript:void(0);">3</a>
+								<a href="javascript:void(0);">4</a>
+								<a href="javascript:void(0);">5</a>
+								<a href="javascript:void(0);">6</a>
+								<a href="javascript:void(0);">7</a>
+								<a href="javascript:void(0);">8</a>
+								<a href="javascript:void(0);">9</a>
+								<a href="javascript:void(0);">10</a>
+							</span>
+							<a href="javascript:void(0);">&gt;</a>
+						</div>
+					</article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+			
+			<div id="chartWrap">
+				<h4><span class="chartTitle"></span></h4>
+				<ul class="chart">
+					<li>
+						<h5>CPU Usage</h5>
+						<div id="cpuUsageChart"></div>
+					</li>
+					<li>
+						<h5>CPU Load Average</h5>
+						<div id="cpuLoadChart"></div>
+					</li>
+					<li>
+						<h5>Memory Usage</h5>
+						<div id="memoryUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk Usage</h5>
+						<div id="diskUsageChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Byte</h5>
+						<div id="networkByteChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Drop</h5>
+						<div id="networkDropChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Error</h5>
+						<div id="networkErrorChart"></div>
+					</li>
+				</ul>
+				<a href="javascript:void(0);" class="chartClosed"></a>
+			</div>
+
+		</div>
+		<!-- // Wrap -->
+
+		<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+		<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+		<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const cont = {
+					id : '',
+
+					init() {
+						// Alarm Count
+					fnComm.alarmCount('paas');
+						
+						// cell 컨디션 차트
+						fnComm.loadData('GET', fnComm.url + 'paas/cell/overview', fnComm.paasConditionChart);
+						// container 컨디션 차트
+						fnComm.loadData('GET', fnComm.url + 'paas/container/overview', fnComm.contConditionChart);
+						// paas Summary 리스트
+						fnComm.loadData('GET', fnComm.url + 'paas/container/summary', cont.contSummaryList);
+					},
+					
+					contSummaryList(data) {
+						//console.log(data.data);
+						//////////////////////////////////////////////////////////////////////
+						// appCnt: "0"
+						// cellCnt: "1"
+						// cellName: ""
+						// containerCnt: "0"
+						// criticalCnt: "0"
+						// failedCnt: "0"
+						// runningCnt: "0"
+						// warningCnt: "0"
+						// zoneName: "z1"
+						//////////////////////////////////////////////////////////////////////
+						var target = document.getElementById('contSummary');
+						
+						fnComm.removeHtml(target);
+
+						var subClass = ['running', 'warning', 'critical', 'fail'];
+	
+						data.data.forEach((value, idx)=>{
+							var arr = [value.runningCnt, value.warningCnt, value.criticalCnt, value.failedCnt];
+
+							var html = '<div>';
+
+							if(Math.max(...arr) > 0){
+								html += '	<span class="'+subClass[arr.indexOf(Math.max(...arr).toString())]+'">'+value.zoneName+'</span>';
+							} else {
+								html += '	<span class="normal">'+value.zoneName+'</span>';
+							}
+
+							html += '	<div>';
+							html += '		<em>Cell '+value.cellCnt+'</em>';
+							html += '		<em>Application '+value.appCnt+'</em>';
+							html += '		<em>Container '+value.containerCnt+'</em>';
+							html += '	</div>';
+							html += '	<div>';
+							html += '		<dl class="running">';
+							html += '			<dt>Running</dt>';
+							html += '			<dd>'+value.runningCnt+'</dd>';
+							html += '		</dl>';
+							html += '		<dl class="warning">';
+							html += '			<dt>Warning</dt>';
+							html += '			<dd>'+value.warningCnt+'</dd>';
+							html += '		</dl>';
+							html += '		<dl class="critical">';
+							html += '			<dt>Critical</dt>';
+							html += '			<dd>'+value.criticalCnt+'</dd>';
+							html += '		</dl>';
+							html += '		<dl class="fail">';
+							html += '			<dt>Failed</dt>';
+							html += '			<dd>'+value.failedCnt+'</dd>';
+							html += '		</dl>';
+							html += '	</div>';
+							html += '	<div class="summaryBtn" data-id="'+value.zoneName+'">';
+							html += '		<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Detail"><span>Detail</span></a>';
+							html += '	</div>';
+							html += '</a>';
+							
+							fnComm.appendHtml(target, html, 'div');
+
+							var article = target.childNodes.item(idx);
+							article.setAttribute('data-id', value.zoneName);
+
+							if(idx === 0){
+								// Set Relation 
+								fnComm.loadData('GET', fnComm.url + 'paas/container/relationship/' + value.zoneName, cont.contRelation );
+
+							};
+						});
+						
+						// Button Event (Detail)
+						var elm = document.querySelectorAll('.summaryBtn');
+						for(var i=0 ; i<elm.length ; i++){
+							// Process Event
+							elm[i].querySelector('.chart').addEventListener('click', (e) => {
+								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
+
+								fnComm.loadData('GET', fnComm.url + 'paas/container/relationship/' + elmID, cont.contRelation );
+							}, false);
+						};
+					},
+	
+					contRelation(data) {
+						var target = document.getElementById('cellCollection');
+						//console.log(data);
+
+						if(data === null || data.length <= 0){ // cell 데이터 없을 시 중지
+							target.innerHTML = '<p>No Data</p>';
+
+							fnComm.alertPopup('NOTICE', 'No Data!');
+						} else {
+							fnComm.removeHtml(target);
+
+							document.getElementById('cellRelation').innerHTML = data[0].zoneName;
+
+							var blankCheck = false;
+							for(var i=0; i<data.length ;i++) {
+								if (data[i].containers !== null && data[i].containers != "")
+									blankCheck = true;
+							}
+
+							//containers 존재하지 않을 경우 팝업 표시
+							if(!blankCheck){
+								target.innerHTML = '<p>No Data</p>';
+
+								fnComm.alertPopup('NOTICE', 'No Containers Data!');
+
+								return false;
+							}
+
+							data.forEach((value, idx)=>{
+								var html = '<dl>';
+								html += '<dt>'+value.cellName+'</dt>';
+								html += '<dd>';
+
+
+								// containers 데이터가 있는 경우만 cell 표시
+								if(value.containers !== null){
+									value.containers.forEach((value, idx)=>{
+										//////////////////////////////////////////////////////////////////////
+										// appIndex: "0"
+										//appName: "spring-music"
+										//containerId: "w7gn0eq24ueh-0"
+										//status: "running"
+										//////////////////////////////////////////////////////////////////////
+										html += '<a href="javascript:void(0);" class="contChart '+value.status+'" data-id="'+value.containerId+'" data-name="'+value.appName+'">';
+										html += '	<div>';
+										html += '		<dl>';
+										html += '			<dt>Index</dt>';
+										html += '			<dd>'+value.appIndex+'</dd>';
+										html += '		</dl>';
+										html += '		<dl>';
+										html += '			<dt>Name</dt>';
+										html += '			<dd>'+value.appName+'</dd>';
+										html += '		</dl>';
+										html += '	</div>';
+										html += '</a>';
+									});
+								}
+
+								html += '</dd></dl>';
+
+								fnComm.appendHtml(target, html, 'div');
+							});
+							
+							// Button Event (Process, Chart, Log)
+							var elm = document.querySelectorAll('.contChart');
+							for(var i=0 ; i<elm.length ; i++){
+								// Chart Event
+								elm[i].addEventListener('click', (e) => {
+									var elmID = e.target.getAttribute('data-id');
+									var elmName = e.target.getAttribute('data-name');
+
+									document.querySelector('.chartTitle').innerHTML = elmName;
+									cont.chartView(elmID);
+								}, false);
+								
+								// Chart Event
+								document.querySelector('.chartClosed').addEventListener('click', (e) => {
+									document.getElementById('chartWrap').classList.toggle('on', false);
+								}, false);
+							};
+						};
+					},
+
+					chartView(elmID) {
+						document.getElementById('chartWrap').classList.toggle('on', true);
+						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
+
+						setTimeout(() => {
+							// CPU Usage 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/cpu/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
+
+							// CPU Load 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/cpu/'+ elmID +'/loads' + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
+
+							// Memory Usage 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/memory/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
+
+							// Disk Usage 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/disk/'+ elmID +'/usages' + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
+
+							// Network IO Bytes 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/network/'+ elmID +'/bytes' + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
+							
+							// Network IO Drop 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/network/'+ elmID +'/drops' + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
+							
+							// Network IO Error 정보
+							fnComm.loadData('GET', fnComm.url + 'paas/container/network/'+ elmID +'/errors' + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
+						},500);
+					},
+				}
+	
+				cont.init();
+			};
+		</script>
+	</body>
+</html>

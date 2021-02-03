@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS-TA Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<ul id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li class="PaaS"><a href="../paas/index.html">PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../dist/index.html#/iaas/main">IaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html" class="on"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="cluster.html">C<span>luster</span></a></li>
+						<li><a href="workloads.html">W<span>orkloads</span></a></li>
+						<li><a href="pod.html">P<span>od</span></a></li>
+						<li>
+							<a href="alarm_definition.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_definition.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="gaugeWrap">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<h3>Cluster Usage</h3>
+					<div class="gaugeChart" id="podUsage"></div>
+					<div class="gaugeChart" id="cpuUsage"></div>
+					<div class="gaugeChart" id="memoryUsage"></div>
+					<div class="gaugeChart" id="diskUsage"></div>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article>
+						<h4>Cluster Overview</h4>
+						<div id="clusterOverview" class="ovChart"></div>
+						<!--<h4>Workloads Status</h4>-->
+						<h4>Workloads Status</h4>
+						<div class="statusBlock">
+							<div>
+								<h5>Deployment Replicas Status</h5>
+								<ul>
+									<li class="bg1">
+										<strong class="dp1">0</strong>
+										<span>T<br>o<br>t<br>a<br>l</span>
+									</li>
+									<li class="bg2">
+										<strong class="dp2">0</strong>
+										<span>A<br>v<br>a<br>i<br>l<br>a<br>b<br>l<br>e</span>
+									</li>
+									<li class="bg3">
+										<strong class="dp3">0</strong>
+										<span>U<br>p<br>d<br>a<br>t<br>e<br>d</span>
+									</li>
+									<li class="bg4">
+										<strong class="dp4">0</strong>
+										<span>U<br>n<br>a<br>v<br>a<br>i<br>l<br>a<br>b<br>l<br>e</span>
+									</li>
+								</ul>
+							</div>
+							<div>
+								<h5>Stateful Replicas Status</h5>
+								<ul>
+									<li class="bg1">
+										<strong class="sr1">0</strong>
+										<span>T<br>o<br>t<br>a<br>l</span>
+									</li>
+									<li class="bg2">
+										<strong class="sr2">0</strong>
+										<span>R<br>e<br>a<br>d<br>y</span>
+									</li>
+									<li class="bg3">
+										<strong class="sr3">0</strong>
+										<span>U<br>p<br>d<br>a<br>t<br>e<br>d</span>
+									</li>
+									<li class="bg4">
+										<strong class="sr4">0</strong>
+										<span>R<br>e<br>v<br>i<br>s<br>i<br>o<br>n</span>
+									</li>
+								</ul>
+							</div>
+							<div>
+								<h5>DaemonSet Status</h5>
+								<ul>
+									<li class="bg1">
+										<strong class="ds1">0</strong>
+										<span>R<br>e<br>a<br>d<br>y</span>
+									</li>
+									<li class="bg2">
+										<strong class="ds2">0</strong>
+										<span>A<br>v<br>a<br>i<br>l<br>a<br>b<br>l<br>e</span>
+									</li>
+									<li class="bg3">
+										<strong class="ds3">0</strong>
+										<span>M<br>i<br>s<br>s<br>c<br>h<br>e<br>d<br>u<br>l<br>e<br>d</span>
+									</li>
+									<li class="bg4">
+										<strong class="ds4">0</strong>
+										<span>U<br>n<br>a<br>v<br>a<br>i<br>l<br>a<br>b<br>l<br>e</span>
+									</li>
+								</ul>
+							</div>
+							<div>
+								<h5>Pod Container Status</h5>
+								<ul>
+									<li class="bg1">
+										<strong class="pc1">0</strong>
+										<span>R<br>e<br>a<br>d<br>y</span>
+									</li>
+									<li class="bg2">
+										<strong class="pc2">0</strong>
+										<span>R<br>u<br>n<br>n<br>i<br>n<br>g</span>
+									</li>
+									<li class="bg3">
+										<strong class="pc3">0</strong>
+										<span>R<br>e<br>s<br>t<br>a<br>r<br>t<br>s</span>
+									</li>
+									<li class="bg4">
+										<strong class="pc4">0</strong>
+										<span>T<br>e<br>r<br>m<br>i<br>n<br>a<br>t<br>e<br>d</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+
+		</div>
+		<!-- // Wrap -->
+
+		<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+		<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+		<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+		<script type="text/javascript">
+			window.onload = () => {
+				const caasMain = {
+					id : '',
+
+					init() {
+						// Alarm Count
+					fnComm.alarmCount('caas');
+						
+						// Cluster Usage 데이터로드
+						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/clusterAvg', caasMain.gaugeList);
+						
+						// Cluster Overview 데이터로드
+						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/clusterOverview', caasMain.clusterOverview);
+						
+						// Workloads Status 데이터로드
+						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workloadsStatus', caasMain.workloadsStatus);
+					},
+
+					gaugeList(data){
+						// pod Usage 차트
+						fnComm.gaugeChart(data.PodUsage, 'Pod Usage', '#podUsage');
+
+						// CPU Usage 차트
+						fnComm.gaugeChart(data.CpuUsage, 'Cpu Usage', '#cpuUsage');
+
+						// Memory Usage 차트
+						fnComm.gaugeChart(data.MemoryUsage, 'Memory Usage', '#memoryUsage');
+
+						// Disk Usage 차트
+						fnComm.gaugeChart(data.DiskUsage, 'Disk Usage', '#diskUsage');
+
+					},
+
+					clusterOverview(data) {
+						// Alerts: "7"
+						// Nodes: "3"
+						// PodRestart: "0"
+						// RunningContainer: "55"
+						// RunningPod: "30"
+						
+						var chart = c3.generate({
+							bindto: '#clusterOverview',
+							data: {
+								columns: [
+									['Alerts', 0, data.Alerts, 0, 0, 0, 0, 0],
+									['Nodes', 0, 0, data.Nodes, 0, 0, 0, 0],
+									['PodRestart', 0, 0, 0, data.PodRestart, 0, 0, 0],
+									['RunningContainer', 0, 0, 0, 0, data.RunningContainer, 0, 0],
+									['RunningPod', 0, 0, 0, 0, 0, data.RunningPod, 0]
+								],
+								labels: true,
+								type: 'spline'
+							},
+							color: {
+								pattern: ['#43be42', '#f6a200', '#f4256c', '#c048c8', '#ccc']
+							},
+							axis: {
+								x: {
+									show: false
+								},
+								y: {
+									show: false
+								}
+							},
+						});
+					},
+
+					workloadsStatus(data) {
+						// Available: "12"
+						// Misscheduled: ""
+						// Name: "Deployment"
+						// Ready: ""
+						// Restart: ""
+						// Revision: ""
+						// Running: ""
+						// Total: "13"
+						// Unavailable: "1"
+						// Updated: "12"
+						// terminated: ""
+
+						data.forEach(value => {
+							switch(value.Name) {
+								case 'Deployment':
+									fnComm.countUp(document.querySelector('.dp1'), value.Total);
+									fnComm.countUp(document.querySelector('.dp2'), value.Available);
+									fnComm.countUp(document.querySelector('.dp3'), value.Updated);
+									fnComm.countUp(document.querySelector('.dp4'), value.Unavailable);
+								break;
+								case 'DaemonSet':
+									fnComm.countUp(document.querySelector('.ds1'), value.Ready);
+									fnComm.countUp(document.querySelector('.ds2'), value.Available);
+									fnComm.countUp(document.querySelector('.ds31'), value.Misscheduled);
+									fnComm.countUp(document.querySelector('.ds4'), value.Unavailable);
+								break;
+								case 'Stateful':
+									fnComm.countUp(document.querySelector('.sr1'), value.Total);
+									fnComm.countUp(document.querySelector('.sr2'), value.Ready);
+									fnComm.countUp(document.querySelector('.sr3'), value.Updated);
+									fnComm.countUp(document.querySelector('.sr4'), value.Revision);
+								break;
+								case 'Pod':
+									fnComm.countUp(document.querySelector('.pc1'), value.Ready);
+									fnComm.countUp(document.querySelector('.pc2'), value.Running);
+									fnComm.countUp(document.querySelector('.pc3'), value.Restart);
+									fnComm.countUp(document.querySelector('.pc4'), value.terminated);
+								break;
+							};
+						});
+					},
+				}
+	
+				caasMain.init();
+			};
+		</script>
+	</body>
+</html>
