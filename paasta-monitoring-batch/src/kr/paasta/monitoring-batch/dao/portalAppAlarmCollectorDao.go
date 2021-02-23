@@ -2,7 +2,7 @@ package dao
 
 import (
 	"fmt"
-	client "github.com/influxdata/influxdb1-client/v2"
+	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring-batch/model"
 	"kr/paasta/monitoring-batch/model/base"
