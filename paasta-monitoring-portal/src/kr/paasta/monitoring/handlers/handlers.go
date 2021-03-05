@@ -16,7 +16,7 @@ import (
 	tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"
 	/*tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"*/
 	"github.com/tedsuo/rata"
-	"gopkg.in/olivere/elastic.v3"
+	/*"gopkg.in/olivere/elastic.v3"*/
 	"io"
 	caasContoller "kr/paasta/monitoring/caas/controller"
 	"kr/paasta/monitoring/common/controller"
@@ -30,10 +30,12 @@ import (
 	"net/http"
 	/*"strings"*/
 	"time"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )
 
 func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
-	iaasTxn *gorm.DB, paasTxn *gorm.DB, iaasElasticClient *elastic.Client, paasElasticClient *elastic.Client, monsClient monascaclient.Client,
+	iaasTxn *gorm.DB, paasTxn *gorm.DB, iaasElasticClient *elasticsearch.Client, paasElasticClient *elasticsearch.Client, monsClient monascaclient.Client,
 	auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig) http.Handler {
 
 	//Controller선언

@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
 	"github.com/cihub/seelog"
+	"net"
 	//"github.com/cloudfoundry-community/go-cfclient"
 
 	//"github.com/cloudfoundry-community/go-cfclient"
@@ -14,7 +16,7 @@ import (
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"github.com/monasca/golang-monascaclient/monascaclient"
-	"gopkg.in/olivere/elastic.v3"
+	/*"gopkg.in/olivere/elastic.v3"*/
 	"io"
 	"io/ioutil"
 	"kr/paasta/monitoring/handlers"
@@ -27,6 +29,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )
 
 type Config map[string]string
@@ -99,14 +103,14 @@ func main() {
 	// iaas client
 	var iaasDbAccessObj *gorm.DB
 	var iaaSInfluxServerClient client.Client
-	var iaasElasticClient *elastic.Client
+	var iaasElasticClient *elasticsearch.Client
 	var openstackProvider model.OpenstackProvider
 	var monClient *monascaclient.Client
 	var auth gophercloud.AuthOptions
 
 	// paas client
 	var paaSInfluxServerClient client.Client
-	var paasElasticClient *elastic.Client
+	var paasElasticClient *elasticsearch.Client
 	var databases bm.Databases
 	//var cfProvider cfclient.Config
 	var boshClient *gogobosh.Client
@@ -239,7 +243,7 @@ func createTable(dbClient *gorm.DB) {
 	dbClient.Debug().AutoMigrate(&MemberInfo{})
 }
 
-func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elastic.Client, openstackProvider model.OpenstackProvider, monClient *monascaclient.Client, auth gophercloud.AuthOptions, err error) {
+func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider model.OpenstackProvider, monClient *monascaclient.Client, auth gophercloud.AuthOptions, err error) {
 
 	// Mysql
 	iaasConfigDbCon := new(DBConfig)
@@ -266,14 +270,40 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 		Addr:     iaasUrl,
 		Username: iaasUserName,
 		Password: iaasPassword,
+		InsecureSkipVerify: true,
 	})
 
+	elasticsearchUsername, _ := config["paas.elasticsearch.username"]
+	elasticsearchPassword, _ := config["paas.elasticsearch.password"]
+	elasticsearchUrl, _ := config["paas.elasticsearch.url"]
+	elasticsearchHttpsEnabled, _ := strconv.ParseBool(config["paas.elasticsearch.https_enabled"])
+
+	cfg := elasticsearch.Config{
+		Username: elasticsearchUsername,
+		Password: elasticsearchPassword,
+		Addresses: []string{
+			elasticsearchUrl,
+		},
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: time.Second,
+			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+			TLSClientConfig: &tls.Config{
+				MaxVersion:         tls.VersionTLS11,
+				InsecureSkipVerify: elasticsearchHttpsEnabled,
+			},
+		},
+	}
+	iaasElasticClient, err = elasticsearch.NewClient(cfg)
+	fmt.Println("iaasElasticClient::", iaasElasticClient)
+	fmt.Println("err::", err)
+
 	// ElasticSearch
-	iaasElasticUrl, _ := config["iaas.elastic.url"]
+	/*iaasElasticUrl, _ := config["iaas.elastic.url"]
 	iaasElasticClient, err = elastic.NewClient(
 		elastic.SetURL(fmt.Sprintf("http://%s", iaasElasticUrl)),
 		elastic.SetSniff(false),
-	)
+	)*/
 
 	// Openstack Info
 	openstackProvider.Region, _ = config["default.region"]
@@ -323,7 +353,7 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 	return
 }
 
-func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elastic.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
+func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elasticsearch.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
 
 	// InfluxDB
 	paasUrl, _ := config["paas.metric.db.url"]
@@ -334,17 +364,43 @@ func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasEl
 		Addr:     paasUrl,
 		Username: paasuserName,
 		Password: paasPassword,
+		InsecureSkipVerify: true,
 	})
 
 	fmt.Printf("paaSInfluxServerClient : %v\n", paaSInfluxServerClient)
 	fmt.Printf("err : %v\n", err)
 
+	elasticsearchUsername, _ := config["paas.elasticsearch.username"]
+	elasticsearchPassword, _ := config["paas.elasticsearch.password"]
+	elasticsearchUrl, _ := config["paas.elasticsearch.url"]
+	elasticsearchHttpsEnabled, _ := strconv.ParseBool(config["paas.elasticsearch.https_enabled"])
+
+	cfg := elasticsearch.Config{
+		Username: elasticsearchUsername,
+		Password: elasticsearchPassword,
+		Addresses: []string{
+			elasticsearchUrl,
+		},
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: time.Second,
+			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+			TLSClientConfig: &tls.Config{
+				MaxVersion:         tls.VersionTLS11,
+				InsecureSkipVerify: elasticsearchHttpsEnabled,
+			},
+		},
+	}
+	paasElasticClient, err = elasticsearch.NewClient(cfg)
+	fmt.Println("paasElasticClient::", paasElasticClient)
+	fmt.Println("err::", err)
+
 	// ElasticSearch
-	paasElasticUrl, _ := config["paas.elastic.url"]
+	/*paasElasticUrl, _ := config["paas.elastic.url"]
 	paasElasticClient, err = elastic.NewClient(
 		elastic.SetURL(fmt.Sprintf("http://%s", paasElasticUrl)),
 		elastic.SetSniff(false),
-	)
+	)*/
 
 	// PaaS Database
 	bosh_database, _ := config["paas.metric.db.name.bosh"]

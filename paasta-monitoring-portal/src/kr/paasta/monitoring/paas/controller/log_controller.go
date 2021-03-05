@@ -2,20 +2,22 @@ package controller
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"
-	"gopkg.in/olivere/elastic.v3"
+	/*"gopkg.in/olivere/elastic.v3"*/
 	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/service"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 	"strconv"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )
 
 type PaasLogController struct {
 	influxClient  client.Client
-	ElasticClient *elastic.Client
+	ElasticClient *elasticsearch.Client
 }
 
-func NewLogController(influxClient client.Client, elasticClient *elastic.Client) *PaasLogController {
+func NewLogController(influxClient client.Client, elasticClient *elasticsearch.Client) *PaasLogController {
 	s := &PaasLogController{
 		influxClient:  influxClient,
 		ElasticClient: elasticClient,

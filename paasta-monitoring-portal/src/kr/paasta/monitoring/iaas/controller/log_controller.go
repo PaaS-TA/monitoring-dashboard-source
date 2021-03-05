@@ -2,21 +2,23 @@ package controller
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"
-	"gopkg.in/olivere/elastic.v3"
+	/*"gopkg.in/olivere/elastic.v3"*/
 	"kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/iaas/service"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 	"strconv"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )
 
 type OpenstackLog struct {
 	OpenstackProvider model.OpenstackProvider
 	influxClient      client.Client
-	ElasticClient     *elastic.Client
+	ElasticClient     *elasticsearch.Client
 }
 
-func NewLogController(openstackProvider model.OpenstackProvider, influxClient client.Client, elasticClient *elastic.Client) *OpenstackLog {
+func NewLogController(openstackProvider model.OpenstackProvider, influxClient client.Client, elasticClient *elasticsearch.Client) *OpenstackLog {
 	s := &OpenstackLog{
 		OpenstackProvider: openstackProvider,
 		influxClient:      influxClient,

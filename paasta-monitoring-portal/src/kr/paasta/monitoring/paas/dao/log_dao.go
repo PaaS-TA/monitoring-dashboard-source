@@ -1,31 +1,61 @@
 package dao
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"gopkg.in/olivere/elastic.v3"
+	"io/ioutil"
+	"strconv"
+
+	/*"gopkg.in/olivere/elastic.v3"*/
 	iaasmodel "kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/paas/model"
 	"math"
 	"strings"
 	"time"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
+	esapi "github.com/elastic/go-elasticsearch/v7/esapi"
 )
 
 type PaasLogDao struct {
-	elasticClient *elastic.Client
+	elasticClient *elasticsearch.Client
 }
 
-func GetPaasLogDao(elasticClient *elastic.Client) *PaasLogDao {
+func GetPaasLogDao(elasticClient *elasticsearch.Client) *PaasLogDao {
 	return &PaasLogDao{
 		elasticClient: elasticClient,
 	}
 }
 
-//Node의 현재 CPU사용률을 조회한다.
-func (log PaasLogDao) GetDefaultRecentLog(request model.LogMessage, paging bool) (_ model.LogMessage, errMsg iaasmodel.ErrMessage) {
+func setInitRequest(initRequest model.LogMessage) (request model.LogMessage){
+	//initRequest.Period = 1
+	//initRequest.PageIndex = 3
+	//initRequest.PageItems = 10
 
-	if request.Index == "" {
+	// test
+	//if initRequest.Index == "" {
+	//
+	//	// Default Target vm's recent log - recent 30 minutes.
+	//	now := time.Now().Local()
+	//	current := now.Unix() - int64(9)*60*60 //9 hour difference Between Local PC and GMT(Greenwich Mean Time).
+	//	//current := now.Unix()
+	//	/*
+	//		조회 주기정보를 전달받아 로그를 조회한다.(period - '분'단위)
+	//	*/
+	//	//Current Time Stamp
+	//	before := now.Unix() - initRequest.Period*60 //화면에서 설정한 조회주기(분) (ex: 30 * 60 seconds)
+	//	before = before - int64(9)*60*60 //9시간	=> if time zone is equal to Logsearch Instance, it must be removed.
+	//	//9 hour difference Between Local PC and Virginia.
+	//	initRequest.StartTime = time.Unix(before, 0).Format(time.RFC3339)[0:19]
+	//	initRequest.EndTime = time.Unix(current, 0).Format(time.RFC3339)[0:19]
+	//	//request.Index = fmt.Sprintf("logstash-%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
+	//	initRequest.Index = fmt.Sprintf("logstash-2021.03.02")
+	//	initRequest.TargetDate = fmt.Sprintf("%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
+	//}
+
+	// origin
+	if initRequest.Index == "" {
 		// Default Target vm's recent log - recent 30 minutes.
 		now := time.Now().Local()
 		//current := now.Unix() - int64(iaasmodel.GMTTimeGap)*60*60 //9 hour difference Between Local PC and GMT(Greenwich Mean Time).
@@ -34,161 +64,275 @@ func (log PaasLogDao) GetDefaultRecentLog(request model.LogMessage, paging bool)
 			조회 주기정보를 전달받아 로그를 조회한다.(period - '분'단위)
 		*/
 		//Current Time Stamp
-		before := now.Unix() - request.Period*60 //화면에서 설정한 조회주기(분) (ex: 30 * 60 seconds)
+		before := now.Unix() - initRequest.Period*60 //화면에서 설정한 조회주기(분) (ex: 30 * 60 seconds)
 		//before = before - int64(iaasmodel.GMTTimeGap)*60*60 //9시간	=> if time zone is equal to Logsearch Instance, it must be removed.
 		//9 hour difference Between Local PC and Virginia.
-		request.StartTime = time.Unix(before, 0).Format(time.RFC3339)[0:19]
-		request.EndTime = time.Unix(current, 0).Format(time.RFC3339)[0:19]
-		request.Index = fmt.Sprintf("logs-platform-%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
-		request.TargetDate = fmt.Sprintf("%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
+		initRequest.StartTime = time.Unix(before, 0).Format(time.RFC3339)[0:19]
+		initRequest.EndTime = time.Unix(current, 0).Format(time.RFC3339)[0:19]
+		initRequest.Index = fmt.Sprintf("logstash-%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
+		initRequest.TargetDate = fmt.Sprintf("%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
 	}
 
-	exists, err := log.elasticClient.IndexExists(request.Index).Do()
-	if err != nil || !exists {
-		//fmt.Println("index doesn't exists :", err)
+	fmt.Println(initRequest)
+	return initRequest
+}
+func retrieveElasticClientInfo(elasticClient *elasticsearch.Client) (response *esapi.Response, errMsg iaasmodel.ErrMessage){
+	response, err := elasticClient.Info()
+	if err != nil {
+		fmt.Println("Error retrieveElasticClientInfo: %s", err)
 		errMsg = iaasmodel.ErrMessage{
-			"Message":    fmt.Sprintf("target index - %s - doesn't exists.", request.Index),
-			"HttpStatus": 200,
+			"Message": err.Error(),
 		}
-		return request, errMsg
+		return response, errMsg
+	}
+	defer response.Body.Close()
+	// check elasticClient Info
+	bytes, _:= ioutil.ReadAll(response.Body)
+	str := string(bytes)
+	fmt.Println(str)
+	return response, nil
+}
+func setDefaultRecentLogQuery(request model.LogMessage, paging bool, search_count int)(query string){
+	//example variable
+	//request.Keyword = "guardian.list-containers.finished"
+	//request.LogType = "bosh"
+	//request.Id = "022eab7c-f0ad-4351-8616-43473aa6bd84"
+
+	//!! not execute (term - syslog_sd_params.id), so use match_phrase @raw !!
+	query = `{
+		"query" : {
+			"bool": {
+				"must": [`
+
+	if request.Keyword != ""{
+		query +=
+						`{
+							"match_phrase" : {
+								"@message" : "`+request.Keyword+`"
+							}
+						},`
 	}
 
-	//fmt.Println("elastic request =====>>>>", request)
+	if request.LogType == model.BOSH_NAME{
+		query +=
+						`{
+							"term": {
+						  		"syslog_sd_params.deployment": "`+request.LogType+`"
+							}
+						}`
+	}else {
+		query +=
+						`{
+							"match_phrase": {
+						  		"@raw": "`+request.Id+`"
+							}
+						}`
+	}
 
-	if exists {
-		reqQuery := elastic.NewBoolQuery()
-		if request.Keyword != "" {
-			reqQuery = reqQuery.Must(elastic.NewMatchPhraseQuery("@message", request.Keyword))
+
+	query +=	`],
+				"filter": {
+					"range": {
+							"@timestamp": {
+						  		"gte": "`+request.StartTime+`",
+						  		"lte": "`+request.EndTime+`"
+							}
+					 	}
+				},
+				"boost" : 5.0
+			}
+		},
+		"sort": {
+			"@timestamp": {
+			  "order": "desc"
+			}
+		}`
+	if paging == true {
+		query += `,
+					"from" : "` + strconv.Itoa((request.PageIndex-1)*request.PageItems) + `",
+					"size" : "` + strconv.Itoa(search_count) + `"`
+	}else {
+		query += `,
+					"from" : "0",
+					"size" : "` + strconv.Itoa(search_count) + `"`
+	}
+
+	query += `}`
+	fmt.Println(query)
+	return query
+}
+func retrieveElasticClientSearch(elasticClient *elasticsearch.Client, request model.LogMessage, query string) (body []byte, errMsg iaasmodel.ErrMessage) {
+	// Perform the search request.
+	response, err := elasticClient.Search(
+		elasticClient.Search.WithContext(context.Background()),
+		elasticClient.Search.WithIndex(request.Index),
+		elasticClient.Search.WithBody(strings.NewReader(query)),
+		elasticClient.Search.WithTrackTotalHits(true),
+		elasticClient.Search.WithPretty(),
+	)
+	if err != nil {
+		fmt.Println("Error retrieveElasticClientSearch : %s", err)
+		errMsg = iaasmodel.ErrMessage{
+			"Message": err.Error(),
 		}
-
-		if request.LogType == model.BOSH_NAME {
-			reqQuery = reqQuery.Must(elastic.NewTermQuery("syslog_sd_params.deployment", request.LogType))
-		} else {
-			reqQuery = reqQuery.Must(elastic.NewTermQuery("syslog_sd_params.id", request.Id))
+		if strings.Contains(err.Error(), "timeout awaiting response headers")  {
+			fmt.Println("retry retrieveElasticClientSearch")
+			response, err = elasticClient.Search(
+				elasticClient.Search.WithContext(context.Background()),
+				elasticClient.Search.WithIndex(request.Index),
+				elasticClient.Search.WithBody(strings.NewReader(query)),
+				elasticClient.Search.WithTrackTotalHits(true),
+				elasticClient.Search.WithPretty(),
+			)
+		}else{
+			return nil, errMsg
 		}
+	}
+	defer response.Body.Close()
 
-		reqQuery = reqQuery.Filter(elastic.NewRangeQuery("@timestamp").Gte(request.StartTime).Lte(request.EndTime))
-		reqQuery = reqQuery.Boost(5)
-		reqQuery = reqQuery.DisableCoord(true)
-		reqQuery = reqQuery.QueryName("Default_Recent_logs")
+	body, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println("Error retrieveElasticClientSearch ioutil.ReadAll : %s", err)
+		errMsg = iaasmodel.ErrMessage{
+			"Message": err.Error(),
+		}
+		return nil, errMsg
+	}
+	//str := string(body)
+	//fmt.Println(str)
 
-		// Search with a term query for totalcount
-		searchResult, err := log.elasticClient.Search().
-			Index(request.Index).
-			Query(reqQuery).           // specify the query
-			Sort("@timestamp", false). // sort by "timestamp" field, ascending - true, descending - false
-			Pretty(true).              // pretty print request and response JSON
-			Do()                       // execute
+	return body, errMsg
+}
+func searchDataJsonUnmarshal(body []byte)(hits map[string]interface{}, totalHits float64, errMsg iaasmodel.ErrMessage){
+	// body ([]byte) -> JsonUnmarsal -> data(map[string]interface)
+	var data map[string]interface{}
+	err := json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Println("Error searchDataJsonUnmarshal json.Unmarshal : %s", err)
+		errMsg = iaasmodel.ErrMessage{
+			"Message": err.Error(),
+		}
+		return nil, 0, errMsg
+	}
+	// response data
+	//fmt.Printf("Results: %v\n", data)
+	// 1 depth
+	//fmt.Printf("Results: %v\n", data["_shards"])
+	//fmt.Printf("Results: %v\n", data["hits"])
+	//fmt.Printf("Results: %v\n", data["total"])
 
+	hits = data["hits"].(map[string]interface{}) // 1 depth
+	//fmt.Println(hits["total"])
+	total := hits["total"].(map[string]interface{}) // 2 depth
+	//fmt.Println(total["value"])
+	totalHits = total["value"].(float64)
+
+	return hits, totalHits, errMsg
+}
+func setLogInfoList(hits map[string]interface{})(logInfoList []model.LogInfo, errMsg iaasmodel.ErrMessage){
+	for _, hit := range hits["hits"].([]interface {}) {
+		//fmt.Println("=======-------",hit)
+		//_id := hit.(map[string]interface {})["_id"]
+		_source := hit.(map[string]interface {})["_source"]
+		messageObj := _source.(map[string]interface {})["@message"]
+		timestamp := _source.(map[string]interface {})["@timestamp"]
+
+		var logInfo model.LogInfo
+
+		resTime := strings.Replace(timestamp.(string), "\\", "", -1)
+		resTime = strings.Replace(resTime, "\"", "", -1)
+		convert_time, err := time.Parse(time.RFC3339, resTime)
 		if err != nil {
-			errMessage := iaasmodel.ErrMessage{
+			fmt.Println("Recent TimeLogs - Time Conversion error :", err)
+			errMsg = iaasmodel.ErrMessage{
 				"Message": err.Error(),
 			}
-			return request, errMessage
+			return nil, errMsg
 		}
-
-		if paging {
-			totalPages := int(searchResult.TotalHits()) / request.PageItems
-
-			var search_count int
-			if request.PageIndex > totalPages {
-				search_count = int(math.Mod(float64(searchResult.TotalHits()), float64(request.PageItems)))
-			} else {
-				search_count = request.PageItems
-			}
-
-			totalCount := int(searchResult.TotalHits())
-			if totalCount > 10000 {
-				totalCount = 9999
-			}
-			request.TotalCount = totalCount
-			request.CurrentItems = search_count
-
-			// Search with a term query
-			searchResult, err = log.elasticClient.Search().
-				Index(request.Index).
-				Query(reqQuery).           // specify the query
-				Sort("@timestamp", false). // sort by "timestamp" field, ascending - true, descending - false
-				From((request.PageIndex - 1) * request.PageItems).Size(search_count).
-				Pretty(true). // pretty print request and response JSON
-				Do()          // execute
-		} else {
-			search_count := int(searchResult.TotalHits())
-			if search_count > 10000 {
-				search_count = 9999
-			}
-			// Search with a term query
-			searchResult, err = log.elasticClient.Search().
-				Index(request.Index).
-				Query(reqQuery).           // specify the query
-				Sort("@timestamp", false). // sort by "timestamp" field, ascending - true, descending - false
-				From(0).Size(search_count).
-				Pretty(true). // pretty print request and response JSON
-				Do()          // execute
-		}
-
-		var logInfoList []model.LogInfo
-
-		for _, hit := range searchResult.Hits.Hits {
-			//convert the result of searching to Map interface
-			rawData := make(map[string]json.RawMessage)
-			jsondata, err := hit.Source.MarshalJSON()
-			if err != nil {
-				//fmt.Println("Json Marshal error :", err)
-				errMessage := iaasmodel.ErrMessage{
-					"Message": err.Error(),
-				}
-				return request, errMessage
-			} else {
-				//fmt.Println("original source :", string(jsondata))
-				err = json.Unmarshal(jsondata, &rawData)
-				if err != nil {
-					//fmt.Println("#### Json Unmarshal error :", err)
-					errMessage := iaasmodel.ErrMessage{
-						"Message": err.Error(),
-					}
-					return request, errMessage
-				} else {
-
-					var logInfo model.LogInfo
-
-					for key, value := range rawData {
-						if strings.Contains(key, "timestamp") {
-							resTime := strings.Replace(string(value), "\\", "", -1)
-							resTime = strings.Replace(resTime, "\"", "", -1)
-							convert_time, err := time.Parse(time.RFC3339, resTime)
-							if err != nil {
-								fmt.Println("Recent TimeLogs - Time Conversion error :", err)
-							}
-							logInfo.Time = time.Unix(convert_time.Unix()+int64(iaasmodel.GMTTimeGap)*60*60, 0).Format(time.RFC3339)[0:19]
-						}
-
-						if strings.Contains(key, "message") {
-							logInfo.Message = strings.Replace(string(value), "\\", "", -1)
-						}
-					}
-					logInfoList = append(logInfoList, logInfo)
-				}
-			}
-		}
-
-		request.Messages = logInfoList
+		logInfo.Time = time.Unix(convert_time.Unix()+int64(9)*60*60, 0).Format(time.RFC3339)[0:19]
+		logInfo.Message = messageObj.(string)
+		logInfoList = append(logInfoList, logInfo)
 	}
+
+	return logInfoList, nil
+}
+
+//PaaS 선택된 항목의 최근 로그를 조회한다.
+func (log PaasLogDao) GetDefaultRecentLog(request model.LogMessage, paging bool) (_ model.LogMessage, errMsg iaasmodel.ErrMessage) {
+
+	request = setInitRequest(request)
+	/*response, err := retrieveElasticClientInfo(log.elasticClient)
+	fmt.Println(response)
+	if err != nil {
+		return request, err
+	}*/
+
+	query := setDefaultRecentLogQuery(request, false, 0)
+	body, err := retrieveElasticClientSearch(log.elasticClient, request, query)
+	hits, totalHits, err := searchDataJsonUnmarshal(body)
+	if err != nil {
+		return request, err
+	}
+
+	// adapt paging option
+	if paging {
+		totalPages := int(totalHits) / request.PageItems
+
+		var search_count int
+		if request.PageIndex > totalPages {
+			search_count = int(math.Mod(float64(totalHits), float64(request.PageItems)))
+		} else {
+			search_count = request.PageItems
+		}
+
+		totalCount := totalHits
+		if totalCount > 10000 {
+			totalCount = 9999
+		}
+		request.TotalCount = int(totalCount)
+		request.CurrentItems = search_count
+
+		query := setDefaultRecentLogQuery(request, true, search_count)
+		body, err = retrieveElasticClientSearch(log.elasticClient, request, query)
+		hits, totalHits, err = searchDataJsonUnmarshal(body)
+		if err != nil {
+			return request, err
+		}
+	} else {
+		search_count := int(totalHits)
+		if search_count > 10000 {
+			search_count = 9999
+		}
+
+		query := setDefaultRecentLogQuery(request, false, search_count)
+		body, err = retrieveElasticClientSearch(log.elasticClient, request, query)
+		hits, totalHits, err = searchDataJsonUnmarshal(body)
+		if err != nil {
+			return request, err
+		}
+	}
+
+	request.Messages, err = setLogInfoList(hits)
+	if err != nil {
+		return request, err
+	}
+
 	return request, nil
 }
 
-//Node의 현재 CPU사용률을 조회한다.
+//PaaS 선택된 항목의 시간 별 로그를 조회한다.
 func (log PaasLogDao) GetSpecificTimeRangeLog(request model.LogMessage, paging bool) (_ model.LogMessage, errMsg iaasmodel.ErrMessage) {
 
+	// setInitRequest
 	if request.Index == "" {
 
 		//To get Index name do not use TargetDate. Instead, use startTime.
 		date_array := strings.Split(request.TargetDate, "-")
 		if len(date_array) != 3 {
-			errMessage := iaasmodel.ErrMessage{
+			/*errMessage := ErrMessage{
 				"Message": errors.New("request target date error:" + request.TargetDate),
 			}
-			return request, errMessage
+			return request, errMessage*/
 		}
 
 		if request.StartTime == "" && request.EndTime == "" {
@@ -211,18 +355,18 @@ func (log PaasLogDao) GetSpecificTimeRangeLog(request model.LogMessage, paging b
 		convert_start_time, err := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", request.StartTime))
 		if err != nil {
 			//fmt.Println("SpecificTimeLogs - Time Conversion error :", err)
-			errMessage := iaasmodel.ErrMessage{
+			/*errMessage := ErrMessage{
 				"Message": err.Error(),
 			}
-			return request, errMessage
+			return request, errMessage*/
 		}
 		convert_end_time, err := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", request.EndTime))
 		if err != nil {
 			//fmt.Println("SpecificTimeLogs - Time Conversion error :", err)
-			errMessage := iaasmodel.ErrMessage{
+			/*errMessage := ErrMessage{
 				"Message": err.Error(),
 			}
-			return request, errMessage
+			return request, errMessage*/
 		}
 
 		//end := convert_end_time.Unix() 	- int64(iaasmodel.GMTTimeGap)*60*60  //9 hour difference Between Local PC and GMT(Greenwich Mean Time).
@@ -233,141 +377,67 @@ func (log PaasLogDao) GetSpecificTimeRangeLog(request model.LogMessage, paging b
 		request.StartTime = time.Unix(start, 0).Format(time.RFC3339)[0:19]
 		request.EndTime = time.Unix(end, 0).Format(time.RFC3339)[0:19]
 
-		request.Index = fmt.Sprintf("logs-platform-%s", fmt.Sprintf("%d.%s.%s", time.Unix(start, 0).Year(), attachZero(int(time.Unix(start, 0).Month())), attachZero(time.Unix(start, 0).Day())))
+		request.Index = fmt.Sprintf("logstash-%s", fmt.Sprintf("%d.%s.%s", time.Unix(start, 0).Year(), attachZero(int(time.Unix(start, 0).Month())), attachZero(time.Unix(start, 0).Day())))
 	}
 
 	fmt.Println("elastic request =====>>>>", request)
 
-	exists, err := log.elasticClient.IndexExists(request.Index).Do()
-	if err != nil || !exists {
-		//fmt.Println("SpecificTimeLogs - index doesn't exists :", err)
-		errMsg = iaasmodel.ErrMessage{
-			"Message": fmt.Sprintf("target index - %s - doesn't exists.", request.Index),
-		}
-		return request, errMsg
+	// retrieveElasticClientInfo
+	/*response, err := retrieveElasticClientInfo(log.elasticClient)
+	fmt.Println(response)
+	if err != nil {
+		return request, err
+	}*/
+
+	query := setDefaultRecentLogQuery(request, false, 0)
+	body, err := retrieveElasticClientSearch(log.elasticClient, request, query)
+	hits, totalHits, err := searchDataJsonUnmarshal(body)
+	if err != nil {
+		return request, err
 	}
 
-	if exists {
+	if paging {
+		totalPages := int(totalHits) / request.PageItems
 
-		reqQuery := elastic.NewBoolQuery()
-		if request.Keyword != "" {
-			reqQuery = reqQuery.Must(elastic.NewMatchPhraseQuery("@message", request.Keyword))
-		}
-
-		if request.LogType == model.BOSH_NAME {
-			reqQuery = reqQuery.Must(elastic.NewTermQuery("syslog_sd_params.deployment", request.LogType))
+		var search_count int
+		if request.PageIndex > totalPages {
+			search_count = int(math.Mod(float64(totalHits), float64(request.PageItems)))
 		} else {
-			reqQuery = reqQuery.Must(elastic.NewTermQuery("syslog_sd_params.id", request.Id))
+			search_count = request.PageItems
 		}
 
-		reqQuery = reqQuery.Filter(elastic.NewRangeQuery("@timestamp").Gte(request.StartTime).Lte(request.EndTime))
-		reqQuery = reqQuery.Boost(5)
-		reqQuery = reqQuery.DisableCoord(true)
-		reqQuery = reqQuery.QueryName("Target_Time_range_logs")
+		totalCount := int(totalHits)
+		if totalCount > 9001 {
+			totalCount = 9000
+		}
+		request.TotalCount = totalCount
+		request.CurrentItems = search_count
 
-		// Search with a term query for totalcount
-		searchResult, err := log.elasticClient.Search().
-			Index(request.Index).
-			Query(reqQuery).           // specify the query
-			Sort("@timestamp", false). // sort by "timestamp" field, ascending - true, descending - false
-			Pretty(true).              // pretty print request and response JSON
-			Do()                       // execute
-
+		query := setDefaultRecentLogQuery(request, true, search_count)
+		body, err = retrieveElasticClientSearch(log.elasticClient, request, query)
+		hits, totalHits, err = searchDataJsonUnmarshal(body)
 		if err != nil {
-			//fmt.Println("searching error :", err)
-			errMessage := iaasmodel.ErrMessage{
-				"Message": err.Error(),
-			}
-			return request, errMessage
+			return request, err
+		}
+	} else {
+		search_count := int(totalHits)
+		if search_count > 9001 {
+			search_count = 9000
 		}
 
-		if paging {
-			totalPages := int(searchResult.TotalHits()) / request.PageItems
-
-			var search_count int
-			if request.PageIndex > totalPages {
-				search_count = int(math.Mod(float64(searchResult.TotalHits()), float64(request.PageItems)))
-			} else {
-				search_count = request.PageItems
-			}
-
-			totalCount := int(searchResult.TotalHits())
-			if totalCount > 10000 {
-				totalCount = 9999
-			}
-			request.TotalCount = totalCount
-			request.CurrentItems = search_count
-
-			// Search with a term query
-			searchResult, err = log.elasticClient.Search().
-				Index(request.Index).
-				Query(reqQuery).           // specify the query
-				Sort("@timestamp", false). // sort by "timestamp" field, ascending - true, descending - false
-				From((request.PageIndex - 1) * request.PageItems).Size(search_count).
-				Pretty(true). // pretty print request and response JSON
-				Do()          // execute
-		} else {
-			search_count := int(searchResult.TotalHits())
-			if search_count > 10000 {
-				search_count = 9999
-			}
-
-			// Search with a term query
-			searchResult, err = log.elasticClient.Search().
-				Index(request.Index).
-				Query(reqQuery).           // specify the query
-				Sort("@timestamp", false). // sort by "timestamp" field, ascending - true, descending - false
-				From(0).Size(search_count).
-				Pretty(true). // pretty print request and response JSON
-				Do()          // execute
+		query := setDefaultRecentLogQuery(request, false, search_count)
+		body, err = retrieveElasticClientSearch(log.elasticClient, request, query)
+		hits, totalHits, err = searchDataJsonUnmarshal(body)
+		if err != nil {
+			return request, err
 		}
-
-		var logInfoList []model.LogInfo
-
-		for _, hit := range searchResult.Hits.Hits {
-			//convert the result of searching to Map interface
-			rawData := make(map[string]json.RawMessage)
-			jsondata, err := hit.Source.MarshalJSON()
-			if err != nil {
-				//fmt.Println("SpecificTimeLogs - Json Marshal error :", err)
-				errMessage := iaasmodel.ErrMessage{
-					"Message": err.Error(),
-				}
-				return request, errMessage
-			} else {
-				//fmt.Println("original source :", string(jsondata))
-				err = json.Unmarshal(jsondata, &rawData)
-				if err != nil {
-					//fmt.Println("#### SpecificTimeLogs - Json Unmarshal error :", err)
-					errMessage := iaasmodel.ErrMessage{
-						"Message": err.Error(),
-					}
-					return request, errMessage
-				} else {
-					var logInfo model.LogInfo
-
-					for key, value := range rawData {
-						if strings.Contains(key, "timestamp") {
-							resTime := strings.Replace(string(value), "\\", "", -1)
-							resTime = strings.Replace(resTime, "\"", "", -1)
-							convert_time, err := time.Parse(time.RFC3339, resTime)
-							if err != nil {
-								fmt.Println("Specific TimeLogs - Time Conversion error :", err)
-							}
-							logInfo.Time = time.Unix(convert_time.Unix()+int64(iaasmodel.GMTTimeGap)*60*60, 0).Format(time.RFC3339)[0:19]
-						}
-
-						if strings.Contains(key, "message") {
-							logInfo.Message = strings.Replace(string(value), "\\", "", -1)
-						}
-					}
-					logInfoList = append(logInfoList, logInfo)
-				}
-			}
-			//index = index + 1
-		}
-		request.Messages = logInfoList
 	}
+
+	request.Messages, err = setLogInfoList(hits)
+	if err != nil {
+		return request, err
+	}
+
 	return request, nil
 }
 
