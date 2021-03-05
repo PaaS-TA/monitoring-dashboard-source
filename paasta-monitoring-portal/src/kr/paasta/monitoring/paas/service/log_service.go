@@ -1,17 +1,19 @@
 package service
 
 import (
-	"gopkg.in/olivere/elastic.v3"
+	/*"gopkg.in/olivere/elastic.v3"*/
 	iaasmodel "kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/paas/dao"
 	"kr/paasta/monitoring/paas/model"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )
 
 type PaasLogService struct {
-	elasticClient *elastic.Client
+	elasticClient *elasticsearch.Client
 }
 
-func GetPaasLogService(elasticClient *elastic.Client) *PaasLogService {
+func GetPaasLogService(elasticClient *elasticsearch.Client) *PaasLogService {
 	return &PaasLogService{
 		elasticClient: elasticClient,
 	}
