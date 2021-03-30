@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
-	client "github.com/influxdata/influxdb1-client/v2"
+	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jinzhu/gorm"
 	md "kr/paasta/monitoring-batch/model"
 	"net/http"
@@ -135,6 +135,7 @@ func NewBackendServices(gmtTimeGapHour int64, influx *InfluxConfig, configDB *DB
 		Addr:     influx.InfluxUrl,
 		Username: influx.InfluxUser,
 		Password: influx.InfluxPass,
+		InsecureSkipVerify: true,
 	})
 
 	boshClientConfig := &gogobosh.Config{

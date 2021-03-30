@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	client "github.com/influxdata/influxdb1-client/v2"
+	client "github.com/influxdata/influxdb/client/v2"
 	"kr/paasta/monitoring-batch/alarm"
 	"kr/paasta/monitoring-batch/dao"
 	mod "kr/paasta/monitoring-batch/model"

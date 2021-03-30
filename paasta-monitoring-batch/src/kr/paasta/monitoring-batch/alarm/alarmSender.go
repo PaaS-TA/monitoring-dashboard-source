@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	client "github.com/influxdata/influxdb1-client/v2"
+	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring-batch/dao"
 	mod "kr/paasta/monitoring-batch/model"

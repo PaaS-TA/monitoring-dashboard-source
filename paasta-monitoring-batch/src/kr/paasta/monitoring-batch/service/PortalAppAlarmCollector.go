@@ -347,6 +347,8 @@ func (p *PortalAppAlarmStruct) GetAppInfo(appGuid string) model.ApplicationInfo 
 
 	appInfo := model.ApplicationInfo{ApplicationId:appGuid}
 
+	fmt.Println(">>>>> GetAppInfo resp :", resp)
+
 	for _, v := range resp.Results[0].Series{
 
 		var appContainerInfo model.ApplicationContainerInfo
