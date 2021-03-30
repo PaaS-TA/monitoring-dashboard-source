@@ -133,10 +133,16 @@ func (p portalAppAlarmDao) GetAppInfo(appGuid string) (_ client.Response, errMsg
 		Command:  fmt.Sprintf(sql, appGuid),
 		Database: p.influxDbName,
 	}
+
+	fmt.Println(">>>>> Query :", fmt.Sprintf(sql, appGuid))
+
 	resp, err := p.influxClient.Query(q)
 	if err != nil {
 		errLogMsg = err.Error()
+		fmt.Println(">>>>> InfluxDB Quering Error :", errLogMsg)
 	}
+
+	fmt.Println(">>>>> Query result :", resp)
 
 	return util.GetError().CheckError(*resp, err)
 }

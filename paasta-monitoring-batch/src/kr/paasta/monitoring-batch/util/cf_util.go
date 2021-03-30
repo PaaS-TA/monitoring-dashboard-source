@@ -26,6 +26,9 @@ type UaaToken struct {
 	ErrorDescription string `json:"error_description"`
 }
 
+/**
+	AccessToken 발급을 위한 API 호출 함수
+ */
 func GetUaaToken(n md.CFConfig) (token md.UaaToken) {
 
 	if len(n.UserId) > 0 && len(n.UserPw) > 0 {
@@ -33,15 +36,18 @@ func GetUaaToken(n md.CFConfig) (token md.UaaToken) {
 		resource := "/oauth/token"
 		data := url.Values{}
 		data.Set("grant_type", "password")
+		data.Set("response_type", "token")
+		//data.Set("token_format", "opaque")
 		data.Set("username", n.UserId)
 		data.Set("password", n.UserPw)
-		//data.Set("token_format", "opaque")
 		data.Set("client_id", n.ClientId)
-		data.Set("response_type", "token")
 		//data.Set("client_secret", n.ClientPw)
+
 		u, _ := url.ParseRequestURI(apiUrl)
 		u.Path = resource
 		urlStr := u.String() // "https://api.com/user/"
+
+		fmt.Println(">>>>> [cf_util.go / GetUaaToken()] API URL : " + urlStr)
 
 		tp := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
@@ -52,7 +58,8 @@ func GetUaaToken(n md.CFConfig) (token md.UaaToken) {
 		r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 		r.SetBasicAuth(url.QueryEscape("cf"), url.QueryEscape(""))
 		resp, err := client.Do(r)
-		fmt.Println(resp.Status)
+		fmt.Println(">>>>> [cf_util.go / GetUaaToken()] Request to ", urlStr, resp.Status)
+		//fmt.Println(resp.Status)
 
 		if err != nil {
 			fmt.Println(err)
@@ -65,10 +72,12 @@ func GetUaaToken(n md.CFConfig) (token md.UaaToken) {
 			fmt.Println(err)
 		}
 		bodyString := string(bodyBytes)
-		fmt.Println(bodyString)
+		fmt.Println(">>>>> [cf_util.go / GetUaaToken()] response Body : ", bodyString)
 
 		var uaaToken UaaToken
 		json.Unmarshal(bodyBytes, &uaaToken)
+
+		fmt.Println(">>>>> [cf_util.go / GetUaaToken()] uaaToken.Token : ", uaaToken.Token)
 
 		if resp.StatusCode != http.StatusOK {
 			fmt.Println(uaaToken)
@@ -113,6 +122,8 @@ func GetUaaReFreshToken(n md.CFConfig, refreshToken string) (string, string) {
 	u.Path = resource
 	urlStr := u.String() // "https://api.com/user/"
 
+	fmt.Println(">>>>> [cf_util.go / GetUaaReFreshToken()] API URL : " + urlStr)
+
 	tp := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
 	client := &http.Client{Transport: tp}
@@ -147,6 +158,9 @@ func GetUaaReFreshToken(n md.CFConfig, refreshToken string) (string, string) {
 	return result, ""
 }
 
+/**
+	CF API를 통해 App 정보를 조회하는 함수
+ */
 func GetAppByGuid(n md.CFConfig, m md.UaaToken, guid string) (md.Resource, error) {
 	var processResource md.ProcessResource
 	var resource md.Resource
@@ -162,6 +176,9 @@ func GetAppByGuid(n md.CFConfig, m md.UaaToken, guid string) (md.Resource, error
 	r, _ := http.NewRequest("GET", urlStr, nil) // URL-encoded payload
 	//r.Header.Add("Accept", "application/json")
 	//r.Header.Add("Content-Type", "application/json")
+
+	//fmt.Println(">>>>> [cf_util.go / GetAppByGuid()] CF API accessToken : " + m.Token)
+	fmt.Println(">>>>> [cf_util.go / GetAppByGuid()] CF API URL : " + urlStr)
 	r.Header.Add("Authorization", "bearer "+m.Token)
 	//r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -171,7 +188,7 @@ func GetAppByGuid(n md.CFConfig, m md.UaaToken, guid string) (md.Resource, error
 		return md.Resource{}, errors.Wrap(err, "Error requesting apps")
 	}
 
-	fmt.Println(resp.Status)
+	fmt.Println(">>>>> [cf_util.go / GetAppByGuid()] Request to ", urlStr, resp.Status)
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -179,18 +196,22 @@ func GetAppByGuid(n md.CFConfig, m md.UaaToken, guid string) (md.Resource, error
 		return md.Resource{}, errors.Wrap(err, "Error reading app response body")
 	}
 	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
+	fmt.Println(">>>>> [cf_util.go] resp.Body : ", bodyString)
 
 	json.Unmarshal(bodyBytes, &processResource)
+	fmt.Println(">>>>> [cf_util.go] processResource : ", processResource)
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println(processResource)
 
 	}
 	fmt.Println(processResource.Resources)
-	for _, resource = range processResource.Resources {
+	for _, resource := range processResource.Resources {
 		//n.mergeAppResource(item)
-		fmt.Println(resource)
+		fmt.Println(">>>>> [cf_util.go] resource : ", resource)
+		if resource.Guid == guid {
+			break
+		}
 		//return resource, nil
 	}
 	//json.Unmarshal(bodyBytes,  &processResource.Resources)
@@ -234,6 +255,9 @@ func UpdateApp(n md.CFConfig, m md.UaaToken, guid string, aur md.ScaleProcess) (
 
 	tp := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
+	//fmt.Println(">>>>> [cf_util.go / UpdateApp()] CF API accessToken : " + m.Token)
+	fmt.Println(">>>>> [cf_util.go / UpdateApp()] CF API URL : " + urlStr)
+
 	client := &http.Client{Transport: tp}
 	r, _ := http.NewRequest("POST", urlStr, buf) // URL-encoded payload
 	r.Header.Add("Accept", "application/json")
@@ -251,6 +275,8 @@ func UpdateApp(n md.CFConfig, m md.UaaToken, guid string, aur md.ScaleProcess) (
 	if resp.StatusCode != http.StatusAccepted {
 		return md.Resource{}, fmt.Errorf("CF API returned with status code %d", resp.StatusCode)
 	}
+
+	fmt.Println(">>>>> [cf_util.go / UpdateApp()] Request to ", urlStr, resp.Status)
 
 	body, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
