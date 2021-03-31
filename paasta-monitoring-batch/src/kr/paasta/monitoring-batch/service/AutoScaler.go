@@ -55,7 +55,7 @@ func (a *AutoScalerStruct) AutoScale() {
 		fmt.Println("time:", a.b.CfClientToken.ExpireTime)
 		if a.b.CfClientToken.ExpireTime.Before(time.Now()) {
 			a.b.CfClientToken = util.GetUaaToken(a.b.CfConfig)
-			//fmt.Println(">>>>> cf token:", cfToken.Token)
+			//fmt.Println("====== AutoScaler.go / AutoScale() - cf token : ", cfToken.Token)
 		}
 	}
 
@@ -81,14 +81,14 @@ func (a *AutoScalerStruct) AutoScale() {
 
 			//리소스 사용량 SET & 오토스케일링 대상 추출
 			a.setResourceUsage(&appInfo, policy, &listAutoScaleTarget)
-			fmt.Println(">>>>> [AutoScaler.go] APP_INFO:", appInfo)
+			fmt.Println("====== AutoScaler.go / AutoScale() - APP_INFO:", appInfo)
 
 		}(&wg, policy)
 	}
 	wg.Wait()
 
 	//Request AutoScale API
-	fmt.Println(">>>>> [AutoScaler.go] LIST_AUTO_SCALING_TARGET:", listAutoScaleTarget)
+	fmt.Println("====== AutoScaler.go / AutoScale() - LIST_AUTO_SCALING_TARGET:", listAutoScaleTarget)
 	for _, target := range listAutoScaleTarget {
 		a.requestAutoScale(target)
 	}
@@ -102,7 +102,7 @@ func (a *AutoScalerStruct) requestAutoScale(target model.AutoScaleTarget) {
 	//	return
 	//}
 
-	fmt.Printf(">>>>> [AutoScaler.go] Request cf AutoScaling: guid=[%v], instances=[%v]\n", target.AppGuid, target.InstanceCnt)
+	fmt.Printf("====== AutoScaler.go / AutoScale() - Request cf AutoScaling ( guid : %v, instances : %v\n", target.AppGuid, target.InstanceCnt)
 
 	var aur md.ScaleProcess
 	aur.Instances, _ = strconv.Atoi(target.InstanceCnt)
@@ -112,7 +112,7 @@ func (a *AutoScalerStruct) requestAutoScale(target model.AutoScaleTarget) {
 		fmt.Errorf(">>>>> cf API(UpdateApp) error:%v", updateErr)
 		return
 	}
-	fmt.Println(">>>>> [AutoScaler.go] cf API(UpdateApp) resp:", updateResp)
+	fmt.Println("====== AutoScaler.go / AutoScale() - cf API(UpdateApp) resp:", updateResp)
 
 	/*
 		err := util.PortalExistCHeck()
@@ -134,11 +134,11 @@ func (a *AutoScalerStruct) requestAutoScale(target model.AutoScaleTarget) {
  */
 func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, policy model.AppAutoScalingPolicy, listAutoScaleTarget *[]model.AutoScaleTarget) {
 
-	fmt.Println(">>>>> [AutoScaler.go] CfClientToken : ", a.b.CfClientToken)
+	fmt.Println("====== AutoScaler.go / setResourceUsage() - CfClientToken : ", a.b.CfClientToken)
 
 	cfApp, cfErr := util.GetAppByGuid(a.b.CfConfig, a.b.CfClientToken, appInfo.ApplicationId)
 	if cfErr != nil {
-		fmt.Errorf(">>>>> [AutoScaler.go]  cf API(GetAppByGuid) error:%v", cfErr)
+		fmt.Errorf("====== AutoScaler.go / setResourceUsage() - cf API(GetAppByGuid) error : %v", cfErr)
 		return
 	}
 
@@ -154,9 +154,9 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 		container.CpuUsage = a.p.GetContainerCpuUsage(container, policy.MeasureTimeSec)
 		container.MemoryUsage = a.p.GetContainerMemoryUsage(container, policy.MeasureTimeSec)
 
-		fmt.Printf(">>>>> [AutoScaler.go] application_id=[%v], container_interface=[%v], measure_time=[%v]\n",container.ApplicationId, container.ContainerInterface, policy.MeasureTimeSec)
-		fmt.Printf(">>>>> [AutoScaler.go] cpu_usage=[%v]\n", container.CpuUsage)
-		fmt.Printf(">>>>> [AutoScaler.go] memory_usage=[%v]\n", container.MemoryUsage)
+		fmt.Printf("====== AutoScaler.go / setResourceUsage() - application_id : %v, container_interface : %v, measure_time : %v\n",container.ApplicationId, container.ContainerInterface, policy.MeasureTimeSec)
+		fmt.Printf("====== AutoScaler.go / setResourceUsage() - cpu_usage : %v\n", container.CpuUsage)
+		fmt.Printf("====== AutoScaler.go / setResourceUsage() - memory_usage : %v\n", container.MemoryUsage)
 
 		// 오토스케일링 후 목표 인스턴스 개수
 		var instanceCntAfterAutoScale uint
@@ -170,11 +170,11 @@ func (a *AutoScalerStruct) setResourceUsage(appInfo *model.ApplicationInfo, poli
 				instanceCntAfterAutoScale = uint(cfApp.Instances) + policy.InstanceScalingUnit
 			}
 
-			fmt.Println(">>>>> [AutoScaler.go] cfApp : ", cfApp)
-			fmt.Println(">>>>> [AutoScaler.go] cfApp.Instances : ", cfApp.Instances)
-			fmt.Println(">>>>> [AutoScaler.go] policy.InstanceScalingUnit : ", policy.InstanceScalingUnit)
-			fmt.Println(">>>>> [AutoScaler.go] policy.InstanceMaxCnt : ", policy.InstanceMaxCnt)
-			fmt.Println(">>>>> [AutoScaler.go] instanceCntAfterAutoScale : ", instanceCntAfterAutoScale)
+			fmt.Println("====== [AutoScaler.go / setResourceUsage() - cfApp.Guid : ", cfApp.Guid)
+			fmt.Println("====== [AutoScaler.go / setResourceUsage() - cfApp.Instances : ", cfApp.Instances)
+			fmt.Println("====== [AutoScaler.go / setResourceUsage() - policy.InstanceScalingUnit : ", policy.InstanceScalingUnit)
+			fmt.Println("====== [AutoScaler.go / setResourceUsage() - policy.InstanceMaxCnt : ", policy.InstanceMaxCnt)
+			fmt.Println("====== [AutoScaler.go / setResourceUsage() - instanceCntAfterAutoScale : ", instanceCntAfterAutoScale)
 
 			//임계치 비교하여 Scale-Out 대상에 추가
 			if container.CpuUsage > float64(policy.CpuMaxThreshold) && cfApp.Instances < int(policy.InstanceMaxCnt) && policy.AutoScalingCpuYn == "Y" && !isAppended {
