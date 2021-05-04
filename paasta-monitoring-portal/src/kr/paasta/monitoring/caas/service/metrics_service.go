@@ -42,7 +42,7 @@ const (
 	//(PromQl)
 	//Cluster Usage Metrics
 	PQ_POD_USAGE    = "sum(kube_pod_info)/sum(kube_node_status_allocatable_pods{node=~'.*'})"
-	PQ_POD_CPU_USE  = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name)"
+	PQ_POD_CPU_USE  = "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod)"
 	PQ_CPU_USAGE    = "avg(instance:node_cpu:ratio)*100"
 	PQ_MEMORY_USAGE = "(sum(node_memory_MemTotal_bytes)-sum(node_memory_MemFree_bytes" + PLUS + "node_memory_Buffers_bytes" + PLUS + "node_memory_Cached_bytes))/sum(node_memory_MemTotal_bytes)*100"
 	PQ_DISK_USAGE   = "(sum(node_filesystem_size_bytes)-sum(node_filesystem_free_bytes))/sum(node_filesystem_size_bytes)*100"
@@ -89,20 +89,20 @@ const (
 	PQ_WORK_NODE_CONDITION = "count(kube_node_status_condition{condition='Ready',status='true'})by(node)"
 
 	//Pod Usage Metrics
-	PQ_POD_LIST         = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(pod_name,namespace)"
-	PQ_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m]))by(pod_name,namespace)*100"
-	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/1024/1024"
-	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/1024/1024"
-	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/max(container_fs_limit_bytes{container_name!='POD',image!=''})by(pod_name,namespace)*100"
-	PQ_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container_name!='POD',image!=''})by(pod_name,namespace)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
+	PQ_POD_LIST         = "count(container_cpu_usage_seconds_total{container!='POD',image!=''})by(pod,namespace)"
+	PQ_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!=''}[5m]))by(pod,namespace)*100"
+	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{container!='POD',image!=''})by(pod,namespace)/1024/1024"
+	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{container!='POD',image!=''})by(pod,namespace)/1024/1024"
+	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{container!='POD',image!=''})by(pod,namespace)/max(container_fs_limit_bytes{container!='POD',image!=''})by(pod,namespace)*100"
+	PQ_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container!='POD',image!=''})by(pod,namespace)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
 
 	//Container Usage Metrics
-	PQ_COTAINER_CPU_USE    = "sum(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)" //(MS)
-	PQ_COTAINER_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!=''}[5m])*100)by(namespace,pod_name,container_name)"
-	PQ_COTAINER_MEMORY_USE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
-	PQ_COTAINER_DISK_USE   = "sum(container_fs_usage_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/1024/1024"
-	//PQ_COTAINER_MEMORY_USAGE = "sum(container_memory_working_set_bytes{container_name!='POD',image!=''}/container_memory_max_usage_bytes{container_name!='POD',image!=''}*100)by(namespace,pod_name,container_name)"
-	PQ_COTAINER_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container_name!='POD',image!=''})by(namespace,pod_name,container_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
+	PQ_COTAINER_CPU_USE    = "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod,container)" //(MS)
+	PQ_COTAINER_CPU_USAGE  = "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!=''}[5m])*100)by(namespace,pod,container)"
+	PQ_COTAINER_MEMORY_USE = "sum(container_memory_working_set_bytes{container!='POD',image!=''})by(namespace,pod,container)/1024/1024"
+	PQ_COTAINER_DISK_USE   = "sum(container_fs_usage_bytes{container!='POD',image!=''})by(namespace,pod,container)/1024/1024"
+	//PQ_COTAINER_MEMORY_USAGE = "sum(container_memory_working_set_bytes{container!='POD',image!=''}/container_memory_max_usage_bytes{container!='POD',image!=''}*100)by(namespace,pod,container)"
+	PQ_COTAINER_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container!='POD',image!=''})by(namespace,pod,container)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
 
 	//Pod Phase
 	PQ_POD_PHASE = "count(kube_pod_status_phase>0)by(phase)"
@@ -277,15 +277,15 @@ func (s *MetricsService) GetContainerInfo(request model.MetricsRequest) (model.C
 
 	*/
 	// 1.cpuUsage (input:nodeName,nameSpace,podName)
-	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'}[5m]))by(namespace,pod_name,container_name)*100"
+	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'}[5m]))by(namespace,pod,container)*100"
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	pqMemoryUsage := "avg(container_memory_working_set_bytes{ccontainer_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})by(namespace,pod_name,container_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
+	pqMemoryUsage := "avg(container_memory_working_set_bytes{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'})by(namespace,pod,container)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
 
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
-		"sum(container_fs_usage_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})" +
-			"/max(container_fs_limit_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})*100"
+		"sum(container_fs_usage_bytes{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'})" +
+			"/max(container_fs_limit_bytes{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'})*100"
 
 	fmt.Println("pqDiskUsage : " + pqDiskUsage)
 
@@ -524,14 +524,14 @@ func (s *MetricsService) GetPodInfo(request model.MetricsRequest) (model.Contain
 
 	*/
 	// 1.cpuUsage (input:nodeName,nameSpace,podName)
-	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name='" + podName + "'}[5m]))by(pod_name)*100"
+	pqCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!='',pod='" + podName + "'}[5m]))by(pod)*100"
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	pqMemoryUsage := "avg(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})by(pod_name)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
+	pqMemoryUsage := "avg(container_memory_working_set_bytes{container!='POD',image!='',pod='" + podName + "'})by(pod)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
-		"sum(container_fs_usage_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})" +
-			"/max(container_fs_limit_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})*100"
+		"sum(container_fs_usage_bytes{container!='POD',image!='',pod='" + podName + "'})" +
+			"/max(container_fs_limit_bytes{container!='POD',image!='',pod='" + podName + "'})*100"
 
 	// Metrics Call func
 	cpuUsageData, _ := strconv.ParseFloat(GetResourceUsage(s.promethusUrl+pqCpuUsage, VALUE_1_DATA), 64)
@@ -759,14 +759,14 @@ func (s *MetricsService) GetPodInfoGraph(request model.MetricsRequest) ([]model.
 	fromToTimeParmameter := util.GetPromqlFromToParameter(3600, "600")
 
 	// 1.cpuUsage (input:nodeName,nameSpace,podName)
-	pqCpuUsage := "sum(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name='" + podName + "'})" + fromToTimeParmameter
+	pqCpuUsage := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',pod='" + podName + "'})" + fromToTimeParmameter
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	pqMemoryUsage := "sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})" + fromToTimeParmameter
+	pqMemoryUsage := "sum(container_memory_working_set_bytes{container!='POD',image!='',pod='" + podName + "'})" + fromToTimeParmameter
 
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
-		"sum(container_fs_usage_bytes{container_name!='POD',image!='',pod_name='" + podName + "'})" + fromToTimeParmameter
+		"sum(container_fs_usage_bytes{container!='POD',image!='',pod='" + podName + "'})" + fromToTimeParmameter
 
 	// Metrics Call func
 	cpuGraphData := GetGraphDataMap(s.promethusRangeUrl+pqCpuUsage, CPU)
@@ -794,14 +794,14 @@ func (s *MetricsService) GetContainerInfoGraph(request model.MetricsRequest) ([]
 	fromToTimeParmameter := util.GetPromqlFromToParameter(3600, "600")
 
 	// 1.cpuUsage (input:nodeName,nameSpace,podName)
-	pqCpuUsage := "sum(container_cpu_usage_seconds_total{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})" + fromToTimeParmameter
+	pqCpuUsage := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'})" + fromToTimeParmameter
 
 	// 2.memoryUsage (input:nodeName,nameSpace,podName)
-	pqMemoryUsage := "sum(container_memory_working_set_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})" + fromToTimeParmameter
+	pqMemoryUsage := "sum(container_memory_working_set_bytes{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'})" + fromToTimeParmameter
 
 	// 3.diskUsage (input:nodeName,nameSpace,podName)
 	pqDiskUsage :=
-		"sum(container_fs_usage_bytes{container_name!='POD',image!='',container_name='" + containerName + "',namespace='" + nameSpace + "',pod_name='" + podName + "'})" + fromToTimeParmameter
+		"sum(container_fs_usage_bytes{container!='POD',image!='',container='" + containerName + "',namespace='" + nameSpace + "',pod='" + podName + "'})" + fromToTimeParmameter
 
 	// Metrics Call func
 	cpuGraphData := GetGraphDataMap(s.promethusRangeUrl+pqCpuUsage, CPU)
@@ -1223,16 +1223,16 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 	return workloadsMetrics
 }
 func GetDivsionContiCpuUse(url string, namespace string, podname string, division string) float64 {
-	pqUrl := "sum(container_cpu_usage_seconds_total{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})"
+	pqUrl := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})"
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 	return dataWL
 }
 func GetDivsionContiMemoryUse(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})/1024/1024"
+		pqUrl = "sum(container_memory_working_set_bytes{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})/1024/1024"
 	} else if division == "pod" {
-		pqUrl = "sum(container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "'})/1024/1024"
+		pqUrl = "sum(container_memory_working_set_bytes{container!='',pod=~'" + podname + "'})/1024/1024"
 	}
 
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
@@ -1241,9 +1241,9 @@ func GetDivsionContiMemoryUse(url string, namespace string, podname string, divi
 func GetDivsionContiCpuUsage(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(rate(container_cpu_usage_seconds_total{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}[5m]))*100"
+		pqUrl = "sum(rate(container_cpu_usage_seconds_total{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'}[5m]))*100"
 	} else if division == "pod" {
-		pqUrl = "sum(rate(container_cpu_usage_seconds_total{container_name!='POD',pod_name=~'" + podname + "'}[5m]))*100"
+		pqUrl = "sum(rate(container_cpu_usage_seconds_total{container!='POD',pod=~'" + podname + "'}[5m]))*100"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 	return dataWL
@@ -1251,11 +1251,11 @@ func GetDivsionContiCpuUsage(url string, namespace string, podname string, divis
 func GetDivsionContiMemoryUsage(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		//pqUrl = "container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
-		pqUrl = "avg(container_memory_working_set_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
+		//pqUrl = "container_memory_working_set_bytes{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'}*100"
+		pqUrl = "avg(container_memory_working_set_bytes{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
 	} else if division == "pod" {
-		//pqUrl = "container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}*100"
-		pqUrl = "avg(container_memory_working_set_bytes{container_name!='',pod_name=~'" + podname + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container_name!='POD',image!=''}))"
+		//pqUrl = "container_memory_working_set_bytes{container!='',pod=~'" + podname + "-.*'}/container_memory_max_usage_bytes{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'}*100"
+		pqUrl = "avg(container_memory_working_set_bytes{container!='',pod=~'" + podname + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 
@@ -1264,9 +1264,9 @@ func GetDivsionContiMemoryUsage(url string, namespace string, podname string, di
 func GetDivsionContiDiskUse(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(container_fs_usage_bytes{container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'}/1024/1024)"
+		pqUrl = "sum(container_fs_usage_bytes{container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'}/1024/1024)"
 	} else if division == "pod" {
-		pqUrl = "sum(container_fs_usage_bytes{container_name!='',pod_name=~'" + podname + "-.*'}/1024/1024)"
+		pqUrl = "sum(container_fs_usage_bytes{container!='',pod=~'" + podname + "-.*'}/1024/1024)"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 	return dataWL
@@ -1274,9 +1274,9 @@ func GetDivsionContiDiskUse(url string, namespace string, podname string, divisi
 func GetDivsionContiDiskUsage(url string, namespace string, podname string, division string) float64 {
 	var pqUrl string
 	if division == "workLoads" {
-		pqUrl = "sum(container_fs_usage_bytes{container_name!='POD',image!=''.container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})by(pod_name)/max(container_fs_limit_bytes{container_name!='POD',image!='',container_name!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})by(pod_name)*100"
+		pqUrl = "sum(container_fs_usage_bytes{container!='POD',image!=''.container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})by(pod)/max(container_fs_limit_bytes{container!='POD',image!='',container!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})by(pod)*100"
 	} else if division == "pod" {
-		pqUrl = "sum(container_fs_usage_bytes{container_name!='POD',image!='',container_name!='',pod_name=~'" + podname + "-.*'})by(pod_name)/max(container_fs_limit_bytes{container_name!='POD',image!='',container_name!='',pod_name=~'" + podname + "-.*'})by(pod_name)*100"
+		pqUrl = "sum(container_fs_usage_bytes{container!='POD',image!='',container!='',pod=~'" + podname + "-.*'})by(pod)/max(container_fs_limit_bytes{container!='POD',image!='',container!='',pod=~'" + podname + "-.*'})by(pod)*100"
 	}
 	dataWL, _ := strconv.ParseFloat(GetResourceUsage(url+pqUrl, VALUE_1_DATA), 64)
 	return dataWL
@@ -1322,33 +1322,33 @@ func GetDivsionContiNameList(url string, namespace string, podname string, divis
 }
 
 func GetWorkloadsGraphCpuUse(url string, namespace string, podname string, fromToTimeParmameter string) []map[string]string {
-	pqUrl := "sum(container_cpu_usage_seconds_total{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})" + fromToTimeParmameter
+	pqUrl := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})" + fromToTimeParmameter
 	dataWL := GetGraphDataMap(url+pqUrl, CPU)
 	return dataWL
 }
 func GetWorkloadsGraphMemoryUse(url string, namespace string, podname string, fromToTimeParmameter string) []map[string]string {
-	pqUrl := "sum(container_memory_working_set_bytes{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})" + fromToTimeParmameter
+	pqUrl := "sum(container_memory_working_set_bytes{container!='POD',image!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})" + fromToTimeParmameter
 	dataWL := GetGraphDataMap(url+pqUrl, MEMORY)
 	return dataWL
 }
 func GetWorkloadsGraphDiskUse(url string, namespace string, podname string, fromToTimeParmameter string) []map[string]string {
-	pqUrl := "sum(container_fs_usage_bytes{container_name!='POD',image!='',namespace='" + namespace + "',pod_name=~'" + podname + "-.*'})" + fromToTimeParmameter
+	pqUrl := "sum(container_fs_usage_bytes{container!='POD',image!='',namespace='" + namespace + "',pod=~'" + podname + "-.*'})" + fromToTimeParmameter
 	dataWL := GetGraphDataMap(url+pqUrl, DISK+"_MB")
 	return dataWL
 }
 
 func GetWorkloadsGraphCpuUseDaemonset(url string, namespace string, podname string, fromToTimeParmameter string) []map[string]string {
-	pqUrl := "sum(container_cpu_usage_seconds_total{container_name!='POD',image!='',pod_name='" + podname + "'})" + fromToTimeParmameter
+	pqUrl := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',pod='" + podname + "'})" + fromToTimeParmameter
 	dataWL := GetGraphDataMap(url+pqUrl, CPU)
 	return dataWL
 }
 func GetWorkloadsGraphMemoryUseDaemonset(url string, namespace string, podname string, fromToTimeParmameter string) []map[string]string {
-	pqUrl := "sum(container_memory_working_set_bytes{container_name!='POD',image!='',pod_name='" + podname + "'})" + fromToTimeParmameter
+	pqUrl := "sum(container_memory_working_set_bytes{container!='POD',image!='',pod='" + podname + "'})" + fromToTimeParmameter
 	dataWL := GetGraphDataMap(url+pqUrl, MEMORY)
 	return dataWL
 }
 func GetWorkloadsGraphDiskUseDaemonset(url string, namespace string, podname string, fromToTimeParmameter string) []map[string]string {
-	pqUrl := "sum(container_fs_usage_bytes{container_name!='POD',image!='',pod_name='" + podname + "'})" + fromToTimeParmameter
+	pqUrl := "sum(container_fs_usage_bytes{container!='POD',image!='',pod='" + podname + "'})" + fromToTimeParmameter
 	dataWL := GetGraphDataMap(url+pqUrl, DISK+"_MB")
 	return dataWL
 }
@@ -1376,7 +1376,7 @@ func GetPodNameList(url string) []map[string]string {
 
 	for i := 0; i < int(jsonString1.Int()); i++ {
 		tempMap := make(map[string]string)
-		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.pod_name")
+		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.pod")
 		jsonData2 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.namespace")
 		tempMap["podname"] = jsonData.String()
 		tempMap["namespace"] = jsonData2.String()
@@ -1410,7 +1410,7 @@ func GetPodCpuUseList(url string) []map[string]string {
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1442,7 +1442,7 @@ func GetPodCpuUsageList(url string) []map[string]string {
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1475,7 +1475,7 @@ func GetPodMemUseList(url string) []map[string]string {
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1506,7 +1506,7 @@ func GetPodMemUsageList(url string) []map[string]string {
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1537,7 +1537,7 @@ func GetPodDiskUseList(url string) []map[string]string {
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1603,7 +1603,7 @@ func GetPodDiskUsageList(url string) []map[string]string {
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
 		tempMap["value"] = fmt.Sprintf("%.3f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1612,7 +1612,7 @@ func GetPodDiskUsageList(url string) []map[string]string {
 
 //Container Metrics func
 func GetContainerNameList(url string, request model.MetricsRequest) []map[string]string {
-	//	PQ_COTAINER_NAME_LIST  = "count(container_cpu_usage_seconds_total{container_name!='POD',image!=''})by(namespace,pod_name,container_name)"
+	//	PQ_COTAINER_NAME_LIST  = "count(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod,container)"
 	workloadName := request.WorkloadsName
 	podName := request.PodName
 
@@ -1694,8 +1694,8 @@ func GetContainerCpuUseList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["containername"] = jsonDataMap["container_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
+		tempMap["containername"] = jsonDataMap["container"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1728,8 +1728,8 @@ func GetContainerCpuUsageList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["containername"] = jsonDataMap["container_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
+		tempMap["containername"] = jsonDataMap["container"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1763,8 +1763,8 @@ func GetContainerMemUseList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["containername"] = jsonDataMap["container_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
+		tempMap["containername"] = jsonDataMap["container"].String()
 		//		tempMap["value"] =	jsonData1.String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
@@ -1797,8 +1797,8 @@ func GetContainerMemUsageList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["containername"] = jsonDataMap["container_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
+		tempMap["containername"] = jsonDataMap["container"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 		jsonMap = append(jsonMap, tempMap)
 	}
@@ -1830,8 +1830,8 @@ func GetContainerDiskUseList(url string) []map[string]string {
 		jsonDataMap := jsonData.Map()
 		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["podname"] = jsonDataMap["pod_name"].String()
-		tempMap["containername"] = jsonDataMap["container_name"].String()
+		tempMap["podname"] = jsonDataMap["pod"].String()
+		tempMap["containername"] = jsonDataMap["container"].String()
 		tempMap["value"] = fmt.Sprintf("%.2f", jsonData1.Float())
 
 		jsonMap = append(jsonMap, tempMap)
