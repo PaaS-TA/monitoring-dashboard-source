@@ -146,7 +146,6 @@ func podRunningStat(c chan model.BatchAlarmExecution, waitGroup *sync.WaitGroup,
 
 	if alarmInfo.MetricType == "CPU" {
 		value = result["CpuUsage"].Float()
-
 	}
 
 	if alarmInfo.MetricType == "MEMORY" {
@@ -190,14 +189,17 @@ func podRunningStat(c chan model.BatchAlarmExecution, waitGroup *sync.WaitGroup,
 func podStatReport(dbClient *gorm.DB, alarmInfo model.BatchAlarmInfoCheck, batchExecution model.BatchAlarmExecution, result float64) {
 	var token string = ""
 	alarmSns := dao.GetBatchAlarmSnsToken(alarmInfo.ServiceType, dbClient)
+
 	if alarmSns != (model.BatchAlarmSns{}) {
 		token = alarmSns.Token
 	}
 
 	if result > float64(alarmInfo.CriticalValue) || result > float64(alarmInfo.WarningValue) {
 		go dao.InsertBatchExecution(dbClient, &batchExecution)
-		_, snsIds := dao.GetBatchAlarmReceiver(alarmInfo.ServiceType, dbClient)
-		go notify.SendChatBot(snsIds, batchExecution.ExecutionResult, token)
+		if strings.Contains(alarmSns.SnsSendYn, "Y") {
+			_, snsIds := dao.GetBatchAlarmReceiver(alarmInfo.ServiceType, dbClient)
+			go notify.SendChatBot(snsIds, batchExecution.ExecutionResult, token)
+		}
 	}
 }
 func getAlarmInfos(dbClient *gorm.DB, monitoringUrl string) {

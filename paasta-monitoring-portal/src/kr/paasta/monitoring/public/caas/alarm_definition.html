@@ -262,7 +262,7 @@
 					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmInfo`, alarm.alarmPolicies);
 
 					// Alarm SNS Channel
-					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmSnsInfo`, alarm.alarmChannel);
+					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/alarmSnsInfo`, alarm.alarmSNSChannel);
 				},
 
 				alarmPolicies(data) {
@@ -280,7 +280,7 @@
 							alarm.alarmPolicySave();
 						}, false);
 					};
-					console.log(data);
+					//console.log(data);
 
 					alarm.data.forEach((value, idx) => {
 						//////////////////////////////////////////////////////////////////////
@@ -367,8 +367,8 @@
 					fnComm.saveData('PUT', `${fnComm.url}caas/monitoring/alarmUpdate`, policyData.replace(/(\s*)/g,''));
 				},
 
-				alarmChannel(data){
-					console.log(data);
+				alarmSNSChannel(data){
+					//console.log(data);
 					if(data.id != 'undefined' && data.id != null){
 						document.querySelector('.noneSns').style.display = 'none';
 						document.querySelector('.snsWrap').style.display = 'block';
@@ -394,27 +394,48 @@
 						document.querySelector('.snsWrap').style.display = 'none';
 					};
 					
-					// Alarm Channel 등록
+					// Alarm SNS Channel 등록
 					document.querySelector('.regist').addEventListener('click', (e) => {
-						alarm.alarmChannelSave();
+						alarm.alarmSNSChannelSave();
+					}, false);
+					// Alarm SNS Channel 활성 여부 반영
+					document.querySelector("#sns").addEventListener('click', (e) => {
+						alarm.alarmSNSChannelEnabled(data);
 					}, false);
 				},
 
-				alarmChannelSave(){
-					if(document.getElementById('sns').checked == true){
-						document.getElementById('sns').value = 'Y';
-					} else {
-						document.getElementById('sns').value = 'N';
-					};
-					
-					var channelData = `{"originType":"${document.getElementById('dvSelect').value}",
-						"snsId":"${document.querySelector('.snsid').value}",
-						"token":"${document.querySelector('.token').value}",
-						"expl":"${document.querySelector('.expl').value}",
-						"snsSendYn":"${document.getElementById('sns').value}"
-					}`
+				alarmSNSChannelSave(){
+					if(document.querySelector('.snsid').value != "" && document.querySelector('.token').value != ""){
+						if(document.getElementById('sns').checked == true){
+							document.getElementById('sns').value = 'Y';
+						} else {
+							document.getElementById('sns').value = 'N';
+						};
 
-					fnComm.saveData('POST', `${fnComm.url}caas/monitoring/alarmSnsSave`, channelData.replace(/(\s*)/g,''));
+						var channelData = `{"originType":"${document.getElementById('dvSelect').value}",
+							"snsId":"${document.querySelector('.snsid').value}",
+							"token":"${document.querySelector('.token').value}",
+							"expl":"${document.querySelector('.expl').value}",
+							"snsSendYn":"${document.getElementById('sns').value}"
+						}`
+
+						fnComm.saveData('POST', `${fnComm.url}caas/monitoring/alarmSnsSave`, channelData.replace(/(\s*)/g,''));
+					}
+				},
+
+				alarmSNSChannelEnabled(data){
+					// SNS ID가 등록되어 있는 경우
+					if(document.querySelector("#snsId").getAttribute('data-id') != null){
+						document.querySelector('.snsid').disabled = true
+						document.querySelector('.token').disabled = true
+						document.querySelector('.expl').disabled = true
+						document.getElementById('sns').disabled = true
+						document.querySelector('.snsid').value = data.snsId;
+						document.querySelector('.token').value = data.token;
+						document.querySelector('.expl').value = data.expl;
+						document.getElementById('sns').value = data.snsSendYn;
+						this.alarmSNSChannelSave();
+					}
 				},
 			}
 
