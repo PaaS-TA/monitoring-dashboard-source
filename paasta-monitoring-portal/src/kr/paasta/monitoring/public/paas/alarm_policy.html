@@ -5,6 +5,7 @@
 		<title>PaaS-TA Monitoring</title>
 		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
 		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css" />
 	</head>
 	<body>
 
@@ -16,7 +17,7 @@
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
 
 				<ul class="global">
-					<li class="PaaS"><a href="index.html">PaaS</a></li>
+					<li class="PaaS"><a href="index.html" class="top-menu-active">PaaS</a></li>
 					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
 					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
 					<li class="IaaS"><a href="../dist/index.html#/iaas/main">IaaS</a></li>
@@ -215,16 +216,15 @@
 					</div>
 
 					<article class="push">
-                        <h4>Alarm SNS Channel (Telegram)<input type="checkbox" id="sns" value="N"><label for="sns">OFF</label></h4>
+                        <h4>Alarm SNS Channel (Telegram)<!--<input type="checkbox" id="sns" value="N"><label for="sns">OFF</label>--></h4>
                         <div class="snsBot">
 							<p class="noneSns">Telegram 에 등록된 Bot 채널이 없습니다.</p>
 							<div class="snsWrap" id="snsList">
 								<p class="snsInfo">Telegram 메신져에서 아래 아이디를 검색 후 Bot 채널에 참여 하시면 알람 메세지를 받을 수 있습니다.</p>
 								<div class="snsInfo list">
-									<span id="snsId">@all_paasta_sns_alarm</span>
-									<em id="snsDe">전체 SNS 알람 수신</em>
+									<ul id="snsListCotainer"></ul>
 								</div>
-								<button>DELETE</button>
+								<button id="btnDel">DELETE</button>
 							</div>
 							<div class="snsWrap">
 								<p>Telegram 메신져에서 @BotFather 채널에 참여 후 /newbot 명령으로 알람 Bot을 생성하여 아래 등록해주시기 바랍니다.<a href="#">등록방법</a></p>
@@ -238,6 +238,11 @@
 									<input type="text" placeholder="Bot ID" class="snsid">
 									<input type="text" placeholder="Token Value" class="token">
 									<input type="text" placeholder="Description" class="expl">
+									<h4 class="h4-small">
+										Enable Send Message
+										<input type="checkbox" id="sns" value="N">
+										<label for="sns">OFF</label>
+									</h4>
 									<button class="regist">REGIST</button>
 								</fieldset>
 							</div>
@@ -259,6 +264,23 @@
 	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
 	
 	<script type="text/javascript">
+
+
+		function saveAlarmSnsSendYn(elem) {
+
+			var sendYn = elem.value == 'Y' ? 'N' : 'Y';
+			var id = elem.id.substring(3);
+			console.log(sendYn);
+			console.log(id);
+
+			var params = `{
+				"id" : ${id},
+				"snsSendYn" : "${sendYn}"
+			},`;
+
+			fnComm.saveData('PUT', `${fnComm.url}paas/alarm/sns/channel`, params.replace(/(\s*)/g,''));
+		}
+
 		window.onload = () => {
 			const alarm = {
 				id : 'bos',
@@ -351,6 +373,13 @@
 					var rTarget = document.querySelectorAll('.rData');
 
 					for(var i=0; i<target.length; i++){
+
+						// 2021.05.18 - 예외처리 추가
+						if (cTarget[i].value <= wTarget[i].value) {
+							fnComm.alertPopup('Notice', 'Critical 임계값을 Warning 임계값보다 높게 설정해주세요.', null);
+							return;
+						}
+
 						policyData += `{
 							"originType":"${document.getElementById('type').value}",
 							"alarmType":"${target[i].getAttribute('data-id')}",
@@ -388,8 +417,82 @@
 					fnComm.saveData('PUT', `${fnComm.url}paas/alarm/policy`, policyData.replace(/(\s*)/g,''));
 				},
 
-				alarmChannel(data){
+				// 2021.05.18 - Alarm SNS Channel 정보 출력하기
+				alarmChannel(data) {
 					console.log(data);
+					if (data.length > 0) {
+						document.querySelector('.noneSns').style.display = 'none';
+						document.querySelector('.snsWrap').style.display = 'block';
+						if (data[0].snsSendYn == 'Y') {
+							document.getElementById('sns').value = 'Y';
+							document.getElementById('sns').setAttribute('checked', 'checked');
+						} else {
+							document.getElementById('sns').value = 'N';
+							document.getElementById('sns').removeAttribute('checked');
+						}
+
+						var listContainer = document.getElementById("snsListCotainer");
+
+						var htmlStr = '';
+						for (var i=0; i<data.length; i++) {
+							var item = data[i];
+							var sendYnCheckedTxt = item.snsSendYn == 'Y' ? 'checked' : '';
+							var snsSendYnTxt = item.snsSendYn == 'Y' ? '발송가능' : '발송불가';
+							var originTypeTxt = item.originType == 'all' ? 'ALL' :
+									item.originType == 'bos' ? 'Bosh' :
+											item.originType == 'con' ? 'Container' :
+													item.originType == 'pas' ? 'PaaS-TA' : '';
+
+							htmlStr += "<li style=\"display:inline-block; width:100%\">"
+								+ "<input class=\"list-checkinput\"type=\"checkbox\" id=\"" + item.id + "\" value=\"" + item.snsSendYn + "\"/>"
+								+ "<label class=\"list-checkbox\" for=\""+item.id+"\">" + snsSendYnTxt + "</label>"
+								+ "<em style=\"float:left;margin-right:10px;\">[" + originTypeTxt + "]</em>"
+								+ "<span>" + item.snsId +"</span>"
+
+								+ "<div class=\"toggle\">"
+								+ "<input class=\"list-toggleCheck\" type=\"checkbox\" onclick=\"saveAlarmSnsSendYn(this);\" id=\"sns"+item.id+"\" value=\""+item.snsSendYn+"\""+ sendYnCheckedTxt+ ">"
+								+ "<label for=\"sns"+item.id+"\">OFF</label>"
+								+ "<em>" + snsSendYnTxt + "</em>"
+								+ "</div>"
+								+ "</li>";
+						}
+						listContainer.innerHTML = htmlStr;
+
+						// Alarm Channel 삭제버튼 이벤트
+						document.getElementById('btnDel').addEventListener('click', (e) => {
+							var checkedId = [];
+							var checkboxElem = document.getElementsByClassName("list-checkinput");
+							for (var i=0; i<checkboxElem.length; i++) {
+								if (checkboxElem[i].checked)
+									checkedId.push(checkboxElem[i].id)
+							}
+
+							if (checkedId.length == 0) {
+								fnComm.alertPopup('DELETE', '삭제할 항목을 체크해주세요.', null);
+
+							} else {
+								for (var i=0; i<checkedId.length; i++) {
+									var url = `${fnComm.url}paas/alarm/sns/channel/` + checkedId[i]
+
+									var request = new XMLHttpRequest();
+									request.open('DELETE', url);
+									request.setRequestHeader('X-XSRF-TOKEN', sessionStorage.getItem('token'));
+									request.send(null);
+
+									//fnComm.saveData('DELETE', url);
+								}
+								fnComm.alertPopup('DELETE', 'COMPLETE', fnComm.winReload);
+							}
+						}, false);
+
+
+
+					} else {
+						document.querySelector('.noneSns').style.display = 'block';
+						document.querySelector('.snsWrap').style.display = 'none';
+					}
+
+					/*
 					if(data != 'undefined' && data != null && data != ''){
 						document.querySelector('.noneSns').style.display = 'none';
 						document.querySelector('.snsWrap').style.display = 'block';
@@ -403,12 +506,19 @@
 						} else {
 							document.getElementById('sns').value = 'N';
 							document.getElementById('sns').removeAttribute('checked');
-						};
+						}
+
+						// Alarm Channel 삭제
+						document.getElementById('btnDel').addEventListener('click', (e) => {
+							console.log(document.getElementById('snsId').getAttribute('data-id'));
+							fnComm.saveData('DELETE', `${fnComm.url}paas/alarm/sns/channel/${document.getElementById('snsId').getAttribute('data-id')}`);
+						}, false);
+
 					} else {
 						document.querySelector('.noneSns').style.display = 'block';
 						document.querySelector('.snsWrap').style.display = 'none';
 					};
-					
+					*/
 
 					// Alarm Channel 등록
 					document.querySelector('.regist').addEventListener('click', (e) => {
@@ -416,7 +526,21 @@
 					}, false);
 				},
 
+
 				alarmChannelSave(){
+
+					// 2021.05.18 - 예외처리 추가
+					if (document.querySelector('.snsid').value == '') {
+						fnComm.alertPopup('Notice', 'ID를 입력해주세요.', null);
+						return;
+					}
+
+					// 2021.05.18 - 예외처리 추가
+					if (document.querySelector('.token').value == '') {
+						fnComm.alertPopup('Notice', 'Token을 입력해주세요.', null);
+						return;
+					}
+
 					if(document.getElementById('sns').checked == true){
 						document.getElementById('sns').value = 'Y';
 					} else {

@@ -168,6 +168,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 			routes.PAAS_ALARM_SNS_CHANNEL_LIST:   route(alarmPolicyController.GetAlarmSnsChannelList),
 			routes.PAAS_ALARM_SNS_CHANNEL_CREATE: route(alarmPolicyController.CreateAlarmSnsChannel),
 			routes.PAAS_ALARM_SNS_CHANNEL_DELETE: route(alarmPolicyController.DeleteAlarmSnsChannel),
+			routes.PAAS_ALARM_SNS_CHANNEL_UPDATE: route(alarmPolicyController.UpdateAlarmSnsChannel),  // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
 
 			routes.PAAS_ALARM_STATUS_LIST:    route(alarmController.GetAlarmList),
 			routes.PAAS_ALARM_STATUS_COUNT:   route(alarmController.GetAlarmListCount),

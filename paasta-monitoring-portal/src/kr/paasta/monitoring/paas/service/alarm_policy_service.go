@@ -89,7 +89,15 @@ func (h *AlarmService) CreateAlarmSnsChannel(request model.AlarmPolicyRequest, t
 }
 
 func (h *AlarmService) DeleteAlarmSnsChannel(request model.AlarmPolicyRequest, txn *gorm.DB) model.ErrMessage {
-
+	fmt.Println("PaaS > DeleteAlarmSnsChannel() called....")
 	err := dao.GetAlarmPolicyDao(h.txn).DeleteAlarmSnsChannel(request)
+	return err
+}
+
+/**
+	2021.05.18 - PaaS 알람 SNS 정보 수정 기능 추가
+ */
+func (h *AlarmService) UpdateAlarmSnsChannel(request model.AlarmPolicyRequest, txn *gorm.DB) model.ErrMessage {
+	err := dao.GetAlarmPolicyDao(h.txn).UpdateAlarmSnsChannel(request)
 	return err
 }

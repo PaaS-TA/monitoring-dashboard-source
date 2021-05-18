@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+#contents article div.toggle input[type=checkbox] {float:right; visibility:hidden;}
+#contents article div.toggle input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:62px; height:23px; margin-left:10px; margin-top:7px; padding:0 10px; font-size:11px; line-height:24px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition:.5s;}
+#contents article div.toggle input[type=checkbox] + label:before {content:'ON'; position:absolute; top:0px; left:-85px; z-index:1; width:140px; height:30px; color:#fff; font-weight:400; border:0;}
+#contents article div.toggle input[type=checkbox] + label:after {content:''; position:absolute; top:5px; left:3px; z-index:2; overflow:hidden; width:13px; height:13px; border:0; background:#fff; border-radius:12px; transition:.5s;}
+#contents article div.toggle input[type=checkbox]:checked + label {text-indent:102px; background:#f576c3;}
+#contents article div.toggle input[type=checkbox]:checked + label:after {border:0;left:43px;}
+
+.list-checkbox { float: left; margin: 8px; }
+
+.h4-small { font-size: 13pt; margin: 0 0 0 10px; }
+.top-menu-active { font-weight: bold; }

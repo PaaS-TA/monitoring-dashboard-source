@@ -157,3 +157,23 @@ func (b AlarmPolicyDao) DeleteAlarmSnsChannel(request model.AlarmPolicyRequest) 
 	err := util.GetError().DbCheckError(status.Error)
 	return err
 }
+
+/**
+2021.05.18 - PaaS 알람 SNS 정보 수정 기능 추가
+*/
+func (b AlarmPolicyDao) UpdateAlarmSnsChannel(request model.AlarmPolicyRequest) model.ErrMessage {
+
+	alarmSns := model.AlarmSns{
+		ChannelId : request.Id,
+		SnsSendYn:  request.SnsSendYn,
+	}
+
+	status := b.txn.Debug().Table("alarm_sns").Model(&alarmSns).Where("channel_id = ?", alarmSns.ChannelId).Updates(
+		map[string]interface{}{
+			"sns_send_yn": alarmSns.SnsSendYn,
+			"modi_date":    util.GetDBCurrentTime(),
+			"modi_user":    "system"});
+
+	err := util.GetError().DbCheckError(status.Error)
+	return err
+}

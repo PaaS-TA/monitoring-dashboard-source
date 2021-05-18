@@ -85,6 +85,7 @@ const (
 	PAAS_ALARM_SNS_CHANNEL_LIST   = "PAAS_ALARM_SNS_CHANNEL_LIST"
 	PAAS_ALARM_SNS_CHANNEL_CREATE = "PAAS_ALARM_SNS_CHANNEL_CREATE"
 	PAAS_ALARM_SNS_CHANNEL_DELETE = "PAAS_ALARM_SNS_CHANNEL_DELETE"
+	PAAS_ALARM_SNS_CHANNEL_UPDATE = "PAAS_ALARM_SNS_CHANNEL_UPDATE"
 
 	PAAS_ALARM_STATUS_LIST    = "PAAS_ALARM_STATUS_LIST"
 	PAAS_ALARM_STATUS_COUNT   = "PAAS_ALARM_STATUS_COUNT"
@@ -332,6 +333,7 @@ var PaasRoutes = rata.Routes{
 	{Path: "/v2/paas/alarm/sns/channel", Method: "POST", Name: PAAS_ALARM_SNS_CHANNEL_CREATE},
 	{Path: "/v2/paas/alarm/sns/channel/list", Method: "GET", Name: PAAS_ALARM_SNS_CHANNEL_LIST},
 	{Path: "/v2/paas/alarm/sns/channel/:id", Method: "DELETE", Name: PAAS_ALARM_SNS_CHANNEL_DELETE},
+	{Path: "/v2/paas/alarm/sns/channel", Method: "PUT", Name: PAAS_ALARM_SNS_CHANNEL_UPDATE},  // 2021.05.18 - PaaS 채널 SNS 수정 기능 추가
 
 	{Path: "/v2/paas/alarm/statuses", Method: "GET", Name: PAAS_ALARM_STATUS_LIST},
 	{Path: "/v2/paas/alarm/status/count", Method: "GET", Name: PAAS_ALARM_STATUS_COUNT},

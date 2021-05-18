@@ -42,6 +42,7 @@ func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *htt
 
 	err := json.Unmarshal(data, &apiRequest)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
@@ -52,6 +53,7 @@ func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *htt
 		if i < 3 {
 			err := data.AlarmPolicyValidate(data)
 			if err != nil {
+				fmt.Println(err)
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte(err.Error()))
 				return
@@ -59,6 +61,7 @@ func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *htt
 		} else {
 			err := data.AlarmEmailValidate(data)
 			if err != nil {
+				fmt.Println(err)
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte(err.Error()))
 				return
@@ -116,19 +119,55 @@ func (h *AlarmPolicyService) CreateAlarmSnsChannel(w http.ResponseWriter, r *htt
 	}
 }
 
+
 func (h *AlarmPolicyService) DeleteAlarmSnsChannel(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmPolicyRequest
 	id, _ := strconv.Atoi(r.FormValue(":id"))
 	apiRequest.Id = uint(id)
 
-	ErrMessage := service.GetAlarmService(h.txn).DeleteAlarmSnsChannel(apiRequest, h.txn)
+	err := service.GetAlarmService(h.txn).DeleteAlarmSnsChannel(apiRequest, h.txn)
+
+
+	// TODO : 파라미터를 배열로 받아서 처리하는 방안 고민 필요..
+	/*
+		var err model.ErrMessage
+		idArr, _ := r.URL.Query()["id"]
+		for _, value := range idArr {
+			id, _ := strconv.Atoi(value)
+			apiRequest.Id = uint(id)
+			err = service.GetAlarmService(h.txn).DeleteAlarmSnsChannel(apiRequest, h.txn)
+			if (err != nil) {
+				break
+			}
+		}
+	*/
+
+	util.RenderJsonResponse(err, w)
+}
+
+
+/**
+2021.05.18 - PaaS 알람 SNS 정보 수정 기능 추가
+*/
+func (h *AlarmPolicyService) UpdateAlarmSnsChannel(w http.ResponseWriter, r *http.Request) {
+	var apiRequest model.AlarmPolicyRequest
+	err := json.NewDecoder(r.Body).Decode(&apiRequest)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	ErrMessage := service.GetAlarmService(h.txn).UpdateAlarmSnsChannel(apiRequest, h.txn)
 	if ErrMessage != nil {
 		util.RenderJsonResponse(ErrMessage, w)
 		return
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(204)
-		w.Write([]byte("{\"status\":\"No Content\"}"))
+		w.WriteHeader(201)
+		w.Write([]byte("{\"status\":\"Created\"}"))
 	}
 }
