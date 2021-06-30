@@ -41,8 +41,7 @@ const (
 
 	//(PromQl)
 	//Cluster Usage Metrics
-	PQ_POD_USAGE    = "sum(kube_pod_info)/sum(kube_node_status_allocatable_pods{node=~'.*'})"
-	PQ_POD_CPU_USE  = "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod)"
+	PQ_POD_USAGE    = "sum(kube_pod_info)/sum(sum(kube_node_status_allocatable{resource='pods'})by(node))*100"
 	PQ_CPU_USAGE    = "avg(instance:node_cpu:ratio)*100"
 	PQ_MEMORY_USAGE = "(sum(node_memory_MemTotal_bytes)-sum(node_memory_MemFree_bytes" + PLUS + "node_memory_Buffers_bytes" + PLUS + "node_memory_Cached_bytes))/sum(node_memory_MemTotal_bytes)*100"
 	PQ_DISK_USAGE   = "(sum(node_filesystem_size_bytes)-sum(node_filesystem_free_bytes))/sum(node_filesystem_size_bytes)*100"
@@ -51,7 +50,7 @@ const (
 	PQ_CLUSTER_ALERTS            = "sum(ALERTS)"
 	PQ_CLUSTER_RUNNING_POD       = "sum(kubelet_running_pod_count)"
 	PQ_CLUSTER_RUNNING_CONTAINER = "sum(kubelet_running_container_count)"
-	PQ_CLUSTER_POD_RESTART       = "kube_pod_container_status_restarts_total"
+	PQ_CLUSTER_POD_RESTART       = "sum(kube_pod_container_status_restarts_total)"
 	PQ_CLUSTER_NODES             = "sum(kube_node_info)"
 
 	//Workloads Status (Deployment, Daemonset, StateFulset, PodContainer)
@@ -82,19 +81,20 @@ const (
 		"-node_memory_Cached_bytes{job='node-exporter'})" +
 		"/node_memory_MemTotal_bytes{job='node-exporter'})*100)by(instance)"
 
-	PQ_WORK_NODE_CPU_ALLOC  = "sum(kube_node_status_allocatable_cpu_cores*100)by(node)"
+	PQ_WORK_NODE_CPU_ALLOC  = "sum(node_cpu_seconds_total{mode='iowait',cpu='0'})by(instance)"
 	PQ_WORK_NODE_MEMORY_USE = "node_memory_Active_bytes"
 
 	PQ_WORK_NODE_DISK_USE  = "sum(node_filesystem_size_bytes-node_filesystem_free_bytes)by(instance)"
 	PQ_WORK_NODE_CONDITION = "count(kube_node_status_condition{condition='Ready',status='true'})by(node)"
 
 	//Pod Usage Metrics
-	PQ_POD_LIST         = "count(container_cpu_usage_seconds_total{container!='POD',image!=''})by(pod,namespace)"
-	PQ_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!=''}[5m]))by(pod,namespace)*100"
-	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{container!='POD',image!=''})by(pod,namespace)/1024/1024"
-	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{container!='POD',image!=''})by(pod,namespace)/1024/1024"
-	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{container!='POD',image!=''})by(pod,namespace)/max(container_fs_limit_bytes{container!='POD',image!=''})by(pod,namespace)*100"
-	PQ_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{container!='POD',image!=''})by(pod,namespace)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
+	PQ_POD_LIST         = "sum(container_cpu_usage_seconds_total{pod!='',image!=''})by(pod,namespace)"
+	PQ_POD_CPU_USE      = "sum(container_cpu_usage_seconds_total{pod!='',image!=''})by(pod)"
+	PQ_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{pod!='',image!=''}[5m]))by(pod,namespace)*100"
+	PQ_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{pod!='',image!=''})by(pod,namespace)/1024/1024"
+	PQ_POD_DISK_USE     = "sum(container_fs_usage_bytes{pod!='',image!=''})by(pod,namespace)/1024/1024"
+	PQ_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{pod!='',image!=''})by(pod,namespace)/max(container_fs_limit_bytes{pod!='',image!=''})by(pod,namespace)*100"
+	PQ_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{pod!='',image!=''})by(pod,namespace)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{pod!='',image!=''}))"
 
 	//Container Usage Metrics
 	PQ_COTAINER_CPU_USE    = "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod,container)" //(MS)
@@ -374,7 +374,7 @@ func (s *MetricsService) GetWorkloadsStatus() ([]model.WorkloadsStatus, model.Er
 
 func (s *MetricsService) GetWorkloadsContiSummary() ([]model.WorkloadsContiSummary, model.ErrMessage) {
 	// Metrics Call func && Struct Metrics Values Setting
-	dataWorkloadsContiSummary := make([]model.WorkloadsContiSummary, 3)
+ 	dataWorkloadsContiSummary := make([]model.WorkloadsContiSummary, 3)
 	deplomentMetric := model.WorkloadsContiSummary{}
 	statefulsetMetric := model.WorkloadsContiSummary{}
 	daemonsetMetric := model.WorkloadsContiSummary{}
@@ -869,6 +869,7 @@ func GetWorkNodeNameList(url string, url2 string) []map[string]string {
 	jsonMap := make([]map[string]string, 0)
 
 	//======================================================
+	/*
 	resp2, err2 := http.Get(url2)
 
 	if err2 != nil {
@@ -884,16 +885,16 @@ func GetWorkNodeNameList(url string, url2 string) []map[string]string {
 	}
 
 	str3 := string(data2)
-
+    */
 	for i := 0; i < int(jsonString1.Int()); i++ {
 		tempMap := make(map[string]string)
 		jsonData := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric")
 		jsonDataMap := jsonData.Map()
-		jsonData2 := gjson.Get(str3, "data.result."+strconv.Itoa(i)+".metric")
-		jsonDataMap2 := jsonData2.Map()
+		//jsonData2 := gjson.Get(str3, "data.result."+strconv.Itoa(i)+".metric")
+		//jsonDataMap2 := jsonData2.Map()
 		tempMap["instance"] = jsonDataMap["instance"].String()
 		tempMap["namespace"] = jsonDataMap["namespace"].String()
-		tempMap["nodename"] = jsonDataMap2["node"].String()
+		tempMap["nodename"] = jsonDataMap["nodename"].String()
 
 		fmt.Println("instance : " + tempMap["instance"])
 		fmt.Println("nodename : " + tempMap["nodename"])
@@ -1029,12 +1030,12 @@ func GetWorkNodeCpuUseList(url string) []map[string]string {
 
 	for i := 0; i < int(jsonString1.Int()); i++ {
 		tempMap := make(map[string]string)
-		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.node")
+		jsonData1 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".metric.instance")
 		tempData1 := jsonData1.String()
 		jsonData2 := gjson.Get(str2, "data.result."+strconv.Itoa(i)+".value.1")
 		tempData2 := jsonData2.Float()
 
-		tempMap["node"] = tempData1
+		tempMap["instance"] = tempData1
 		tempMap["value"] = fmt.Sprintf("%.0f", tempData2)
 
 		jsonMap = append(jsonMap, tempMap)
@@ -1174,7 +1175,7 @@ func GetWorkloadsMetrics(url string, workloadsName string) model.WorkloadsContiS
 
 	// 결과 출력
 	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+ 	if err != nil {
 		log.Println(err)
 	}
 	str2 := string(data)
@@ -1893,7 +1894,7 @@ func WorkNodeMapMerge(
 
 	for i := 0; i < len(workNodeList); i++ {
 		dataInstance := workNodeList[i].Instance
-		dataNodeName := workNodeList[i].NodeName
+		// dataNodeName := workNodeList[i].NodeName
 		for _, data := range workNodeMemUsageList {
 			if strings.Compare(dataInstance, data["instance"]) == 0 {
 				workNodeList[i].MemoryUsage = data["value"]
@@ -1916,7 +1917,7 @@ func WorkNodeMapMerge(
 
 		//NodeCpuUse
 		for _, data := range workNodeCpuUseList {
-			if strings.Compare(dataNodeName, data["node"]) == 0 {
+			if strings.Compare(dataInstance, data["instance"]) == 0 {
 				workNodeList[i].Cpu = data["value"]
 			}
 		}
@@ -1930,7 +1931,7 @@ func WorkNodeMapMerge(
 
 		//NodeConditionReady(true, false)
 		for _, data := range workNodeConditionList {
-			if strings.Contains(dataNodeName, data["node"]) {
+			if strings.Contains(dataInstance, data["instance"]) {
 				workNodeList[i].Ready = "TRUE"
 			}
 		}
