@@ -3,10 +3,10 @@ package services
 import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"github.com/rackspace/gophercloud"
-	"kr/paasta/monitoring/iaas/dao"
-	"kr/paasta/monitoring/iaas/integration"
-	"kr/paasta/monitoring/iaas/model"
+	"github.com/gophercloud/gophercloud"
+	"kr/paasta/monitoring/iaas_new/dao"
+	"kr/paasta/monitoring/iaas_new/integration"
+	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 	"reflect"
 )

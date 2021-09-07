@@ -3,10 +3,10 @@ package integration
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rackspace/gophercloud"
-	"github.com/rackspace/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
 	"io/ioutil"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 )

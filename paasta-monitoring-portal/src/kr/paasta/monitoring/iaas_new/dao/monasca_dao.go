@@ -2,7 +2,7 @@ package dao
 
 import (
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	pm "kr/paasta/monitoring/paas/model"
 )
 

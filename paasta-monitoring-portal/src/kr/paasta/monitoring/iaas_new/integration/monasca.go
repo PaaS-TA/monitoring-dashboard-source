@@ -3,7 +3,7 @@ package integration
 import (
 	"github.com/monasca/golang-monascaclient/monascaclient"
 	mod "github.com/monasca/golang-monascaclient/monascaclient/models"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"strings"
 	"time"
 )

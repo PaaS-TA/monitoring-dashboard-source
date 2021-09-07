@@ -20,13 +20,11 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"github.com/monasca/golang-monascaclient/monascaclient"
 
 	"kr/paasta/monitoring/common/config"
-	commonModel "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/handlers"
-	"kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/iaas_new"
+	"kr/paasta/monitoring/iaas_new/model"
 	bm "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"
 )
@@ -89,28 +87,20 @@ func main() {
 	var iaaSInfluxServerClient client.Client
 	var iaasElasticClient *elasticsearch.Client
 	var openstackProvider model.OpenstackProvider
-	var monClient *monascaclient.Client
 	var auth gophercloud.AuthOptions
 
 	// paas client
 	var paaSInfluxServerClient client.Client
 	var paasElasticClient *elasticsearch.Client
 	var databases bm.Databases
-	//var cfProvider cfclient.Config
 	var boshClient *gogobosh.Client
 
-	// Common MysqlDB
-	paasConfigDbCon := new(commonModel.DBConfig)
-	paasConfigDbCon.DbType = configMap["paas.monitoring.db.type"]
-	paasConfigDbCon.DbName = configMap["paas.monitoring.db.dbname"]
-	paasConfigDbCon.UserName = configMap["paas.monitoring.db.username"]
-	paasConfigDbCon.UserPassword = configMap["paas.monitoring.db.password"]
-	paasConfigDbCon.Host = configMap["paas.monitoring.db.host"]
-	paasConfigDbCon.Port = configMap["paas.monitoring.db.port"]
+	// config.ini 파일에서 MySQL 접속정보를 추출
+	dbConnInfo := config.InitDBConnectionConfig(configMap)
 
-	paasConnectionString := utils.GetConnectionString(paasConfigDbCon.Host, paasConfigDbCon.Port, paasConfigDbCon.UserName, paasConfigDbCon.UserPassword, paasConfigDbCon.DbName)
+	paasConnectionString := utils.GetConnectionString(dbConnInfo.Host, dbConnInfo.Port, dbConnInfo.UserName, dbConnInfo.UserPassword, dbConnInfo.DbName)
 	fmt.Println("String:", paasConnectionString)
-	paasDbAccessObj, paasDbErr := gorm.Open(paasConfigDbCon.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
+	paasDbAccessObj, paasDbErr := gorm.Open(dbConnInfo.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
 	if paasDbErr != nil {
 		fmt.Println("err::", paasDbErr)
 		return
@@ -131,7 +121,7 @@ func main() {
 	}
 	//IaaS Connection Info
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
-		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = iaas_new.GetIaasClients(configMap)
+		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, auth, err = iaas_new.GetIaasClients(configMap)
 		if err != nil {
 			log.Println(err)
 			os.Exit(-1)
@@ -152,14 +142,14 @@ func main() {
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, auth, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			log.Fatalln(err)
 		}
 	} else {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, monascaclient.Client{}, auth, databases,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, auth, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			log.Fatalln(err)

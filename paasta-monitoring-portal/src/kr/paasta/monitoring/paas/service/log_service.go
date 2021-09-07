@@ -2,7 +2,7 @@ package service
 
 import (
 	/*"gopkg.in/olivere/elastic.v3"*/
-	iaasmodel "kr/paasta/monitoring/iaas/model"
+	iaasmodel "kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/paas/dao"
 	"kr/paasta/monitoring/paas/model"
 

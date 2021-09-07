@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	commonModel "kr/paasta/monitoring/common/model"
 	"os"
 	"strings"
 )
@@ -60,4 +61,17 @@ func ConvertXmlToString(fileName string) (string, error) {
 		return "", err
 	}
 	return string(xmlFile), nil
+}
+
+
+func InitDBConnectionConfig(configMap map[string]string) commonModel.DBConfig {
+	dbConnInfo := commonModel.DBConfig{}
+	dbConnInfo.DbType = configMap["paas.monitoring.db.type"]
+	dbConnInfo.DbName = configMap["paas.monitoring.db.dbname"]
+	dbConnInfo.UserName = configMap["paas.monitoring.db.username"]
+	dbConnInfo.UserPassword = configMap["paas.monitoring.db.password"]
+	dbConnInfo.Host = configMap["paas.monitoring.db.host"]
+	dbConnInfo.Port = configMap["paas.monitoring.db.port"]
+
+	return dbConnInfo
 }

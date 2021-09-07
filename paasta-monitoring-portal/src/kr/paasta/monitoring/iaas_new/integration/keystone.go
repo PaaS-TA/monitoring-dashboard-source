@@ -2,10 +2,10 @@ package integration
 
 import (
 	"fmt"
-	"github.com/rackspace/gophercloud"
-	"github.com/rackspace/gophercloud/openstack"
-	"github.com/rackspace/gophercloud/openstack/identity/v3/tokens"
-	"kr/paasta/monitoring/iaas/model"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
+	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 )
 
@@ -27,7 +27,7 @@ Description : Get openstack's registered project lists
 func (k *Keystone) GetTenantList() (tenant_lists []model.TenantInfo, err error) {
 
 	//client for Keystone API operation
-	client := openstack.NewIdentityV3(k.provider)
+	client, _ := openstack.NewIdentityV3(k.provider, gophercloud.EndpointOpts{})
 	response, err := client.Get(fmt.Sprintf("%s/%s/projects", model.KeystoneUrl, model.KeystoneVersion), nil, nil)
 
 	msg, err := utils.ResponseUnmarshal(response, err)
@@ -55,7 +55,7 @@ func (k *Keystone) GetUserIdByName(userName string) (userId string, err error) {
 		return userId, err
 	}*/
 	//client for Keystone API operation
-	client := openstack.NewIdentityV3(k.provider)
+	client, _ := openstack.NewIdentityV3(k.provider, gophercloud.EndpointOpts{})
 
 	response, err := client.Get(fmt.Sprintf("%s/%s/users?name=%s", model.KeystoneUrl, model.KeystoneVersion, userName), nil, nil)
 	msg, err := utils.ResponseUnmarshal(response, err)
@@ -69,7 +69,7 @@ func (k *Keystone) GetUserIdByName(userName string) (userId string, err error) {
 
 func (k *Keystone) GetUserTenantList(userId string) (project_lists []model.TenantInfo, err error) {
 
-	client := openstack.NewIdentityV3(k.provider)
+	client, _ := openstack.NewIdentityV3(k.provider, gophercloud.EndpointOpts{})
 
 	response, err := client.Get(fmt.Sprintf("%s/%s/users/%s/projects", model.KeystoneUrl, model.KeystoneVersion, userId), nil, nil)
 	msg, err := utils.ResponseUnmarshal(response, err)
@@ -92,7 +92,7 @@ func (k *Keystone) GetUserTenantList(userId string) (project_lists []model.Tenan
 
 func (k *Keystone) RevokeToken() tokens.RevokeResult {
 
-	client := openstack.NewIdentityV3(k.provider)
+	client, _ := openstack.NewIdentityV3(k.provider, gophercloud.EndpointOpts{})
 	result := tokens.Revoke(client, client.TokenID)
 
 	return result

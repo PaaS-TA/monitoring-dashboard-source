@@ -2,40 +2,35 @@ package handlers
 
 import (
 	"fmt"
-	//"github.com/cloudfoundry-community/go-cfclient"
+	"io"
+	http2 "kr/paasta/monitoring/iaas_new/http"
+	"net/http"
 	"strings"
+	"time"
 
-	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-redis/redis"
+	"github.com/gophercloud/gophercloud"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"github.com/monasca/golang-monascaclient/monascaclient"
-	"github.com/rackspace/gophercloud"
-	tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"
-	/*tokens3 "github.com/rackspace/gophercloud/openstack/identity/v3/tokens"*/
 	"github.com/tedsuo/rata"
-	/*"gopkg.in/olivere/elastic.v3"*/
-	"io"
+
 	caasContoller "kr/paasta/monitoring/caas/controller"
 	"kr/paasta/monitoring/common/controller"
-	iaasContoller "kr/paasta/monitoring/iaas/controller"
-	"kr/paasta/monitoring/iaas/model"
 	paasContoller "kr/paasta/monitoring/paas/controller"
 	pm "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/routes"
 	saasContoller "kr/paasta/monitoring/saas/controller"
-	"kr/paasta/monitoring/utils"
-	"net/http"
-	/*"strings"*/
-	"time"
 
-	elasticsearch "github.com/elastic/go-elasticsearch/v7"
+	"kr/paasta/monitoring/routes"
+	"kr/paasta/monitoring/utils"
+
+	"kr/paasta/monitoring/iaas_new/model"
 )
 
-func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
-	iaasTxn *gorm.DB, paasTxn *gorm.DB, iaasElasticClient *elasticsearch.Client, paasElasticClient *elasticsearch.Client, monsClient monascaclient.Client,
+func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
+	iaasTxn *gorm.DB, paasTxn *gorm.DB, iaasElasticClient *elasticsearch.Client, paasElasticClient *elasticsearch.Client,
 	auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig) http.Handler {
 
 	//Controller선언
@@ -45,92 +40,15 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	// SaaS Metrics
 	var applicationController *saasContoller.SaasController
 
-	loginController = controller.NewLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType, cfConfig)
-	memberController = controller.NewMemberController(openstack_provider, paasTxn, rdClient, sysType, cfConfig)
+	loginController = controller.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
+	memberController = controller.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
 
-	var mainController *iaasContoller.OpenstackServices
-	var computeController *iaasContoller.OpenstackComputeNode
-	var manageNodeController *iaasContoller.OpenstackManageNode
-	var tenantController *iaasContoller.OpenstackTenant
-	var notificationController *iaasContoller.NotificationController
-	var definitionController *iaasContoller.AlarmDefinitionController
-	var stautsController *iaasContoller.AlarmStatusController
-	var logController *iaasContoller.OpenstackLog
 	var caasMetricsController *caasContoller.MetricController
 
 	var iaasActions rata.Handlers
 
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
-		mainController = iaasContoller.NewMainController(openstack_provider, iaasInfluxClient)
-		computeController = iaasContoller.NewComputeController(openstack_provider, iaasInfluxClient)
-		manageNodeController = iaasContoller.NewManageNodeController(openstack_provider, iaasInfluxClient)
-		tenantController = iaasContoller.NewOpenstackTenantController(openstack_provider, iaasInfluxClient)
-		notificationController = iaasContoller.NewNotificationController(monsClient, iaasInfluxClient)
-		definitionController = iaasContoller.NewAlarmDefinitionController(monsClient, iaasInfluxClient)
-		stautsController = iaasContoller.NewAlarmStatusController(monsClient, iaasInfluxClient, iaasTxn)
-		logController = iaasContoller.NewLogController(openstack_provider, iaasInfluxClient, iaasElasticClient)
-
-		iaasActions = rata.Handlers{
-			routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
-			routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
-
-			//Integrated with routes
-			routes.IAAS_MAIN_SUMMARY:         route(mainController.OpenstackSummary),
-			routes.IAAS_NODE_COMPUTE_SUMMARY: route(computeController.NodeSummary),
-			routes.IAAS_NODES:                route(manageNodeController.GetNodeList),
-
-			routes.IAAS_NODE_CPU_USAGE_LIST:           route(computeController.GetCpuUsageList),
-			routes.IAAS_NODE_CPU_LOAD_LIST:            route(computeController.GetCpuLoadList),
-			routes.IAAS_NODE_MEMORY_SWAP_LIST:         route(computeController.GetMemorySwapList),
-			routes.IAAS_NODE_MEMORY_USAGE_LIST:        route(computeController.GetMemoryUsageList),
-			routes.IAAS_NODE_DISK_USAGE_LIST:          route(computeController.GetDiskUsageList),
-			routes.IAAS_NODE_DISK_READ_LIST:           route(computeController.GetDiskIoReadList),
-			routes.IAAS_NODE_DISK_WRITE_LIST:          route(computeController.GetDiskIoWriteList),
-			routes.IAAS_NODE_NETWORK_KBYTE_LIST:       route(computeController.GetNetworkInOutKByteList),
-			routes.IAAS_NODE_NETWORK_ERROR_LIST:       route(computeController.GetNetworkInOutErrorList),
-			routes.IAAS_NODE_NETWORK_DROP_PACKET_LIST: route(computeController.GetNetworkDroppedPacketList),
-
-			routes.IAAS_NODE_MANAGE_SUMMARY:            route(manageNodeController.ManageNodeSummary),
-			routes.IAAS_NODE_RABBITMQ_SUMMARY_OVERVIEW: route(manageNodeController.ManageRabbitMqSummary),
-			routes.IAAS_NODE_TOPPROCESS_CPU:            route(manageNodeController.GetTopProcessByCpu),
-			routes.IAAS_NODE_TOPPROCESS_MEMORY:         route(manageNodeController.GetTopProcessByMemory),
-
-			routes.IAAS_TENANT_SUMMARY:             route(tenantController.TenantSummary),
-			routes.IAAS_TENANT_INSTANCE_LIST:       route(tenantController.GetTenantInstanceList),
-			routes.IAAS_TENANT_CPU_USAGE_LIST:      route(tenantController.GetInstanceCpuUsageList),
-			routes.IAAS_TENANT_MEMORY_USAGE_LIST:   route(tenantController.GetInstanceMemoryUsageList),
-			routes.IAAS_TENANT_DISK_READ_LIST:      route(tenantController.GetInstanceDiskReadList),
-			routes.IAAS_TENANT_DISK_WRITE_LIST:     route(tenantController.GetInstanceDiskWriteList),
-			routes.IAAS_TENANT_NETWORK_IO_LIST:     route(tenantController.GetInstanceNetworkIoList),
-			routes.IAAS_TENANT_NETWORK_PACKET_LIST: route(tenantController.GetInstanceNetworkPacketsList),
-
-			routes.IAAS_LOG_RECENT:   route(logController.GetDefaultRecentLog),
-			routes.IAAS_LOG_SPECIFIC: route(logController.GetSpecificTimeRangeLog),
-
-			routes.IAAS_ALARM_NOTIFICATION_LIST:   route(notificationController.GetAlarmNotificationList),
-			routes.IAAS_ALARM_NOTIFICATION_CREATE: route(notificationController.CreateAlarmNotification),
-			routes.IAAS_ALARM_NOTIFICATION_UPDATE: route(notificationController.UpdateAlarmNotification),
-			routes.IAAS_ALARM_NOTIFICATION_DELETE: route(notificationController.DeleteAlarmNotification),
-
-			routes.IAAS_ALARM_POLICY_LIST:   route(definitionController.GetAlarmDefinitionList),
-			routes.IAAS_ALARM_POLICY:        route(definitionController.GetAlarmDefinition),
-			routes.IAAS_ALARM_POLICY_CREATE: route(definitionController.CreateAlarmDefinition),
-			routes.IAAS_ALARM_POLICY_UPDATE: route(definitionController.UpdateAlarmDefinition),
-			routes.IAAS_ALARM_POLICY_DELETE: route(definitionController.DeleteAlarmDefinition),
-
-			routes.IAAS_ALARM_STATUS_LIST:  route(stautsController.GetAlarmStatusList),
-			routes.IAAS_ALARM_STATUS:       route(stautsController.GetAlarmStatus),
-			routes.IAAS_ALARM_HISTORY_LIST: route(stautsController.GetAlarmHistoryList),
-			routes.IAAS_ALARM_STATUS_COUNT: route(stautsController.GetAlarmStatusCount),
-
-			routes.IAAS_ALARM_ACTION_LIST:   route(stautsController.GetAlarmHistoryActionList),
-			routes.IAAS_ALARM_ACTION_CREATE: route(stautsController.CreateAlarmHistoryAction),
-			routes.IAAS_ALARM_ACTION_UPDATE: route(stautsController.UpdateAlarmHistoryAction),
-			routes.IAAS_ALARM_ACTION_DELETE: route(stautsController.DeleteAlarmHistoryAction),
-
-			routes.IAAS_ALARM_REALTIME_COUNT: route(stautsController.GetIaasAlarmRealTimeCount),
-			routes.IAAS_ALARM_REALTIME_LIST:  route(stautsController.GetIaasAlarmRealTimeList),
-		}
+		iaasActions = http2.InitHandler(openstackProvider, iaasInfluxClient, iaasElasticClient)
 	}
 
 	var alarmController *paasContoller.AlarmService
@@ -381,7 +299,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, iaasActions)
-		routeList = append(routeList, routes.IaasRoutes)
+		routeList = append(routeList, http2.IaasRoutes)
 	}
 	if strings.Contains(sysType, utils.SYS_TYPE_PAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, paasActions)
@@ -409,7 +327,7 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 		panic("unable to create router: " + err.Error())
 	}
 	fmt.Println("Monit Application Started")
-	return HttpWrap(handler, rdClient, openstack_provider, cfConfig)
+	return utils.HttpWrap(handler, rdClient, openstackProvider, cfConfig)
 }
 
 func getActions(list []rata.Handlers) rata.Handlers {
@@ -434,170 +352,7 @@ func getRoutes(list []rata.Routes) rata.Routes {
 	return rList
 }
 
-func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider model.OpenstackProvider, cfConfig pm.CFConfig) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
 
-		if origin := r.Header.Get("Origin"); origin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, X-XSRF-TOKEN, Accept-Encoding, Authorization")
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Expose-Headers", "X-XSRF-TOKEN")
-		}
-
-		// Stop here if its Preflighted OPTIONS request
-		if r.Method == "OPTIONS" {
-			return
-		}
-
-		// token Pass
-		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/monitoring/podList") {
-			fmt.Println("Request URI :: ", r.RequestURI)
-
-			reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)
-			if reqToken == "0" || reqToken == "null" {
-				fmt.Println("HttpWrap Hander reqToken is null ")
-				errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-				utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-			} else {
-				//fmt.Println("HttpWrap Hander reqToken =",len(reqToken),":",reqToken)
-				//모든 경로의 redis 의 토큰 정보를 확인한다
-				val := rdClient.HGetAll(reqToken).Val()
-				if val == nil || len(val) == 0 { // redis 에서 token 정보가 expire 된경우 로그인 화면으로 돌아간다
-					fmt.Println("HttpWrap Hander redis.iaas_userid is null ")
-					errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-					utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-				} else {
-
-					if strings.Contains(r.RequestURI, "/v2/member") && val["userId"] != "" {
-
-						handler.ServeHTTP(w, r)
-
-					} else if strings.Contains(r.RequestURI, "/v2/iaas") && val["iaasToken"] != "" && val["iaasUserId"] != "" { // IaaS 토큰 정보가 있는경우
-
-						provider1, _, err := utils.GetOpenstackProvider(r)
-						if err != nil || provider1 == nil {
-							errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-							utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-						} else {
-							v3Client := NewIdentityV3(provider1)
-
-							//IaaS, token 검증
-							bool, err := tokens3.Validate(v3Client, val["iaasToken"])
-							if err != nil || bool == false {
-								//errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-								//utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-								fmt.Println("iaas token validate error::", err)
-								handler.ServeHTTP(w, r)
-							} else {
-								//두개 token 이 없는 경우도 고려 해야함
-								rdClient.Expire(reqToken, 30*60*time.Second)
-								handler.ServeHTTP(w, r)
-							}
-						}
-
-					} else if strings.Contains(r.RequestURI, "/v2/paas") && val["paasRefreshToken"] != "" { // PaaS 토큰 정보가 있는경우
-
-						// Pass token 검증 로직 추가
-						//get paas token
-						//cfProvider.Token = val["paasToken"]
-						t1, _ := time.Parse(time.RFC3339, val["paasExpire"])
-						if t1.Before(time.Now()) {
-							fmt.Println("paas time : " + t1.String())
-
-							cfConfig.Type = "PAAS"
-							result, err := utils.GetUaaReFreshToken(reqToken, cfConfig, rdClient)
-							//client_test, err := cfclient.NewClient(&cfProvider)
-							fmt.Println("paas token : " + result)
-							errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-
-							if err != "" {
-								utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-							} else {
-								//_, err01 := client_test.GetToken() // cf token 을 refresh 함
-								//if err01 != nil {
-								//	utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-								//	return
-								//}
-								/*
-									fmt.Println("paas hander token ::: ",token)
-
-									token01, err02 := client_test.ListApps()
-									if err02 != nil {
-										fmt.Println("paas ListApps error::",token01,":::",err02.Error())
-									}else{
-										fmt.Println("paas ListApps info  ::",token01)
-									}
-								*/
-								rdClient.Expire(reqToken, 30*60*time.Second)
-								handler.ServeHTTP(w, r)
-							}
-						} else {
-							rdClient.Expire(reqToken, 30*60*time.Second)
-							handler.ServeHTTP(w, r)
-						}
-
-					} else if strings.Contains(r.RequestURI, "/v2/caas") && val["caasRefreshToken"] != "" { // PaaS 토큰 정보가 있는경우
-
-						// Pass token 검증 로직 추가
-						//get paas token
-						//cfProvider.Token = val["paasToken"]
-						//t1, _ := time.Parse(time.RFC3339, val["caasExpire"])
-						//if t1.Before(time.Now()) {
-						//	fmt.Println("caas time : " + t1.String())
-						//
-						//	cfConfig.Type = "CAAS"
-						//	result, err := utils.GetUaaReFreshToken(reqToken, cfConfig, rdClient)
-						//	//client_test, err := cfclient.NewClient(&cfProvider)
-						//	fmt.Println("caas token : " + result)
-						//	errMessage := model.ErrMessage{"Message": "UnAuthrized"}
-						//	if err != "" {
-						//		utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-						//	} else {
-						//		//_, err01 := client_test.GetToken() // cf token 을 refresh 함
-						//		//if err01 != nil {
-						//		//	utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-						//		//	return
-						//		//}
-						//		/*
-						//			fmt.Println("paas hander token ::: ",token)
-						//
-						//			token01, err02 := client_test.ListApps()
-						//			if err02 != nil {
-						//				fmt.Println("paas ListApps error::",token01,":::",err02.Error())
-						//			}else{
-						//				fmt.Println("paas ListApps info  ::",token01)
-						//			}
-						//		*/
-						//		rdClient.Expire(reqToken, 30*60*time.Second)
-						//		handler.ServeHTTP(w, r)
-						//	}
-						//}else{
-						//	rdClient.Expire(reqToken, 30*60*time.Second)
-						//	handler.ServeHTTP(w, r)
-						//}
-						rdClient.Expire(reqToken, 30*60*time.Second)
-						handler.ServeHTTP(w, r)
-
-					} else if strings.Contains(r.RequestURI, "/v2/saas") { // PaaS 토큰 정보가 있는경우
-
-						rdClient.Expire(reqToken, 30*60*time.Second)
-						handler.ServeHTTP(w, r)
-					} else {
-						fmt.Println("URL Not All")
-						//rdClient.Expire(reqToken, 30*60*time.Second)
-						//handler.ServeHTTP(w, r)
-					}
-				}
-			}
-		} else {
-			fmt.Println("url pass ::", r.RequestURI)
-			handler.ServeHTTP(w, r)
-		}
-		//handler.ServeHTTP(w, r)
-	}
-
-}
 
 func route(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(f)

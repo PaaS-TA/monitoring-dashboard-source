@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"github.com/rackspace/gophercloud"
-	"github.com/rackspace/gophercloud/openstack"
-	"kr/paasta/monitoring/iaas/model"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
+	"kr/paasta/monitoring/iaas_new/model"
 	//"fmt"
 )
 
@@ -22,7 +22,7 @@ func GetComputeClient(provider *gophercloud.ProviderClient, region string) (*gop
 
 func GetKeystoneClient(provider *gophercloud.ProviderClient) *gophercloud.ServiceClient {
 
-	client := openstack.NewIdentityV3(provider)
+	client, _ := openstack.NewIdentityV3(provider, gophercloud.EndpointOpts{})
 
 	return client
 }

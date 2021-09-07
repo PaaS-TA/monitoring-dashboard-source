@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	/*"gopkg.in/olivere/elastic.v3"*/
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"math"
 	"strings"
 	"time"

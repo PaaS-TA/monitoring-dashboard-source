@@ -7,7 +7,7 @@ import (
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/monasca/golang-monascaclient/monascaclient"
 	mod "github.com/monasca/golang-monascaclient/monascaclient/models"
-	"kr/paasta/monitoring/iaas/service"
+	"kr/paasta/monitoring/iaas_new/service"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 	"strconv"

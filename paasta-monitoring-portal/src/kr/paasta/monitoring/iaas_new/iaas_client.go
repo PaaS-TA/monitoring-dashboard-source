@@ -7,10 +7,9 @@ import (
 	"github.com/gophercloud/gophercloud"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"github.com/monasca/golang-monascaclient/monascaclient"
 	commonModel "kr/paasta/monitoring/common/model"
-	iaasModel "kr/paasta/monitoring/iaas/model"
 	"kr/paasta/monitoring/iaas_new/model"
+	iaasModel "kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 	"net"
 	"net/http"
@@ -18,7 +17,7 @@ import (
 	"time"
 )
 
-func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider iaasModel.OpenstackProvider, monClient *monascaclient.Client, auth gophercloud.AuthOptions, err error) {
+func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider iaasModel.OpenstackProvider, auth gophercloud.AuthOptions, err error) {
 
 	// Mysql
 	iaasConfigDbCon := new(commonModel.DBConfig)
@@ -110,13 +109,6 @@ func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInf
 	model.RabbitMqPort, _ = config["rabbitmq.port"]
 	model.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
 
-	monClient = monascaclient.New()
-	monClient.SetBaseURL(config["monasca.url"])
-	timeOut, _ := strconv.Atoi(config["monasca.connect.timeout"])
-	monClient.SetTimeout(timeOut)
-
-	tls, _ := strconv.ParseBool(config["monasca.secure.tls"])
-	monClient.SetInsecure(tls)
 
 	auth = gophercloud.AuthOptions{
 		DomainName:       config["default.domain"],

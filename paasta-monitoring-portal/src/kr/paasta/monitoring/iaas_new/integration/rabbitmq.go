@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 	"time"
