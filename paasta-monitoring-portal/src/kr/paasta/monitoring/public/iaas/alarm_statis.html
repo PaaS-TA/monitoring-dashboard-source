@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS-TA Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header class="np">
+				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+
+				<ul class="global">
+					<li class="IaaS"><a href="#" class="top-menu-active">IaaS</a></li>
+					<li class="PaaS"><a href="../paas/index.html" >PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="bosh.html">H<span>ypervisor</span></a></li>
+						<li><a href="paas.html">P<span>roject</span></a></li>
+						<li>
+							<a href="alarm_policy.html" class="on">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+								<li><a href="alarm_statis.html">Statistics</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="alarmStatus">
+				<div class="contentsLeft np">
+					<!-- Overview -->
+					<fieldset class="statusSearch">
+						<h4>Search Status</h4>
+						<div class="listSearch">
+							<button class="date on" data-term="d">일</button>
+							<button class="date" data-term="w">주</button>
+							<button class="date" data-term="m">월</button>
+							<button class="date" data-term="y">년</button>
+							<button class="ar left"></button>
+							<button class="ar right"></button>
+							<input type="text" class="day" value="" disabled>
+						</div>
+						<div class="listBtns">
+							<a href="javascript:window.print();" class="print">출력</a>
+							<a href="javascript:void(0);" class="excel">엑셀 다운로드</a>
+						</div>
+					</fieldset>
+					<!-- // Overview -->
+				</div>
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav class="np">
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<div class="timePop np">
+						<h4>Time Range</h4>
+						<div class="timer">
+							<div>
+								<input type="radio" name="timeRange" id="tr01" value="15">
+								<label for="tr01">최근 15분</label>
+								<input type="radio" name="timeRange" id="tr02" value="30">
+								<label for="tr02">최근 30분</label>
+								<input type="radio" name="timeRange" id="tr03" value="60">
+								<label for="tr03">최근 1시간</label>
+								<input type="radio" name="timeRange" id="tr04" value="180">
+								<label for="tr04">최근 3시간</label>
+								<input type="radio" name="timeRange" id="tr05" value="360">
+								<label for="tr05">최근 6시간</label>
+								<input type="radio" name="timeRange" id="tr06" value="720">
+								<label for="tr06">최근 12시간</label>
+								<input type="radio" name="timeRange" id="tr07" value="1440">
+								<label for="tr07">최근 1일</label>
+								<input type="radio" name="timeRange" id="tr08" value="10080">
+								<label for="tr08">최근 이번주</label>
+								<input type="radio" name="timeRange" id="tr09" value="40320">
+								<label for="tr09">최근 이번달</label>
+							</div>
+							<div style="display:none;">
+								<input type="radio" name="timeRange" id="tr10">
+								<label for="tr10">수동설정</label>
+								<input type="text" id="from" name="from">
+								<input type="text" id="to" name="to">
+							</div>
+						</div>
+						<h4>Refreshing Time</h4>
+						<div class="refresh">
+							<div class="select_wrap">
+								<select id="timeSelect">
+									<option value="0">OFF</option>
+									<option value="1">1m</option>
+									<option value="5">5m</option>
+									<option value="15">15m</option>
+									<option value="30">30m</option>
+									<option value="60">1h</option>
+									<option value="120">2h</option>
+									<option value="1440">1d</option>
+								</select>
+								<label for="timeSelect">OFF</label>
+							</div>
+						</div>
+						<div class="btnWrap center">
+							<button class="save">Save Changes</button>
+						</div>
+						<a href="javascript:void(0);" class="close">close</a>
+					</div>
+
+					<article class="alarmStatistics" id="alarmStatistics">
+						<h4>Alarm Statistics</h4>
+						<div class="chart" id="alarmTotal"></div>
+						<div class="chart" id="alarmService"></div>
+						<div class="chart" id="alarmMatrix"></div>
+                    </article>
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+
+		</div>
+		<!-- // Wrap -->
+
+	</body>
+	
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	
+	<script type="text/javascript">
+		window.onload = () => {
+			const alarm = {
+				days : 'd',
+				step : 1,
+				period : 0,
+				today : new Object(),
+				prday : new Object(),
+
+				init() {
+					// Alarm Count
+					fnComm.alarmCount('paas');
+
+					alarm.reload();
+					alarm.event();
+				},
+
+				reload() {
+					// 알람통계 total
+					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/total?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmTotal');
+					// 알람통계 service
+					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/service?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmService');
+					// 알람통계 matrix
+					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/matrix?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmMatrix');
+				},
+				
+				// Detail 차트 //////////////////////////////////////////////////////////////////////////
+				alarmStatistics(data, target){
+					alarm.period = data[0].stat.length;
+
+					let cnt = 0;
+					let yPos = 9;
+					let detailTime = [];
+					let detailData = [];
+					let dataType = [];
+					let chartColor;
+
+					switch (target){
+						case '#alarmTotal':
+							chartColor = ['#ff015a', '#fcce34'];
+						break;
+						case '#alarmService':
+							chartColor = ['#01826c','#76a561','#b9d630','#ac9f37','#41bfa9','#e4f0c2'];
+						break;
+						case '#alarmMatrix':
+							chartColor = ['#143d51', '#005796', '#12c0f3', '#96c4e8', '#586f7d', '#aae0fa'];
+						break;
+					};
+
+					
+					alarm.today = new Date();
+					alarm.prday = new Date();
+					
+					switch (alarm.days){
+						case 'd':
+							detailTime = ['time','22:00','23:00','24:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+
+							
+							alarm.prday.setDate(alarm.prday.getDate()-(alarm.step-1));
+							
+							document.querySelector('.day').value =  alarm.prday.getFullYear() +'. '+ ('0' + (alarm.prday.getMonth()+1)).slice(-2) +'. '+ ('0' + alarm.prday.getDate()).slice(-2) +'. '+ ('0' + alarm.prday.getHours()).slice(-2) +':'+ ('0' + alarm.prday.getMinutes()).slice(-2) +':'+ ('0' + alarm.prday.getSeconds()).slice(-2);
+						break;
+						case 'w':
+							detailTime = ['time'];
+							alarm.prday.setDate(alarm.prday.getDate());
+							alarm.today.setDate(alarm.today.getDate()-(7*alarm.step));
+
+							document.querySelector('.day').value = alarm.today.getFullYear() +'. '+ ('0' + (alarm.today.getMonth()+1)).slice(-2) +'. '+ ('0' + alarm.today.getDate()).slice(-2) +' ~ '+ alarm.prday.getFullYear() +'. '+ ('0' + (alarm.prday.getMonth()+1)).slice(-2) +'. '+ ('0' + alarm.prday.getDate()).slice(-2);
+
+							for(var i=1; i<=7; i++){
+								alarm.today.setDate(alarm.today.getDate()+1);
+								detailTime.push(
+									alarm.today.getFullYear() +'-'+ ('0' + (alarm.today.getMonth()+1)).slice(-2) +'-'+ ('0' + alarm.today.getDate()).slice(-2)
+								);
+							};
+						break;
+						case 'm':
+							detailTime = ['time'];
+							alarm.prday.setMonth(alarm.prday.getMonth());
+							alarm.today.setMonth(alarm.today.getMonth()-alarm.step);
+							
+							document.querySelector('.day').value =  alarm.today.getFullYear() +'. '+ ('0' + (alarm.today.getMonth()+1)).slice(-2) +'. '+ ('0' + alarm.today.getDate()).slice(-2) +' ~ '+ alarm.prday.getFullYear() +'. '+ ('0' + (alarm.prday.getMonth()+1)).slice(-2) +'. '+ ('0' + alarm.prday.getDate()).slice(-2);
+							
+							for(var i=1; i<=alarm.period; i++){
+								alarm.today.setDate(alarm.today.getDate()+1);
+								detailTime.push(
+									('0' + (alarm.today.getMonth()+1)).slice(-2) +'-'+ ('0' + alarm.today.getDate()).slice(-2)
+								);
+							};
+						break;
+						case 'y':
+							detailTime = ['time'];
+							alarm.prday.setMonth(alarm.prday.getMonth()+1);
+							alarm.today.setFullYear(alarm.today.getFullYear()-alarm.step);
+							alarm.today.setMonth(alarm.today.getMonth()+1);
+
+							document.querySelector('.day').value =  alarm.today.getFullYear() +'. '+ ('0' + alarm.today.getMonth()).slice(-2) +'. '+ ('0' + alarm.today.getDate()).slice(-2) +' ~ '+ alarm.prday.getFullYear() +'. '+ ('0' + alarm.prday.getMonth()).slice(-2) +'. '+ ('0' + alarm.prday.getDate()).slice(-2);
+
+							for(var i=1; i<=alarm.period; i++){
+								alarm.today.setMonth(alarm.today.getMonth()+1);
+								detailTime.push(
+									alarm.today.getFullYear() + '-' + ('0' + alarm.today.getMonth()).slice(-2)
+								);
+							};
+						break;
+					};
+
+					dataType.push(detailTime);
+					
+					data.forEach((load, idx) => {
+						detailData[idx] = [load.name];
+
+						load.stat.forEach(value => {
+							detailData[idx].push(Number(Math.ceil(value.count)));
+						});
+
+						dataType.push(detailData[idx]);
+
+						cnt = idx;
+					});
+
+					var chart = c3.generate({
+						bindto: target,
+						data: {
+							x: 'time',
+							columns: dataType,
+							type: 'spline',
+						},
+						color: {
+							pattern: chartColor
+						},
+						axis: {
+							x: {
+								type: 'category',
+								localtime: false,
+								tick: {
+									count: 2,
+								}
+							},
+							y: {
+								tick: {
+									count: 2,
+								}
+							},
+						},
+					});
+				},
+
+				event() {
+					var target = document.querySelector('.listSearch').querySelectorAll('.date');
+
+					for(var i=0 ; i<target.length ; i++){
+						target[i].addEventListener('click', (e) => {
+							alarm.days = e.target.getAttribute('data-term');
+
+							alarm.step = 1;
+
+							document.querySelector('.listSearch').querySelector('.on').classList.toggle('on', false);
+							e.target.classList.toggle('on', true);
+
+							alarm.reload();
+						}, false);
+					};
+					
+					document.querySelector('.listSearch').querySelector('.left').addEventListener('click', (e) => {
+						alarm.step++;
+						alarm.reload();
+					}, false);
+
+					
+					document.querySelector('.listSearch').querySelector('.right').addEventListener('click', (e) => {
+						if(alarm.step > 1){
+							alarm.step--;
+							alarm.reload();
+						};
+					}, false);
+				},
+			}
+
+			alarm.init();
+		};
+
+		// 프린트 출력전 이벤트
+		var hiddenTarget =  document.querySelectorAll('.np');
+
+		window.onbeforeprint = () => {
+			for(var i=0; i<hiddenTarget.length; i++){
+				hiddenTarget[i].style.display = 'none';
+			};
+		};
+
+		// 프린트 출력후 이벤트
+		window.onafterprint = () => {
+			for(var i=0; i<hiddenTarget.length; i++){
+				hiddenTarget[i].style.display = 'block';
+			};
+		};
+	</script>
+</html>

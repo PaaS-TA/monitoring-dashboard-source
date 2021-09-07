@@ -3,8 +3,8 @@ package utils
 import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
+
 	"kr/paasta/monitoring/iaas_new/model"
-	//"fmt"
 )
 
 func GetComputeClient(provider *gophercloud.ProviderClient, region string) (*gophercloud.ServiceClient, error) {

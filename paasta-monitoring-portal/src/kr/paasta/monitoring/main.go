@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-
 	"log"
 	"net"
 	"net/http"
@@ -16,8 +15,6 @@ import (
 	"github.com/cloudfoundry-community/gogobosh"
 	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-redis/redis"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gophercloud/gophercloud"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 
@@ -66,13 +63,13 @@ func main() {
 	}
 
 	logger, err := seelog.LoggerFromConfigAsBytes([]byte(xmlFile))
-
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
 	model.MonitLogger = logger
-	UseLogger(logger)
+	utils.Logger = logger
 
 	timeGap, _ := strconv.Atoi(configMap["gmt.time.gap"])
 	model.GmtTimeGap = timeGap
@@ -83,11 +80,11 @@ func main() {
 	sysType := configMap["system.monitoring.type"]
 
 	// iaas client
-	var iaasDbAccessObj *gorm.DB
-	var iaaSInfluxServerClient client.Client
-	var iaasElasticClient *elasticsearch.Client
-	var openstackProvider model.OpenstackProvider
-	var auth gophercloud.AuthOptions
+	//var iaasDbAccessObj *gorm.DB
+	//var iaaSInfluxServerClient client.Client
+	//var iaasElasticClient *elasticsearch.Client
+	//var openstackProvider model.OpenstackProvider
+	//var auth gophercloud.AuthOptions
 
 	// paas client
 	var paaSInfluxServerClient client.Client
@@ -120,8 +117,10 @@ func main() {
 		CaasBrokerHost: configMap["caas.monitoring.broker.host"],
 	}
 	//IaaS Connection Info
+	iaasClient := iaas_new.IaasClient{}
+
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
-		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, auth, err = iaas_new.GetIaasClients(configMap)
+		iaasClient, err = iaas_new.GetIaasClients(configMap)
 		if err != nil {
 			log.Println(err)
 			os.Exit(-1)
@@ -141,15 +140,15 @@ func main() {
 	var handler http.Handler
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
-		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, auth, databases,
+		handler = handlers.NewHandler(iaasClient.Provider, iaasClient.InfluxClient, paaSInfluxServerClient,
+			iaasClient.ConnectionPool, paasDbAccessObj, iaasClient.ElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			log.Fatalln(err)
 		}
 	} else {
-		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, auth, databases,
+		handler = handlers.NewHandler(iaasClient.Provider, iaasClient.InfluxClient, paaSInfluxServerClient,
+			iaasClient.ConnectionPool, paasDbAccessObj, iaasClient.ElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			log.Fatalln(err)
@@ -158,19 +157,10 @@ func main() {
 
 }
 
-func UseLogger(newLogger seelog.LoggerInterface) {
-	utils.Logger = newLogger
-}
-
-
-
-
-
 // 2021.09.06 - 이거 왜 있는지??
 //func createTable(dbClient *gorm.DB) {
 //	dbClient.Debug().AutoMigrate(&MemberInfo{})
 //}
-
 
 
 func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Client, paasElasticClient *elasticsearch.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
@@ -223,13 +213,13 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	)*/
 
 	// PaaS Database
-	bosh_database, _ := config["paas.metric.db.name.bosh"]
-	paasta_database, _ := config["paas.metric.db.name.paasta"]
-	container_database, _ := config["paas.metric.db.name.container"]
+	boshDatabase, _ := config["paas.metric.db.name.bosh"]
+	paastaDatabase, _ := config["paas.metric.db.name.paasta"]
+	containerDatabase, _ := config["paas.metric.db.name.container"]
 
-	databases.BoshDatabase = bosh_database
-	databases.PaastaDatabase = paasta_database
-	databases.ContainerDatabase = container_database
+	databases.BoshDatabase = boshDatabase
+	databases.PaastaDatabase = paastaDatabase
+	databases.ContainerDatabase = containerDatabase
 
 	// Cloud Foundry Client
 	//cfProvider = cfclient.Config{
@@ -251,6 +241,5 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	if err != nil {
 		log.Fatalln("Failed to create connection to the bosh server. err=", err)
 	}
-
 	return
 }

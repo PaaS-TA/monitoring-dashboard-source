@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/gophercloud/gophercloud"
-	client "github.com/influxdata/influxdb1-client/v2"
+	influx "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	commonModel "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/iaas_new/model"
 	iaasModel "kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 	"net"
@@ -17,7 +16,16 @@ import (
 	"time"
 )
 
-func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider iaasModel.OpenstackProvider, auth gophercloud.AuthOptions, err error) {
+type IaasClient struct {
+	ConnectionPool *gorm.DB
+	InfluxClient influx.Client
+	ElasticClient *elasticsearch.Client
+	Provider iaasModel.OpenstackProvider
+	AuthOpts gophercloud.AuthOptions
+}
+
+func GetIaasClients(config map[string]string) (client IaasClient, err error) {
+
 
 	// Mysql
 	iaasConfigDbCon := new(commonModel.DBConfig)
@@ -30,7 +38,7 @@ func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInf
 
 	iaasConnectionString := utils.GetConnectionString(iaasConfigDbCon.Host, iaasConfigDbCon.Port, iaasConfigDbCon.UserName, iaasConfigDbCon.UserPassword, iaasConfigDbCon.DbName)
 	fmt.Println("String:", iaasConnectionString)
-	iaasDbAccessObj, err = gorm.Open(iaasConfigDbCon.DbType, iaasConnectionString+"?charset=utf8&parseTime=true")
+	iaasDbAccessObj, _ := gorm.Open(iaasConfigDbCon.DbType, iaasConnectionString+"?charset=utf8&parseTime=true")
 
 	// 2021.09.06 - 이거 왜 있는지?
 	//Alarm 처리 내역 정보 Table 생성
@@ -41,7 +49,7 @@ func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInf
 	iaasUserName, _ := config["iaas.metric.db.username"]
 	iaasPassword, _ := config["iaas.metric.db.password"]
 
-	iaaSInfluxServerClient, err = client.NewHTTPClient(client.HTTPConfig{
+	iaaSInfluxServerClient, _ := influx.NewHTTPClient(influx.HTTPConfig{
 		Addr:     iaasUrl,
 		Username: iaasUserName,
 		Password: iaasPassword,
@@ -69,7 +77,7 @@ func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInf
 			},
 		},
 	}
-	iaasElasticClient, err = elasticsearch.NewClient(cfg)
+	iaasElasticClient, _ := elasticsearch.NewClient(cfg)
 	fmt.Println("iaasElasticClient::", iaasElasticClient)
 	fmt.Println("err::", err)
 
@@ -81,6 +89,7 @@ func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInf
 	)*/
 
 	// Openstack Info
+	openstackProvider := iaasModel.OpenstackProvider{}
 	openstackProvider.Region, _ = config["default.region"]
 	openstackProvider.Username, _ = config["default.username"]
 	openstackProvider.Password, _ = config["default.password"]
@@ -93,30 +102,37 @@ func GetIaasClients(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInf
 	openstackProvider.RabbitmqPass, _ = config["rabbitmq.pass"]
 	openstackProvider.RabbitmqTargetNode, _ = config["rabbitmq.target.node"]
 
-	model.MetricDBName, _ = config["iaas.metric.db.name"]
-	model.NovaUrl, _ = config["nova.target.url"]
-	model.NovaVersion, _ = config["nova.target.version"]
-	model.NeutronUrl, _ = config["neutron.target.url"]
-	model.NeutronVersion, _ = config["neutron.target.version"]
-	model.KeystoneUrl, _ = config["keystone.target.url"]
-	model.KeystoneVersion, _ = config["keystone.target.version"]
-	model.CinderUrl, _ = config["cinder.target.url"]
-	model.CinderVersion, _ = config["cinder.target.version"]
-	model.GlanceUrl, _ = config["glance.target.url"]
-	model.GlanceVersion, _ = config["glance.target.version"]
-	model.DefaultTenantId, _ = config["default.tenant_id"]
-	model.RabbitMqIp, _ = config["rabbitmq.ip"]
-	model.RabbitMqPort, _ = config["rabbitmq.port"]
-	model.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
+	iaasModel.MetricDBName, _ = config["iaas.metric.db.name"]
+	iaasModel.NovaUrl, _ = config["nova.target.url"]
+	iaasModel.NovaVersion, _ = config["nova.target.version"]
+	iaasModel.NeutronUrl, _ = config["neutron.target.url"]
+	iaasModel.NeutronVersion, _ = config["neutron.target.version"]
+	iaasModel.KeystoneUrl, _ = config["keystone.target.url"]
+	iaasModel.KeystoneVersion, _ = config["keystone.target.version"]
+	iaasModel.CinderUrl, _ = config["cinder.target.url"]
+	iaasModel.CinderVersion, _ = config["cinder.target.version"]
+	iaasModel.GlanceUrl, _ = config["glance.target.url"]
+	iaasModel.GlanceVersion, _ = config["glance.target.version"]
+	iaasModel.DefaultTenantId, _ = config["default.tenant_id"]
+	iaasModel.RabbitMqIp, _ = config["rabbitmq.ip"]
+	iaasModel.RabbitMqPort, _ = config["rabbitmq.port"]
+	iaasModel.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
 
 
-	auth = gophercloud.AuthOptions{
+	auth := gophercloud.AuthOptions{
 		DomainName:       config["default.domain"],
-		IdentityEndpoint: config["keystone.url"],
+		//IdentityEndpoint: config["keystone.url"],
+		IdentityEndpoint: config["identity.endpoint"],
 		Username:         config["default.username"],
 		Password:         config["default.password"],
 		TenantID:         config["default.tenant_id"],
 	}
+
+	client.ConnectionPool = iaasDbAccessObj
+	client.InfluxClient = iaaSInfluxServerClient
+	client.ElasticClient = iaasElasticClient
+	client.Provider = openstackProvider
+	client.AuthOpts = auth
 
 	return
 }
