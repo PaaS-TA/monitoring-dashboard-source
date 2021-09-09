@@ -26,7 +26,7 @@ func (s *OpenstackComputeNode) NodeSummary(w http.ResponseWriter, r *http.Reques
 	var apiRequest model.NodeReq
 	apiRequest.HostName = r.URL.Query().Get("hostname")
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	computeNodeSummary, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeSummary(apiRequest)
+	computeNodeSummary, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeSummary(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -50,7 +50,7 @@ func (s *OpenstackComputeNode) GetCpuUsageList(w http.ResponseWriter, r *http.Re
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeCpuUsageList(apiRequest)
+	cpuUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeCpuUsageList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -74,7 +74,7 @@ func (s *OpenstackComputeNode) GetCpuLoadList(w http.ResponseWriter, r *http.Req
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeCpuLoad1mList(apiRequest)
+	cpuUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeCpuLoad1mList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -99,7 +99,7 @@ func (s *OpenstackComputeNode) GetMemoryUsageList(w http.ResponseWriter, r *http
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeMemoryUsageList(apiRequest)
+	cpuUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeMemoryUsageList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -124,7 +124,7 @@ func (s *OpenstackComputeNode) GetMemorySwapList(w http.ResponseWriter, r *http.
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeSwapUsageList(apiRequest)
+	cpuUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetComputeNodeSwapUsageList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -149,7 +149,7 @@ func (s *OpenstackComputeNode) GetDiskUsageList(w http.ResponseWriter, r *http.R
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	diskUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeDiskUsageList(apiRequest)
+	diskUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeDiskUsageList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -175,7 +175,7 @@ func (s *OpenstackComputeNode) GetDiskIoReadList(w http.ResponseWriter, r *http.
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
 
-	diskUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeDiskIoReadList(apiRequest)
+	diskUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeDiskIoReadList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -201,7 +201,7 @@ func (s *OpenstackComputeNode) GetDiskIoWriteList(w http.ResponseWriter, r *http
 	}
 
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	diskUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeDiskIoWriteList(apiRequest)
+	diskUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeDiskIoWriteList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -226,7 +226,7 @@ func (s *OpenstackComputeNode) GetNetworkInOutKByteList(w http.ResponseWriter, r
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	networkUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeNetworkInOutKByteList(apiRequest)
+	networkUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeNetworkInOutKByteList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -252,7 +252,7 @@ func (s *OpenstackComputeNode) GetNetworkInOutErrorList(w http.ResponseWriter, r
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
 
-	networkUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeNetworkInOutErrorList(apiRequest)
+	networkUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeNetworkInOutErrorList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -277,7 +277,7 @@ func (s *OpenstackComputeNode) GetNetworkDroppedPacketList(w http.ResponseWriter
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	networkUsageList, err := services.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeNetworkDropPacketList(apiRequest)
+	networkUsageList, err := service.GetComputeNodeService(s.OpenstackProvider, provider, s.influxClient).GetNodeNetworkDropPacketList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {

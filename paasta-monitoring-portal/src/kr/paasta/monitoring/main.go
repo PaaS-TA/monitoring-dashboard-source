@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -15,6 +14,7 @@ import (
 	"github.com/cloudfoundry-community/gogobosh"
 	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-redis/redis"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 
@@ -47,29 +47,25 @@ type MemberInfo struct {
 	CreatedAt     time.Time `gorm:"type:datetime;null;DEFAULT:CURRENT_TIMESTAMP"`
 }
 
+var logger seelog.LoggerInterface
+
 func main() {
 
-	// 기본적인 프로퍼티 설정 정보 읽어오기
-	configMap, err := config.ImportConfig(`config.ini`)
+	xmlFile, err := config.ConvertXmlToString("log_config.xml")
 	if err != nil {
-		log.Println(err)
 		os.Exit(-1)
 	}
 
-	xmlFile, err := config.ConvertXmlToString(`log_config.xml`)
-	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
-	}
-
-	logger, err := seelog.LoggerFromConfigAsBytes([]byte(xmlFile))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
+	logger, _ = seelog.LoggerFromConfigAsBytes([]byte(xmlFile))
 	model.MonitLogger = logger
 	utils.Logger = logger
+
+	// 기본적인 프로퍼티 설정 정보 읽어오기
+	configMap, err := config.ImportConfig("config.ini")
+	if err != nil {
+		logger.Error(err)
+		os.Exit(-1)
+	}
 
 	timeGap, _ := strconv.Atoi(configMap["gmt.time.gap"])
 	model.GmtTimeGap = timeGap
@@ -78,13 +74,6 @@ func main() {
 	apiPort, _ := strconv.Atoi(configMap["server.port"])
 
 	sysType := configMap["system.monitoring.type"]
-
-	// iaas client
-	//var iaasDbAccessObj *gorm.DB
-	//var iaaSInfluxServerClient client.Client
-	//var iaasElasticClient *elasticsearch.Client
-	//var openstackProvider model.OpenstackProvider
-	//var auth gophercloud.AuthOptions
 
 	// paas client
 	var paaSInfluxServerClient client.Client
@@ -96,10 +85,11 @@ func main() {
 	dbConnInfo := config.InitDBConnectionConfig(configMap)
 
 	paasConnectionString := utils.GetConnectionString(dbConnInfo.Host, dbConnInfo.Port, dbConnInfo.UserName, dbConnInfo.UserPassword, dbConnInfo.DbName)
-	fmt.Println("String:", paasConnectionString)
+	logger.Infof("DB Connection Info : %v\n", paasConnectionString)
+
 	paasDbAccessObj, paasDbErr := gorm.Open(dbConnInfo.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
 	if paasDbErr != nil {
-		fmt.Println("err::", paasDbErr)
+		logger.Errorf("%v\n", paasDbErr)
 		return
 	}
 
@@ -112,6 +102,8 @@ func main() {
 		Addr:     configMap["redis.addr"],
 		Password: configMap["redis.password"],
 	})
+	logger.Info(rdClient)
+
 	cfConfig := bm.CFConfig{
 		Host:           configMap["paas.monitoring.cf.host"],
 		CaasBrokerHost: configMap["caas.monitoring.broker.host"],
@@ -122,16 +114,15 @@ func main() {
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
 		iaasClient, err = iaas_new.GetIaasClients(configMap)
 		if err != nil {
-			log.Println(err)
+			logger.Error(err)
 			os.Exit(-1)
 		}
 	}
-	//
+
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_PAAS) {
-		fmt.Println("sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS")
 		paaSInfluxServerClient, paasElasticClient, databases, boshClient, err = getPaasClients(configMap)
 		if err != nil {
-			log.Println(err)
+			logger.Error(err)
 			os.Exit(-1)
 		}
 	}
@@ -144,17 +135,16 @@ func main() {
 			iaasClient.ConnectionPool, paasDbAccessObj, iaasClient.ElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
-			log.Fatalln(err)
+			logger.Error(err)
 		}
 	} else {
 		handler = handlers.NewHandler(iaasClient.Provider, iaasClient.InfluxClient, paaSInfluxServerClient,
 			iaasClient.ConnectionPool, paasDbAccessObj, iaasClient.ElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
-			log.Fatalln(err)
+			logger.Error(err)
 		}
 	}
-
 }
 
 // 2021.09.06 - 이거 왜 있는지??
@@ -177,8 +167,11 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 		InsecureSkipVerify: true,
 	})
 
-	fmt.Printf("paaSInfluxServerClient : %v\n", paaSInfluxServerClient)
-	fmt.Printf("err : %v\n", err)
+	logger.Infof("paaSInfluxServerClient : %v\n", paaSInfluxServerClient)
+	if err != nil {
+		logger.Errorf("err : %v\n", err)
+	}
+
 
 	elasticsearchUsername, _ := config["paas.elasticsearch.username"]
 	elasticsearchPassword, _ := config["paas.elasticsearch.password"]
@@ -202,8 +195,11 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 		},
 	}
 	paasElasticClient, err = elasticsearch.NewClient(cfg)
-	fmt.Println("paasElasticClient::", paasElasticClient)
-	fmt.Println("err::", err)
+	logger.Infof("paasElasticClient : %v\n", paasElasticClient)
+	if err != nil {
+		logger.Errorf("err : %v\n", err)
+	}
+
 
 	// ElasticSearch
 	/*paasElasticUrl, _ := config["paas.elastic.url"]
@@ -239,7 +235,7 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	}
 	boshClient, err = gogobosh.NewClient(boshConfig)
 	if err != nil {
-		log.Fatalln("Failed to create connection to the bosh server. err=", err)
+		logger.Errorf("Failed to create connection to the bosh server. err=", err)
 	}
 	return
 }

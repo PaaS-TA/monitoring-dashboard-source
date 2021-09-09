@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/jinzhu/gorm"
 	"net/http"
 
 	"github.com/elastic/go-elasticsearch/v7"
@@ -11,7 +12,7 @@ import (
 	"kr/paasta/monitoring/iaas_new/model"
 )
 
-func InitHandler(provider model.OpenstackProvider, influx client.Client, elasticsearch *elasticsearch.Client) rata.Handlers {
+func InitHandler(dbConn *gorm.DB, provider model.OpenstackProvider, influx client.Client, elasticsearch *elasticsearch.Client) rata.Handlers {
 	mainController := controller.NewMainController(provider, influx)
 	computeController := controller.NewComputeController(provider, influx)
 	manageNodeController := controller.NewManageNodeController(provider, influx)
@@ -21,6 +22,8 @@ func InitHandler(provider model.OpenstackProvider, influx client.Client, elastic
 	//stautsController := controller.NewAlarmStatusController(monsClient, iaasInfluxClient, iaasTxn)
 	logController := controller.NewLogController(provider, influx, elasticsearch)
 
+	alarmController := controller.GetAlarmController(dbConn)
+	alarmPolicyController := controller.GetAlarmPolicyController(dbConn)
 
 	handlers := rata.Handlers{
 		//routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
@@ -82,6 +85,31 @@ func InitHandler(provider model.OpenstackProvider, influx client.Client, elastic
 
 		//iaas.IAAS_ALARM_REALTIME_COUNT: route(stautsController.GetIaasAlarmRealTimeCount),
 		//iaas.IAAS_ALARM_REALTIME_LIST:  route(stautsController.GetIaasAlarmRealTimeList),
+
+		IAAS_ALARM_REALTIME_COUNT: route(alarmController.GetPaasAlarmRealTimeCount),
+		IAAS_ALARM_REALTIME_LIST:  route(alarmController.GetPaasAlarmRealTimeList),
+
+		IAAS_ALARM_POLICY_LIST:   route(alarmPolicyController.GetAlarmPolicyList),
+		IAAS_ALARM_POLICY_UPDATE: route(alarmPolicyController.UpdateAlarmPolicyList),
+
+		IAAS_ALARM_SNS_CHANNEL_LIST:   route(alarmPolicyController.GetAlarmSnsChannelList),
+		IAAS_ALARM_SNS_CHANNEL_CREATE: route(alarmPolicyController.CreateAlarmSnsChannel),
+		IAAS_ALARM_SNS_CHANNEL_DELETE: route(alarmPolicyController.DeleteAlarmSnsChannel),
+		IAAS_ALARM_SNS_CHANNEL_UPDATE: route(alarmPolicyController.UpdateAlarmSnsChannel),  // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
+
+		IAAS_ALARM_STATUS_LIST:    route(alarmController.GetAlarmList),
+		IAAS_ALARM_STATUS_COUNT:   route(alarmController.GetAlarmListCount),
+		IAAS_ALARM_STATUS_RESOLVE: route(alarmController.GetAlarmResolveStatus),
+		IAAS_ALARM_STATUS_DETAIL:  route(alarmController.GetAlarmDetail),
+		IAAS_ALARM_STATUS_UPDATE:  route(alarmController.UpdateAlarm),
+		IAAS_ALARM_ACTION_CREATE:  route(alarmController.CreateAlarmAction),
+		IAAS_ALARM_ACTION_UPDATE:  route(alarmController.UpdateAlarmAction),
+		IAAS_ALARM_ACTION_DELETE:  route(alarmController.DeleteAlarmAction),
+
+		IAAS_ALARM_STATISTICS:               route(alarmController.GetAlarmStat),
+		IAAS_ALARM_STATISTICS_GRAPH_TOTAL:   route(alarmController.GetAlarmStatGraphTotal),
+		IAAS_ALARM_STATISTICS_GRAPH_SERVICE: route(alarmController.GetAlarmStatGraphService),
+		IAAS_ALARM_STATISTICS_GRAPH_MATRIX:  route(alarmController.GetAlarmStatGraphMatrix),
 	}
 	return handlers
 }

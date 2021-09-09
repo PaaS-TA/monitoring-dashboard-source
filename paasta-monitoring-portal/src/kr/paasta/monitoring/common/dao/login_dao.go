@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"fmt"
 	"github.com/jinzhu/gorm"
 	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/utils"
@@ -20,8 +19,6 @@ func GetLoginDao(txn *gorm.DB) *LoginDao {
 
 //Dao
 func (h *LoginDao) GetLoginMemberInfo(request cm.UserInfo, txn *gorm.DB) (cm.UserInfo, int, error) {
-
-	fmt.Println("Get Call LoginDao GetLoginMemberInfo =====")
 
 	pw := utils.GetSha256(request.Password)
 

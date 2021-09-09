@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	/*"gopkg.in/olivere/elastic.v3"*/

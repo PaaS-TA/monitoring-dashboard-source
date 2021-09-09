@@ -26,7 +26,7 @@ Description : Get Image information
 func (n *Glance) GetImageInfo(image_id, project_id string) (image_info model.ImageInfo, err error) {
 	var data interface{}
 
-	provider, err := utils.GetAdminToken(n.OpenstackProvider)
+	provider, err := utils.GetOpenstackToken(n.OpenstackProvider)
 	if err != nil {
 		return image_info, err
 	}

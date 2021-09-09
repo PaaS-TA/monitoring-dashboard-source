@@ -78,8 +78,6 @@ func GetIaasClients(config map[string]string) (client IaasClient, err error) {
 		},
 	}
 	iaasElasticClient, _ := elasticsearch.NewClient(cfg)
-	fmt.Println("iaasElasticClient::", iaasElasticClient)
-	fmt.Println("err::", err)
 
 	// ElasticSearch
 	/*iaasElasticUrl, _ := config["iaas.elastic.url"]

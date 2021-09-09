@@ -54,7 +54,7 @@ Description : Compute Node Resource Summary
 */
 func (n *Nova) GetComputeNodeResources() (result []model.NodeResources, err error) {
 
-	/*provider, err := utils.GetAdminToken(n.OpenstackProvider)
+	/*provider, err := utils.GetOpenstackToken(n.OpenstackProvider)
 	if err != nil {
 		return result, err
 	}
@@ -107,7 +107,7 @@ Description : Get project resources limit metadata(include network)
 */
 func (n *Nova) GetProjectResourcesLimit(project_id string) (result model.TenantResourcesLimit, err error) {
 	var data interface{}
-	/*provider, err := utils.GetAdminToken(n.OpenstackProvider)
+	/*provider, err := utils.GetOpenstackToken(n.OpenstackProvider)
 	if err != nil {
 		return result, err
 	}*/
@@ -145,7 +145,7 @@ func (n *Nova) GetProjectInstancesList(apiRequest model.TenantReq) (result []mod
 	//var instanceList []model.InstanceInfo
 	var data interface{}
 
-	/*provider, err := utils.GetAdminToken(n.OpenstackProvider)
+	/*provider, err := utils.GetOpenstackToken(n.OpenstackProvider)
 	if err != nil {
 		return result, err
 	}*/
@@ -234,7 +234,7 @@ func (n *Nova) GetProjectInstances(project_id string) (result []model.InstanceIn
 	//var return_value model.HypervisorResources
 	var data interface{}
 
-	/*provider, err := utils.GetAdminToken(n.OpenstackProvider)
+	/*provider, err := utils.GetOpenstackToken(n.OpenstackProvider)
 	if err != nil {
 		return result, err
 	}*/
@@ -294,7 +294,7 @@ Description : Nova API Test
 func (n *Nova) GetInstanceDetail(instance_id, project_id string) (result model.InstanceDetail, err error) {
 	var data interface{}
 
-	/*provider, err := utils.GetAdminToken(n.OpenstackProvider)
+	/*provider, err := utils.GetOpenstackToken(n.OpenstackProvider)
 	if err != nil {
 		return result, err
 	}*/

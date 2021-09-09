@@ -1,9 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"io"
-	http2 "kr/paasta/monitoring/iaas_new/http"
+	iaasHttp "kr/paasta/monitoring/iaas_new/http"
 	"net/http"
 	"strings"
 	"time"
@@ -48,7 +47,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	var iaasActions rata.Handlers
 
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
-		iaasActions = http2.InitHandler(openstackProvider, iaasInfluxClient, iaasElasticClient)
+		iaasActions = iaasHttp.InitHandler(paasTxn, openstackProvider, iaasInfluxClient, iaasElasticClient)
 	}
 
 	var alarmController *paasContoller.AlarmService
@@ -299,7 +298,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, iaasActions)
-		routeList = append(routeList, http2.IaasRoutes)
+		routeList = append(routeList, iaasHttp.IaasRoutes)
 	}
 	if strings.Contains(sysType, utils.SYS_TYPE_PAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, paasActions)
@@ -317,16 +316,17 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 		routeList = append(routeList, routes.CaasRoutes)
 	}
 
-	actions = getActions(actionlist)
-
 	routeList = append(routeList, routes.Routes)
+
+	actions = getActions(actionlist)
 	route = getRoutes(routeList)
 
 	handler, err := rata.NewRouter(route, actions)
 	if err != nil {
 		panic("unable to create router: " + err.Error())
 	}
-	fmt.Println("Monit Application Started")
+
+	utils.Logger.Info("Monit Application Started")
 	return utils.HttpWrap(handler, rdClient, openstackProvider, cfConfig)
 }
 

@@ -50,7 +50,7 @@ func (k *Keystone) GetTenantList() (tenant_lists []model.TenantInfo, err error) 
 
 func (k *Keystone) GetUserIdByName(userName string) (userId string, err error) {
 
-	/*provider, err := utils.GetAdminToken(k.OpenstackProvider)
+	/*provider, err := utils.GetOpenstackToken(k.OpenstackProvider)
 	if err != nil {
 		return userId, err
 	}*/

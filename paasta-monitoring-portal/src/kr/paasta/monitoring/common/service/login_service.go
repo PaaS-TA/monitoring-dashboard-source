@@ -2,21 +2,21 @@ package services
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/go-redis/redis"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 	"github.com/jinzhu/gorm"
+
 	"kr/paasta/monitoring/common/dao"
-	cm "kr/paasta/monitoring/common/model"
+	commonModel "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/iaas_new/integration"
 	"kr/paasta/monitoring/iaas_new/model"
-	pm "kr/paasta/monitoring/paas/model"
+	paasModel "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"
-	ua "kr/paasta/monitoring/utils"
-	//"strings"
-	"strings"
-	"time"
 )
 
 type LoginService struct {
@@ -61,10 +61,9 @@ func (n *LoginService) Logout(provider *gophercloud.ProviderClient, reqCsrfToken
 	return result
 }
 
-func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
+func (n *LoginService) Login(req commonModel.UserInfo, reqCsrfToken string, cfConfig paasModel.CFConfig) (userInfo commonModel.UserInfo, provider *gophercloud.ProviderClient, err error) {
 
-	//member info 로그인 아이디 패스워드를 회원디비에서 검색하여 iaas, paas 로그인 정보를 가지고 온다.
-	result, _, dbErr := dao.GetLoginDao(n.txn).GetLoginMemberInfo(req, n.txn)
+	result, _, dbErr := dao.GetLoginDao(n.txn).GetLoginMemberInfo(req, n.txn)  // 회원 정보 조회
 	resultString := ""
 	if dbErr != nil {
 		if strings.Contains(dbErr.Error(), "record not found") {
@@ -74,19 +73,26 @@ func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.C
 		}
 	}
 
+	// IaaS용 오픈스택 토큰 발급받기
 	if strings.Contains(n.sysType, utils.SYS_TYPE_IAAS) || strings.Contains(n.sysType, utils.SYS_TYPE_ALL) {
 		if result.IaasUserUseYn == "Y" {
-			//get iaas token
+
+			utils.Logger.Debug(result.IaasUserId)
+			utils.Logger.Debug(result.IaasUserPw)
 			n.openstackProvider.Username = result.IaasUserId
 			n.openstackProvider.Password = result.IaasUserPw
-			provider, err = utils.GetAdminToken(n.openstackProvider)
+
+			provider, err = utils.GetOpenstackToken(n.openstackProvider)
 			if err != nil {
-				fmt.Println("iaas error::", err.Error())
+				utils.Logger.Error(err.Error())
 				//return req, provider, err
 			} else {
 				result.IaasToken = provider.TokenID
 				//fmt.Println("iaas token ::: ", result.IaasToken )
 			}
+
+			utils.Logger.Debugf("req.Token(CSRF_TOKEN) : %v\n", req.Token)
+			utils.Logger.Debugf("result.IaasToken : %v\n", result.IaasToken)
 
 			n.RdClient.HSet(req.Token, "iaasToken", result.IaasToken)
 			n.RdClient.HSet(req.Token, "iaasUserId", result.IaasUserId)
@@ -95,22 +101,23 @@ func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.C
 		//result.PaasAdminYn = "N"
 	}
 
+	// PaaS용 UAA 토큰 발급받기
 	if strings.Contains(n.sysType, utils.SYS_TYPE_PAAS) || strings.Contains(n.sysType, utils.SYS_TYPE_ALL) {
 		if result.PaasUserUseYn == "Y" {
 			cfConfig.UserId = result.PaasUserId
 			cfConfig.UserPw = result.PaasUserPw
 			cfConfig.Type = "PAAS"
-			resultString, err = ua.GetUaaToken(result, reqCsrfToken, cfConfig, n.RdClient)
+			resultString, err = utils.GetUaaToken(result, reqCsrfToken, cfConfig, n.RdClient)
 
 			if err != nil {
-				fmt.Println("uaa token::", err.Error())
+				utils.Logger.Error(err.Error())
 				//return req, provider, err
 			} else {
 				req.PaasToken = resultString
 			}
 
 			//resultString = GetMemberService(n.openstackProvider, n.CfProvider, n.txn, n.RdClient).GetUaaToken(req, reqCsrfToken, cfConfig)
-			fmt.Println("paas token ::", resultString)
+			//utils.Logger.Debugf("paas token : %v\n", resultString)
 
 		}
 	}
@@ -123,7 +130,7 @@ func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.C
 			//resultCaasString := ""
 			//resultCaasString = GetMemberService(n.openstackProvider, n.txn, n.RdClient).CaasServiceCheck(result, reqCsrfToken, cfConfig)
 			//if resultCaasString == "adm" {
-			resultString, err = ua.GetUaaToken(result, reqCsrfToken, cfConfig, n.RdClient)
+			resultString, err = utils.GetUaaToken(result, reqCsrfToken, cfConfig, n.RdClient)
 
 			if err != nil {
 				fmt.Println("uaa token::", err.Error())
@@ -157,7 +164,7 @@ func (n *LoginService) Login(req cm.UserInfo, reqCsrfToken string, cfConfig pm.C
 	return result, provider, dbErr
 }
 
-func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConfig) {
+func (s *LoginService) SetUserInfoCache(userInfo *commonModel.UserInfo, reqCsrfToken string, cfConfig paasModel.CFConfig) {
 
 	var strcd1 = ""
 	var strcd2 = ""
@@ -171,10 +178,12 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 	if strings.Contains(s.sysType, utils.SYS_TYPE_IAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
 		if userInfo.IaasUserUseYn == "Y" {
 			strcd1 = "I"
-			var tokenRequest cm.UserInfo
+			var tokenRequest commonModel.UserInfo
 			tokenRequest.IaasUserId = userInfo.IaasUserId
 			tokenRequest.IaasUserPw = userInfo.IaasUserPw
+
 			result := GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
+			model.MonitLogger.Debug(result)
 
 			if result != "" {
 				strcd2 = "S"
@@ -191,7 +200,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 	if strings.Contains(s.sysType, utils.SYS_TYPE_PAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
 		if userInfo.PaasUserUseYn == "Y" {
 			strcd3 = "P"
-			//var tokenRequest cm.UserInfo
+			//var tokenRequest commonModel.UserInfo
 			//tokenRequest.PaasUserId = userInfo.PaasUserId
 			//tokenRequest.PaasUserPw = userInfo.PaasUserPw
 			//cfConfig.Type = "PAAS"
@@ -218,7 +227,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 	if strings.Contains(s.sysType, utils.SYS_TYPE_CAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
 		if userInfo.CaasUserUseYn == "Y" {
 			strcd5 = "C"
-			//var tokenRequest cm.UserInfo
+			//var tokenRequest commonModel.UserInfo
 			//tokenRequest.PaasUserId = userInfo.PaasUserId
 			//tokenRequest.PaasUserPw = userInfo.PaasUserPw
 			//cfConfig.Type = "PAAS"
@@ -242,8 +251,6 @@ func (s *LoginService) SetUserInfoCache(userInfo *cm.UserInfo, reqCsrfToken stri
 			GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
 	}
-
-	//fmt.Println("login User Auth ::: ", strcd1, strcd2, strcd3, strcd4)
 
 	userInfo.AuthI1 = strcd1
 	userInfo.AuthI2 = strcd2

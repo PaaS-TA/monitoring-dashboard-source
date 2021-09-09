@@ -29,7 +29,7 @@ func (s *OpenstackTenant) TenantSummary(w http.ResponseWriter, r *http.Request) 
 
 	provider, username, _ := utils.GetOpenstackProvider(r)
 	s.openstackProvider.Username = username
-	tenantSummary, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetTenantSummary(apiRequest)
+	tenantSummary, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetTenantSummary(apiRequest)
 
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
@@ -58,7 +58,7 @@ func (s *OpenstackTenant) GetTenantInstanceList(w http.ResponseWriter, r *http.R
 	}
 
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	tenantSummary, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetTenantInstanceList(apiRequest)
+	tenantSummary, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetTenantInstanceList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -82,7 +82,7 @@ func (s *OpenstackTenant) GetInstanceCpuUsageList(w http.ResponseWriter, r *http
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceCpuUsageList(apiRequest)
+	cpuUsageList, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceCpuUsageList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -106,7 +106,7 @@ func (s *OpenstackTenant) GetInstanceMemoryUsageList(w http.ResponseWriter, r *h
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceMemoryUsageList(apiRequest)
+	cpuUsageList, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceMemoryUsageList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -131,7 +131,7 @@ func (s *OpenstackTenant) GetInstanceDiskReadList(w http.ResponseWriter, r *http
 	}
 
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceDiskIoKbyteList(apiRequest, "read")
+	cpuUsageList, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceDiskIoKbyteList(apiRequest, "read")
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -155,7 +155,7 @@ func (s *OpenstackTenant) GetInstanceDiskWriteList(w http.ResponseWriter, r *htt
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceDiskIoKbyteList(apiRequest, "write")
+	cpuUsageList, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceDiskIoKbyteList(apiRequest, "write")
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -179,7 +179,7 @@ func (s *OpenstackTenant) GetInstanceNetworkIoList(w http.ResponseWriter, r *htt
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceNetworkIoKbyteList(apiRequest)
+	cpuUsageList, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceNetworkIoKbyteList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -203,7 +203,7 @@ func (s *OpenstackTenant) GetInstanceNetworkPacketsList(w http.ResponseWriter, r
 		return
 	}
 	provider, _, _ := utils.GetOpenstackProvider(r)
-	cpuUsageList, err := services.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceNetworkPacketsList(apiRequest)
+	cpuUsageList, err := service.GetTenantService(s.openstackProvider, provider, s.influxClient).GetInstanceNetworkPacketsList(apiRequest)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {

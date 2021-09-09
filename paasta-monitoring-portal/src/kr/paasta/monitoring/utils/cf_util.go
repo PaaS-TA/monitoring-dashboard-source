@@ -8,6 +8,7 @@ import (
 	"github.com/go-redis/redis"
 	"io/ioutil"
 	cm "kr/paasta/monitoring/common/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	pm "kr/paasta/monitoring/paas/model"
 	"net/http"
 	"net/url"
@@ -108,11 +109,11 @@ func GetUaaToken(apiRequest cm.UserInfo, reqCsrfToken string, cfConfig pm.CFConf
 					//redis 에 사용자 정보를 수정 저장한다.
 					//redis 에 사용자 정보를 저장한다.
 
-					fmt.Println(RdClient)
+					model.MonitLogger.Debug(RdClient)
 					rdresult := RdClient.Get(reqCsrfToken)
 
 					if rdresult.Val() == "" {
-						fmt.Println("redis check")
+						model.MonitLogger.Debug("redis check")
 						RdClient.HSet(reqCsrfToken, "paasUserId", cfConfig.UserId)
 						RdClient.HSet(reqCsrfToken, "paasToken", uaaToken.Token)
 						RdClient.HSet(reqCsrfToken, "paasAdminYn", 'Y')

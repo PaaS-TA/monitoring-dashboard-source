@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"

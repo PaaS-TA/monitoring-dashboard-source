@@ -41,26 +41,57 @@ const (
 	IAAS_TENANT_NETWORK_PACKET_LIST = "IAAS_TENANT_NETWORK_PACKET_LIST"
 	IAAS_LOG_RECENT                 = "IAAS_LOG_RECENT"
 	IAAS_LOG_SPECIFIC               = "IAAS_LOG_SPECIFIC"
+
 	IAAS_ALARM_NOTIFICATION_LIST    = "IAAS_ALARM_NOTIFICATION_LIST"
 	IAAS_ALARM_NOTIFICATION_CREATE  = "IAAS_ALARM_NOTIFICATION_CREATE"
 	IAAS_ALARM_NOTIFICATION_UPDATE  = "IAAS_ALARM_NOTIFICATION_UPDATE"
 	IAAS_ALARM_NOTIFICATION_DELETE  = "IAAS_ALARM_NOTIFICATION_DELETE"
-	IAAS_ALARM_POLICY_LIST          = "IAAS_ALARM_POLICY_LIST"
+
 	IAAS_ALARM_POLICY               = "IAAS_ALARM_POLICY"
 	IAAS_ALARM_POLICY_CREATE        = "IAAS_ALARM_POLICY_CREATE"
-	IAAS_ALARM_POLICY_UPDATE        = "IAAS_ALARM_POLICY_UPDATE"
+
 	IAAS_ALARM_POLICY_DELETE        = "IAAS_ALARM_POLICY_DELETE"
-	IAAS_ALARM_STATUS_COUNT         = "IAAS_ALARM_STATUS_COUNT"
-	IAAS_ALARM_STATUS_LIST          = "IAAS_ALARM_STATUS_LIST"
+
 	IAAS_ALARM_STATUS               = "IAAS_ALARM_STATUS"
 	IAAS_ALARM_HISTORY_LIST         = "IAAS_ALARM_HISTORY_LIST"
 	IAAS_ALARM_ACTION_LIST          = "IAAS_ALARM_ACTION_LIST"
-	IAAS_ALARM_ACTION_CREATE        = "IAAS_ALARM_ACTION_CREATE"
-	IAAS_ALARM_ACTION_UPDATE        = "IAAS_ALARM_ACTION_UPDATE"
-	IAAS_ALARM_ACTION_DELETE        = "IAAS_ALARM_ACTION_DELETE"
+
 
 	IAAS_ALARM_REALTIME_COUNT = "IAAS_ALARM_REALTIME_COUNT"
 	IAAS_ALARM_REALTIME_LIST  = "IAAS_ALARM_REALTIME_LIST"
+
+	IAAS_ALARM_POLICY_LIST   = "IAAS_ALARM_POLICY_LIST"
+	IAAS_ALARM_POLICY_UPDATE = "IAAS_ALARM_POLICY_UPDATE"
+
+	IAAS_ALARM_SNS_CHANNEL_LIST   = "IAAS_ALARM_SNS_CHANNEL_LIST"
+	IAAS_ALARM_SNS_CHANNEL_CREATE = "IAAS_ALARM_SNS_CHANNEL_CREATE"
+	IAAS_ALARM_SNS_CHANNEL_DELETE = "IAAS_ALARM_SNS_CHANNEL_DELETE"
+	IAAS_ALARM_SNS_CHANNEL_UPDATE = "IAAS_ALARM_SNS_CHANNEL_UPDATE"
+
+	IAAS_ALARM_STATUS_LIST    = "IAAS_ALARM_STATUS_LIST"
+	IAAS_ALARM_STATUS_COUNT   = "IAAS_ALARM_STATUS_COUNT"
+	IAAS_ALARM_STATUS_RESOLVE = "IAAS_ALARM_STATUS_RESOLVE"
+	IAAS_ALARM_STATUS_DETAIL  = "IAAS_ALARM_DETAIL"
+	IAAS_ALARM_STATUS_UPDATE  = "IAAS_ALARM_UPDATE"
+
+	IAAS_ALARM_ACTION_CREATE = "IAAS_ALARM_ACTION_CREATE"
+	IAAS_ALARM_ACTION_UPDATE = "IAAS_ALARM_ACTION_UPDATE"
+	IAAS_ALARM_ACTION_DELETE = "IAAS_ALARM_ACTION_DELETE"
+
+	IAAS_ALARM_STATISTICS               = "IAAS_ALARM_STATISTICS"
+	IAAS_ALARM_STATISTICS_GRAPH_TOTAL   = "IAAS_ALARM_STATISTICS_GRAPH_TOTAL"
+	IAAS_ALARM_STATISTICS_GRAPH_SERVICE = "IAAS_ALARM_STATISTICS_GRAPH_SERVICE"
+	IAAS_ALARM_STATISTICS_GRAPH_MATRIX  = "IAAS_ALARM_STATISTICS_GRAPH_MATRIX"
+	IAAS_ALARM_CONTAINER_DEPLOY         = "IAAS_ALARM_CONTAINER_DEPLOY"
+	IAAS_ALARM_DISK_IO_LIST             = "IAAS_ALARM_DISK_IO_LIST"
+	IAAS_ALARM_NETWORK_IO_LIST          = "IAAS_ALARM_NETWORK_IO_LIST"
+	IAAS_ALARM_TOPPROCESS_LIST          = "IAAS_ALARM_TOPPROCESS_LIST"
+	IAAS_ALARM_APP_RESOURCES            = "IAAS_ALARM_APP_RESOURCES"
+	IAAS_ALARM_APP_RESOURCES_ALL        = "IAAS_ALARM_APP_RESOURCES_ALL"
+	IAAS_ALARM_APP_USAGES               = "IAAS_ALARM_APP_USAGES"
+	IAAS_ALARM_APP_MEMORY_USAGES        = "IAAS_ALARM_APP_MEMORY_USAGES"
+	IAAS_ALARM_APP_DISK_USAGES          = "IAAS_ALARM_APP_DISK_USAGES"
+	IAAS_ALARM_APP_NETWORK_USAGES       = "IAAS_ALARM_APP_NETWORK_USAGES"
 )
 
 var IaasRoutes = rata.Routes{
@@ -101,23 +132,41 @@ var IaasRoutes = rata.Routes{
 	{Path: "/v2/iaas/log/recent", Method: "GET", Name: IAAS_LOG_RECENT},
 	{Path: "/v2/iaas/log/specific", Method: "GET", Name: IAAS_LOG_SPECIFIC},
 
-	//{Path: "/v2/iaas/alarm/notifications", Method: "GET", Name: IAAS_ALARM_NOTIFICATION_LIST},
-	//{Path: "/v2/iaas/alarm/notification", Method: "POST", Name: IAAS_ALARM_NOTIFICATION_CREATE},
-	//{Path: "/v2/iaas/alarm/notification/:id", Method: "PUT", Name: IAAS_ALARM_NOTIFICATION_UPDATE},
-	//{Path: "/v2/iaas/alarm/notification/:id", Method: "DELETE", Name: IAAS_ALARM_NOTIFICATION_DELETE},
-	//{Path: "/v2/iaas/alarm/policies", Method: "GET", Name: IAAS_ALARM_POLICY_LIST},
-	//{Path: "/v2/iaas/alarm/policy/:id", Method: "GET", Name: IAAS_ALARM_POLICY},
-	//{Path: "/v2/iaas/alarm/policy", Method: "POST", Name: IAAS_ALARM_POLICY_CREATE},
-	//{Path: "/v2/iaas/alarm/policy/:id", Method: "PATCH", Name: IAAS_ALARM_POLICY_UPDATE},
-	//{Path: "/v2/iaas/alarm/policy/:id", Method: "DELETE", Name: IAAS_ALARM_POLICY_DELETE},
-	//{Path: "/v2/iaas/alarm/status/count", Method: "GET", Name: IAAS_ALARM_STATUS_COUNT},
-	//{Path: "/v2/iaas/alarm/statuses", Method: "GET", Name: IAAS_ALARM_STATUS_LIST},
-	//{Path: "/v2/iaas/alarm/status/:alarmId", Method: "GET", Name: IAAS_ALARM_STATUS},
-	//{Path: "/v2/iaas/alarm/histories/:alarmId", Method: "GET", Name: IAAS_ALARM_HISTORY_LIST},
-	//{Path: "/v2/iaas/alarm/actions/:alarmId", Method: "GET", Name: IAAS_ALARM_ACTION_LIST},
-	//{Path: "/v2/iaas/alarm/action", Method: "POST", Name: IAAS_ALARM_ACTION_CREATE},
-	//{Path: "/v2/iaas/alarm/action/:id", Method: "PUT", Name: IAAS_ALARM_ACTION_UPDATE},
-	//{Path: "/v2/iaas/alarm/action/:id", Method: "DELETE", Name: IAAS_ALARM_ACTION_DELETE},
-	//{Path: "/v2/iaas/alarm/realtime/count", Method: "GET", Name: IAAS_ALARM_REALTIME_COUNT},
-	//{Path: "/v2/iaas/alarm/realtime/list", Method: "GET", Name: IAAS_ALARM_REALTIME_LIST},
+
+	{Path: "/v2/iaas/alarm/realtime/count", Method: "GET", Name: IAAS_ALARM_REALTIME_COUNT},
+	{Path: "/v2/iaas/alarm/realtime/list", Method: "GET", Name: IAAS_ALARM_REALTIME_LIST},
+
+	{Path: "/v2/iaas/alarm/policies", Method: "GET", Name: IAAS_ALARM_POLICY_LIST},
+	{Path: "/v2/iaas/alarm/policy", Method: "PUT", Name: IAAS_ALARM_POLICY_UPDATE},
+
+	{Path: "/v2/iaas/alarm/sns/channel", Method: "POST", Name: IAAS_ALARM_SNS_CHANNEL_CREATE},
+	{Path: "/v2/iaas/alarm/sns/channel/list", Method: "GET", Name: IAAS_ALARM_SNS_CHANNEL_LIST},
+	{Path: "/v2/iaas/alarm/sns/channel/:id", Method: "DELETE", Name: IAAS_ALARM_SNS_CHANNEL_DELETE},
+	{Path: "/v2/iaas/alarm/sns/channel", Method: "PUT", Name: IAAS_ALARM_SNS_CHANNEL_UPDATE},  // 2021.05.18 - PaaS 채널 SNS 수정 기능 추가
+
+	{Path: "/v2/iaas/alarm/statuses", Method: "GET", Name: IAAS_ALARM_STATUS_LIST},
+	{Path: "/v2/iaas/alarm/status/count", Method: "GET", Name: IAAS_ALARM_STATUS_COUNT},
+	{Path: "/v2/iaas/alarm/status/:id", Method: "GET", Name: IAAS_ALARM_STATUS_DETAIL},
+	{Path: "/v2/iaas/alarm/status/:id", Method: "PUT", Name: IAAS_ALARM_STATUS_UPDATE},
+	{Path: "/v2/iaas/alarm/status/:resolveStatus", Method: "GET", Name: IAAS_ALARM_STATUS_RESOLVE},
+
+	{Path: "/v2/iaas/alarm/action", Method: "POST", Name: IAAS_ALARM_ACTION_CREATE},
+	{Path: "/v2/iaas/alarm/action/:actionId", Method: "PATCH", Name: IAAS_ALARM_ACTION_UPDATE},
+	{Path: "/v2/iaas/alarm/action/:actionId", Method: "DELETE", Name: IAAS_ALARM_ACTION_DELETE},
+
+	{Path: "/v2/iaas/alarm/statistics", Method: "GET", Name: IAAS_ALARM_STATISTICS},
+	{Path: "/v2/iaas/alarm/statistics/graph/total", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_TOTAL},
+	{Path: "/v2/iaas/alarm/statistics/graph/service", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_SERVICE},
+	{Path: "/v2/iaas/alarm/statistics/graph/matrix", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_MATRIX},
+
+	//{Path: "/v2/iaas/alarm/container/deploy", Method: "GET", Name: IAAS_ALARM_CONTAINER_DEPLOY},
+	//{Path: "/v2/iaas/alarm/disk/io/:origin", Method: "GET", Name: IAAS_ALARM_DISK_IO_LIST},
+	//{Path: "/v2/iaas/alarm/network/io/:origin", Method: "GET", Name: IAAS_ALARM_NETWORK_IO_LIST},
+	//{Path: "/v2/iaas/alarm/topprocess/:origin", Method: "GET", Name: IAAS_ALARM_TOPPROCESS_LIST},
+	//{Path: "/v2/iaas/alarm/app/resources", Method: "GET", Name: IAAS_ALARM_APP_RESOURCES},
+	//{Path: "/v2/iaas/alarm/app/resources/all", Method: "GET", Name: IAAS_ALARM_APP_RESOURCES_ALL},
+	//{Path: "/v2/iaas/alarm/app/cpu/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_USAGES},
+	//{Path: "/v2/iaas/alarm/app/memory/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_MEMORY_USAGES},
+	//{Path: "/v2/iaas/alarm/app/disk/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_DISK_USAGES},
+	//{Path: "/v2/iaas/alarm/app/network/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_NETWORK_USAGES},
 }

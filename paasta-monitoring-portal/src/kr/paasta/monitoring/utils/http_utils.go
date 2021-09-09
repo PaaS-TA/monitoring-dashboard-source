@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -31,25 +30,31 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 
 		// token Pass
 		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/monitoring/podList") {
-			fmt.Println("Request URI :: ", r.RequestURI)
+			if !strings.Contains(r.RequestURI, "favicon.ico") {
+				Logger.Info("Request URI :: ", r.RequestURI)
+			}
+
 
 			reqToken := r.Header.Get(model.CSRF_TOKEN_NAME)
 			if reqToken == "0" || reqToken == "null" {
-				fmt.Println("HttpWrap Hander reqToken is null ")
+				Logger.Info("HttpWrap Hander reqToken is null ")
 				errMessage := model.ErrMessage{"Message": "UnAuthrized"}
 				RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
 			} else {
 				//fmt.Println("HttpWrap Hander reqToken =",len(reqToken),":",reqToken)
 				//모든 경로의 redis 의 토큰 정보를 확인한다
+
+				Logger.Debugf("reqToken : %v\n", reqToken)
 				val := rdClient.HGetAll(reqToken).Val()
+				Logger.Debugf("iaasToken : %v\n", val["iaasToken"])
+
 				if val == nil || len(val) == 0 { // redis 에서 token 정보가 expire 된경우 로그인 화면으로 돌아간다
-					fmt.Println("HttpWrap Hander redis.iaas_userid is null ")
+					Logger.Info("HttpWrap Hander redis.iaas_userid is null ")
 					errMessage := model.ErrMessage{"Message": "UnAuthrized"}
 					RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
 				} else {
 
 					if strings.Contains(r.RequestURI, "/v2/member") && val["userId"] != "" {
-
 						handler.ServeHTTP(w, r)
 
 					} else if strings.Contains(r.RequestURI, "/v2/iaas") && val["iaasToken"] != "" && val["iaasUserId"] != "" { // IaaS 토큰 정보가 있는경우
@@ -66,7 +71,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 							if err != nil || bool == false {
 								//errMessage := model.ErrMessage{"Message": "UnAuthrized"}
 								//utils.RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
-								fmt.Println("iaas token validate error::", err)
+								Logger.Info("iaas token validate error::", err)
 								handler.ServeHTTP(w, r)
 							} else {
 								//두개 token 이 없는 경우도 고려 해야함
@@ -74,20 +79,19 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 								handler.ServeHTTP(w, r)
 							}
 						}
-
 					} else if strings.Contains(r.RequestURI, "/v2/paas") && val["paasRefreshToken"] != "" { // PaaS 토큰 정보가 있는경우
 
 						// Pass token 검증 로직 추가
-						//get paas token
+						// get paas token
 						//cfProvider.Token = val["paasToken"]
 						t1, _ := time.Parse(time.RFC3339, val["paasExpire"])
 						if t1.Before(time.Now()) {
-							fmt.Println("paas time : " + t1.String())
+							Logger.Info("paas time : " + t1.String())
 
 							cfConfig.Type = "PAAS"
 							result, err := GetUaaReFreshToken(reqToken, cfConfig, rdClient)
 							//client_test, err := cfclient.NewClient(&cfProvider)
-							fmt.Println("paas token : " + result)
+							Logger.Info("paas token : " + result)
 							errMessage := model.ErrMessage{"Message": "UnAuthrized"}
 
 							if err != "" {
@@ -163,14 +167,14 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 						rdClient.Expire(reqToken, 30*60*time.Second)
 						handler.ServeHTTP(w, r)
 					} else {
-						fmt.Println("URL Not All")
+						//fmt.Println("URL Not All")
 						//rdClient.Expire(reqToken, 30*60*time.Second)
 						//handler.ServeHTTP(w, r)
 					}
 				}
 			}
 		} else {
-			fmt.Println("url pass ::", r.RequestURI)
+			Logger.Info("url pass ::", r.RequestURI)
 			handler.ServeHTTP(w, r)
 		}
 		//handler.ServeHTTP(w, r)

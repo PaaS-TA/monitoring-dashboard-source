@@ -31,7 +31,7 @@ func (h *OpenstackServices) Main(w http.ResponseWriter, r *http.Request) {
 func (s *OpenstackServices) OpenstackSummary(w http.ResponseWriter, r *http.Request) {
 
 	provider, username, err := utils.GetOpenstackProvider(r)
-	projectResourceSummary, err := services.GetMainService(s.OpenstackProvider, provider, s.influxClient).GetOpenstackSummary(username)
+	projectResourceSummary, err := service.GetMainService(s.OpenstackProvider, provider, s.influxClient).GetOpenstackSummary(username)
 
 	if err != nil {
 		model.MonitLogger.Error("GetOpenstackResources error :", err)

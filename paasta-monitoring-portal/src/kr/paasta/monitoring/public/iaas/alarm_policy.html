@@ -27,8 +27,8 @@
 				<nav>
 					<ul>
 						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
-						<li><a href="bosh.html">H<span>ypervisor</span></a></li>
-						<li><a href="paas.html">P<span>roject</span></a></li>
+						<li><a href="hypervisor.html">H<span>ypervisor</span></a></li>
+						<li><a href="project.html">P<span>roject</span></a></li>
 						<li>
 							<a href="alarm_policy.html" class="on">A<span>larm</span></a>
 							<ul>
@@ -49,13 +49,7 @@
 				<div class="contentsLeft">
 					<!-- Overview -->
 					<h4>Alarm Policy</h4>
-					<div class="listSearch">
-						<select id="type">
-							<option value="bos">Bosh</option>
-							<option value="pas">Paas-TA</option>
-							<option value="con">Container</option>
-						</select>
-					</div>
+
 					<div class="alarmSetting">
 						<dl class="cpu inputWrap" data-id="cpu">
 							<dt>CPU</dt>
@@ -288,27 +282,21 @@
 
 				init() {
 					// Alarm Count
-					fnComm.alarmCount('paas');
+					fnComm.alarmCount('iaas');
 					
 					// Alarm Policy, Measuring Time, Alarm Receiver Address
-					fnComm.loadData('GET', `${fnComm.url}paas/alarm/policies`, alarm.alarmPolicies);
+					fnComm.loadData('GET', `${fnComm.url}iaas/alarm/policies`, alarm.alarmPolicies);
 
 					// Alarm SNS Channel
-					fnComm.loadData('GET', `${fnComm.url}paas/alarm/sns/channel/list`, alarm.alarmChannel);
+					fnComm.loadData('GET', `${fnComm.url}iaas/alarm/sns/channel/list`, alarm.alarmChannel);
 				},
 
 				alarmPolicies(data) {
-					
+
 					if(alarm.flag){
 						alarm.data = data; // 데이터 저장
 						alarm.flag = false;
-
-						// Alarm Policy 타입 셀렉트
-						document.getElementById('type').addEventListener('change', (e) => {
-							alarm.id = e.target.value;
-							alarm.alarmPolicies();
-						}, false);
-						
+						alarm.id = 'ias';
 						// Alarm Receiver 메일 셀렉트
 						document.getElementById('mailSelect').addEventListener('change', (e) => {
 							document.querySelector('.mailDomain').value = e.target.value;
@@ -405,7 +393,7 @@
 
 					// Alarm Receiver Address 데이터 저장
 					policyData += `{
-						"originType":"${document.getElementById('type').value}",
+						"originType" : "ias",
 						"mailAddress":"${document.querySelector('.mailAddress').value}@${document.querySelector('.mailDomain').value}",
 						"mailSendYn":"${mailYN}",
 						"snsSendYn":"${snsYN}"
@@ -471,7 +459,7 @@
 
 							} else {
 								for (var i=0; i<checkedId.length; i++) {
-									var url = `${fnComm.url}paas/alarm/sns/channel/` + checkedId[i]
+									var url = `${fnComm.url}iaas/alarm/sns/channel/` + checkedId[i]
 
 									var request = new XMLHttpRequest();
 									request.open('DELETE', url);
@@ -510,7 +498,7 @@
 						// Alarm Channel 삭제
 						document.getElementById('btnDel').addEventListener('click', (e) => {
 							console.log(document.getElementById('snsId').getAttribute('data-id'));
-							fnComm.saveData('DELETE', `${fnComm.url}paas/alarm/sns/channel/${document.getElementById('snsId').getAttribute('data-id')}`);
+							fnComm.saveData('DELETE', `${fnComm.url}iaas/alarm/sns/channel/${document.getElementById('snsId').getAttribute('data-id')}`);
 						}, false);
 
 					} else {
@@ -553,7 +541,7 @@
 						"snsSendYn":"${document.getElementById('sns').value}"
 					}`
 
-					fnComm.saveData('POST', `${fnComm.url}paas/alarm/sns/channel`, channelData.replace(/(\s*)/g,''));
+					fnComm.saveData('POST', `${fnComm.url}iaas/alarm/sns/channel`, channelData.replace(/(\s*)/g,''));
 				},
 			}
 

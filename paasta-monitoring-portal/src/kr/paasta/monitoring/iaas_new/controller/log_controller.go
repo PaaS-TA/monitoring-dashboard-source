@@ -62,7 +62,7 @@ func (s *OpenstackLog) GetDefaultRecentLog(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	logInfo, err := services.GetLogService(s.ElasticClient).GetDefaultRecentLog(apiRequest, true)
+	logInfo, err := service.GetLogService(s.ElasticClient).GetDefaultRecentLog(apiRequest, true)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
@@ -93,7 +93,7 @@ func (s *OpenstackLog) GetSpecificTimeRangeLog(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	cpuUsageList, err := services.GetLogService(s.ElasticClient).GetSpecificTimeRangeLog(apiRequest, true)
+	cpuUsageList, err := service.GetLogService(s.ElasticClient).GetSpecificTimeRangeLog(apiRequest, true)
 	if err != nil {
 		utils.ErrRenderJsonResponse(err, w)
 	} else {

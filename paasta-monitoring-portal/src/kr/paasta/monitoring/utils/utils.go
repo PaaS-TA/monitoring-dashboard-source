@@ -257,7 +257,7 @@ func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient
 }
 
 //Get Openstack Admin Token - based on Default Domain & Admin tenant
-func GetAdminToken(openstack_provider model.OpenstackProvider) (*gophercloud.ProviderClient, error) {
+func GetOpenstackToken(openstack_provider model.OpenstackProvider) (*gophercloud.ProviderClient, error) {
 
 	// Option 1: Pass in the values yourself
 	opts := gophercloud.AuthOptions{
