@@ -142,6 +142,7 @@ const fnComm = {
 
 			var type = sessionStorage.getItem('sysType').split(',');
 
+			// config.ini에 설정된 타입에 따라 헤더 메뉴의 show/hide 여부를 제어함
 			for(var i=0 ; i<type.length ; i++){
 				document.querySelector(`.global .${type[i]}`).style.display= 'inline-block';
 			};
