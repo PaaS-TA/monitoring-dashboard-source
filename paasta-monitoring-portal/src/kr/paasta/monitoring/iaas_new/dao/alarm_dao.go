@@ -36,7 +36,7 @@ func (h *AlarmDao) GetAlarmList(request model.AlarmRequest, txn *gorm.DB) ([]mod
 			startDataRow = endDataRow - request.PagingReq.PageItem
 		}
 
-		var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'pas' ) or A.origin_type != 'pas' ) and"
+		var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'ias' ) or A.origin_type != 'ias' ) and"
 
 		if request.OriginType != "" {
 			queryWhere += " origin_type = '" + request.OriginType + "' and"
@@ -80,6 +80,7 @@ func (h *AlarmDao) GetAlarmList(request model.AlarmRequest, txn *gorm.DB) ([]mod
 				"	CASE " +
 				"		WHEN origin_type= 'bos' THEN 'micro-bosh' " +
 				"		WHEN origin_type= 'pas' THEN (select name from vms where vms.id = origin_id) " +
+				"		WHEN origin_type= 'ias' THEN 'IaaS' " +
 				"		ELSE app_name " +
 				"	END " +
 				") origin_name, " +
@@ -118,7 +119,7 @@ func (h *AlarmDao) GetAlarmListCount(request model.AlarmRequest, txn *gorm.DB) (
 
 	t := model.AlarmStatusCountResponse{}
 
-	var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'pas' ) or A.origin_type != 'pas' ) and resolve_status = '" + request.ResolveStatus + "'"
+	var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'ias' ) or A.origin_type != 'ias' ) and resolve_status = '" + request.ResolveStatus + "'"
 
 	if len(request.SearchDateFrom) != 0 && len(request.SearchDateTo) != 0 {
 		queryWhere += " AND alarm_send_date BETWEEN '" + request.SearchDateFrom + " 00:00:00' AND '" + request.SearchDateTo + " 23:59:59' "
@@ -150,6 +151,7 @@ func (h *AlarmDao) GetAlarmResolveStatus(request model.AlarmRequest, txn *gorm.D
 			"	CASE " +
 			"		WHEN origin_type= 'bos' THEN 'micro-bosh' " +
 			"		WHEN origin_type= 'pas' THEN (select name from vms where vms.id = origin_id) " +
+			"		WHEN origin_type= 'ias' THEN 'IaaS' " +
 			"		ELSE app_name " +
 			"	END " +
 			") origin_name, " +
@@ -181,6 +183,7 @@ func (h *AlarmDao) GetAlarmDetail(request model.AlarmRequest, txn *gorm.DB) (mod
 			"	CASE "+
 			"		WHEN origin_type= 'bos' THEN 'micro-bosh' "+
 			"		WHEN origin_type= 'pas' THEN (select name from vms where vms.id = origin_id) "+
+			"		WHEN origin_type= 'ias' THEN 'IaaS' " +
 			"		ELSE app_name "+
 			"	END "+
 			") origin_name, "+
@@ -374,7 +377,7 @@ func (h *AlarmDao) GetPaasAlarmRealTimeList() ([]model.AlarmResponse, model.ErrM
 
 	var list []model.AlarmResponse
 
-	var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'pas' ) or A.origin_type != 'pas' ) and resolve_status != '3'"
+	var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'ias' ) or A.origin_type != 'ias' ) and resolve_status != '3'"
 	status := h.txn.Debug().Table("alarms A").
 		Select("id, origin_type, origin_id, alarm_type, level, ip, app_yn, app_name, app_index, container_name, alarm_title, alarm_message, resolve_status,alarm_cnt, reg_date + INTERVAL 9 HOUR as reg_date, reg_user, modi_date, modi_user, alarm_send_date + INTERVAL 9 HOUR as alarm_send_date").
 		Where(queryWhere).

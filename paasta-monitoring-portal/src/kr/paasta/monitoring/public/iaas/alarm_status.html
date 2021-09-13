@@ -50,12 +50,6 @@
 					<!-- Overview -->
 					<fieldset class="statusSearch">
 						<h4>Search Status</h4>
-						<select id="type1">
-							<option value="">대상 전체</option>
-							<option value="pas">PaaS-TA</option>
-							<option value="bos">Bosh</option>
-							<option value="con">Container</option>
-						</select>
 						<select id="type2">
 							<option value="">자원유형 전체</option>
 							<option value="cpu">CPU</option>
@@ -205,7 +199,7 @@
 					document.getElementById('date1').value = `${yyyy}-${nn}-${dd}`;
 					document.getElementById('date2').value = `${yyyy}-${mm}-${dd}`;
 
-					fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, alarm.alarmStatus);
+					fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=ias&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, alarm.alarmStatus);
 				},
 
 				alarmStatus(data) {
@@ -298,7 +292,7 @@
 							saveBtn[i].addEventListener('click', (e) => {
 								var actionPush = `{"alarmId":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
 
-								fnComm.saveData('POST', `${fnComm.url}paas/alarm/action`, actionPush);
+								fnComm.saveData('POST', `${fnComm.url}iaas/alarm/action`, actionPush);
 
 								e.target.parentNode.previousSibling.previousSibling.value = '';
 							}, false);
@@ -306,7 +300,7 @@
 							complBtn[i].addEventListener('click', (e) => {
 								var actionPush = `{"alarmId":${e.target.getAttribute('data-id')},"alarmActionDesc":"${e.target.parentNode.previousSibling.previousSibling.value}"}`;
 
-								fnComm.saveData('POST', `${fnComm.url}paas/alarm/action`, actionPush);
+								fnComm.saveData('POST', `${fnComm.url}iaas/alarm/action`, actionPush);
 
 								e.target.parentNode.previousSibling.previousSibling.value = '';
 							}, false);
@@ -366,7 +360,7 @@
 
 				event(){
 					document.querySelector('.search').addEventListener('click', (e) => {
-						fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
+						fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=ias&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
 					}, false);
 				},
 			}
