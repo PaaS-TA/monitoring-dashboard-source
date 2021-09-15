@@ -1,31 +1,20 @@
-Related Repositories
-=======================
+# Related Repositories
 <table>
   <tr>
-    <td colspan=2 align=center>
-      플랫폼
-    </td>
-    <td colspan=2 align=center>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">어플리케이션 플랫폼</a>
-    </td>
-    <td colspan=2 align=center>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">컨테이너 플랫폼</a>
-    </td>
+    <td colspan=2 align=center>플랫폼</td>
+    <td colspan=2 align=center><a href="https://github.com/PaaS-TA/paasta-deployment">어플리케이션 플랫폼</a></td>
+    <td colspan=2 align=center><a href="need_change">컨테이너 플랫폼</a></td>
   </tr>
   <tr>
-    <td colspan=2 align=center>
-      포털
-    </td>
-    <td colspan=2 align=center>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">AP 포털</a>
-    </td>
-    <td colspan=2 align=center>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">CP 포털</a>
-    </td>
+    <td colspan=2 rowspan=2 align=center>포털</td>
+    <td colspan=2 align=center><a href="https://github.com/PaaS-TA/portal-deployment">AP 포털</a></td>
+    <td colspan=2 align=center><a href="need_change">CP 포털</a></td>
   </tr>
   <tr align=center>
-    <td rowspan=4>모니터링</td>
-    <td rowspan=2>릴리즈<br>/빌드팩</td>
+    <td colspan=4>🚩<a href="https://github.com/PaaS-TA/PaaS-TA-Monitoring">모니터링 대시보드</a></td>
+  </tr>
+  <tr align=center>
+    <td rowspan=2 colspan=2><a href="https://github.com/PaaS-TA/monitoring-deployment">모니터링</a></td>
     <td><a href="https://github.com/PaaS-TA/PaaS-TA-Monitoring-Release">Monitoring Release</a></td>
     <td><a href="https://github.com/PaaS-TA/paas-ta-monitoring-logsearch-release">Logsearch Release</a></td>
     <td><a href="https://github.com/PaaS-TA/paas-ta-monitoring-influxdb-release">InfluxDB Release</a></td>
@@ -37,70 +26,38 @@ Related Repositories
     <td></td>
     <td></td>
   </tr>
-  <tr align=center>
-    <td>배포</td>
-    <td colspan=4><a href="https://github.com/PaaS-TA/monitoring-deployment">Monitoring Deployment</td>
   </tr>
   <tr align=center>
-    <td>가이드<br>/소스 코드</td>
-    <td colspan=4>🚩<a href="https://github.com/PaaS-TA/PaaS-TA-Monitoring">PaaS-TA-Monitoring</a></td>
-  </tr>
-  </tr>
-  <tr align=center>
-    <td rowspan=4 colspan=2>
-      서비스
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Cubrid</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Gateway</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">GlusterFS</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Lifecycle</a>
-    </td>
+    <td rowspan=4 colspan=2><a href="https://github.com/PaaS-TA/service-deployment">AP 서비스</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-CUBRID-RELEASE">Cubrid Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-API-GATEWAY-SERVICE-RELEASE">Gateway Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-GLUSTERFS-RELEASE">GlusterFS Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-APP-LIFECYCLE-SERVICE-RELEASE">Lifecycle Release</a></td>
   </tr>
   <tr align=center>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Logging</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">MongoDB</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">MySQL</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Pinpoint APM</a>
-    </td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-LOGGING-SERVICE-RELEASE">Logging Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-MONGODB-SHARD-RELEASE">MongoDB Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-MYSQL-RELEASE">MySQL Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-PINPOINT-RELEASE">Pinpoint APM Release</a></td>
   </tr>
   <tr align=center>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Pipeline</a>
-    </td>
-    <td align=center>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">RabbitMQ</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">Redis</a>
-    </td>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">형상관리</a>
-    </td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-DELIVERY-PIPELINE-RELEASE">Pipeline Release</a></td>
+    <td align=center><a href="https://github.com/PaaS-TA/rabbitmq-release">RabbitMQ Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-ON-DEMAND-REDIS-RELEASE">Redis Release</a></td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-SOURCE-CONTROL-RELEASE">Source Control Release</a></td>
   </tr>
   <tr align=center>
-    <td>
-      <a href="https://github.com/PaaS-TA/portal-deployment/commits?author=okpc579">WEB-IDE</a>
-    </td>
-    <td>
-    </td>
-    <td>
-    </td>
-    <td>
-    </td>
+    <td><a href="https://github.com/PaaS-TA/PAAS-TA-WEB-IDE-RELEASE-NEW">WEB-IDE Release</a></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr align=center>
+    <td rowspan=1 colspan=2><a href="https://github.com/PaaS-TA/service-deployment">CP 서비스</a></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
   </tr>
 </table>
 <i>*🚩─ You are here.</i>
