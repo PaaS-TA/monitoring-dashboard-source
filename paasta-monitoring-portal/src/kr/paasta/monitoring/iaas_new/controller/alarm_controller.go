@@ -199,8 +199,11 @@ func (h *AlarmService) GetAlarmStat(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmStatRequest
 	apiRequest.Period = r.URL.Query().Get("period")
+	apiRequest.Origin = r.URL.Query().Get("origin")
+
 	interval, _ := strconv.Atoi(r.URL.Query().Get("interval"))
 	apiRequest.Interval = interval
+
 
 	alarms, err := service.GetAlarmService(h.txn).GetAlarmStat(apiRequest, h.txn)
 	if err != nil {
@@ -214,10 +217,12 @@ func (h *AlarmService) GetAlarmStatGraphTotal(w http.ResponseWriter, r *http.Req
 
 	var apiRequest model.AlarmStatRequest
 	apiRequest.Period = r.URL.Query().Get("period")
+	originType := r.URL.Query().Get("origin")
+
 	apiRequest.Interval, _ = strconv.Atoi(r.URL.Query().Get("interval"))
 	apiRequest.Args = []model.AlarmStat{
-		{model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", ""},
-		{model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", ""}}
+		{model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, originType, ""},
+		{model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, originType, ""}}
 	result, err := service.GetAlarmService(h.txn).GetAlarmStatGraph(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
@@ -250,14 +255,16 @@ func (h *AlarmService) GetAlarmStatGraphMatrix(w http.ResponseWriter, r *http.Re
 
 	var apiRequest model.AlarmStatRequest
 	apiRequest.Period = r.URL.Query().Get("period")
+	originType := r.URL.Query().Get("origin")
+
 	apiRequest.Interval, _ = strconv.Atoi(r.URL.Query().Get("interval"))
 	apiRequest.Args = []model.AlarmStat{
-		{model.ALARM_TYPE_CPU + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_CPU},
-		{model.ALARM_TYPE_CPU + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_CPU},
-		{model.ALARM_TYPE_MEMORY + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_MEMORY},
-		{model.ALARM_TYPE_MEMORY + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_MEMORY},
-		{model.ALARM_TYPE_DISK + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, "", model.ALARM_TYPE_DISK},
-		{model.ALARM_TYPE_DISK + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, "", model.ALARM_TYPE_DISK}}
+		{model.ALARM_TYPE_CPU + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, originType, model.ALARM_TYPE_CPU},
+		{model.ALARM_TYPE_CPU + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, originType, model.ALARM_TYPE_CPU},
+		{model.ALARM_TYPE_MEMORY + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, originType, model.ALARM_TYPE_MEMORY},
+		{model.ALARM_TYPE_MEMORY + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, originType, model.ALARM_TYPE_MEMORY},
+		{model.ALARM_TYPE_DISK + "-" + model.ALARM_LEVEL_CRITICAL, model.ALARM_LEVEL_CRITICAL, originType, model.ALARM_TYPE_DISK},
+		{model.ALARM_TYPE_DISK + "-" + model.ALARM_LEVEL_WARNING, model.ALARM_LEVEL_WARNING, originType, model.ALARM_TYPE_DISK}}
 	result, err := service.GetAlarmService(h.txn).GetAlarmStatGraph(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)

@@ -145,7 +145,6 @@
 					<article class="alarmStatistics" id="alarmStatistics">
 						<h4>Alarm Statistics</h4>
 						<div class="chart" id="alarmTotal"></div>
-						<div class="chart" id="alarmService"></div>
 						<div class="chart" id="alarmMatrix"></div>
                     </article>
 				</section>
@@ -182,11 +181,11 @@
 
 				reload() {
 					// 알람통계 total
-					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/total?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmTotal');
+					fnComm.loadData('GET', fnComm.url + 'iaas/alarm/statistics/graph/total?period='+alarm.days+'&interval='+alarm.step+'&origin=ias', alarm.alarmStatistics, '#alarmTotal');
 					// 알람통계 service
-					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/service?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmService');
+					//fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/service?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmService');
 					// 알람통계 matrix
-					fnComm.loadData('GET', fnComm.url + 'paas/alarm/statistics/graph/matrix?period='+alarm.days+'&interval='+alarm.step, alarm.alarmStatistics, '#alarmMatrix');
+					fnComm.loadData('GET', fnComm.url + 'iaas/alarm/statistics/graph/matrix?period='+alarm.days+'&interval='+alarm.step+'&origin=ias', alarm.alarmStatistics, '#alarmMatrix');
 				},
 				
 				// Detail 차트 //////////////////////////////////////////////////////////////////////////
@@ -203,9 +202,6 @@
 					switch (target){
 						case '#alarmTotal':
 							chartColor = ['#ff015a', '#fcce34'];
-						break;
-						case '#alarmService':
-							chartColor = ['#01826c','#76a561','#b9d630','#ac9f37','#41bfa9','#e4f0c2'];
 						break;
 						case '#alarmMatrix':
 							chartColor = ['#143d51', '#005796', '#12c0f3', '#96c4e8', '#586f7d', '#aae0fa'];
