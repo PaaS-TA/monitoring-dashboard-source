@@ -12,7 +12,7 @@
     <td colspan=2 align=center><a href="https://github.com/PaaS-TA/container-platform-portal-release">CP 포털</a></td>
   </tr>
   <tr align=center>
-    <td colspan=4>🚩 <a href="https://github.com/PaaS-TA/PaaS-TA-Monitoring">모니터링 대시보드</a></td>
+    <td colspan=4>🚩 <a href="https://github.com/PaaS-TA/monitoring-dashboard-source">모니터링 대시보드</a></td>
   </tr>
   <tr align=center>
     <td rowspan=2 colspan=2><a href="https://github.com/PaaS-TA/monitoring-deployment">모니터링</a></td>
@@ -371,11 +371,11 @@ sudo tar xvzf ideaIC-2019.2.3.tar.gz
 - PaaS-TA 소스를 다운로드 받는다.
 ```    
 $ cd workspace
-$ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
+$ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
 ```
 <br/><br/>
 
-> **PaaS-TA-Monitoring Application 구성** <div id='2.3.1.6' />
+> **PaaS-TA monitoring-dashboard-source Application 구성** <div id='2.3.1.6' />
 
 - Project 열기
 
@@ -399,8 +399,8 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     ![](images/2.4.1_5.png)<br/>
  
     - Global GOPATH 우측 + 버튼을 클릭하여 "C:\Go\bin" 설정한다.<br/> 
-    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-TA-Monitoring\paasta-monitoring-batch" 로 설정한다.<br/>
-    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\PaaS-TA-Monitoring\paasta-monitoring-management" 로 설정한다.<br/>
+    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\monitoring-dashboard-source\paasta-monitoring-batch" 로 설정한다.<br/>
+    - Project GOPATH 우측 + 버튼을 클릭하여 "\…\monitoring-dashboard-source\paasta-monitoring-management" 로 설정한다.<br/>
     - IntellJ 를 재시작한다.<br/>
     ![](images/2.4.1_6.png)
 
@@ -414,7 +414,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Windows)<br/>
         ```
-        cd .\PaaS-TA-Monitoring\ paasta-monitoring-portal
+        cd .\monitoring-dashboard-source\paasta-monitoring-portal
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -422,7 +422,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
 
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd ./PaaS-TA-Monitoring/paasta-monitoring-portal 
+        cd ./monitoring-dashboard-source/paasta-monitoring-portal 
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -486,7 +486,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\PaaS-TA-Monitoring\paasta-monitoring-batch
+        cd \...\monitoring-dashboard-source\paasta-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -494,7 +494,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../PaaS-TA-Monitoring/paasta-monitoring-batch
+        cd .../monitoring-dashboard-source/paasta-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -529,7 +529,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\PaaS-TA-Monitoring\paasta-caas-monitoring-batch
+        cd \...\monitoring-dashboard-source\paasta-caas-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -537,7 +537,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../PaaS-TA-Monitoring/paasta-caas-monitoring-batch
+        cd .../monitoring-dashboard-source/paasta-caas-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -566,7 +566,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Windows)<br/>
         ```
-        cd \...\PaaS-TA-Monitoring\paasta-saas-monitoring-batch
+        cd \...\monitoring-dashboard-source\paasta-saas-monitoring-batch
         set GOPATH='현재 디렉토리 경로"
         set PATH=%PATH%;%GOPATH%bin;
         ```
@@ -574,7 +574,7 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
         - Path 설정 (Ubuntu)<br/>
         ```
-        cd .../PaaS-TA-Monitoring/paasta-saas-monitoring-batch
+        cd .../monitoring-dashboard-source/paasta-saas-monitoring-batch
         export GOPATH=$PWD
         export PATH=$GOPATH/bin:$PATH
         ```
@@ -601,14 +601,14 @@ $ git clone https://github.com/PaaS-TA/PaaS-TA-Monitoring
     
 - Windows
 ```
-cd \...\PaaS-TA-Monitoring\paasta-monitoring-portal\src\kr\paasta\monitoring
+cd \...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring
 go run main.go
 ```
 <br/>
     
 - Ubuntu
 ```
-cd /.../PaaS-TA-Monitoring/paasta-monitoring-portal/src/kr/paasta/monitoring
+cd /.../monitoring-dashboard-source/paasta-monitoring-portal/src/kr/paasta/monitoring
 go run main.go
 ```
 <br/>
