@@ -63,7 +63,7 @@
 </table>
 <i>🚩 You are here.</i>
 
-PaaS_TA_Monitoring-v5.5.0
+PaaS-TA monitoring-dashboard-source v5.5.0
 =======================
 
 1. [개요](#1)
@@ -71,7 +71,7 @@ PaaS_TA_Monitoring-v5.5.0
         * [목적](#1.1.1)
         * [범위](#1.1.2)
         * [참고자료](#1.1.3)
-2. [PaaS-TA Monitoring Application 환경 설정](#2)
+2. [PaaS-TA monitoring-dashboard-source 환경 설정](#2)
     * [개요](#2.1)
     * [개발환경 사전 설치 사항](#2.2)
 	* [개발환경 구성](#2.3)
@@ -81,10 +81,10 @@ PaaS_TA_Monitoring-v5.5.0
 	        * [golang 설치](#2.3.1.3)
 	        * [Intellij – GO Application 환경 설정](#2.3.1.4)
 	        * [소스 다운로드](#2.3.1.5)
-	        * [PaaS-TA-Monitoring Application 구성](#2.3.1.6)
+	        * [PaaS-TA monitoring-dashboard 구성](#2.3.1.6)
 	        * [Server Start](#2.3.1.7)	    
-3. [PaaS-TA Monitoring Application 구성](#3)	    
-    * [PaaS-TA-Monitoring-Portal](#3.1)
+3. [PaaS-TA monitoring-dashboard 구성](#3)	    
+    * [PaaS-TA monitoring-dashboard](#3.1)
         * [관련 Table 목록 및 구조](#3.1.1)
             * [관련 Table 목록](#3.1.1.1)
             * [실시간 모니터링 기반 데이터 수집 정보](#3.1.1.2)
@@ -138,7 +138,7 @@ PaaS_TA_Monitoring-v5.5.0
             * [SaaS Alarm Status](#3.1.8.40)
             * [CaaS SaaS Status Detail](#3.1.8.41)
             
-    * [PaaS-TA Monitoring Batch](#3.2)
+    * [PaaS Monitoring Batch](#3.2)
         * [관련 Table 목록 및 구조](#3.2.1)
         * [Component 정보](#3.2.2)
         * [설정 정보](#3.2.3)
@@ -168,7 +168,7 @@ PaaS_TA_Monitoring-v5.5.0
         * [e-mail](#3.4.6.1)
         * [telegram](#3.4.6.2)                    
         
-    * [Monitoring Guide Agent 구성](#3.5)
+    * [Monitoring Agent 구성](#3.5)
         * [개요](#3.5.1)
         * [PaaS Metrics Agent 개발환경 구성](#3.5.2)
             * [bosh-metric-agent](#3.5.2.1)
@@ -200,7 +200,7 @@ PaaS_TA_Monitoring-v5.5.0
 
 ### 1.1.1. 목적 <div id='1.1.1' />
 
-> 본 문서는 Paas-TA 프로젝트의 PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
+> 본 문서는 PaaS-TA 프로젝트의 PaaS, CaaS, SaaS Monitoring 애플리케이션을 개발 및 배포하는 방법에 대해 제시하는 문서이다.
 
 <br />
 
@@ -213,43 +213,42 @@ PaaS_TA_Monitoring-v5.5.0
 ### 1.1.3. 참고자료 <div id='1.1.3' />
 - https://golang.org/
 - https://git-scm.com
-- github.com/tedsuo/ifrit
-- github.com/tedsuo/rata
-- github.com/influxdata/influxdb1-client/v2
-- github.com/rackspace/gophercloud
-- github.com/cloudfoundry-community/go-cfclient
-- github.com/go-redis/redis
-- github.com/go-sql-driver/mysql
-- github.com/jinzhu/gorm
-- github.com/cihub/seelog
-- github.com/monasca/golang-monascaclient/monascaclient
-- github.com/gophercloud/gophercloud/
-- github.com/alexedwards/scs
-- gopkg.in/olivere/elastic.v3
-- github.com/onsi/ginkgo
-- github.com/onsi/gomega
-- github.com/stretchr/testify
-- github.com/cloudfoundry-community/gogobosh
-- github.com/go-telegram-bot-api/telegram-bot-api
-- github.com/thoas/go-funk
-- get github.com/tidwall/gjson
-- gopkg.in/gomail.v2
+- https://github.com/tedsuo/ifrit
+- https://github.com/tedsuo/rata
+- https://github.com/influxdata/influxdb1-client
+- https://github.com/rackspace/gophercloud
+- https://github.com/cloudfoundry-community/go-cfclient
+- https://github.com/go-redis/redis
+- https://github.com/go-sql-driver/mysql
+- https://github.com/jinzhu/gorm
+- https://github.com/cihub/seelog
+- https://github.com/gophercloud/gophercloud/
+- https://github.com/alexedwards/scs
+- https://github.com/elastic/go-elasticsearch/
+- https://github.com/onsi/ginkgo
+- https://github.com/onsi/gomega
+- https://github.com/stretchr/testify
+- https://github.com/cloudfoundry-community/gogobosh
+- https://github.com/go-telegram-bot-api/telegram-bot-api
+- https://github.com/thoas/go-funk
+- https://github.com/tidwall/gjson
+- https://gopkg.in/gomail.v2
 <br /><br /><br />
 
-#   2. PaaS-TA Monitoring Application 환경 설정 <div id='2' />
+#   2. PaaS-TA monitoring-dashboard-source 환경 설정 <div id='2' />
 
 ##  2.1. 개요 <div id='2.1' />
 
-> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 PaaS-TA-Monitoring-Portal 시스템에서 IaaS(Openstack)시스템의 상태와 PaaS-Ta 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
+> 클라우드 서비스(IaaS/PaaS/CaaS/SaaS) 통합 운영관리 기술 개발 프로젝트의 PaaS-TA monitoring-dashboard에서 IaaS(Openstack)시스템의 상태와 PaaS-TA 서비스(Bosh/CF/Diego/App)들의 상태를 조회하여 사전에 설정한 임계치 값과 비교 후, 초과된 시스템 자원을 사용중인 서비스들의 목록을 관리자에게 통보하기 위한 애플리케이션 개발하고, 배포하는 방법을 설명한다.
 <br />
 
-##  2.2. 개발환경 사전 설치 사항 <div id='2.2' />
-PaaS-TA-Monitoring-Portal 시스템에는 선행작업(Prerequisites)으로 Monasca Server 및 Monasca Client가 설치되어 있어야 합니다.
-> **[Monasca - Server](./Monasca_Server.md)**
+##  <strike>2.2. 개발환경 사전 설치 사항</strike> <div id='2.2' />
+<strike>PaaS-TA-Monitoring-Portal 시스템에는 선행작업(Prerequisites)으로 Monasca Server 및 Monasca Client가 설치되어 있어야 합니다.</strike>
+> <strike>**[Monasca - Server](./Monasca_Server.md)**</strike>
 
-> **[Monasca - Client](./Monasca_Client.md)**
+> <strike>**[Monasca - Client](./Monasca_Client.md)**</strike>
 
-##  2.3. 개발환경 구성 <div id='2.3' />
+##  2.3. 개발환경 구성 (Dependencies 현행화 필요) <div id='2.3' />
 
 > 애플리케이션 개발을 위해 다음과 같은 환경으로 개발환경을 구성 한다.
 ```
@@ -257,17 +256,16 @@ PaaS-TA-Monitoring-Portal 시스템에는 선행작업(Prerequisites)으로 Mona
 - Golang : 1.12.6
 - Dependencies :  github.com/tedsuo/ifrit
                   github.com/tedsuo/rata
-                  github.com/influxdata/influxdb/client/v2
+                  github.com/influxdata/influxdata/influxdb1-client
                   github.com/rackspace/gophercloud
                   github.com/cloudfoundry-community/go-cfclient
                   github.com/go-redis/redis
                   github.com/go-sql-driver/mysql
                   github.com/jinzhu/gorm
                   github.com/cihub/seelog
-                  github.com/monasca/golang-monascaclient/monascaclient
                   github.com/gophercloud/gophercloud/
                   github.com/alexedwards/scs
-                  gopkg.in/olivere/elastic.v3
+                  github.com/elastic/go-elasticsearch/v7
                   github.com/onsi/ginkgo
                   github.com/onsi/gomega
                   github.com/stretchr/testify
@@ -375,14 +373,14 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
 ```
 <br/><br/>
 
-> **PaaS-TA monitoring-dashboard-source Application 구성** <div id='2.3.1.6' />
+> **PaaS-TA monitoring-dashboard 구성** <div id='2.3.1.6' />
 
 - Project 열기
 
     - IntellJ 실행 후 "Open" 을 선택한다.<br/>
     ![](images/2.4.1_1.png)<br/>
 
-    - 화면상단 메뉴에서 File > Open 을 클릭한다.<br/>
+    - 화면상단 메뉴에서 File > Open 을 클릭한다. (이미지 수정 필요)<br/>
     ![](images/2.4.1_2.png)<br/>
 
     <br/>
@@ -408,7 +406,7 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
 
 - Dependencies Module 다운로드 
 
-    - paasta-monitoring-portal Dependency Module Download
+    - monitoring-dashboard-source/paasta-monitoring-portal Dependency Module Download
 
         Power Shell 또는 Terminal 을 실행한다.
 
@@ -432,16 +430,15 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
         ```
         go get github.com/tedsuo/ifrit
         go get github.com/tedsuo/rata
-        go get github.com/influxdata/influxdb1-client/v2
+        go get github.com/influxdata/influxdb1-client
         go get github.com/rackspace/gophercloud
         go get github.com/go-redis/redis
         go get github.com/go-sql-driver/mysql
         go get github.com/jinzhu/gorm
         go get github.com/cihub/seelog
-        go get github.com/monasca/golang-monascaclient/monascaclient
         go get github.com/gophercloud/gophercloud/
         go get github.com/alexedwards/scs
-        go get gopkg.in/olivere/elastic.v3
+        go get github.com/elastic/go-elasticsearch/v7
         go get github.com/onsi/ginkgo
         go get github.com/onsi/gomega
         go get github.com/stretchr/testify
@@ -457,10 +454,6 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
         
         - Dependency 소스 수정 (Windows)<br/>
         ```
-        xcopy ./lib-bugFix-src/alarm_definitions.go ./src/github.com/monasca/golang-monascaclient/monascaclient
-        xcopy ./lib-bugFix-src/notifications.go ./src/github.com/monasca/golang-monascaclient/monascaclient
-        xcopy ./lib-bugFix-src/alarms.go ./src/github.com/monasca/golang-monascaclient/monascaclient
-        xcopy ./lib-bugFix-src/monascaclient/client.go ./src/github.com/monasca/golang-monascaclient/monascaclient
         xcopy ./lib-bugFix-src/gophercloud/requests.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         xcopy ./lib-bugFix-src/gophercloud/results.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         xcopy ./lib-bugFix-src/gophercloud/client.go ./src/github.com/rackspace/gophercloud/openstack
@@ -469,10 +462,6 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
 
         - Dependency 소스 수정 (Ubuntu)<br/>
         ```
-        cp ./lib-bugFix-src/alarm_definitions.go ./src/github.com/monasca/golang-monascaclient/monascaclient
-        cp ./lib-bugFix-src/notifications.go ./src/github.com/monasca/golang-monascaclient/monascaclient
-        cp ./lib-bugFix-src/alarms.go ./src/github.com/monasca/golang-monascaclient/monascaclient
-        cp ./lib-bugFix-src/monascaclient/client.go ./src/github.com/monasca/golang-monascaclient/monascaclient
         cp ./lib-bugFix-src/gophercloud/requests.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         cp ./lib-bugFix-src/gophercloud/results.go ./src/github.com/rackspace/gophercloud/openstack/identity/v3/tokens
         cp ./lib-bugFix-src/gophercloud/client.go ./src/github.com/rackspace/gophercloud/openstack
@@ -480,7 +469,7 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
         
         <br/><br/>
         
-    - paasta-monitoring-batch Dependency Module Download
+    - monitoring-dashboard-source/paasta-monitoring-batch Dependency Module Download
     
         Power Shall 또는 Terminal 을 실행한다.
     
@@ -523,7 +512,7 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
         
         <br/><br/>
 
-    - paasta-caas-monitoring-batch Dependency Module Download
+    - monitoring-dashboard-source/paasta-caas-monitoring-batch Dependency Module Download
     
         Power Shall 또는 Terminal 을 실행한다.
     
@@ -560,7 +549,7 @@ $ git clone https://github.com/PaaS-TA/monitoring-dashboard-source
         
         <br/><br/>
 
-    - paasta-saas-monitoring-batch Dependency Module Download
+    - monitoring-dashboard-source/paasta-saas-monitoring-batch Dependency Module Download
     
         Power Shall 또는 Terminal 을 실행한다.
     
@@ -613,36 +602,36 @@ go run main.go
 ```
 <br/>
 
-# 3. Paas-TA Monitoring Application 구성 <div id='3' />
-Paas-Ta Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다. 
+# 3. PaaS-TA monitoring-dashboard 구성 <div id='3' />
+<strike>Paas-Ta Monitoring Application의 IaaS는 Openstack과 Monasca를 기반으로 구성되어 있다. Openstack Node에 monasca Agent가 설치되어 Metric Data를 Monasca에 전송해준다. IaaS 모니터링은 Openstack, Monasca와 연동하여 Application을 기동한다.</strike>
 &nbsp;&nbsp;&nbsp; ![](images/PaasTa_Monitoring_architecture.png)
 그림 1. PaaS-TA Monitoring 구성도
 
-## 3.1. Paas-Ta Monitoring <div id='3.1' />
+## 3.1. PaaS-TA monitoring-dashboard <div id='3.1' />
 
 ### 3.1.1. 관련 Table 목록 및 구조 <div id='3.1.1' />
-Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database를 생성하여 사용한다. ‘PasstaMonitoring’ Database는 Server 실행시  Table을 자동으로 생성한다. PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+<strike>Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database를 생성하여 사용한다.</strike> ‘PasstaMonitoring’ Database는 Server 실행시 Table을 자동으로 생성한다. PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
 
 > **관련 Table 목록** <div id='3.1.1.1' />
 
-\<IaaS Monitoring Database\>
+\<<strike>IaaS Monitoring Database</strike>\>
 
 |Table명|설명|
 |:--------|:--------|
-|alarms|Alarm_definition 과 notification_method의 매핑 Table로 Alarm 발생시 Action 을 정의 한다.|
-|alarm_definition|Alarm 임계치를 정의 한다. Expression 은 sub_alarm_definition에 저장된다.|
-|alarm_definition_serverity|Alarm 심각도를 정의하는 table로 초기 Data (CRITICAL,HIGH,LOW,MEDIUM) 가 있다.|
-|sub_alarm_definition|Alarm_definition에서 expression에 조건 만큼 Data존재한다.|
-|sub_alarm_definition_dimension|Sub Alarm의 조회 field를 정의한다.|
-|alarm_metric|Alarm metric정보가 저장된다.|
-|alarm_state|Alarm state를 정의하는 table로 초기 Data(ALARM, OK, UNDETERMINED) 가 있다.|
-|metric_definition|metric정의|
-|metric_definition_dimensions|Metric measurement의 field정의가 있다.|
-|notification_method|alarm 대상별 Alarm전송방식정보가 저장되어 있다.|
-|notification_method_type|Alarm을 알릴 방식을 정의한다. Email, webhook등이 있다.|
-|alarm|ThresholdEngine에서 alarm_definition에서 정의한 임계치 위배시 alarm 발생|
-|sub_alarm|Alarm 발생시 alarm_definition에서 어떤 expression에서 임계치가 위배 되었는지 정보가 있다. ThresholdEngine에서 생성|
-|alarm_action_histories|알람 조치 내역을 입력한다. IaaS Monitoring 에서 Table을 생성하고 관리한다.|
+|<strike>alarms</strike>|<strike>Alarm_definition 과 notification_method의 매핑 Table로 Alarm 발생시 Action 을 정의 한다.</strike>|
+|<strike>alarm_definition</strike>|<strike>Alarm 임계치를 정의 한다. Expression 은 sub_alarm_definition에 저장된다.</strike>|
+|<strike>alarm_definition_serverity</strike>|<strike>Alarm 심각도를 정의하는 table로 초기 Data (CRITICAL,HIGH,LOW,MEDIUM) 가 있다.</strike>|
+|<strike>sub_alarm_definition</strike>|<strike>Alarm_definition에서 expression에 조건 만큼 Data존재한다.</strike>|
+|<strike>sub_alarm_definition_dimension</strike>|<strike>Sub Alarm의 조회 field를 정의한다.</strike>|
+|<strike>alarm_metric</strike>|<strike>Alarm metric정보가 저장된다.</strike>|
+|<strike>alarm_state</strike>|<strike>Alarm state를 정의하는 table로 초기 Data(ALARM, OK, UNDETERMINED) 가 있다.</strike>|
+|<strike>metric_definition</strike>|<strike>metric정의</strike>|
+|<strike>metric_definition_dimensions</strike>|<strike>Metric measurement의 field정의가 있다.</strike>|
+|<strike>notification_method</strike>|<strike>alarm 대상별 Alarm전송방식정보가 저장되어 있다.</strike>|
+|<strike>notification_method_type</strike>|<strike>Alarm을 알릴 방식을 정의한다. Email, webhook등이 있다.</strike>|
+|<strike>alarm</strike>|<strike>ThresholdEngine에서 alarm_definition에서 정의한 임계치 위배시 alarm 발생</strike>|
+|<strike>sub_alarm</strike>|<strike>Alarm 발생시 alarm_definition에서 어떤 expression에서 임계치가 위배 되었는지 정보가 있다. ThresholdEngine에서 생성</strike>|
+|<strike>alarm_action_histories</strike>|<strike>알람 조치 내역을 입력한다. IaaS Monitoring 에서 Table을 생성하고 관리한다.</strike>|
 
 <br/>
 
@@ -680,7 +669,7 @@ Paas-Ta Monitoring은 기본적으로 Monasca의 Database 인 ‘mom‘ Database
 
 
 > **실시간 모니터링 기반 데이터 수집 정보** <div id='3.1.1.2' />
-PaaS-TA-Monitoring-Portal은 구성된 PaaS 환경의 CPU, Memory, Disk 그리고 Network 등의 자원 상태를 모니터링 하기 위하여 agent를 통해 지속적으로 데이터를 수집하여 시계열 데이터베이스에 저장한다. 저장된 데이터를 기반으로 관리자는 PaaS 환경에 대한 상태를 모니터링 할 수 있다.
+PaaS-TA monitoring-dashboard는 구성된 PaaS 환경의 CPU, Memory, Disk 그리고 Network 등의 자원 상태를 모니터링 하기 위하여 agent를 통해 지속적으로 데이터를 수집하여 시계열 데이터베이스에 저장한다. 저장된 데이터를 기반으로 관리자는 PaaS 환경에 대한 상태를 모니터링 할 수 있다.
 
 - Measurement 리스트
 
@@ -1108,7 +1097,7 @@ PaaS-TA-Monitoring-Portal은 구성된 PaaS 환경의 CPU, Memory, Disk 그리�
 
 - IaaS Monitoring
 
-    다음 그림은 IaaS 모니터링의 좀더 상세한 구조를 보여준다.  IaaS Monitoring은 Openstack, metricDB, configDB와 연계하여 시스템의 상태 및 알람설정 및 처리 이력등을 보여준다.<br/>
+    <strike>다음 그림은 IaaS 모니터링의 좀더 상세한 구조를 보여준다.  IaaS Monitoring은 Openstack, metricDB, configDB와 연계하여 시스템의 상태 및 알람설정 및 처리 이력등을 보여준다.</strike><br/>
     ![](images/iaas_monitoring_architecture.png)<br/>
     <br/>
 
@@ -1155,7 +1144,7 @@ server.port = 8080
 #system.monitoring.type=IaaS
 system.monitoring.type=PaaS,CaaS,SaaS
 
-# Monasca RDB 접속 정보
+# Monasca RDB 접속 정보 (제거 예정)
 iaas.monitoring.db.type=mysql
 iaas.monitoring.db.dbname=mon
 iaas.monitoring.db.username=root
@@ -1195,7 +1184,7 @@ default.tenant_id=61e66f7d847e4951aa38452fe74c93eb
 identity.endpoint=http://xxx.xx.xxx.xxx:5000/v3
 keystone.url=http://xxx.xx.xxx.xxx:35357/v3
 
-# Monasca Api
+# Monasca Api (제거 예정)
 monasca.url=http://xxx.xx.xxx.xxxx:8020/v2.0
 monasca.connect.timeout=60
 monasca.secure.tls=false
@@ -1285,11 +1274,11 @@ paas.monitoring.cf.host=https://uaa.xx.xxx.xx.xx.xip.io
 caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
 ```
 
-### 3.1.4. API Package 구조 <div id='3.1.4' />
+### 3.1.4. API Package 구조 (변경 필요) <div id='3.1.4' />
 ![](images/api_web_package.png)<br/>
 <br/>
     
-### 3.1.5. API Package 간 호출 구조 <div id='3.1.5' />
+### 3.1.5. API Package 간 호출 구조 (변경 필요) <div id='3.1.5' />
 ![](images/api_package_call.png)<br/>
 <br/>
 
@@ -1324,7 +1313,7 @@ caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
 
 > **Bosh Summary** <div id='3.1.8.16' />
 
-- Bosh Summary 화면에는 Bosh 목록(micro-bosh)과 선택한 bosh의 Memory Top Process를 보여준다.
+- Bosh Summary 화면에는 Bosh 목록(micro-bosh)과 선택한 Bosh의 Memory Top Process를 보여준다.
 ![](images/14_bosh.png)<br>
 <br><br>
 
@@ -1481,17 +1470,17 @@ caas.monitoring.broker.host=http://xx.xxx.xx.xx:3334
 ![](images/38_saas_alarm_status.png)<br>
 <br><br>
 
-> **CaaS SaaS Status Detail** <div id='3.1.8.41' />
+> **SaaS Status Detail** <div id='3.1.8.41' />
 
 - Alarm Status Detail 화면에는 발생된 알람 정보를 보여주고 또한 조치한 내역이 있을 경우 조치 내역도 보여준다.
 ![](images/39_saas_alarm_status_detail.png)<br>
 <br><br>
 
 ## 3.2. PaaS-TA Monitoring Batch <div id='3.2' />
-PaaS-TA-Monitoring-Batch는 Table 및 기초 Data를 구성하며, Influx에서 CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다. AutoScale 시 PortalDB에서 AutoScale 정보를 읽어 임계치를 초과한 경우 PaaS-TA Portal에 Scale In/Out 요청을 한다.
+PaaS-TA Monitoring Batch는 Table 및 기초 Data를 구성하며, Influx에서 CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email or Telegram)을 전송하며, Alarm정보를 발생시킨다. AutoScale 시 PortalDB에서 AutoScale 정보를 읽어 임계치를 초과한 경우 PaaS-TA Portal에 Scale In/Out 요청을 한다.
 
 ### 3.2.1. 관련 Table 목록 및 구조 <div id='3.2.1' />
-PaaS-TA-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. PaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 및 기초 Data를 생성한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+PaaS-TA Monitoring Batch는 다음 Table들과 연관관계를 갖는다. PaaS-TA Monitoring Batch는 기동시 PasstaMonitoring Database Table을 자동생성 및 기초 Data를 생성한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
 
 \<PaaS-TA Monitoring Database\>
 
@@ -1516,7 +1505,7 @@ PaaS-TA-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. PaaS-T
 |app_alarm_histories|Portal 앱 알람 발송 이력 정보|
 
 ![](images/batch_architecture.png)
-그림 1. Monitoring-Batch 구성도
+그림 1. PaaS-TA Monitoring Batch 구성도
 <br><br><br>
 
 ### 3.2.2. Component 정보 <div id='3.2.2' />
@@ -1576,24 +1565,24 @@ bosh.ip=xxx.xxx.xxx.xxx
 bosh.admin=id
 bosh.password=password
 bosh.cf.deployment.name=cf           → paasta-controller deployment 명이 일치 해야함.
-bosh.cell.name.prefix=cell              → paasta cell VM의 prefix 명이 일치 해야함.
+bosh.cell.name.prefix=cell           → paasta cell VM의 prefix 명이 일치 해야함.
 bosh.service.name=bosh               → bosh 명이 일치 해야함.
 
 # e-mail 정보
 mail.smtp.host=smtp.gmail.com        → Alarm 전송할 SMTP Server 명
 mail.smtp.port=465                   → Alarm 전송할 SMTP Server Port
-mail.sender=xxxxxxxx@gmail.com      → Alarm 발송자 e-mail 주소
-mail.sender.password=paasword       → Alarm 발송자 SMTP 비밀번호
-mail.resource.url=url                  → Monit-API URL 주소
+mail.sender=xxxxxxxx@gmail.com       → Alarm 발송자 e-mail 주소
+mail.sender.password=paasword        → Alarm 발송자 SMTP 비밀번호
+mail.resource.url=url                → Monit-API URL 주소
 mail.alarm.send=true                 → Alarm 발생시 e-mail 전송 여부
 
-batch.interval.second=60              → PaaS-TA Batch Monitoring 실행 주기
-gmt.time.hour.gap=0                 → GMT 시간과 차이 설정
-                                    → 한국일 경우 -9로 설정
+batch.interval.second=60             → PaaS-TA Batch Monitoring 실행 주기
+gmt.time.hour.gap=0                  → GMT 시간과 차이 설정
+                                     → 한국일 경우 -9로 설정
 
 # Portal API
-portal.api.url=url                      → PaaS-TA Portal URL 주소
-user.portal.alarm.interval=60            → PaaS-TA Portal Monitoring 실행 주기
+portal.api.url=url                   → PaaS-TA Portal URL 주소
+user.portal.alarm.interval=60        → PaaS-TA Portal Monitoring 실행 주기
 
 # redis
 redis.addr=xxx.xxx.xxx.xxx:xxxx
@@ -1622,10 +1611,11 @@ redis.db=0
 <br><br><br>
 
 ## 3.3. CaaS Monitoring Batch <div id='3.3' />
-CaaS-Monitoring-Batch는 Table 및 기초 Data를 구성하며, Prometheus Metric CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다.
+CaaS Monitoring Batch는 Table 및 기초 Data를 구성하며, Prometheus Metric CPU/Memory/Disk 정보를 읽어 사용자에게 Alarm(Email or Telegram)을 전송하며, Alarm정보를 발생시킨다.
 
 ### 3.3.1. 관련 Table 목록 및 구조 <div id='3.3.1' />
-CaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. CaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+CaaS Monitoring Batch는 다음 Table들과 연관관계를 갖는다. CaaS Monitoring Batch는 기동시 PasstaMonitoring Database Table을 자동 생성한다. 
+단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
 
 \<PasstaMonitoring Database\>
 
@@ -1638,7 +1628,7 @@ CaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. CaaS-TA-M
 |batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
 
 ![](images/caas_batch_architecture.png)
-그림 1. Monitoring-Batch 구성도
+그림 1. CaaS Monitoring Batch 구성도
 <br><br><br>
 
 ### 3.3.2. Component 정보 <div id='3.3.2' />
@@ -1692,10 +1682,11 @@ caas.monitoring.api.url = http://xx.xx.xx.xxx:8080
 
 
 ## 3.4. SaaS Monitoring Batch <div id='3.4' />
-SaaS-Monitoring-Batch는 Table 및 기초 Data를 구성하며, PINPOINT Metric System CPU/JVM CPU/Heap Memory 정보를 읽어 사용자에게 Alarm(Email / Telegram)을 전송하며, Alarm정보를 발생시킨다.
+SaaS Monitoring Batch는 Table 및 기초 Data를 구성하며, PINPOINT Metric System CPU/JVM CPU/Heap Memory 정보를 읽어 사용자에게 Alarm(Email or Telegram)을 전송하며, Alarm정보를 발생시킨다.
 
 ### 3.4.1. 관련 Table 목록 및 구조 <div id='3.4.1' />
-SaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. SaaS-TA-Monitoring-Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
+SaaS Monitoring Batch는 다음 Table들과 연관관계를 갖는다. SaaS Monitoring Batch는 기동시 PasstaMonitoring Database Table을 자동생성 한다. 
+단, PasstaMonitoring Database는 생성 후 config 파일에 설정한다.
 
 \<PasstaMonitoring Database\>
 
@@ -1708,7 +1699,7 @@ SaaS-Monitoring-Batch는 다음 Table들과 연관관계를 갖는다. SaaS-TA-M
 |batch_alarm_sns|Alarm 발생시 전송 받을 채널(Telegram)을 정의한다.|
 
 ![](images/saas_batch_architecture.png)
-그림 1. Monitoring-Batch 구성도
+그림 1. SaaS Monitoring Batch 구성도
 <br><br><br>
 
 ### 3.4.2. Component 정보 <div id='3.4.2' />
@@ -1761,7 +1752,7 @@ saas.pinpoint.url = http://xx.xx.xxx.xxx:8079
 ![](images/saas_telegram.png)
 <br><br><br>
 
-## 3.5. Paas-Ta Monitoring Guide Agent 구성 <div id='3.5' />
+## 3.5. PaaS-TA Monitoring Agent 구성 <div id='3.5' />
 
 <br>
 
