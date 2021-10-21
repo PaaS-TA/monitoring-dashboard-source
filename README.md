@@ -16,14 +16,14 @@
   </tr>
   <tr align=center>
     <td rowspan=2 colspan=2><a href="https://github.com/PaaS-TA/monitoring-deployment">모니터링</a></td>
-    <td><a href="https://github.com/PaaS-TA/PaaS-TA-Monitoring-Release">Monitoring</a></td>
-    <td><a href="https://github.com/PaaS-TA/paas-ta-monitoring-logsearch-release">Logsearch</a></td>
-    <td><a href="https://github.com/PaaS-TA/paas-ta-monitoring-influxdb-release">InfluxDB</a></td>
-    <td><a href="https://github.com/PaaS-TA/paas-ta-monitoring-redis-release">Redis</a></td>
+    <td><a href="https://github.com/PaaS-TA/monitoring-dashboard-release">Monitoring</a></td>
+    <td><a href="https://github.com/PaaS-TA/monitoring-logsearch-release">Logsearch</a></td>
+    <td><a href="https://github.com/PaaS-TA/monitoring-influxdb-release">InfluxDB</a></td>
+    <td><a href="https://github.com/PaaS-TA/monitoring-redis-release">Redis</a></td>
   </tr>
   <tr align=center>
-    <td><a href="https://github.com/PaaS-TA/PAAS-TA-PINPOINT-MONITORING-RELEASE">Pinpoint</td>
-    <td><a href="https://github.com/PaaS-TA/PAAS-TA-PINPOINT-MONITORING-BUILDPACK">Pinpoint Buildpack</td>
+    <td><a href="https://github.com/PaaS-TA/monitoring-pinpoint-release">Pinpoint</td>
+    <td><a href="https://github.com/PaaS-TA/monitoring-pinpoint-buildpack">Pinpoint Buildpack</td>
     <td></td>
     <td></td>
   </tr>
