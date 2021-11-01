@@ -1,0 +1,13 @@
+---
+
+STACK_VERSION:
+  - 7.11.0-SNAPSHOT
+
+GO_VERSION:
+  - 1-alpine
+
+TEST_SUITE:
+  - core
+  - xpack
+
+exclude: ~
