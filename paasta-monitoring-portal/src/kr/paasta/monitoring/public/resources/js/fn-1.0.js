@@ -144,7 +144,14 @@ const fnComm = {
 
 			// config.ini에 설정된 타입에 따라 헤더 메뉴의 show/hide 여부를 제어함
 			for(var i=0 ; i<type.length ; i++){
-				document.querySelector(`.global .${type[i]}`).style.display= 'inline-block';
+				if (type[i] !== 'ALL') {
+					document.querySelector(`.global .${type[i]}`).style.display = 'inline-block';
+				} else {
+					document.querySelector(`.global .IaaS`).style.display = 'inline-block';
+					document.querySelector(`.global .PaaS`).style.display = 'inline-block';
+					document.querySelector(`.global .SaaS`).style.display = 'inline-block';
+					document.querySelector(`.global .CaaS`).style.display = 'inline-block';
+				}
 			};
 		
 			// logout 이벤트
@@ -406,11 +413,11 @@ const fnComm = {
     		bindto: '#paasChart',
 			data: {
 				columns: [
-					['Running', 0, data.running, 0, 0, 0, 0, 0],
-					['Warning', 0, 0, data.warning, 0, 0, 0, 0],
-					['Critical', 0, 0, 0, data.critical, 0, 0, 0],
-					['Failed', 0, 0, 0, 0, data.failed, 0, 0],
-					['Total', 0, 0, 0, 0, 0, data.total, 0]
+					['Running', 0, data.Running, 0, 0, 0, 0, 0],
+					['Warning', 0, 0, data.Warning, 0, 0, 0, 0],
+					['Critical', 0, 0, 0, data.Critical, 0, 0, 0],
+					['Failed', 0, 0, 0, 0, data.Failed, 0, 0],
+					['Total', 0, 0, 0, 0, 0, data.Total, 0]
 				],
 				labels: true,
 				type: 'spline'

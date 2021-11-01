@@ -303,9 +303,6 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	if strings.Contains(sysType, utils.SYS_TYPE_PAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, paasActions)
 		routeList = append(routeList, routes.PaasRoutes)
-
-		actionlist = append(actionlist, saasActions)
-		routeList = append(routeList, routes.SaasRoutes)
 	}
 	if strings.Contains(sysType, utils.SYS_TYPE_SAAS) || sysType == utils.SYS_TYPE_ALL {
 		actionlist = append(actionlist, saasActions)

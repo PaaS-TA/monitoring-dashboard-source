@@ -66,10 +66,10 @@ type ApplicationGaugeTot struct {
 }
 
 type AgentStatus struct {
-	AgentCnt   int `json:"agentCnt"`
-	Running    int `json:"running"`
-	Disconnect int `json:"disconnect"`
-	Shutdown   int `json:"shutdown"`
+	AgentCnt   int `json:"AgentCnt"`
+	Running    int `json:"Running"`
+	Disconnect int `json:"Disconnect"`
+	Shutdown   int `json:"Shutdown"`
 }
 
 func GetSaasController(txn *gorm.DB) *SaasController {

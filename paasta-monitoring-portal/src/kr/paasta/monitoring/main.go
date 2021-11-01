@@ -2,7 +2,9 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"github.com/rday/zabbix"
 	"net"
 	"net/http"
 	"os"
@@ -237,5 +239,106 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	if err != nil {
 		logger.Errorf("Failed to create connection to the bosh server. err=", err)
 	}
+
+	// Zabbix API에 연결하기
+	// Zabbix API 객체 생성
+	api, err := zabbix.NewAPI("http://203.255.255.101:8080/zabbix/api_jsonrpc.php", "Admin", "zabbix")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+
+	// Zabbix API의 버전 정보 가져오기
+	ApiVersionInfo, err := api.Version()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Print("*Zabbix API Version: ")
+	fmt.Println(ApiVersionInfo)
+
+
+	// Zabbix API에 로그인 하기
+	// 로그인 성공 여부 확인
+	_, err = api.Login()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("*Login Successful")
+
+
+	// Zabbix 토큰 값 가져오기
+	ApiToken := api.GetAuth()
+	fmt.Print("*Zabbix API Token: ")
+	fmt.Println(ApiToken)
+
+
+	// <<< *** hostgroup.get 메서드 사용하는 영역 *** >>>
+	// Zabbix에 등록된 HostGroup 전체 리스트 가져오기
+	paramsHostGroup := make(map[string]interface{})
+	hostGroup, err := api.HostGroup("get", paramsHostGroup)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	hostGroupResultForJson, _ := json.MarshalIndent(hostGroup, "", "  ")
+	fmt.Println(string(hostGroupResultForJson))
+
+
+	// Zabbix HostGroup 중 "PaaS-TA Group"에 속한 호스트 갯수 가져오기
+	// "name"이 "PaaS-TA Group"인 호스트를 검색하기 위해 "search" 파라미터 사용
+	// 갯수를 가져오기 위해 "selectHosts" 파라미터의 "count" 속성 필요
+	hostGroupName := make(map[string]interface{})
+	hostGroupName["name"] = "PaaS-TA Group"
+	paramsHostGroup["search"] = hostGroupName
+	paramsHostGroup["selectHosts"] = "count"
+	hostGroup, err = api.HostGroup("get", paramsHostGroup)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	hostGroupResultForJson, _ = json.MarshalIndent(hostGroup, "", "  ")
+	fmt.Println(string(hostGroupResultForJson))
+
+
+	// Zabbix HostGroup 중 "PaaS-TA Group"에 속한 호스트 전체 리스트 가져오기
+	// 호스트의 "name" 리스트를 가져오기 위해 "selectHosts" 파라미터가 사용할 수 있는 "hosts"의 속성 배열 값 중 "name"을 사용
+	// 따라서 hosts 속성 사용 시에는 string 배열로 사용되어야 함
+	hostProp := []string{"name"}
+	paramsHostGroup["selectHosts"] = hostProp
+	hostGroup, err = api.HostGroup("get", paramsHostGroup)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	hostGroupResultForJson, _ = json.MarshalIndent(hostGroup, "", "  ")
+	fmt.Println(string(hostGroupResultForJson))
+
+
+	// <<< *** item.get 메서드 사용하는 영역 *** >>>
+	// 특정 호스트에 대한 기본 시스템 정보(CPU/Memory/Disk Utilization, Interface Address) 가져오기
+	paramsItem := make(map[string]interface{})
+	itemFilter := make(map[string]interface{})
+	nameList := []string{}
+	outputList := []string{}
+	interfaceProp := []string{}
+	paramsItem["group"] = "PaaS-TA Group"
+	paramsItem["host"] = "ebcbef8b-cf4d-409d-ab58-c7ee352b6604"
+	nameList = []string{"CPU utilization", "Memory utilization", "/: Space utilization"}
+	itemFilter["name"] = nameList
+	paramsItem["filter"] = itemFilter
+	outputList = []string{"name", "lastvalue", "units"}
+	paramsItem["output"] = outputList
+	interfaceProp = []string{"ip"}
+	paramsItem["selectInterfaces"] = interfaceProp
+	itemInfo, err := api.Item("get", paramsItem)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	itemInfoForJson, _ := json.MarshalIndent(itemInfo, "", "  ")
+	fmt.Println(string(itemInfoForJson))
+
 	return
 }

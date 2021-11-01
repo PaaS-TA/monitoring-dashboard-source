@@ -27,8 +27,8 @@
 				<nav>
 					<ul>
 						<li><a href="index.html" class="on"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
-						<li><a href="bosh.html">H<span>ypervisor</span></a></li>
-						<li><a href="paas.html">P<span>roject</span></a></li>
+						<li><a href="hypervisor.html">H<span>ypervisor</span></a></li>
+						<li><a href="project.html">P<span>roject</span></a></li>
 						<li>
 							<a href="alarm_policy.html">A<span>larm</span></a>
 							<ul>
@@ -44,25 +44,63 @@
 			</header>
 			<!-- // Header -->
 
-			<ul class="global">
-				<li><a href="../iaas/index.html">IaaS</a></li>
-				<li><a href="../paas/index.html">PaaS</a></li>
-				<li><a href="../saas/index.html">SaaS</a></li>
-				<li><a href="../caas/index.html">CaaS</a></li>
-			</ul>
-
 			<!-- Container -->
-			<div id="container">
+			<div id="container" class="gaugeWrap">
 				<div class="contentsLeft">
 					<!-- Overview -->
-					<h3>Bosh</h3>
-					<div class="chartView" id="boshChart"></div>
-					<h3>PaaS-TA</h3>
-					<div class="chartView" id="paasChart"></div>
-					<h3>Container</h3>
-					<div class="chartView" id="contChart"></div>
+					<h3>Summary</h3>
+					<h4><span>VCPU 사용량</span></h4>
+					<div id="iaasPodChart"></div>
+					<span>사용 <strong>999</strong>개 / 전체 <em>999</em>개</span>
+
+					<h4><span>Memory 사용량</span></h4>
+					<div id="iaasCpuChart"></div>
+					<span>사용 <strong>999</strong>개 / 사용가능 <span>999</span>개</span>
+
+					<h4><span>Disk 사용량</span></h4>
+					<div id="iaasMemoryChart"></div>
+					<span>사용 <strong>999</strong>개 / 사용가능 <span>999</span>개</span>
+
 					<!-- // Overview -->
+					<div class="insList">
+						<h4><span>인스턴스</span></h4>
+						<dl>
+							<dt>Max Instance</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Running / OK</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>No Stauta</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Idle / Blocked</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Paused</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Shutting down</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Shut Off</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Croshed</dt>
+							<dd><strong>999</strong>개</dd>
+						</dl>
+					</div>
 				</div>
+
+
+
 
 				<!-- Contents -->
 				<section id="contents">
@@ -123,11 +161,217 @@
 
 					<article class="zoneWrap">
 						<h4>
-							<span>Zone-Containers View</span>
-							<select id="containerZone">
-							</select>
+							<span>Node</span>
+							<div>
+								<span class="run">Running<strong>999</strong></span><span class="war">Warning<strong>999</strong></span> <span class="cri">Critical<strong>999</strong></span>
+							</div>
 						</h4>
-						<div class="cellList">
+						<div class="nodeList">
+							<dl class="running">
+								<dt>con01<span>203.255.255.101</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>99.9%</span></li>
+										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
+										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>
+							<dl class="warning">
+								<dt>con02<span>203.255.255.101</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>99.9%</span></li>
+										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
+										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>
+							<dl class="critical">
+								<dt>con03<span>203.255.255.101</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>99.9%</span></li>
+										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
+										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>
+							<dl class="fail">
+								<dt>con04<span>203.255.255.101</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>99.9%</span></li>
+										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
+										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>
+							<dl class="running">
+								<dt>con01<span>203.255.255.101</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>99.9%</span></li>
+										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
+										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>
+						</div>
+						<h4>
+							<span>Project</span>
+							<div>
+								<span class="bak">total<strong>999</strong></span><span class="run">enable<strong>999</strong></span> <span class="cri">disable<strong>999</strong></span>
+							</div>
+						</h4>
+						<div class="nodeList">
+							<dl class="admin">
+								<dt>admin</dt>
+								<dd>
+									<ul class="project">
+										<li>
+											<dl>
+												<dt>VCPU</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Memory</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Instance</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>FIP</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Security</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Valumes</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Storage</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+									</ul>
+								</dd>
+							</dl>
+							<dl class="demo">
+								<dt>demo</dt>
+								<dd>
+									<ul class="project">
+										<li>
+											<dl>
+												<dt>VCPU</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Memory</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Instance</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>FIP</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Security</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Valumes</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Storage</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+									</ul>
+								</dd>
+							</dl>
+							<dl class="admin">
+								<dt>admin</dt>
+								<dd>
+									<ul class="project">
+										<li>
+											<dl>
+												<dt>VCPU</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Memory</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Instance</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>FIP</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Security</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Valumes</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Storage</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+									</ul>
+								</dd>
+							</dl>
 						</div>
 					</article>
 
@@ -207,6 +451,9 @@
 
 					// CONTAINER 컨디션 리스트 - 셀렉트 생성
 					fnComm.loadData('GET', `${fnComm.url}paas/container/summary?pageIndex=1&pageItems=1000`, main.zoneCreateSelect);
+
+					// IaaS-Monitoring Summary
+					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/clusterAvg`, main.iaasCount);
 
 					
 					// 오늘 날짜
@@ -397,6 +644,138 @@
 
 						fnComm.appendHtml(target, html, 'div');
 					}
+				},
+
+				iaasCount(data){
+					// CpuUsage: "1.20"
+					// DiskUsage: "15.90"
+					// MemoryUsage: "4.35"
+					// PodUsage: "0.03"
+
+					// caasPodChart caasCpuChart caasMemoryChart caasDiskChart
+
+					var chart1 = c3.generate({
+						bindto: '#iaasPodChart',
+						data: {
+							columns: [
+								['POD', data.PodUsage]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+
+					var chart2 = c3.generate({
+						bindto: '#iaasCpuChart',
+						data: {
+							columns: [
+								['CPU', data.CpuUsage]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+
+					var chart3 = c3.generate({
+						bindto: '#iaasMemoryChart',
+						data: {
+							columns: [
+								['Memory', data.MemoryUsage]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
 				},
 			}
 

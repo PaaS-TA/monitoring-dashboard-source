@@ -43,20 +43,72 @@
 						</li>
 					</ul>
 				</nav>
-				
 			</header>
 			<!-- // Header -->
 
 			<!-- Container -->
 			<ul id="container">
+
 				<!-- Contents -->
 				<div id="contents">
 					<section class="summary">
-						<!--
 						<article class="iaas isContent">
 							<h3>IaaS-Monitoring Summary</h3>
+							<ul class="chartWrap">
+								<li class="iaasPod">
+									<h4><span>VCPU 사용량</span></h4>
+									<div id="iaasPodChart"></div>
+									<span>사용 <strong>999</strong>개 / 전체 <em>999</em>개</span>
+								</li>
+								<li class="iaasCpu">
+									<h4><span>Memory 사용량</span></h4>
+									<div id="iaasCpuChart"></div>
+									<span>사용 <strong>999</strong>개 / 사용가능 <span>999</span>개</span>
+								</li>
+								<li class="iaasMemory">
+									<h4><span>Disk 사용량</span></h4>
+									<div id="iaasMemoryChart"></div>
+									<span>사용 <strong>999</strong>개 / 사용가능 <span>999</span>개</span>
+								</li>
+								<li class="iaasIns">
+									<h4>인스턴스</h4>
+									<div>
+										<dl>
+											<dt>Max Instance</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Running / OK</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>No Stauta</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Idle / Blocked</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Paused</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Shutting down</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Shut Off</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Zabbix API Version</dt>
+											<dd><strong>999</strong>개</dd>
+										</dl>
+									</div>
+								</li>
+							</ul>
 						</article>
-						-->
 
 						<article class="paas psContent">
 							<h3>PaaS-Monitoring Summary</h3>
@@ -121,37 +173,14 @@
 								</li>
 							</ul>
 						</article>
-
-						<article class="iaas isContent">
-							<h3>IaaS-Monitoring Summary</h3>
-							<ul class="chartWrap">
-								<li>
-									<h4>Bosh</h4>
-									<p class="boshCnt">0</p>
-									<div id="boshChart"></div>
-								</li>
-								<li>
-									<h4>PaaS-TA</h4>
-									<p class="paasCnt">0</p>
-									<div id="paasChart"></div>
-								</li>
-								<li>
-									<h4>Container</h4>
-									<p class="conCnt">0</p>
-									<div id="conChart"></div>
-								</li>
-							</ul>
-						</article>
-						
 					</section>
+
 					<section class="event">
 						<article>
-							<!--
 							<div class="iaas isContent">
 								<h4>IaaS Event View</h4>
 								<ul id="iaasEvent"></ul>
 							</div>
-							-->
 							<div class="paas psContent">
 								<h4>PaaS Event View</h4>
 								<ul id="paasEvent"></ul>
@@ -163,10 +192,6 @@
 							<div class="caas csContent">
 								<h4>CaaS Event View(POD)</h4>
 								<ul id="caasEvent"></ul>
-							</div>
-							<div class="iaas isContent">
-								<h4>IaaS Event View</h4>
-								<ul id="iaasEvent"></ul>
 							</div>
 						</article>
 					</section>
@@ -198,28 +223,48 @@
 					var type = sessionStorage.getItem('sysType').split(',');
 
 					for(var i=0 ; i<type.length ; i++){
+
+						if (type[i] !== 'ALL') {
 						console.log(`.global .${type[i]}`)
 						document.querySelector(`.global .${type[i]}`).style.display= 'block';
 
-						switch(type[i]){
+						switch(type[i]) {
 							case 'PaaS':
-								document.querySelectorAll('.psContent')[0].style.display= 'block';
-								document.querySelectorAll('.psContent')[1].style.display= 'block';
-							break;
+								document.querySelectorAll('.psContent')[0].style.display = 'block';
+								document.querySelectorAll('.psContent')[1].style.display = 'block';
+								break;
 							case 'SaaS':
-								document.querySelectorAll('.ssContent')[0].style.display= 'block';
-								document.querySelectorAll('.ssContent')[1].style.display= 'block';
-							break;
+								document.querySelectorAll('.ssContent')[0].style.display = 'block';
+								document.querySelectorAll('.ssContent')[1].style.display = 'block';
+								break;
 							case 'CaaS':
-								document.querySelectorAll('.csContent')[0].style.display= 'block';
-								document.querySelectorAll('.csContent')[1].style.display= 'block';
-							break;
+								document.querySelectorAll('.csContent')[0].style.display = 'block';
+								document.querySelectorAll('.csContent')[1].style.display = 'block';
+								break;
 							case 'IaaS':
-								document.querySelectorAll('.isContent')[0].style.display= 'block';
-								document.querySelectorAll('.isContent')[1].style.display= 'block';
-							break;
+								document.querySelectorAll('.isContent')[0].style.display = 'block';
+								document.querySelectorAll('.isContent')[1].style.display = 'block';
+								break;
 						};
+						} else {
+							document.querySelector(`.global .PaaS`).style.display = 'block';
+							document.querySelectorAll('.psContent')[0].style.display = 'block';
+							document.querySelectorAll('.psContent')[1].style.display = 'block';
+							document.querySelector(`.global .IaaS`).style.display = 'block';
+							document.querySelectorAll('.isContent')[0].style.display = 'block';
+							document.querySelectorAll('.isContent')[1].style.display = 'block';
+							document.querySelector(`.global .CaaS`).style.display = 'block';
+							document.querySelectorAll('.csContent')[0].style.display = 'block';
+							document.querySelectorAll('.csContent')[1].style.display = 'block';
+							document.querySelector(`.global .SaaS`).style.display = 'block';
+							document.querySelectorAll('.ssContent')[0].style.display = 'block';
+							document.querySelectorAll('.ssContent')[1].style.display = 'block';
+						};
+
 					};
+
+					// IaaS-Monitoring Summary
+					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/clusterAvg`, total.iaasCount);
 
 					// PaaS-Monitoring BOSH Summary
 					fnComm.loadData('GET', `${fnComm.url}paas/bosh/overview`, total.boshDraw);
@@ -227,23 +272,27 @@
 					fnComm.loadData('GET', `${fnComm.url}paas/paasta/overview`, total.paasDraw);
 					// PaaS-Monitoring CONTAINER Summary
 					fnComm.loadData('GET', `${fnComm.url}paas/container/overview`, total.conDraw);
-					
+
 					// SaaS-Monitoring Summary
 					fnComm.loadData('GET', `${fnComm.url}saas/app/application/gauge`, total.saasCount);
-					
 					// CaaS-Monitoring Summary
 					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/clusterAvg`, total.caasCount);
 
-					
+					// IaaS Event View
+					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/podStat`, total.iaasEvent);
 					// PaaS Event View
 					fnComm.loadData('GET', `${fnComm.url}paas/all/overview`, total.paasEvent);
-					
 					// CaaS Event View(POD)
 					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/podStat`, total.caasEvent);
-					
 					// SaaS Event View
 					fnComm.loadData('GET', `${fnComm.url}saas/app/application/status`, total.saasEvent);
+
+					// Zabbix API Version
+					fnComm.loadData('GET', `${fnComm.url}zabbix/api/version`, total.zabbixVersion);
+
 				},
+
+
 
 				boshDraw(data){
 					// critical: "0"
@@ -291,16 +340,16 @@
 					// running: "0"
 					// total: "0"
 					// warning: "0"
-					document.querySelector('.paasCnt').innerHTML = data.total;
+					document.querySelector('.paasCnt').innerHTML = data.Total;
 
 					var chart = c3.generate({
 						bindto: '#paasChart',
 						data: {
 							columns: [
-								['Running', data.running],
-								['Warning', data.warning],
-								['Critical', data.critical],
-								['Failed', data.failed],
+								['Running', data.Running],
+								['Warning', data.Warning],
+								['Critical', data.Critical],
+								['Failed', data.Failed],
 							],
 							type : 'donut'
 						},
@@ -680,6 +729,138 @@
 					});
 				},
 
+				iaasCount(data){
+					// CpuUsage: "1.20"
+					// DiskUsage: "15.90"
+					// MemoryUsage: "4.35"
+					// PodUsage: "0.03"
+
+					// caasPodChart caasCpuChart caasMemoryChart caasDiskChart
+
+					var chart1 = c3.generate({
+						bindto: '#iaasPodChart',
+						data: {
+							columns: [
+								['POD', data.PodUsage]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+
+					var chart2 = c3.generate({
+						bindto: '#iaasCpuChart',
+						data: {
+							columns: [
+								['CPU', data.CpuUsage]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+
+					var chart3 = c3.generate({
+						bindto: '#iaasMemoryChart',
+						data: {
+							columns: [
+								['Memory', data.MemoryUsage]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+				},
+
 				paasEvent(data){
 					for(var name in data){
 						if(parseInt(data[name]) > 0){
@@ -715,6 +896,19 @@
 							</li>`;
 
 							fnComm.appendHtml(document.getElementById('saasEvent'), html, 'ul');
+						};
+					};
+				},
+
+				iaasEvent(data){
+					for(var name in data){
+						if(parseInt(data[name]) > 0){
+							var html = `<li>
+								<span>${name}</span>
+								<strong>${data[name]}</strong>
+							</li>`;
+
+							fnComm.appendHtml(document.getElementById('iaasEvent'), html, 'ul');
 						};
 					};
 				},
