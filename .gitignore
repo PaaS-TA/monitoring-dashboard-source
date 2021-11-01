@@ -48,6 +48,8 @@ paasta-monitoring-portal/src/github.com/stretchr/
 paasta-monitoring-portal/src/github.com/tedsuo/
 paasta-monitoring-portal/src/github.com/thoas/
 paasta-monitoring-portal/src/github.com/tidwall/
+paasta-monitoring-portal/src/github.com/elastic/
+paasta-monitoring-portal/src/github.com/rday/
 paasta-monitoring-portal/src/golang.org/x/
 paasta-monitoring-portal/src/gopkg.in/olivere/
 paasta-monitoring-portal/src/gopkg.in/yaml.v2/
