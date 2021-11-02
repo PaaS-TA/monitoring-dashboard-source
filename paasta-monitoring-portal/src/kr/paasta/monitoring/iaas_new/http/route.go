@@ -92,6 +92,10 @@ const (
 	IAAS_ALARM_APP_MEMORY_USAGES        = "IAAS_ALARM_APP_MEMORY_USAGES"
 	IAAS_ALARM_APP_DISK_USAGES          = "IAAS_ALARM_APP_DISK_USAGES"
 	IAAS_ALARM_APP_NETWORK_USAGES       = "IAAS_ALARM_APP_NETWORK_USAGES"
+
+	// TODO 2021.11.01 - IAAS 모니터링
+	IAAS_GET_HYPER_STATISTICS = "IAAS_GET_HYPER_STATISTICS"
+	IAAS_GET_SERVER_LIST = "IAAS_GET_SERVER_LIST"
 )
 
 var IaasRoutes = rata.Routes{
@@ -169,4 +173,8 @@ var IaasRoutes = rata.Routes{
 	//{Path: "/v2/iaas/alarm/app/memory/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_MEMORY_USAGES},
 	//{Path: "/v2/iaas/alarm/app/disk/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_DISK_USAGES},
 	//{Path: "/v2/iaas/alarm/app/network/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_NETWORK_USAGES},
+
+	//TODO
+	{Path: "/v2/iaas/hyper/statistics", Method: "GET", Name: IAAS_GET_HYPER_STATISTICS},
+	{Path: "/v2/iaas/server/list", Method: "GET", Name: IAAS_GET_SERVER_LIST},
 }

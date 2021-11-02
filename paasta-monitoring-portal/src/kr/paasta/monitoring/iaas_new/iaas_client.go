@@ -86,7 +86,7 @@ func GetIaasClients(config map[string]string) (client IaasClient, err error) {
 		elastic.SetSniff(false),
 	)*/
 
-	// Openstack Info
+	// Openstack 정보
 	openstackProvider := iaasModel.OpenstackProvider{}
 	openstackProvider.Region, _ = config["default.region"]
 	openstackProvider.Username, _ = config["default.username"]

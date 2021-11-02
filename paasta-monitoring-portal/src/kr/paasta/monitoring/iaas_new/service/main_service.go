@@ -27,6 +27,7 @@ func GetMainService(openstackProvider model.OpenstackProvider, provider *gopherc
 
 func (n MainService) GetOpenstackSummary(userName string) (model.HypervisorResources, error) {
 
+	utils.Logger.Debug("GetOpenstackSummary")
 	//Openstack Summary 정보 조회
 	openstackSummaryInfo, err := integration.GetNova(n.openstackProvider, n.provider).GetOpenstackResources()
 

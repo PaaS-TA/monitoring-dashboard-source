@@ -25,14 +25,16 @@ func InitHandler(dbConn *gorm.DB, provider model.OpenstackProvider, influx clien
 	alarmController := controller.GetAlarmController(dbConn)
 	alarmPolicyController := controller.GetAlarmPolicyController(dbConn)
 
-	handlers := rata.Handlers{
+	openstackController := controller.NewOpenstackController(provider)
+
+	handlers := rata.Handlers {
 		//routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
 		//routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
 
 		//Integrated with routes
-		IAAS_MAIN_SUMMARY:         route(mainController.OpenstackSummary),
-		IAAS_NODE_COMPUTE_SUMMARY: route(computeController.NodeSummary),
-		IAAS_NODES:                route(manageNodeController.GetNodeList),
+		IAAS_MAIN_SUMMARY:                  route(mainController.OpenstackSummary),
+		IAAS_NODE_COMPUTE_SUMMARY:          route(computeController.NodeSummary),
+		IAAS_NODES:                         route(manageNodeController.GetNodeList),
 
 		IAAS_NODE_CPU_USAGE_LIST:           route(computeController.GetCpuUsageList),
 		IAAS_NODE_CPU_LOAD_LIST:            route(computeController.GetCpuLoadList),
@@ -61,6 +63,11 @@ func InitHandler(dbConn *gorm.DB, provider model.OpenstackProvider, influx clien
 
 		IAAS_LOG_RECENT:   route(logController.GetDefaultRecentLog),
 		IAAS_LOG_SPECIFIC: route(logController.GetSpecificTimeRangeLog),
+
+		// TODO
+		IAAS_GET_HYPER_STATISTICS: route(openstackController.GetHypervisorStatistics),
+		IAAS_GET_SERVER_LIST: route(openstackController.GetServerList),
+
 
 		//iaas.IAAS_ALARM_NOTIFICATION_LIST:   route(notificationController.GetAlarmNotificationList),
 		//iaas.IAAS_ALARM_NOTIFICATION_CREATE: route(notificationController.CreateAlarmNotification),

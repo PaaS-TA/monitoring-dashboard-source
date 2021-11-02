@@ -2,9 +2,8 @@ package main
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"github.com/rday/zabbix"
+	commonModel "kr/paasta/monitoring/common/model"
 	"net"
 	"net/http"
 	"os"
@@ -110,15 +109,30 @@ func main() {
 		Host:           configMap["paas.monitoring.cf.host"],
 		CaasBrokerHost: configMap["caas.monitoring.broker.host"],
 	}
-	//IaaS Connection Info
+
+	// TODO IaaS Connection Info
 	iaasClient := iaas_new.IaasClient{}
 
+
+	var iaasDbAccessObj *gorm.DB
+	var iaaSInfluxServerClient client.Client
+	var iaasElasticClient *elasticsearch.Client
+	var openstackProvider model.OpenstackProvider
+
+
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
+		/*
 		iaasClient, err = iaas_new.GetIaasClients(configMap)
 		if err != nil {
 			logger.Error(err)
 			os.Exit(-1)
 		}
+		*/
+
+		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, err = getIaasClent(configMap)
+
+
+
 	}
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_PAAS) {
@@ -133,15 +147,15 @@ func main() {
 	var handler http.Handler
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
-		handler = handlers.NewHandler(iaasClient.Provider, iaasClient.InfluxClient, paaSInfluxServerClient,
-			iaasClient.ConnectionPool, paasDbAccessObj, iaasClient.ElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
+		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			logger.Error(err)
 		}
 	} else {
-		handler = handlers.NewHandler(iaasClient.Provider, iaasClient.InfluxClient, paaSInfluxServerClient,
-			iaasClient.ConnectionPool, paasDbAccessObj, iaasClient.ElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
+		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
 			rdClient, sysType, boshClient, cfConfig)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			logger.Error(err)
@@ -239,106 +253,98 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	if err != nil {
 		logger.Errorf("Failed to create connection to the bosh server. err=", err)
 	}
+	return
+}
 
-	// Zabbix API에 연결하기
-	// Zabbix API 객체 생성
-	api, err := zabbix.NewAPI("http://203.255.255.101:8080/zabbix/api_jsonrpc.php", "Admin", "zabbix")
-	if err != nil {
-		fmt.Println(err)
-		return
+
+func getIaasClent(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider model.OpenstackProvider, err error) {
+	// Mysql
+	iaasConfigDbCon := new(commonModel.DBConfig)
+	iaasConfigDbCon.DbType = config["iaas.monitoring.db.type"]
+	iaasConfigDbCon.DbName = config["iaas.monitoring.db.dbname"]
+	iaasConfigDbCon.UserName = config["iaas.monitoring.db.username"]
+	iaasConfigDbCon.UserPassword = config["iaas.monitoring.db.password"]
+	iaasConfigDbCon.Host = config["iaas.monitoring.db.host"]
+	iaasConfigDbCon.Port = config["iaas.monitoring.db.port"]
+
+	iaasConnectionString := utils.GetConnectionString(iaasConfigDbCon.Host, iaasConfigDbCon.Port, iaasConfigDbCon.UserName, iaasConfigDbCon.UserPassword, iaasConfigDbCon.DbName)
+	//fmt.Println("String:", iaasConnectionString)
+	iaasDbAccessObj, _ = gorm.Open(iaasConfigDbCon.DbType, iaasConnectionString+"?charset=utf8&parseTime=true")
+
+	// 2021.09.06 - 이거 왜 있는지?
+	//Alarm 처리 내역 정보 Table 생성
+	//iaasDbAccessObj.Debug().AutoMigrate(&model.AlarmActionHistory{})
+
+	// InfluxDB
+	iaasUrl, _ := config["iaas.metric.db.url"]
+	iaasUserName, _ := config["iaas.metric.db.username"]
+	iaasPassword, _ := config["iaas.metric.db.password"]
+
+	iaaSInfluxServerClient, _ = client.NewHTTPClient(client.HTTPConfig{
+		Addr:     iaasUrl,
+		Username: iaasUserName,
+		Password: iaasPassword,
+		InsecureSkipVerify: true,
+	})
+
+	elasticsearchUsername, _ := config["paas.elasticsearch.username"]
+	elasticsearchPassword, _ := config["paas.elasticsearch.password"]
+	elasticsearchUrl, _ := config["paas.elasticsearch.url"]
+	elasticsearchHttpsEnabled, _ := strconv.ParseBool(config["paas.elasticsearch.https_enabled"])
+
+	cfg := elasticsearch.Config{
+		Username: elasticsearchUsername,
+		Password: elasticsearchPassword,
+		Addresses: []string{
+			elasticsearchUrl,
+		},
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: time.Second,
+			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+			TLSClientConfig: &tls.Config{
+				MaxVersion:         tls.VersionTLS11,
+				InsecureSkipVerify: elasticsearchHttpsEnabled,
+			},
+		},
 	}
+	iaasElasticClient, _ = elasticsearch.NewClient(cfg)
 
+	// ElasticSearch
+	/*iaasElasticUrl, _ := config["iaas.elastic.url"]
+	iaasElasticClient, err = elastic.NewClient(
+		elastic.SetURL(fmt.Sprintf("http://%s", iaasElasticUrl)),
+		elastic.SetSniff(false),
+	)*/
 
-	// Zabbix API의 버전 정보 가져오기
-	ApiVersionInfo, err := api.Version()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Print("*Zabbix API Version: ")
-	fmt.Println(ApiVersionInfo)
+	// Openstack 정보
+	openstackProvider.Region, _ = config["default.region"]
+	openstackProvider.Username, _ = config["default.username"]
+	openstackProvider.Password, _ = config["default.password"]
+	openstackProvider.Domain, _ = config["default.domain"]
+	openstackProvider.TenantName, _ = config["default.tenant_name"]
+	openstackProvider.AdminTenantId, _ = config["default.tenant_id"]
+	openstackProvider.KeystoneUrl, _ = config["keystone.url"]
+	openstackProvider.IdentityEndpoint, _ = config["identity.endpoint"]
+	openstackProvider.RabbitmqUser, _ = config["rabbitmq.user"]
+	openstackProvider.RabbitmqPass, _ = config["rabbitmq.pass"]
+	openstackProvider.RabbitmqTargetNode, _ = config["rabbitmq.target.node"]
 
-
-	// Zabbix API에 로그인 하기
-	// 로그인 성공 여부 확인
-	_, err = api.Login()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("*Login Successful")
-
-
-	// Zabbix 토큰 값 가져오기
-	ApiToken := api.GetAuth()
-	fmt.Print("*Zabbix API Token: ")
-	fmt.Println(ApiToken)
-
-
-	// <<< *** hostgroup.get 메서드 사용하는 영역 *** >>>
-	// Zabbix에 등록된 HostGroup 전체 리스트 가져오기
-	paramsHostGroup := make(map[string]interface{})
-	hostGroup, err := api.HostGroup("get", paramsHostGroup)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	hostGroupResultForJson, _ := json.MarshalIndent(hostGroup, "", "  ")
-	fmt.Println(string(hostGroupResultForJson))
-
-
-	// Zabbix HostGroup 중 "PaaS-TA Group"에 속한 호스트 갯수 가져오기
-	// "name"이 "PaaS-TA Group"인 호스트를 검색하기 위해 "search" 파라미터 사용
-	// 갯수를 가져오기 위해 "selectHosts" 파라미터의 "count" 속성 필요
-	hostGroupName := make(map[string]interface{})
-	hostGroupName["name"] = "PaaS-TA Group"
-	paramsHostGroup["search"] = hostGroupName
-	paramsHostGroup["selectHosts"] = "count"
-	hostGroup, err = api.HostGroup("get", paramsHostGroup)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	hostGroupResultForJson, _ = json.MarshalIndent(hostGroup, "", "  ")
-	fmt.Println(string(hostGroupResultForJson))
-
-
-	// Zabbix HostGroup 중 "PaaS-TA Group"에 속한 호스트 전체 리스트 가져오기
-	// 호스트의 "name" 리스트를 가져오기 위해 "selectHosts" 파라미터가 사용할 수 있는 "hosts"의 속성 배열 값 중 "name"을 사용
-	// 따라서 hosts 속성 사용 시에는 string 배열로 사용되어야 함
-	hostProp := []string{"name"}
-	paramsHostGroup["selectHosts"] = hostProp
-	hostGroup, err = api.HostGroup("get", paramsHostGroup)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	hostGroupResultForJson, _ = json.MarshalIndent(hostGroup, "", "  ")
-	fmt.Println(string(hostGroupResultForJson))
-
-
-	// <<< *** item.get 메서드 사용하는 영역 *** >>>
-	// 특정 호스트에 대한 기본 시스템 정보(CPU/Memory/Disk Utilization, Interface Address) 가져오기
-	paramsItem := make(map[string]interface{})
-	itemFilter := make(map[string]interface{})
-	nameList := []string{}
-	outputList := []string{}
-	interfaceProp := []string{}
-	paramsItem["group"] = "PaaS-TA Group"
-	paramsItem["host"] = "ebcbef8b-cf4d-409d-ab58-c7ee352b6604"
-	nameList = []string{"CPU utilization", "Memory utilization", "/: Space utilization"}
-	itemFilter["name"] = nameList
-	paramsItem["filter"] = itemFilter
-	outputList = []string{"name", "lastvalue", "units"}
-	paramsItem["output"] = outputList
-	interfaceProp = []string{"ip"}
-	paramsItem["selectInterfaces"] = interfaceProp
-	itemInfo, err := api.Item("get", paramsItem)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	itemInfoForJson, _ := json.MarshalIndent(itemInfo, "", "  ")
-	fmt.Println(string(itemInfoForJson))
+	model.MetricDBName, _ = config["iaas.metric.db.name"]
+	model.NovaUrl, _ = config["nova.target.url"]
+	model.NovaVersion, _ = config["nova.target.version"]
+	model.NeutronUrl, _ = config["neutron.target.url"]
+	model.NeutronVersion, _ = config["neutron.target.version"]
+	model.KeystoneUrl, _ = config["keystone.target.url"]
+	model.KeystoneVersion, _ = config["keystone.target.version"]
+	model.CinderUrl, _ = config["cinder.target.url"]
+	model.CinderVersion, _ = config["cinder.target.version"]
+	model.GlanceUrl, _ = config["glance.target.url"]
+	model.GlanceVersion, _ = config["glance.target.version"]
+	model.DefaultTenantId, _ = config["default.tenant_id"]
+	model.RabbitMqIp, _ = config["rabbitmq.ip"]
+	model.RabbitMqPort, _ = config["rabbitmq.port"]
+	model.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
 
 	return
 }
