@@ -286,6 +286,8 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList > div.normal:before {content:'N'; background:#ddd;}
 .summaryList > div.TRUE:before {content:'T'; background:#55c554;}
 .summaryList > div.FALSE:before {content:'F'; background:#e91a61;}
+.summaryList > div.up:before {content:'U'; background:#55c554;}
+.summaryList > div.down:before {content:'D'; background:#ddd;}
 .summaryList > div > span {position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px; text-transform:uppercase;}
 .summaryList > div > span.running {background:#55c554;}
 .summaryList > div > span.warning {background:#fba602;}
@@ -750,7 +752,6 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .iaasIns div dl dd {float:right; line-height:27px;}
 
 /* 21.10.26 퍼블리싱 작업으로부터 추가됨 */
-
 .contentsLeft .insList {overflow:hidden;}
 .contentsLeft .insList dl {float:left; width:50%; line-height:24px;}
 .contentsLeft .insList dl:nth-child(even) {padding-right:15px;}
@@ -790,3 +791,20 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .zoneWrap .nodeList > dl > dd ul.project li dl dt {margin-bottom:5px;}
 .zoneWrap .nodeList > dl > dd ul.project li dl dd {padding:3px 10px; border:1px solid #55c554; border-radius:5px;}
 .zoneWrap .nodeList > dl.demo > dd ul.project li dl dd {border:1px solid #ccc;}
+
+/* 21.11.01 퍼블리싱 작업으로부터 추가됨 */
+.projectList {position:relative;}
+.projectList > div {position:relative; margin-top:15px; padding:15px; min-height:100px; border:1px solid #fafafa; cursor:pointer; transition:.5s; text-align: left}
+.projectList > div:hover,
+.projectList > div.on {border:1px solid #fba602; background-color:#fff; box-shadow:3px 3px 10px rgba(0,0,0,.1);}
+.projectList > div:before {content:''; position:absolute; top:18px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
+.projectList > div.true:before {content:'T'; background:#55c554;}
+.projectList > div.false:before {content:'F'; background:#e91a61;}
+.projectList > div > div {overflow:hidden; padding-left:80px; line-height:24px;}
+.projectList > div > div:first-child {margin-bottom:10px;}
+.projectList > div > div strong {float:left; width:88%; overflow:hidden; font-size:18px; color:#222; font-weight:300; line-height:24px;}
+.projectList > div > div em {float:left; width:20%; margin-left:5%; color:#999; font-size:14px; font-weight:300; line-height:inherit;}
+.projectList > div > div dl {float:left; margin-left:15px;}
+.projectList > div > div dl:first-child {margin-left:0;}
+.projectList > div > div dl dt {float:left;color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.projectList > div > div dl dd {float:left; margin-left:10px; padding:0 10px; color:#666; font-size:14px; line-height:inherit; background:#f7f7f7;}

@@ -1,580 +1,718 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<title>PaaS-TA Monitoring</title>
-		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
-		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
-		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css" />
-	</head>
-	<body>
+<html><head>
+	<meta charset="utf-8">
+	<title>PaaS-TA Monitoring</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css">
+</head>
+<body cz-shortcut-listen="true">
 
-		<!-- Wrap -->
-		<div id="wrap">
+	<!-- Wrap -->
+	<div id="wrap">
+		
+		<!-- Header -->
+		<header>
+			<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring"></a></h1>
+
+			<ul class="global">
+				<li class="IaaS" style="display: inline-block;"><a href="#" class="top-menu-active">IaaS</a></li>
+				<li class="PaaS" style="display: inline-block;"><a href="../paas/index.html">PaaS</a></li>
+				<li class="SaaS" style="display: inline-block;"><a href="../saas/index.html">SaaS</a></li>
+				<li class="CaaS" style="display: inline-block;"><a href="../caas/index.html">CaaS</a></li>
+			</ul>
 			
-			<!-- Header -->
-			<header>
-				<h1><a href="../index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+			<!-- Navigation -->
+			<nav>
+				<ul>
+					<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home"></em></a></li>
+					<li><a href="hypervisor.html">H<span>ypervisor</span></a></li>
+					<li><a href="project.html" class="on">P<span>roject</span></a></li>
+					<li>
+						<a href="alarm_policy.html">A<span>larm</span></a>
+						<ul>
+							<li><a href="alarm_policy.html">Policy</a></li>
+							<li><a href="alarm_status.html">Status</a></li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<!-- // Navigation -->
+			
+		</header>
+		<!-- // Header -->
 
-				<ul class="global">
-						<li class="IaaS"><a href="#" class="top-menu-active">IaaS</a></li>
-						<li class="PaaS"><a href="../paas/index.html">PaaS</a></li>
-						<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
-						<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
-					</ul>
-				
-				<!-- Navigation -->
+		<!-- Container -->
+		<div id="container">
+			<div class="contentsLeft">
+				<!-- Overview -->
+				<h3>Project</h3>
+				<div class="projectList">
+					<div class="true">
+						<div>
+							<strong>admin</strong>
+						</div>
+						<div>
+							<dl>
+								<dt>VCPU</dt>
+								<dd>999</dd>
+							</dl>
+							<dl>
+								<dt>Menory(GB)</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Instande</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Floating IP</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Security Group</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Volumes</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Volumes Strorege</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+					</div>
+					<div class="false">
+						<div>
+							<strong>admin</strong>
+						</div>
+						<div>
+							<dl>
+								<dt>VCPU</dt>
+								<dd>999</dd>
+							</dl>
+							<dl>
+								<dt>Menory(GB)</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Instande</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Floating IP</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Security Group</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Volumes</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Volumes Strorege</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+					</div>
+					<div class="true">
+						<div>
+							<strong>admin</strong>
+						</div>
+						<div>
+							<dl>
+								<dt>VCPU</dt>
+								<dd>999</dd>
+							</dl>
+							<dl>
+								<dt>Menory(GB)</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Instande</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Floating IP</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Security Group</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Volumes</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Volumes Strorege</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Contents -->
+			<section id="contents">
 				<nav>
+					<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar"></a>
 					<ul>
-						<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
-						<li><a href="hypervisor.html">H<span>ypervisor</span></a></li>
-						<li><a href="project.html" class="on">P<span>roject</span></a></li>
 						<li>
-							<a href="alarm_policy.html">A<span>larm</span></a>
-							<ul>
-								<li><a href="alarm_policy.html">Policy</a></li>
-								<li><a href="alarm_status.html">Status</a></li>
-								<li><a href="alarm_statis.html">Statistics</a></li>
-							</ul>
+							<a href="javascript:void(0);" class="alarmView">
+								<img src="../resources/img/btn_header_alarm.png" alt="alarm">
+								<img src="../resources/img/btn_header_alarm_on.png" alt="alarm">
+								<span>0</span>
+							</a>
+						</li>
+						<li class="outBtn">
+							<a href="javascript:void(0);">
+								<img src="../resources/img/btn_header_user.png" alt="user">
+								<div><strong>admin</strong><span>admin@admin.com</span></div>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user"><span>Sign Out</span></a>
 						</li>
 					</ul>
 				</nav>
-				<!-- // Navigation -->
-				
-			</header>
-			<!-- // Header -->
-
-			<!-- Container -->
-			<div id="container">
-
-
-				<!-- Contents -->
-				<section id="contents">
-					<nav>
-						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
-						<ul>
-							<li>
-								<a href="javascript:void(0);" class="alarmView">
-									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
-									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
-									<span>0</span>
-								</a>
-							</li>
-							<li class="outBtn">
-								<a href="javascript:void(0);">
-									<img src="../resources/img/btn_header_user.png" alt="user" >
-									<div><strong>username</strong><span>username</span></div>
-								</a>
-							</li>
-							<li>
-								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
-							</li>
-						</ul>
-					</nav>
-					<div class="timePop">
-						<h4>Time Range</h4>
-						<div class="timer">
-							<div>
-								<input type="radio" name="timeRange" id="tr01" value="15">
-								<label for="tr01">최근 15분</label>
-								<input type="radio" name="timeRange" id="tr02" value="30">
-								<label for="tr02">최근 30분</label>
-								<input type="radio" name="timeRange" id="tr03" value="60">
-								<label for="tr03">최근 1시간</label>
-								<input type="radio" name="timeRange" id="tr04" value="180">
-								<label for="tr04">최근 3시간</label>
-								<input type="radio" name="timeRange" id="tr05" value="360">
-								<label for="tr05">최근 6시간</label>
-								<input type="radio" name="timeRange" id="tr06" value="720">
-								<label for="tr06">최근 12시간</label>
-								<input type="radio" name="timeRange" id="tr07" value="1440">
-								<label for="tr07">최근 1일</label>
-								<input type="radio" name="timeRange" id="tr08" value="10080">
-								<label for="tr08">최근 이번주</label>
-								<input type="radio" name="timeRange" id="tr09" value="40320">
-								<label for="tr09">최근 이번달</label>
-							</div>
-							<div style="display:none;">
-								<input type="radio" name="timeRange" id="tr10">
-								<label for="tr10">수동설정</label>
-								<input type="text" id="from" name="from">
-								<input type="text" id="to" name="to">
-							</div>
+				<div class="timePop">
+					<h4>Time Range</h4>
+					<div class="timer">
+						<div>
+							<input type="radio" name="timeRange" id="tr01" value="15">
+							<label for="tr01">최근 15분</label>
+							<input type="radio" name="timeRange" id="tr02" value="30">
+							<label for="tr02">최근 30분</label>
+							<input type="radio" name="timeRange" id="tr03" value="60">
+							<label for="tr03">최근 1시간</label>
+							<input type="radio" name="timeRange" id="tr04" value="180">
+							<label for="tr04">최근 3시간</label>
+							<input type="radio" name="timeRange" id="tr05" value="360">
+							<label for="tr05">최근 6시간</label>
+							<input type="radio" name="timeRange" id="tr06" value="720">
+							<label for="tr06">최근 12시간</label>
+							<input type="radio" name="timeRange" id="tr07" value="1440">
+							<label for="tr07">최근 1일</label>
+							<input type="radio" name="timeRange" id="tr08" value="10080">
+							<label for="tr08">최근 이번주</label>
+							<input type="radio" name="timeRange" id="tr09" value="40320">
+							<label for="tr09">최근 이번달</label>
 						</div>
-						<h4>Refreshing Time</h4>
-						<div class="refresh">
-							<div class="select_wrap">
-								<select id="timeSelect">
-									<option value="0">OFF</option>
-									<option value="1">1m</option>
-									<option value="5">5m</option>
-									<option value="15">15m</option>
-									<option value="30">30m</option>
-									<option value="60">1h</option>
-									<option value="120">2h</option>
-									<option value="1440">1d</option>
-								</select>
-								<label for="timeSelect">OFF</label>
-							</div>
+						<div style="display:none;">
+							<input type="radio" name="timeRange" id="tr10">
+							<label for="tr10">수동설정</label>
+							<input type="text" id="from" name="from">
+							<input type="text" id="to" name="to">
 						</div>
-						<div class="btnWrap center">
-							<button class="save">Save Changes</button>
-						</div>
-						<a href="javascript:void(0);" class="close">close</a>
 					</div>
+					<h4>Refreshing Time</h4>
+					<div class="refresh">
+						<div class="select_wrap">
+							<select id="timeSelect">
+								<option value="0">OFF</option>
+								<option value="1">1m</option>
+								<option value="5">5m</option>
+								<option value="15">15m</option>
+								<option value="30">30m</option>
+								<option value="60">1h</option>
+								<option value="120">2h</option>
+								<option value="1440">1d</option>
+							</select>
+							<label for="timeSelect">OFF</label>
+						</div>
+					</div>
+					<div class="btnWrap center">
+						<button class="save">Save Changes</button>
+					</div>
+					<a href="javascript:void(0);" class="close">close</a>
+				</div>
 
-					<article class="iaas isContent">
-						<h3>Project</h3>
-						<ul class="chartWrap">
-							<li>
-								<h4>VCPU 사용량</h4>
-								<p class="IaaSvcpuCnt">0</p>
-								<div id="vcpuChart"></div>
-							</li>
-							<li>
-								<h4>Memory 사용량</h4>
-								<p class="IaaSmemCnt">0</p>
-								<div id="IaaSmemChart"></div>
-							</li>
-							<li>
-								<h4>Disk 사용량</h4>
-								<p class="IaaSdiskCnt">0</p>
-								<div id="IaaSdiskChart"></div>
-							</li>
-							<li>
-								<h4>인스턴스</h4>
-								<p class="instance">
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-								</p>
-							</li>
-						</ul>
-					</article>
-
-					<article class="iaas isContent">
-						<h3>Instance List</h3>
-						<ul class="chartWrap">
-							<li>
-								<h4>VCPU 사용량</h4>
-								<p class="IaaSvcpuCnt">0</p>
-								<div id="vcpuChart"></div>
-							</li>
-							<li>
-								<h4>Memory 사용량</h4>
-								<p class="IaaSmemCnt">0</p>
-								<div id="IaaSmemChart"></div>
-							</li>
-							<li>
-								<h4>Disk 사용량</h4>
-								<p class="IaaSdiskCnt">0</p>
-								<div id="IaaSdiskChart"></div>
-							</li>
-							<li>
-								<h4>인스턴스</h4>
-								<p class="instance">
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-									Max Instance 10<br>
-								</p>
-							</li>
-						</ul>
-					</article>
-				</section>
-				<!-- // Contents -->
-
-			</div>
-			<!-- // Container -->
-			
-			<div id="chartWrap">
+				<article>
+					<h4>Instance List (<span>admin</span>)</h4>
+					<div id="workerSummary" class="summaryList">
+						<div class="normal">
+							<div>
+								<strong>deployment</strong>
+								<em>10.5.0.123</em>
+								<em>2021-08-27 T10:44:22</em>
+							</div>
+							<div>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>0.17 %</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>6.83 %</dd>
+								</dl>
+								<dl>
+									<dt>Zone</dt>
+									<dd>nova</dd>
+								</dl>
+								<dl>
+									<dt>Flavor</dt>
+									<dd>m1.small</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>999</dd>
+								</dl>
+								<dl>
+									<dt>DISK</dt>
+									<dd>999GB</dd>
+								</dl>
+								<dl>
+									<dt>RAM</dt>
+									<dd>99GB</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-name="deployment">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>
+						<div class="normal">
+							<div>
+								<strong>deployment</strong>
+								<em>10.5.0.123</em>
+								<em>2021-08-27 T10:44:22</em>
+							</div>
+							<div>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>0.17 %</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>6.83 %</dd>
+								</dl>
+								<dl>
+									<dt>Zone</dt>
+									<dd>nova</dd>
+								</dl>
+								<dl>
+									<dt>Flavor</dt>
+									<dd>m1.small</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>999</dd>
+								</dl>
+								<dl>
+									<dt>DISK</dt>
+									<dd>999GB</dd>
+								</dl>
+								<dl>
+									<dt>RAM</dt>
+									<dd>99GB</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-name="statefulset">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>
+						<div class="normal">
+							<div>
+								<strong>deployment</strong>
+								<em>10.5.0.123</em>
+								<em>2021-08-27 T10:44:22</em>
+							</div>
+							<div>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>0.17 %</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>6.83 %</dd>
+								</dl>
+								<dl>
+									<dt>Zone</dt>
+									<dd>nova</dd>
+								</dl>
+								<dl>
+									<dt>Flavor</dt>
+									<dd>m1.small</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>999</dd>
+								</dl>
+								<dl>
+									<dt>DISK</dt>
+									<dd>999GB</dd>
+								</dl>
+								<dl>
+									<dt>RAM</dt>
+									<dd>99GB</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-name="daemonset">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>
+					</div>
+					<!--<h4>Workloads Status</h4>-->
+				</article>
+			</section>
+			<!-- // Contents -->
+		</div>
+		<!-- // Container -->
+		
+		<div id="chartWrap">
+			<div class="chart on">
 				<h4><span class="chartTitle"></span></h4>
-				<ul class="chart">
+				<ul class="one">
 					<li>
-						<h5>CPU Usage</h5>
-						<div id="cpuUsageChart"></div>
-					</li>
-					<li>
-						<h5>CPU Load Average</h5>
-						<div id="cpuLoadChart"></div>
-					</li>
-					<li>
-						<h5>Memory Usage</h5>
-						<div id="memoryUsageChart"></div>
-					</li>
-					<li>
-						<h5>Disk Usage</h5>
-						<div id="diskUsageChart"></div>
-					</li>
-					<li>
-						<h5>Disk IO</h5>
-						<div id="diskIoChart"></div>
-					</li>
-					<li>
-						<h5>Network IO Byte</h5>
-						<div id="networkByteChart"></div>
-					</li>
-					<li>
-						<h5>Network IO Packtes</h5>
-						<div id="networkPacktesChart"></div>
-					</li>
-					<li>
-						<h5>Network IO Drop</h5>
-						<div id="networkDropChart"></div>
-					</li>
-					<li>
-						<h5>Network IO Error</h5>
-						<div id="networkErrorChart"></div>
+						<h5>Workloads Usage</h5>
+						<div id="nodeChart" class="gaugeChart"></div>
 					</li>
 				</ul>
-				
-				<div class="logs">
-					<fieldset>
-						<div>
-							<label>Date</label>
-							<input type="date" id="date" placeholder="2019-05-09" style="width:220px;">
-							<label>Time</label>
-							<input type="time" id="sTime" style="width:180px;">
-							<em>~</em>
-							<input type="time" id="eTime" style="width:180px;">
-							<button class="reset">RESET</button>
-						</div>
-						<div>
-							<label>Message</label>
-							<input type="text" id="message" style="width:800px;">
-						</div>
-						<button class="logSearch">SEARCH</button>
-					</fieldset>
-					<ul class="preText">
-					</ul>
-					<div class="paging logPaging">
-						<a href="javascript:void(0);" class="move next">&lt;</a>
-						<span>
-						</span>
-						<a href="javascript:void(0);" class="move prev">&gt;</a>
+				<h5>Workloads Container list</h5>
+				<div class="tableList">
+					<table style="table-layout: fixed">
+						<caption>Workloads Container list</caption>
+						<thead>
+							<tr>
+								<th width="21%">Container Name</th>
+								<th width="14%">Name Space</th>
+								<th width="24%">podName</th>
+								<th width="8%">CPU<br>(ms)</th>
+								<th width="8%">Memory<br>(MB)</th>
+								<th width="8%">Disk<br>(GB)</th>
+								<th width="8%">CPU<br>Usage</th>
+								<th width="8%">Memory<br>Usage</th>
+							</tr>
+						</thead>
+						<tbody id="containerlist">
+						</tbody>
+					</table>
+				</div>
+
+				<!-- // Log Layer -->
+				<div class="logWrap">
+					<div class="log on">
+						<h4>LOG</h4>
+						<div id="logChart" class="logChart"></div>
+						<pre id="logText"></pre>
+						<a href="javascript:void(0);" class="logClosed"></a>
 					</div>
 				</div>
-				<a href="javascript:void(0);" class="chartClosed"></a>
+				<!-- // Log Layer -->
 			</div>
-			<div id="logWrap">
-
-			</div>
-
+			<a href="javascript:void(0);" class="chartClosed"></a>
 		</div>
-		<!-- // Wrap -->
 
-		<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
-		<script type="text/javascript" src="../resources/js/c3.min.js"></script>
-		<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
-		<script type="text/javascript">
-			window.onload = () => {
-				const bosh = {
-					id : '',
-					logId : '',
-					logCnt : 1,
-					logPage : 1,
-					logSum : 1,
+	</div>
+	<!-- // Wrap -->
 
-					init() {
-						// Alarm Count
-						fnComm.alarmCount('paas');
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	<script type="text/javascript">
+		window.onload = () => {
+			const workloads = {
+				id : '',
+				data : [],
 
-						// 오늘 날짜
-						var today = new Date();
-						var dd = today.getDate();
-						var mm = today.getMonth()+1;
-						var yyyy = today.getFullYear();
-
-						if(dd < 10) dd='0'+dd;
-						if(mm < 10) mm='0'+mm;
-
-						// LOG 검색 Default set
-						document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
-
-						var hh = today.getHours();
-						var hs = today.getHours()-1;
-						var nn = today.getMinutes();
-						var ss = today.getSeconds();
-
-						if(hh < 10) hh='0'+hh;
-						if(hs < 10) hs='0'+hs;
-						if(nn < 10) nn='0'+nn;
-						if(ss < 10) ss='0'+ss;
-
-						document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
-						document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
-						
-						// BOSH 컨디션 차트
-						fnComm.loadData('GET', fnComm.url + 'paas/bosh/overview', fnComm.boshConditionChart);
-						// BOSH Summary 리스트
-						fnComm.loadData('GET', fnComm.url + 'paas/bosh/summary', bosh.boshSummaryList);
-					},
+				init() {
+					// Alarm Count
+					fnComm.alarmCount('caas');
 					
-					boshSummaryList(data) {
-						//////////////////////////////////////////////////////////////////////
-						// BOSH Summary : 리스트
-						// Data Example //////////////////////////////////////////////////////
-						// address: "10.20.0.6"
-						// core: "8"
-						// cpuErrStat: "running"
-						// cpuUsage: 0.31
-						// dataDisk: 142462.5703125
-						// diskDataErrStat: "healthy"
-						// diskRootErrStat: "healthy"
-						// diskStatus: "healthy"
-						// id: "f2e1c906-34ae-4a13-581d-1d161cc516d6"
-						// memErrStat: "running"
-						// memoryUsage: 54.97
-						// name: "micro-bosh"
-						// state: "running"
-						// totalDisk: 2818.65625
-						// totalMemory: 16046.84765625
-						//////////////////////////////////////////////////////////////////////
-						var target = document.getElementById('boshSummary');
-						
-						fnComm.removeHtml(target);
+					// Workloads Status 데이터로드
+					fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workloadsStatus', workloads.workloadsStatus);
+					
+					// Workloads Container Summary 데이터로드
+					fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
+				},
 
-						if(data.data != null){
-							data.data.forEach((value, idx)=>{
-								var html = `<div class="${value.state}">
-									<div>
-										<strong>${value.name}</strong>
-										<em>${value.address}</em>
-										<em>Core ${value.core}</em>
-									</div>
-									<div>
-										<dl>
-											<dt>CPU Used</dt>
-											<dd>${value.cpuUsage} %</dd>
-										</dl>
-										<dl>
-											<dt>Total Memory</dt>
-											<dd>${fnComm.numberComma(2, value.cpuUsage)} %</dd>
-										</dl>
-										<dl>
-											<dt>Memory Used</dt>
-											<dd>${fnComm.numberComma(2, value.memoryUsage)} %</dd>
-										</dl>
-									</div>
-									<div>
-										<dl>
-											<dt>Total Disk</dt>
-											<dd>${fnComm.numberComma(0, value.totalDisk)} MB</dd>
-										</dl>
-										<dl>
-											<dt>Disk Status</dt>
-											<dd>${value.diskStatus}</dd>
-										</dl>
-									</div>
-									<div class="summaryBtn" data-id="${value.id}"  data-name="${value.name}">
-										<a href="javascript:void(0);" class="process"><img src="../resources/img/btn_process.png" alt="process"><span>Process</span></a>
-										<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
-										<a href="javascript:void(0);" class="log"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>
-									</div>
-								</a>`;
-								
-								fnComm.appendHtml(target, html, 'div');
+				gaugeList(data){
+					// pod Usage 차트
+					fnComm.gaugeChart(data.PodUsage, 'Pod Usage', '#podUsage');
 
-								var article = target.childNodes.item(idx);
-								article.setAttribute('data-id', value.id);
+					// CPU Usage 차트
+					fnComm.gaugeChart(data.CpuUsage, 'Cpu Usage', '#cpuUsage');
 
-								if(idx === 0){
-									bosh.id = value.id;
+					// Memory Usage 차트
+					fnComm.gaugeChart(data.MemoryUsage, 'Memory Usage', '#memoryUsage');
 
-									document.getElementById('boshTopTitle').innerHTML = value.name;
-								};
-							});
-							
-							// Set BOSH Top Process 
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/topprocess/${bosh.id}/memory`, bosh.boshTopProcess );
-							
-							// Button Event (Process, Chart, Log)
-							var elm = document.querySelectorAll('.summaryBtn');
-							for(var i=0 ; i<elm.length ; i++){
-								// Process Event
-								elm[i].querySelector('.process').addEventListener('click', (e) => {
-									var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
-									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+					// Disk Usage 차트
+					fnComm.gaugeChart(data.DiskUsage, 'Disk Usage', '#diskUsage');
 
-									fnComm.loadData('GET', `${fnComm.url}paas/bosh/topprocess/${elmID}/memory`, bosh.boshTopProcess );
+				},
 
+				workloadsStatus(data) {
+					// Alerts: "7"
+					// Nodes: "3"
+					// PodRestart: "0"
+					// RunningContainer: "55"
+					// RunningPod: "30"
 
-									document.getElementById('boshTopTitle').innerHTML = elmName;
-								}, false);
+					
+					data.forEach(value => {
+						var target ='';
+						let arr = [];
 
-								// Chart Event
-								elm[i].querySelector('.chart').addEventListener('click', (e) => {
-									var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
-									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
-									document.querySelector('.chartTitle').innerHTML = elmName;
-									bosh.chartView(elmID);
-								}, false);
+						switch(value.Name) {
+							case 'Deployment':
+								target = '#deployment'
+								arr = [
+									['Total', 0, value.Total, 0, 0, 0, 0],
+									['Available', 0, 0, value.Available, 0, 0, 0],
+									['Updated', 0, 0, 0, value.Updated, 0, 0],
+									['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
+								];
+							break;
+							case 'DaemonSet':
+								target = '#daemonSet'
+								arr = [
+									['Ready', 0, value.Ready, 0, 0, 0, 0],
+									['Available', 0, 0, value.Available, 0, 0, 0],
+									['Misscheduled', 0, 0, 0, value.Misscheduled, 0, 0],
+									['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
+								];
+							break;
+							case 'Stateful':
+								target = '#stateful'
+								arr = [
+									['Total', 0, value.Total, 0, 0, 0, 0],
+									['Ready', 0, 0, value.Ready, 0, 0, 0],
+									['Updated', 0, 0, 0, value.Updated, 0, 0],
+									['Revision', 0, 0, 0, 0, value.Revision, 0]
+								];
+							break;
+							case 'Pod':
+								target = '#pod'
+								arr = [
+									['Ready', 0, value.Ready, 0, 0, 0, 0],
+									['Running', 0, 0, value.Running, 0, 0, 0],
+									['Restart', 0, 0, 0, value.Restart, 0, 0],
+									['terminated', 0, 0, 0, 0, value.terminated, 0]
+								];
+							break;
+						};
 
-								// Log Event
-								elm[i].querySelector('.log').addEventListener('click', (e) => {
-									bosh.logId = e.target.parentNode.parentNode.getAttribute('data-id');
-									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
-									document.querySelector('.chartTitle').innerHTML = elmName;
+						workloads.workloadsChart(target, arr)
+					});
+				},
 
-									bosh.logView();
-								}, false);
+				workloadsChart(target, arr){
+					var chart = c3.generate({
+						bindto: target,
+						data: {
+							columns: arr,
+							labels: true,
+							type: 'spline'
+						},
+						color: {
+							pattern: ['#43be42', '#f6a200', '#f4256c', '#c048c8', '#ccc']
+						},
+						axis: {
+							x: {
+								show: false
+							},
+							y: {
+								show: false
+							}
+						},
+					});
+				},
+
+				workloadsSummary(data) {
+					// Data Example //////////////////////////////////////////////////////
+					// Cpu: "59447.14"
+					// CpuUsage: "0.02"
+					// Disk: "74.7"
+					// DiskUsage: "0.02"
+					// Memory: "353.1"
+					// MemoryUsage: "9.54"
+					// Name: "deployment"
+					//////////////////////////////////////////////////////////////////////
+					
+					var target = document.getElementById('workerSummary');
+					
+					fnComm.removeHtml(target);
+
+					data.forEach((value, idx)=>{
+						var html = `<div class="normal">
+							<div>
+								<strong><a href="javascript:void(0);">${value.Name}</a></strong>
+							</div>
+							<div>
+								<dl class="color1" title="CPU">
+									<dt>C</dt>
+									<dd>${value.Cpu} ms</dd>
+								</dl>
+								<dl class="color2" title="Memory">
+									<dt>M</dt>
+									<dd>${value.Memory} MB</dd>
+								</dl>
+								<dl class="color3" title="Disk">
+									<dt>D</dt>
+									<dd>${value.Disk} GB</dd>
+								</dl>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>${value.CpuUsage} %</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>${value.MemoryUsage} %</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-name="${value.Name}">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>`
+
+						fnComm.appendHtml(target, html, 'div');
+					});
+
+					// Application Event (Chart)
+					var elm = document.querySelectorAll('.summaryBtn');
+					for(var i=0 ; i<elm.length ; i++){
+						// Worker Node Info Event
+						elm[i].querySelector('.chart').addEventListener('click', (e) => {
+							if(e.target.nodeName == 'A'){
+								var elmName = e.target.parentNode.getAttribute('data-name');
+							} else {
+								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 							};
 							
-							// Chart Close Event
-							document.querySelector('.chartClosed').addEventListener('click', (e) => {
-								document.getElementById('chartWrap').classList.toggle('on', false);
-							}, false);
+							document.querySelector('.chartTitle').innerHTML = elmName;
+
+							// Workloads Detail Chart 데이터로드
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/workloadsGraph?WorkloadsName=${elmName}`, workloads.nodeInfo);
 						
-							// LOG Reset Event
-							document.querySelector('.reset').addEventListener('click', (e) => {
-								// 오늘 날짜
-								var today = new Date();
-								var dd = today.getDate();
-								var mm = today.getMonth()+1;
-								var yyyy = today.getFullYear();
-
-								if(dd < 10) dd='0'+dd;
-								if(mm < 10) mm='0'+mm;
-
-								// LOG 검색 Default set
-								document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
-
-								var hh = today.getHours();
-								var hs = today.getHours()-1;
-								var nn = today.getMinutes();
-								var ss = today.getSeconds();
-
-								if(hh < 10) hh='0'+hh;
-								if(hs < 10) hs='0'+hs;
-								if(nn < 10) nn='0'+nn;
-								if(ss < 10) ss='0'+ss;
-
-								document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
-								document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
-								document.getElementById('message').value = '';
-							}, false);
-							
-							// LOG Search Event
-							document.querySelector('.logSearch').addEventListener('click', (e) => {
-								var logParameter = `?id=${bosh.logId}&logType=bosh&pageIndex=1&pageItems=1000&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-							
-								// Log 리스트
-								fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, bosh.detailLog);
-							}, false);
-						};
-					},
-	
-					boshTopProcess(data) {
-						//////////////////////////////////////////////////////////////////////
-						// BOSH Top Process : 리스트
-						// Data Example //////////////////////////////////////////////////////
-						// index: "1"
-						// memory: 449.203125
-						// pid: "27457"
-						// process: "java"
-						// time: "2018-11-13T05:41:02"
-						//////////////////////////////////////////////////////////////////////
-						var target = document.getElementById('boshTop');
-	
-						fnComm.removeHtml(target);
-	
-						data.data.forEach((value, idx)=>{
-							var html = `<div>
-								<strong>${value.index}</strong>
-								<div>
-									<dl class="time">
-										<dt><img src="../resources/img/icon_time.png" alt="time"></dt>
-										<dd>${value.time}</dd>
-									</dl>
-									<dl class="pid">
-										<dt><img src="../resources/img/icon_id.png" alt="pid"></dt>
-										<dd>${value.pid}</dd>
-									</dl>
-									<dl class="process">
-										<dt><img src="../resources/img/icon_process.png" alt="process"></dt>
-										<dd>${value.process}</dd>
-									</dl>
-									<dl class="memory">
-										<dt><img src="../resources/img/icon_memory.png" alt="memory"></dt>
-										<dd>${fnComm.numberComma(0, value.memory)} MB</dd>
-									</dl>
-								</div>
-							</div>`;
-	
-							fnComm.appendHtml(target, html, 'div');
-						});
-					},
-
-					chartView(elmID) {
-						document.getElementById('chartWrap').classList.toggle('on', true);
-						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
-
-						setTimeout(() => {
-							// CPU Usage 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/cpu/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
-
-							// CPU Load 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/cpu/${elmID}/loads` + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
-
-							// Memory Usage 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/memory/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
-
-							// Disk Usage 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/disk/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
-
-							// Disk IO 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/disk/${elmID}/ios` + fnComm.setTimer(), fnComm.detailChart, '#diskIoChart');
-
-							// Network IO Bytes 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/bytes` + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
-							
-							// Network IO Packets 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/packets` + fnComm.setTimer(), fnComm.detailChart, '#networkPacktesChart');
-							
-							// Network IO Drop 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/drops` + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
-							
-							// Network IO Error 정보
-							fnComm.loadData('GET', fnComm.url + `paas/bosh/network/${elmID}/errors` + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
-						},500);
-					},
-
-					logView() {
-						document.getElementById('chartWrap').classList.toggle('on', true);
-						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
-
-						setTimeout(() => {
-							var logParameter = `?id=${bosh.logId}&logType=bosh&pageIndex=1&pageItems=1000&period=5m`;
+							// Workloads Container list 데이터로드
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?WorkloadsName=${elmName}`, workloads.containerlist);
+						}, false);
+					};
 						
-							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, bosh.detailLog);
-						},500);
-					},
+					// Chart Close Event
+					document.querySelector('.chartClosed').addEventListener('click', (e) => {
+						document.getElementById('chartWrap').classList.toggle('on', false);
+						document.querySelector('.logWrap').classList.toggle('on', false);
+					}, false);
+						
+					// LOG Close Event
+					document.querySelector('.logClosed').addEventListener('click', (e) => {
+						document.querySelector('.logWrap').classList.toggle('on', false);
+					}, false);
+				},
 
-					detailLog(data){
-						if(data.messages !=  null){
-							var target = document.querySelector('.preText');
-	
-							fnComm.removeHtml(target);
+				nodeInfo(data){
+					document.getElementById('chartWrap').classList.toggle('on', true);
+
+					setTimeout(() => {
+						fnComm.detailChart(data, '#nodeChart');
+					},500);
+				},
+
+				containerlist(data) {
+					console.log(data);
+					workloads.data = data;
+					// ContainerName: "fluentd-gcp-scaler"
+					// Cpu: "22522.09"
+					// CpuUsage: "0.66"
+					// Disk: "23.5"
+					// Memory: "82.8"
+					// MemoryUsage: "2.24"
+					// NameSpace: "kube-system"
+					// PodName: "fluentd-gcp-scaler-7b895cbc89-rzqbq"
+					
+					var target = document.getElementById('containerlist');
+					
+					fnComm.removeHtml(target);
+
+					data.forEach(value => {
+						var html = `<tr>
+							<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
+							<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
+							<td class="left" title="${value.PodName}">${value.PodName}</td>
+							<td>${value.Cpu}</td>
+							<td>${value.Memory}</td>
+							<td>${value.Disk}</td>
+							<td>${value.CpuUsage}</td>
+							<td>${value.MemoryUsage}</td>
+						</tr>`;
+						
+						fnComm.appendHtml(target, html, 'tbody');
+					});
+
+					// Container Event (Log)
+					var elm = document.querySelectorAll('.contName');
+					for(var i=0 ; i<elm.length ; i++){
+						// Pod Node Info Event
+						elm[i].addEventListener('click', (e) => {
+							var containerName = e.target.parentNode.getAttribute('title');
+							var nameSpace = e.target.parentNode.getAttribute('data-sp');
+							var podName = e.target.parentNode.getAttribute('data-po');
+						
+							// Container Chart 데이터로드
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, workloads.containerChart);
 							
-							data.messages.forEach((value)=>{
-								var html = `<li>${value.time}<br>${value.message}</li>`;
+							// Container Log 데이터로드
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, workloads.containerLog);
+						}, false);
+					};
+						
+					// Chart Close Event
+					document.querySelector('.logClosed').addEventListener('click', (e) => {
+						document.querySelector('.logWrap').classList.toggle('on', false);
+					}, false);
+				},
 
-								fnComm.appendHtml(target, html, 'ul');
-							});
-						} else {
-							document.querySelector('.preText').innerHTML = 'No Log'
-						};
-					},
-				}
-	
-				bosh.init();
-			};
-		</script>
-	</body>
-</html>
+				containerChart(data) {
+					document.querySelector('.logWrap').classList.toggle('on', true);
+
+					setTimeout(() => {
+						fnComm.detailChart(data, '#logChart');
+					},500);
+				},
+
+				containerLog(data) {
+					document.getElementById('logText').innerHTML = data;
+				},
+
+				sortList() {
+					workloads.data.sort(function(a,b) {
+						return parseFloat(a[sortData]) - parseFloat(b[sortData]);
+					});
+
+					workloads.containerlist(workloads.data);
+				},
+			}
+
+			workloads.init();
+		};
+	</script>
+
+</body></html>
