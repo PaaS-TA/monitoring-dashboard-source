@@ -47,7 +47,8 @@
 			<div class="contentsLeft">
 				<!-- Overview -->
 				<h3>Project</h3>
-				<div class="projectList">
+				<div id="projectList" class="projectList">
+					<!--
 					<div class="true">
 						<div>
 							<strong>admin</strong>
@@ -130,47 +131,8 @@
 							</dl>
 						</div>
 					</div>
-					<div class="true">
-						<div>
-							<strong>admin</strong>
-						</div>
-						<div>
-							<dl>
-								<dt>VCPU</dt>
-								<dd>999</dd>
-							</dl>
-							<dl>
-								<dt>Menory(GB)</dt>
-								<dd>999/999</dd>
-							</dl>
-						</div>
-						<div>
-							<dl>
-								<dt>Instande</dt>
-								<dd>999/999</dd>
-							</dl>
-							<dl>
-								<dt>Floating IP</dt>
-								<dd>999/999</dd>
-							</dl>
-						</div>
-						<div>
-							<dl>
-								<dt>Security Group</dt>
-								<dd>999/999</dd>
-							</dl>
-							<dl>
-								<dt>Volumes</dt>
-								<dd>999/999</dd>
-							</dl>
-						</div>
-						<div>
-							<dl>
-								<dt>Volumes Strorege</dt>
-								<dd>999/999</dd>
-							</dl>
-						</div>
-					</div>
+					-->
+
 				</div>
 			</div>
 
@@ -251,91 +213,8 @@
 
 				<article>
 					<h4>Instance List (<span>admin</span>)</h4>
-					<div id="workerSummary" class="summaryList">
-						<div class="normal">
-							<div>
-								<strong>deployment</strong>
-								<em>10.5.0.123</em>
-								<em>2021-08-27 T10:44:22</em>
-							</div>
-							<div>
-								<dl>
-									<dt>CPU Usage</dt>
-									<dd>0.17 %</dd>
-								</dl>
-								<dl>
-									<dt>Memory Usage</dt>
-									<dd>6.83 %</dd>
-								</dl>
-								<dl>
-									<dt>Zone</dt>
-									<dd>nova</dd>
-								</dl>
-								<dl>
-									<dt>Flavor</dt>
-									<dd>m1.small</dd>
-								</dl>
-							</div>
-							<div>
-								<dl>
-									<dt>VCPU</dt>
-									<dd>999</dd>
-								</dl>
-								<dl>
-									<dt>DISK</dt>
-									<dd>999GB</dd>
-								</dl>
-								<dl>
-									<dt>RAM</dt>
-									<dd>99GB</dd>
-								</dl>
-							</div>
-							<div class="summaryBtn" data-name="deployment">
-								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
-							</div>
-						</div>
-						<div class="normal">
-							<div>
-								<strong>deployment</strong>
-								<em>10.5.0.123</em>
-								<em>2021-08-27 T10:44:22</em>
-							</div>
-							<div>
-								<dl>
-									<dt>CPU Usage</dt>
-									<dd>0.17 %</dd>
-								</dl>
-								<dl>
-									<dt>Memory Usage</dt>
-									<dd>6.83 %</dd>
-								</dl>
-								<dl>
-									<dt>Zone</dt>
-									<dd>nova</dd>
-								</dl>
-								<dl>
-									<dt>Flavor</dt>
-									<dd>m1.small</dd>
-								</dl>
-							</div>
-							<div>
-								<dl>
-									<dt>VCPU</dt>
-									<dd>999</dd>
-								</dl>
-								<dl>
-									<dt>DISK</dt>
-									<dd>999GB</dd>
-								</dl>
-								<dl>
-									<dt>RAM</dt>
-									<dd>99GB</dd>
-								</dl>
-							</div>
-							<div class="summaryBtn" data-name="statefulset">
-								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
-							</div>
-						</div>
+					<div id="instanceSummary" class="summaryList">
+						<!--
 						<div class="normal">
 							<div>
 								<strong>deployment</strong>
@@ -378,6 +257,7 @@
 								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
 							</div>
 						</div>
+						-->
 					</div>
 					<!--<h4>Workloads Status</h4>-->
 				</article>
@@ -438,19 +318,119 @@
 	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
 	<script type="text/javascript">
 		window.onload = () => {
-			const workloads = {
+			const project = {
 				id : '',
 				data : [],
 
 				init() {
 					// Alarm Count
-					fnComm.alarmCount('caas');
+					//fnComm.alarmCount('iaas');
 					
-					// Workloads Status 데이터로드
-					fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workloadsStatus', workloads.workloadsStatus);
+					// VM
+					fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workloadsStatus', project.workloadsStatus);
 					
 					// Workloads Container Summary 데이터로드
-					fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
+					//fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
+
+					// TODO VM 인스턴스 리스트 조회
+					fnComm.loadData('GET', fnComm.url + 'iaas/server/list', project.getInstanceList);
+
+					// TODO Openstack 프로젝트 조회
+					fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
+				},
+
+				getProjectList(data) {
+					console.log(data);
+					var target = document.getElementById('projectList');
+
+					fnComm.removeHtml(target);
+
+					data.forEach((value, idx) => {
+						var html = `<div class="true">
+							<div>
+								<strong>${value.name}</strong>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>999</dd>
+								</dl>
+								<dl>
+									<dt>Menory(GB)</dt>
+									<dd>999/999</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>Instande</dt>
+									<dd>999/999</dd>
+								</dl>
+								<dl>
+									<dt>Floating IP</dt>
+									<dd>999/999</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>Security Group</dt>
+									<dd>999/999</dd>
+								</dl>
+								<dl>
+									<dt>Volumes</dt>
+									<dd>999/999</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>Volumes Strorege</dt>
+									<dd>999/999</dd>
+								</dl>
+							</div>
+						</div>`
+
+						fnComm.appendHtml(target, html, 'div');
+					});
+
+				},
+
+				getInstanceList(data) {
+					var target = document.getElementById('instanceSummary');
+
+					fnComm.removeHtml(target);
+					data.forEach((value, idx)=>{
+						var html = `<div class="normal">
+							<div>
+								<strong><a href="javascript:void(0);">${value.name}</a></strong>
+							</div>
+							<div>
+								<dl class="color1" title="CPU">
+									<dt>C</dt>
+									<dd>${value.Cpu} ms</dd>
+								</dl>
+								<dl class="color2" title="Memory">
+									<dt>M</dt>
+									<dd>${value.Memory} MB</dd>
+								</dl>
+								<dl class="color3" title="Disk">
+									<dt>D</dt>
+									<dd>${value.Disk} GB</dd>
+								</dl>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>${value.CpuUsage} %</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>${value.MemoryUsage} %</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-name="${value.Name}">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>`
+
+						fnComm.appendHtml(target, html, 'div');
+					});
 				},
 
 				gaugeList(data){
@@ -519,7 +499,7 @@
 							break;
 						};
 
-						workloads.workloadsChart(target, arr)
+						project.workloadsChart(target, arr)
 					});
 				},
 
@@ -556,7 +536,7 @@
 					// Name: "deployment"
 					//////////////////////////////////////////////////////////////////////
 					
-					var target = document.getElementById('workerSummary');
+					var target = document.getElementById('instanceSummary');
 					
 					fnComm.removeHtml(target);
 
@@ -609,10 +589,10 @@
 							document.querySelector('.chartTitle').innerHTML = elmName;
 
 							// Workloads Detail Chart 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/workloadsGraph?WorkloadsName=${elmName}`, workloads.nodeInfo);
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/workloadsGraph?WorkloadsName=${elmName}`, project.nodeInfo);
 						
 							// Workloads Container list 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?WorkloadsName=${elmName}`, workloads.containerlist);
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?WorkloadsName=${elmName}`, project.containerlist);
 						}, false);
 					};
 						
@@ -638,7 +618,7 @@
 
 				containerlist(data) {
 					console.log(data);
-					workloads.data = data;
+					project.data = data;
 					// ContainerName: "fluentd-gcp-scaler"
 					// Cpu: "22522.09"
 					// CpuUsage: "0.66"
@@ -677,10 +657,11 @@
 							var podName = e.target.parentNode.getAttribute('data-po');
 						
 							// Container Chart 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, workloads.containerChart);
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerChart);
 							
 							// Container Log 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, workloads.containerLog);
+							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerLog);
+
 						}, false);
 					};
 						
@@ -703,15 +684,15 @@
 				},
 
 				sortList() {
-					workloads.data.sort(function(a,b) {
+					project.data.sort(function(a,b) {
 						return parseFloat(a[sortData]) - parseFloat(b[sortData]);
 					});
 
-					workloads.containerlist(workloads.data);
+					project.containerlist(project.data);
 				},
 			}
 
-			workloads.init();
+			project.init();
 		};
 	</script>
 

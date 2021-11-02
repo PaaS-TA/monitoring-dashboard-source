@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"kr/paasta/monitoring/iaas_new/dao"
 	"kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/utils"
 )
 
 type AlarmPolicyService struct {
@@ -19,6 +20,7 @@ func GetAlarmPolicyService(txn *gorm.DB) *AlarmPolicyService {
 
 //Alarm Policy Select
 func (h *AlarmPolicyService) GetAlarmPolicyList() (result []model.AlarmPolicyResponse, err model.ErrMessage) {
+	utils.Logger.Info("GetAlarmPolicyList")
 
 	result, err = dao.GetAlarmPolicyDao(h.txn).GetAlarmPolicyList()
 

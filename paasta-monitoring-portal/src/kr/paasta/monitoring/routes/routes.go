@@ -277,6 +277,7 @@ const (
 	// TODO 2021.11.01 - IAAS 모니터링
 	IAAS_GET_HYPER_STATISTICS = "IAAS_GET_HYPER_STATISTICS"
 	IAAS_GET_SERVER_LIST = "IAAS_GET_SERVER_LIST"
+	IAAS_GET_PROJECT_LIST = "IAAS_GET_PROJECT_LIST"
 
 
 )
@@ -518,28 +519,28 @@ var IaasRoutes = rata.Routes{
 	//{Path: "/v2/iaas/alarm/realtime/count", Method: "GET", Name: IAAS_ALARM_REALTIME_COUNT},
 	//{Path: "/v2/iaas/alarm/realtime/list", Method: "GET", Name: IAAS_ALARM_REALTIME_LIST},
 
-	//{Path: "/v2/iaas/alarm/policies", Method: "GET", Name: IAAS_ALARM_POLICY_LIST},
-	//{Path: "/v2/iaas/alarm/policy", Method: "PUT", Name: IAAS_ALARM_POLICY_UPDATE},
+	{Path: "/v2/iaas/alarm/policies", Method: "GET", Name: IAAS_ALARM_POLICY_LIST},
+	{Path: "/v2/iaas/alarm/policy", Method: "PUT", Name: IAAS_ALARM_POLICY_UPDATE},
 
-	//{Path: "/v2/iaas/alarm/sns/channel", Method: "POST", Name: IAAS_ALARM_SNS_CHANNEL_CREATE},
-	//{Path: "/v2/iaas/alarm/sns/channel/list", Method: "GET", Name: IAAS_ALARM_SNS_CHANNEL_LIST},
-	//{Path: "/v2/iaas/alarm/sns/channel/:id", Method: "DELETE", Name: IAAS_ALARM_SNS_CHANNEL_DELETE},
-	//{Path: "/v2/iaas/alarm/sns/channel", Method: "PUT", Name: IAAS_ALARM_SNS_CHANNEL_UPDATE},  // 2021.05.18 - PaaS 채널 SNS 수정 기능 추가
+	{Path: "/v2/iaas/alarm/sns/channel", Method: "POST", Name: IAAS_ALARM_SNS_CHANNEL_CREATE},
+	{Path: "/v2/iaas/alarm/sns/channel/list", Method: "GET", Name: IAAS_ALARM_SNS_CHANNEL_LIST},
+	{Path: "/v2/iaas/alarm/sns/channel/:id", Method: "DELETE", Name: IAAS_ALARM_SNS_CHANNEL_DELETE},
+	{Path: "/v2/iaas/alarm/sns/channel", Method: "PUT", Name: IAAS_ALARM_SNS_CHANNEL_UPDATE},  // 2021.05.18 - PaaS 채널 SNS 수정 기능 추가
 
-	//{Path: "/v2/iaas/alarm/statuses", Method: "GET", Name: IAAS_ALARM_STATUS_LIST},
-	//{Path: "/v2/iaas/alarm/status/count", Method: "GET", Name: IAAS_ALARM_STATUS_COUNT},
-	//{Path: "/v2/iaas/alarm/status/:id", Method: "GET", Name: IAAS_ALARM_STATUS_DETAIL},
-	//{Path: "/v2/iaas/alarm/status/:id", Method: "PUT", Name: IAAS_ALARM_STATUS_UPDATE},
-	//{Path: "/v2/iaas/alarm/status/:resolveStatus", Method: "GET", Name: IAAS_ALARM_STATUS_RESOLVE},
+	{Path: "/v2/iaas/alarm/statuses", Method: "GET", Name: IAAS_ALARM_STATUS_LIST},
+	{Path: "/v2/iaas/alarm/status/count", Method: "GET", Name: IAAS_ALARM_STATUS_COUNT},
+	{Path: "/v2/iaas/alarm/status/:id", Method: "GET", Name: IAAS_ALARM_STATUS_DETAIL},
+	{Path: "/v2/iaas/alarm/status/:id", Method: "PUT", Name: IAAS_ALARM_STATUS_UPDATE},
+	{Path: "/v2/iaas/alarm/status/:resolveStatus", Method: "GET", Name: IAAS_ALARM_STATUS_RESOLVE},
 
 	//{Path: "/v2/iaas/alarm/action", Method: "POST", Name: IAAS_ALARM_ACTION_CREATE},
 	//{Path: "/v2/iaas/alarm/action/:actionId", Method: "PATCH", Name: IAAS_ALARM_ACTION_UPDATE},
 	//{Path: "/v2/iaas/alarm/action/:actionId", Method: "DELETE", Name: IAAS_ALARM_ACTION_DELETE},
 
-	//{Path: "/v2/iaas/alarm/statistics", Method: "GET", Name: IAAS_ALARM_STATISTICS},
-	//{Path: "/v2/iaas/alarm/statistics/graph/total", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_TOTAL},
-	//{Path: "/v2/iaas/alarm/statistics/graph/service", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_SERVICE},
-	//{Path: "/v2/iaas/alarm/statistics/graph/matrix", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_MATRIX},
+	{Path: "/v2/iaas/alarm/statistics", Method: "GET", Name: IAAS_ALARM_STATISTICS},
+	{Path: "/v2/iaas/alarm/statistics/graph/total", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_TOTAL},
+	{Path: "/v2/iaas/alarm/statistics/graph/service", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_SERVICE},
+	{Path: "/v2/iaas/alarm/statistics/graph/matrix", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_MATRIX},
 
 	//{Path: "/v2/iaas/alarm/container/deploy", Method: "GET", Name: IAAS_ALARM_CONTAINER_DEPLOY},
 	//{Path: "/v2/iaas/alarm/disk/io/:origin", Method: "GET", Name: IAAS_ALARM_DISK_IO_LIST},
@@ -555,4 +556,6 @@ var IaasRoutes = rata.Routes{
 	//TODO
 	{Path: "/v2/iaas/hyper/statistics", Method: "GET", Name: IAAS_GET_HYPER_STATISTICS},
 	{Path: "/v2/iaas/server/list", Method: "GET", Name: IAAS_GET_SERVER_LIST},
+	{Path: "/v2/iaas/project/list", Method: "GET", Name: IAAS_GET_PROJECT_LIST},
+
 }

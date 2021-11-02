@@ -53,9 +53,10 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	//definitionController := iaasContoller.NewAlarmDefinitionController(monsClient, iaasInfluxClient)
 	//stautsController := iaasContoller.NewAlarmStatusController(monsClient, iaasInfluxClient, iaasTxn)
 	logController := iaasContoller.NewLogController(openstackProvider, iaasInfluxClient, iaasElasticClient)
-	//alarmController := iaasContoller.GetAlarmController(dbConn)
-	//alarmPolicyController := iaasContoller.GetAlarmPolicyController(dbConn)
+
 	openstackController := iaasContoller.NewOpenstackController(openstackProvider, iaasInfluxClient)
+	iaasAlarmController := iaasContoller.GetAlarmController(paasTxn)
+	iaasAlarmPolicyController := iaasContoller.GetAlarmPolicyController(paasTxn)
 
 	var iaasActions rata.Handlers
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
@@ -101,17 +102,34 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			// TODO
 			routes.IAAS_GET_HYPER_STATISTICS : route(openstackController.GetHypervisorStatistics),
 			routes.IAAS_GET_SERVER_LIST : route(openstackController.GetServerList),
+			routes.IAAS_GET_PROJECT_LIST : route(openstackController.GetProjectList),
 
 			//routes..IAAS_ALARM_NOTIFICATION_LIST:   route(notificationController.GetAlarmNotificationList),
 			//routes..IAAS_ALARM_NOTIFICATION_CREATE: route(notificationController.CreateAlarmNotification),
 			//routes..IAAS_ALARM_NOTIFICATION_UPDATE: route(notificationController.UpdateAlarmNotification),
 			//routes..IAAS_ALARM_NOTIFICATION_DELETE: route(notificationController.DeleteAlarmNotification),
 
-			//routes.IAAS_ALARM_POLICY_LIST:   route(definitionController.GetAlarmDefinitionList),
-			//routes.IAAS_ALARM_POLICY:        route(definitionController.GetAlarmDefinition),
-			//routes.IAAS_ALARM_POLICY_CREATE: route(definitionController.CreateAlarmDefinition),
-			//routes.IAAS_ALARM_POLICY_UPDATE: route(definitionController.UpdateAlarmDefinition),
-			//routes.IAAS_ALARM_POLICY_DELETE: route(definitionController.DeleteAlarmDefinition),
+			routes.IAAS_ALARM_POLICY_LIST:   route(iaasAlarmPolicyController.GetAlarmPolicyList),
+			routes.IAAS_ALARM_POLICY_UPDATE: route(iaasAlarmPolicyController.UpdateAlarmPolicyList),
+
+			routes.IAAS_ALARM_SNS_CHANNEL_LIST:   route(iaasAlarmPolicyController.GetAlarmSnsChannelList),
+			routes.IAAS_ALARM_SNS_CHANNEL_CREATE: route(iaasAlarmPolicyController.CreateAlarmSnsChannel),
+			routes.IAAS_ALARM_SNS_CHANNEL_DELETE: route(iaasAlarmPolicyController.DeleteAlarmSnsChannel),
+			routes.IAAS_ALARM_SNS_CHANNEL_UPDATE: route(iaasAlarmPolicyController.UpdateAlarmSnsChannel),  // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
+
+			routes.IAAS_ALARM_STATUS_LIST:    route(iaasAlarmController.GetAlarmList),
+			routes.IAAS_ALARM_STATUS_COUNT:   route(iaasAlarmController.GetAlarmListCount),
+			routes.IAAS_ALARM_STATUS_RESOLVE: route(iaasAlarmController.GetAlarmResolveStatus),
+			routes.IAAS_ALARM_STATUS_DETAIL:  route(iaasAlarmController.GetAlarmDetail),
+			routes.IAAS_ALARM_STATUS_UPDATE:  route(iaasAlarmController.UpdateAlarm),
+			routes.IAAS_ALARM_ACTION_CREATE:  route(iaasAlarmController.CreateAlarmAction),
+			routes.IAAS_ALARM_ACTION_UPDATE:  route(iaasAlarmController.UpdateAlarmAction),
+			routes.IAAS_ALARM_ACTION_DELETE:  route(iaasAlarmController.DeleteAlarmAction),
+
+			routes.IAAS_ALARM_STATISTICS:               route(iaasAlarmController.GetAlarmStat),
+			routes.IAAS_ALARM_STATISTICS_GRAPH_TOTAL:   route(iaasAlarmController.GetAlarmStatGraphTotal),
+			routes.IAAS_ALARM_STATISTICS_GRAPH_SERVICE: route(iaasAlarmController.GetAlarmStatGraphService),
+			routes.IAAS_ALARM_STATISTICS_GRAPH_MATRIX:  route(iaasAlarmController.GetAlarmStatGraphMatrix),
 
 			//routes.IAAS_ALARM_STATUS_LIST:  route(stautsController.GetAlarmStatusList),
 			//routes.IAAS_ALARM_STATUS:       route(stautsController.GetAlarmStatus),

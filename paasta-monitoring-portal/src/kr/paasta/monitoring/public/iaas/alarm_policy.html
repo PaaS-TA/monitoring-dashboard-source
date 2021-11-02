@@ -281,6 +281,16 @@
 				flag : true,
 
 				init() {
+
+					document.querySelector('.outBtn strong').innerHTML = sessionStorage.getItem('user');
+					document.querySelector('.outBtn span').innerHTML = sessionStorage.getItem('mail');
+
+					// logout 이벤트
+					document.querySelector('.logout').addEventListener('click', (e) => {
+						sessionStorage.clear();
+						document.location.href = 'login.html';
+					}, false);
+
 					// Alarm Count
 					fnComm.alarmCount('iaas');
 					
@@ -545,7 +555,7 @@
 				},
 			}
 
-			//alarm.init();
+			alarm.init();
 		};
 	</script>
 </html>

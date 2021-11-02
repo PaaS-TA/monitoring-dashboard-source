@@ -21,9 +21,11 @@ func NewOpenstackController(openstackProvider model.OpenstackProvider, influxCli
 	}
 }
 
-
+/**
+	하이퍼바이저 통계 데이터 조회
+		- 화면 : public/index.html
+ */
 func (osService *OpenstackController) GetHypervisorStatistics(w http.ResponseWriter, r *http.Request) {
-
 	provider, userName, err := utils.GetOpenstackProvider(r)
 
 	result, err := service.GetOpenstackService(osService.OpenstackProvider, provider, osService.influxClient).GetHypervisorStatistics(userName)
@@ -36,7 +38,35 @@ func (osService *OpenstackController) GetHypervisorStatistics(w http.ResponseWri
 	}
 }
 
-func (service *OpenstackController) GetServerList(w http.ResponseWriter, r *http.Request) {
+func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *http.Request) {
+	provider, _, err := utils.GetOpenstackProvider(r)
+
+	serverParams := make(map[string]interface{}, 0)
+	serverParams["allTenants"] = true
+	result, err := service.GetOpenstackService(osService.OpenstackProvider, provider, osService.influxClient).GetServerList(serverParams)
+
+	if err != nil {
+		model.MonitLogger.Error("GetServerList error :", err)
+		utils.ErrRenderJsonResponse(err, w)
+	} else {
+		utils.RenderJsonResponse(result, w)
+	}
+}
+
+
+func (osService *OpenstackController) GetProjectList(w http.ResponseWriter, r *http.Request) {
+	provider, _, err := utils.GetOpenstackProvider(r)
+
+	serverParams := make(map[string]interface{}, 0)
+	result, err := service.GetOpenstackService(osService.OpenstackProvider, provider, osService.influxClient).GetProjectList(serverParams)
+
+	if err != nil {
+		model.MonitLogger.Error("GetProjectList error :", err)
+		utils.ErrRenderJsonResponse(err, w)
+	} else {
+		utils.RenderJsonResponse(result, w)
+	}
 
 }
+
 
