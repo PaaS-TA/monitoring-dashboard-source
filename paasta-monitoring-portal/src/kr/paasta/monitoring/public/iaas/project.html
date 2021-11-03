@@ -349,7 +349,7 @@
 				fnComm.removeHtml(target);
 
 				data.forEach((value, idx) => {
-					var html = `<div class="true project-item" onclick="onClickProjectItem('${value.id}')">
+					var html = `<div class="${value.enabled} projectItem" onclick="onClickProjectItem('${value.id}', this)">
 							<div>
 								<strong>${value.name}</strong>
 							</div>
@@ -359,18 +359,18 @@
 									<dd>999</dd>
 								</dl>
 								<dl>
-									<dt>Menory(GB)</dt>
+									<dt>Memory(GB)</dt>
 									<dd>999/999</dd>
 								</dl>
 							</div>
 							<div>
 								<dl>
-									<dt>Instande</dt>
+									<dt>Instance</dt>
 									<dd>999/999</dd>
 								</dl>
 								<dl>
 									<dt>Floating IP</dt>
-									<dd>999/999</dd>
+									<dd>${value.floatingIps}</dd>
 								</dl>
 							</div>
 							<div>
@@ -696,8 +696,10 @@
 		}
 		// 프로젝트 항목 클릭 이벤트
 
-		function onClickProjectItem(id) {
-			console.log(id)
+		function onClickProjectItem(id, target) {
+			console.log(id);
+			console.log(target);
+
 
 			var params = {
 				tenantId : id
@@ -705,7 +707,8 @@
 
 			// TODO VM 인스턴스 리스트 조회
 			fnComm.loadData('GET', fnComm.url + 'iaas/server/list?tenantId='+id, project.getInstanceList);
-
+			Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
+			target.classList.add("on");
 		}
 
 		window.onload = () => {
