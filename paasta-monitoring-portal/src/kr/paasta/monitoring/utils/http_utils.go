@@ -61,6 +61,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 
 						provider1, _, err := GetOpenstackProvider(r)
 						if err != nil || provider1 == nil {
+							Logger.Debug(err)
 							errMessage := model.ErrMessage{"Message": "UnAuthrized"}
 							RenderJsonUnAuthResponse(errMessage, http.StatusUnauthorized, w)
 						} else {

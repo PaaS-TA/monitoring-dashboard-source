@@ -317,36 +317,39 @@
 	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
 	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
 	<script type="text/javascript">
-		window.onload = () => {
-			const project = {
-				id : '',
-				data : [],
 
-				init() {
-					// Alarm Count
-					//fnComm.alarmCount('iaas');
-					
-					// VM
-					fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workloadsStatus', project.workloadsStatus);
-					
-					// Workloads Container Summary 데이터로드
-					//fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
 
-					// TODO VM 인스턴스 리스트 조회
-					fnComm.loadData('GET', fnComm.url + 'iaas/server/list', project.getInstanceList);
+		const project = {
+			id : '',
+			data : [],
 
-					// TODO Openstack 프로젝트 조회
-					fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
-				},
+			init() {
+				// Alarm Count
+				//fnComm.alarmCount('iaas');
 
-				getProjectList(data) {
-					console.log(data);
-					var target = document.getElementById('projectList');
+				// Workloads Container Summary 데이터로드
+				//fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
 
-					fnComm.removeHtml(target);
+				// TODO VM 인스턴스 리스트 조회
+				fnComm.loadData('GET', fnComm.url + 'iaas/server/list', project.getInstanceList);
 
-					data.forEach((value, idx) => {
-						var html = `<div class="true">
+				// TODO Openstack 프로젝트 조회
+				fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
+
+				// 만수
+
+			},
+
+
+
+			// 2021.11.03 - 프로젝트 목록 콜백함수
+			getProjectList(data) {
+				console.log(data);
+				var target = document.getElementById('projectList');
+				fnComm.removeHtml(target);
+
+				data.forEach((value, idx) => {
+					var html = `<div class="true project-item" onclick="onClickProjectItem('${value.id}')">
 							<div>
 								<strong>${value.name}</strong>
 							</div>
@@ -388,17 +391,17 @@
 							</div>
 						</div>`
 
-						fnComm.appendHtml(target, html, 'div');
-					});
+					fnComm.appendHtml(target, html, 'div');
+				});
 
-				},
+			},
 
-				getInstanceList(data) {
-					var target = document.getElementById('instanceSummary');
+			getInstanceList(data) {
+				var target = document.getElementById('instanceSummary');
 
-					fnComm.removeHtml(target);
-					data.forEach((value, idx)=>{
-						var html = `<div class="normal">
+				fnComm.removeHtml(target);
+				data.forEach((value, idx)=>{
+					var html = `<div class="normal">
 							<div>
 								<strong><a href="javascript:void(0);">${value.name}</a></strong>
 							</div>
@@ -429,119 +432,119 @@
 							</div>
 						</div>`
 
-						fnComm.appendHtml(target, html, 'div');
-					});
-				},
+					fnComm.appendHtml(target, html, 'div');
+				});
+			},
 
-				gaugeList(data){
-					// pod Usage 차트
-					fnComm.gaugeChart(data.PodUsage, 'Pod Usage', '#podUsage');
+			gaugeList(data){
+				// pod Usage 차트
+				fnComm.gaugeChart(data.PodUsage, 'Pod Usage', '#podUsage');
 
-					// CPU Usage 차트
-					fnComm.gaugeChart(data.CpuUsage, 'Cpu Usage', '#cpuUsage');
+				// CPU Usage 차트
+				fnComm.gaugeChart(data.CpuUsage, 'Cpu Usage', '#cpuUsage');
 
-					// Memory Usage 차트
-					fnComm.gaugeChart(data.MemoryUsage, 'Memory Usage', '#memoryUsage');
+				// Memory Usage 차트
+				fnComm.gaugeChart(data.MemoryUsage, 'Memory Usage', '#memoryUsage');
 
-					// Disk Usage 차트
-					fnComm.gaugeChart(data.DiskUsage, 'Disk Usage', '#diskUsage');
+				// Disk Usage 차트
+				fnComm.gaugeChart(data.DiskUsage, 'Disk Usage', '#diskUsage');
 
-				},
+			},
 
-				workloadsStatus(data) {
-					// Alerts: "7"
-					// Nodes: "3"
-					// PodRestart: "0"
-					// RunningContainer: "55"
-					// RunningPod: "30"
+			workloadsStatus(data) {
+				// Alerts: "7"
+				// Nodes: "3"
+				// PodRestart: "0"
+				// RunningContainer: "55"
+				// RunningPod: "30"
 
-					
-					data.forEach(value => {
-						var target ='';
-						let arr = [];
 
-						switch(value.Name) {
-							case 'Deployment':
-								target = '#deployment'
-								arr = [
-									['Total', 0, value.Total, 0, 0, 0, 0],
-									['Available', 0, 0, value.Available, 0, 0, 0],
-									['Updated', 0, 0, 0, value.Updated, 0, 0],
-									['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
-								];
+				data.forEach(value => {
+					var target ='';
+					let arr = [];
+
+					switch(value.Name) {
+						case 'Deployment':
+							target = '#deployment'
+							arr = [
+								['Total', 0, value.Total, 0, 0, 0, 0],
+								['Available', 0, 0, value.Available, 0, 0, 0],
+								['Updated', 0, 0, 0, value.Updated, 0, 0],
+								['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
+							];
 							break;
-							case 'DaemonSet':
-								target = '#daemonSet'
-								arr = [
-									['Ready', 0, value.Ready, 0, 0, 0, 0],
-									['Available', 0, 0, value.Available, 0, 0, 0],
-									['Misscheduled', 0, 0, 0, value.Misscheduled, 0, 0],
-									['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
-								];
+						case 'DaemonSet':
+							target = '#daemonSet'
+							arr = [
+								['Ready', 0, value.Ready, 0, 0, 0, 0],
+								['Available', 0, 0, value.Available, 0, 0, 0],
+								['Misscheduled', 0, 0, 0, value.Misscheduled, 0, 0],
+								['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
+							];
 							break;
-							case 'Stateful':
-								target = '#stateful'
-								arr = [
-									['Total', 0, value.Total, 0, 0, 0, 0],
-									['Ready', 0, 0, value.Ready, 0, 0, 0],
-									['Updated', 0, 0, 0, value.Updated, 0, 0],
-									['Revision', 0, 0, 0, 0, value.Revision, 0]
-								];
+						case 'Stateful':
+							target = '#stateful'
+							arr = [
+								['Total', 0, value.Total, 0, 0, 0, 0],
+								['Ready', 0, 0, value.Ready, 0, 0, 0],
+								['Updated', 0, 0, 0, value.Updated, 0, 0],
+								['Revision', 0, 0, 0, 0, value.Revision, 0]
+							];
 							break;
-							case 'Pod':
-								target = '#pod'
-								arr = [
-									['Ready', 0, value.Ready, 0, 0, 0, 0],
-									['Running', 0, 0, value.Running, 0, 0, 0],
-									['Restart', 0, 0, 0, value.Restart, 0, 0],
-									['terminated', 0, 0, 0, 0, value.terminated, 0]
-								];
+						case 'Pod':
+							target = '#pod'
+							arr = [
+								['Ready', 0, value.Ready, 0, 0, 0, 0],
+								['Running', 0, 0, value.Running, 0, 0, 0],
+								['Restart', 0, 0, 0, value.Restart, 0, 0],
+								['terminated', 0, 0, 0, 0, value.terminated, 0]
+							];
 							break;
-						};
+					};
 
-						project.workloadsChart(target, arr)
-					});
-				},
+					project.workloadsChart(target, arr)
+				});
+			},
 
-				workloadsChart(target, arr){
-					var chart = c3.generate({
-						bindto: target,
-						data: {
-							columns: arr,
-							labels: true,
-							type: 'spline'
+			workloadsChart(target, arr){
+				var chart = c3.generate({
+					bindto: target,
+					data: {
+						columns: arr,
+						labels: true,
+						type: 'spline'
+					},
+					color: {
+						pattern: ['#43be42', '#f6a200', '#f4256c', '#c048c8', '#ccc']
+					},
+					axis: {
+						x: {
+							show: false
 						},
-						color: {
-							pattern: ['#43be42', '#f6a200', '#f4256c', '#c048c8', '#ccc']
-						},
-						axis: {
-							x: {
-								show: false
-							},
-							y: {
-								show: false
-							}
-						},
-					});
-				},
+						y: {
+							show: false
+						}
+					},
+				});
+			},
 
-				workloadsSummary(data) {
-					// Data Example //////////////////////////////////////////////////////
-					// Cpu: "59447.14"
-					// CpuUsage: "0.02"
-					// Disk: "74.7"
-					// DiskUsage: "0.02"
-					// Memory: "353.1"
-					// MemoryUsage: "9.54"
-					// Name: "deployment"
-					//////////////////////////////////////////////////////////////////////
-					
-					var target = document.getElementById('instanceSummary');
-					
-					fnComm.removeHtml(target);
+			workloadsSummary(data) {
+				// Data Example //////////////////////////////////////////////////////
+				// Cpu: "59447.14"
+				// CpuUsage: "0.02"
+				// Disk: "74.7"
+				// DiskUsage: "0.02"
+				// Memory: "353.1"
+				// MemoryUsage: "9.54"
+				// Name: "deployment"
+				//////////////////////////////////////////////////////////////////////
 
-					data.forEach((value, idx)=>{
-						var html = `<div class="normal">
+				var target = document.getElementById('instanceSummary');
+
+				fnComm.removeHtml(target);
+
+				data.forEach((value, idx)=>{
+					var html = `<div class="normal">
 							<div>
 								<strong><a href="javascript:void(0);">${value.Name}</a></strong>
 							</div>
@@ -572,68 +575,68 @@
 							</div>
 						</div>`
 
-						fnComm.appendHtml(target, html, 'div');
-					});
+					fnComm.appendHtml(target, html, 'div');
+				});
 
-					// Application Event (Chart)
-					var elm = document.querySelectorAll('.summaryBtn');
-					for(var i=0 ; i<elm.length ; i++){
-						// Worker Node Info Event
-						elm[i].querySelector('.chart').addEventListener('click', (e) => {
-							if(e.target.nodeName == 'A'){
-								var elmName = e.target.parentNode.getAttribute('data-name');
-							} else {
-								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
-							};
-							
-							document.querySelector('.chartTitle').innerHTML = elmName;
+				// Application Event (Chart)
+				var elm = document.querySelectorAll('.summaryBtn');
+				for(var i=0 ; i<elm.length ; i++){
+					// Worker Node Info Event
+					elm[i].querySelector('.chart').addEventListener('click', (e) => {
+						if(e.target.nodeName == 'A'){
+							var elmName = e.target.parentNode.getAttribute('data-name');
+						} else {
+							var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
+						};
 
-							// Workloads Detail Chart 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/workloadsGraph?WorkloadsName=${elmName}`, project.nodeInfo);
-						
-							// Workloads Container list 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?WorkloadsName=${elmName}`, project.containerlist);
-						}, false);
-					};
-						
-					// Chart Close Event
-					document.querySelector('.chartClosed').addEventListener('click', (e) => {
-						document.getElementById('chartWrap').classList.toggle('on', false);
-						document.querySelector('.logWrap').classList.toggle('on', false);
+						document.querySelector('.chartTitle').innerHTML = elmName;
+
+						// Workloads Detail Chart 데이터로드
+						fnComm.loadData('GET', fnComm.url + `caas/monitoring/workloadsGraph?WorkloadsName=${elmName}`, project.nodeInfo);
+
+						// Workloads Container list 데이터로드
+						fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?WorkloadsName=${elmName}`, project.containerlist);
 					}, false);
-						
-					// LOG Close Event
-					document.querySelector('.logClosed').addEventListener('click', (e) => {
-						document.querySelector('.logWrap').classList.toggle('on', false);
-					}, false);
-				},
+				};
 
-				nodeInfo(data){
-					document.getElementById('chartWrap').classList.toggle('on', true);
+				// Chart Close Event
+				document.querySelector('.chartClosed').addEventListener('click', (e) => {
+					document.getElementById('chartWrap').classList.toggle('on', false);
+					document.querySelector('.logWrap').classList.toggle('on', false);
+				}, false);
 
-					setTimeout(() => {
-						fnComm.detailChart(data, '#nodeChart');
-					},500);
-				},
+				// LOG Close Event
+				document.querySelector('.logClosed').addEventListener('click', (e) => {
+					document.querySelector('.logWrap').classList.toggle('on', false);
+				}, false);
+			},
 
-				containerlist(data) {
-					console.log(data);
-					project.data = data;
-					// ContainerName: "fluentd-gcp-scaler"
-					// Cpu: "22522.09"
-					// CpuUsage: "0.66"
-					// Disk: "23.5"
-					// Memory: "82.8"
-					// MemoryUsage: "2.24"
-					// NameSpace: "kube-system"
-					// PodName: "fluentd-gcp-scaler-7b895cbc89-rzqbq"
-					
-					var target = document.getElementById('containerlist');
-					
-					fnComm.removeHtml(target);
+			nodeInfo(data){
+				document.getElementById('chartWrap').classList.toggle('on', true);
 
-					data.forEach(value => {
-						var html = `<tr>
+				setTimeout(() => {
+					fnComm.detailChart(data, '#nodeChart');
+				},500);
+			},
+
+			containerlist(data) {
+				console.log(data);
+				project.data = data;
+				// ContainerName: "fluentd-gcp-scaler"
+				// Cpu: "22522.09"
+				// CpuUsage: "0.66"
+				// Disk: "23.5"
+				// Memory: "82.8"
+				// MemoryUsage: "2.24"
+				// NameSpace: "kube-system"
+				// PodName: "fluentd-gcp-scaler-7b895cbc89-rzqbq"
+
+				var target = document.getElementById('containerlist');
+
+				fnComm.removeHtml(target);
+
+				data.forEach(value => {
+					var html = `<tr>
 							<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
 							<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
 							<td class="left" title="${value.PodName}">${value.PodName}</td>
@@ -643,54 +646,69 @@
 							<td>${value.CpuUsage}</td>
 							<td>${value.MemoryUsage}</td>
 						</tr>`;
-						
-						fnComm.appendHtml(target, html, 'tbody');
-					});
 
-					// Container Event (Log)
-					var elm = document.querySelectorAll('.contName');
-					for(var i=0 ; i<elm.length ; i++){
-						// Pod Node Info Event
-						elm[i].addEventListener('click', (e) => {
-							var containerName = e.target.parentNode.getAttribute('title');
-							var nameSpace = e.target.parentNode.getAttribute('data-sp');
-							var podName = e.target.parentNode.getAttribute('data-po');
-						
-							// Container Chart 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerChart);
-							
-							// Container Log 데이터로드
-							fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerLog);
+					fnComm.appendHtml(target, html, 'tbody');
+				});
 
-						}, false);
-					};
-						
-					// Chart Close Event
-					document.querySelector('.logClosed').addEventListener('click', (e) => {
-						document.querySelector('.logWrap').classList.toggle('on', false);
+				// Container Event (Log)
+				var elm = document.querySelectorAll('.contName');
+				for(var i=0 ; i<elm.length ; i++){
+					// Pod Node Info Event
+					elm[i].addEventListener('click', (e) => {
+						var containerName = e.target.parentNode.getAttribute('title');
+						var nameSpace = e.target.parentNode.getAttribute('data-sp');
+						var podName = e.target.parentNode.getAttribute('data-po');
+
+						// Container Chart 데이터로드
+						fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerChart);
+
+						// Container Log 데이터로드
+						fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerLog);
+
 					}, false);
-				},
+				};
 
-				containerChart(data) {
-					document.querySelector('.logWrap').classList.toggle('on', true);
+				// Chart Close Event
+				document.querySelector('.logClosed').addEventListener('click', (e) => {
+					document.querySelector('.logWrap').classList.toggle('on', false);
+				}, false);
+			},
 
-					setTimeout(() => {
-						fnComm.detailChart(data, '#logChart');
-					},500);
-				},
+			containerChart(data) {
+				document.querySelector('.logWrap').classList.toggle('on', true);
 
-				containerLog(data) {
-					document.getElementById('logText').innerHTML = data;
-				},
+				setTimeout(() => {
+					fnComm.detailChart(data, '#logChart');
+				},500);
+			},
 
-				sortList() {
-					project.data.sort(function(a,b) {
-						return parseFloat(a[sortData]) - parseFloat(b[sortData]);
-					});
+			containerLog(data) {
+				document.getElementById('logText').innerHTML = data;
+			},
 
-					project.containerlist(project.data);
-				},
-			}
+			sortList() {
+				project.data.sort(function(a,b) {
+					return parseFloat(a[sortData]) - parseFloat(b[sortData]);
+				});
+
+				project.containerlist(project.data);
+			},
+		}
+		// 프로젝트 항목 클릭 이벤트
+
+		function onClickProjectItem(id) {
+			console.log(id)
+
+			var params = {
+				tenantId : id
+			};
+
+			// TODO VM 인스턴스 리스트 조회
+			fnComm.loadData('GET', fnComm.url + 'iaas/server/list?tenantId='+id, project.getInstanceList);
+
+		}
+
+		window.onload = () => {
 
 			project.init();
 		};

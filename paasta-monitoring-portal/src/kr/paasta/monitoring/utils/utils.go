@@ -194,13 +194,11 @@ func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient
 	}
 
 	//Provider is the top-level client that all of your OpenStack services
-
 	providerClient, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, "", err
 	}
-	fmt.Println("GetOpenstackProvider providerClient.TokenID :::", providerClient.TokenID)
 
 	///////////////////////////////////////////////////////////////////////////
 	/*

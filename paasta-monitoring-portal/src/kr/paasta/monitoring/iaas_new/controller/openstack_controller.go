@@ -2,7 +2,6 @@ package controller
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"
-
 	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/iaas_new/service"
 	"kr/paasta/monitoring/utils"
@@ -39,10 +38,17 @@ func (osService *OpenstackController) GetHypervisorStatistics(w http.ResponseWri
 }
 
 func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *http.Request) {
+
+	tenantIdParam := r.URL.Query().Get("tenantId")
+
+
 	provider, _, err := utils.GetOpenstackProvider(r)
 
 	serverParams := make(map[string]interface{}, 0)
 	serverParams["allTenants"] = true
+	if tenantIdParam != "" {
+		serverParams["tenantId"] = tenantIdParam
+	}
 	result, err := service.GetOpenstackService(osService.OpenstackProvider, provider, osService.influxClient).GetServerList(serverParams)
 
 	if err != nil {
@@ -66,6 +72,8 @@ func (osService *OpenstackController) GetProjectList(w http.ResponseWriter, r *h
 	} else {
 		utils.RenderJsonResponse(result, w)
 	}
+
+
 
 }
 

@@ -77,8 +77,6 @@ func (n *LoginService) Login(req commonModel.UserInfo, reqCsrfToken string, cfCo
 	if strings.Contains(n.sysType, utils.SYS_TYPE_IAAS) || strings.Contains(n.sysType, utils.SYS_TYPE_ALL) {
 		if result.IaasUserUseYn == "Y" {
 
-			utils.Logger.Debug(result.IaasUserId)
-			utils.Logger.Debug(result.IaasUserPw)
 			n.openstackProvider.Username = result.IaasUserId
 			n.openstackProvider.Password = result.IaasUserPw
 
