@@ -278,6 +278,7 @@ const (
 	IAAS_GET_HYPER_STATISTICS = "IAAS_GET_HYPER_STATISTICS"
 	IAAS_GET_SERVER_LIST = "IAAS_GET_SERVER_LIST"
 	IAAS_GET_PROJECT_LIST = "IAAS_GET_PROJECT_LIST"
+	IAAS_GET_INSTANCE_USAGE_LIST = "IAAS_GET_INSTANCE_USAGE_LIST"
 
 
 )
@@ -557,5 +558,6 @@ var IaasRoutes = rata.Routes{
 	{Path: "/v2/iaas/hyper/statistics", Method: "GET", Name: IAAS_GET_HYPER_STATISTICS},
 	{Path: "/v2/iaas/server/list", Method: "GET", Name: IAAS_GET_SERVER_LIST},
 	{Path: "/v2/iaas/project/list", Method: "GET", Name: IAAS_GET_PROJECT_LIST},
+	{Path: "/v2/iaas/instance/usage/list", Method: "GET", Name: IAAS_GET_INSTANCE_USAGE_LIST},
 
 }

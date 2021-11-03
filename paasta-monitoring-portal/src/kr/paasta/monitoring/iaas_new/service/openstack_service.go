@@ -8,8 +8,8 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
-	_"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
-	"github.com/gophercloud/gophercloud/pagination"
+	_ "github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
+	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/groups"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
@@ -112,13 +112,17 @@ func (service *OpenstackService) GetServerList(params map[string]interface{}) ([
 
 }
 
+
 func (service *OpenstackService) GetProjectList(params map[string]interface{}) ([]interface{}, error) {
 	client := utils.GetKeystoneClient(service.Provider)
 	networkClient := utils.GetNetworkClient(service.Provider, service.OpenstackProvider.Region)
 
+
 	var listOpts projects.ListOpts
 	result := projects.List(client, listOpts)
 	resultPages, err := result.AllPages()
+	fmt.Println(resultPages)
+
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -145,6 +149,24 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 		}
 		itemMap["floatingIps"] = len(allFloatingIPs)
 
+		var secGroupListOpts groups.ListOpts
+		secGroupListOpts.ProjectID = projectId
+		secGroupPages, err := groups.List(networkClient, secGroupListOpts).AllPages()
+		if err != nil {
+			panic(err)
+		}
+
+		secGroups, err := groups.ExtractGroups(secGroupPages)
+		if err != nil {
+			panic(err)
+		}
+		itemMap["secGroups"] = len(secGroups)
+
+
+
+		service.retrieveSingleProjectUsage(projectId)
+
+
 		/*
 		var listOpts servers.ListOpts
 		listOpts.TenantID = projectId
@@ -158,32 +180,37 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 		 */
 	}
 
-	service.retrieveProjectUsage()
+
 
 	return list, err
 }
 
 
-func (service *OpenstackService) retrieveProjectUsage() {
+func (service *OpenstackService) RetrieveTenantUsage() []usage.TenantUsage {
 	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
 
 	allTenantsOpts := usage.AllTenantsOpts{
 		Detailed: true,
 	}
 
-	err := usage.AllTenants(computeClient, allTenantsOpts).EachPage(func(page pagination.Page) (bool, error) {
-		allTenantsUsage, err := usage.ExtractAllTenants(page)
-		if err != nil {
-			return false, err
-		}
+	usagePages, _ := usage.AllTenants(computeClient, allTenantsOpts).AllPages()
+	fmt.Println(usagePages)
+	usageList, _ := usage.ExtractAllTenants(usagePages)
 
-		fmt.Printf("%+v\n", allTenantsUsage)
 
-		return true, nil
-	})
 
-	if err != nil {
-		panic(err)
+	return usageList
+}
+
+func (service *OpenstackService) retrieveSingleProjectUsage(projectId string) {
+	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
+	//computeClient.Microversion = "2.40"
+	opts := usage.SingleTenantOpts{
+
 	}
+	fmt.Println("projectId : " + projectId)
+	usagePages, _ := usage.SingleTenant(computeClient, projectId, opts).AllPages()
+	usageList, _ := usage.ExtractSingleTenant(usagePages)
+	fmt.Println(usageList)
 
 }

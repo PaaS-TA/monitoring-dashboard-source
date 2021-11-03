@@ -60,6 +60,28 @@ func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *ht
 }
 
 
+func (osService *OpenstackController) GetProjectUsage(w http.ResponseWriter, r *http.Request) {
+	tenantIdParam := r.URL.Query().Get("tenantId")
+
+	provider, _, err := utils.GetOpenstackProvider(r)
+
+	serverParams := make(map[string]interface{}, 0)
+	serverParams["allTenants"] = true
+	if tenantIdParam != "" {
+		serverParams["tenantId"] = tenantIdParam
+	}
+	result := service.GetOpenstackService(osService.OpenstackProvider, provider, osService.influxClient).RetrieveTenantUsage()
+
+	if err != nil {
+		model.MonitLogger.Error("GetServerList error :", err)
+		utils.ErrRenderJsonResponse(err, w)
+	} else {
+		utils.RenderJsonResponse(result, w)
+	}
+
+}
+
+
 func (osService *OpenstackController) GetProjectList(w http.ResponseWriter, r *http.Request) {
 	provider, _, err := utils.GetOpenstackProvider(r)
 

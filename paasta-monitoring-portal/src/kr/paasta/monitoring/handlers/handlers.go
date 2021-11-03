@@ -103,6 +103,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_GET_HYPER_STATISTICS : route(openstackController.GetHypervisorStatistics),
 			routes.IAAS_GET_SERVER_LIST : route(openstackController.GetServerList),
 			routes.IAAS_GET_PROJECT_LIST : route(openstackController.GetProjectList),
+			routes.IAAS_GET_INSTANCE_USAGE_LIST : route(openstackController.GetProjectUsage),
 
 			//routes..IAAS_ALARM_NOTIFICATION_LIST:   route(notificationController.GetAlarmNotificationList),
 			//routes..IAAS_ALARM_NOTIFICATION_CREATE: route(notificationController.CreateAlarmNotification),

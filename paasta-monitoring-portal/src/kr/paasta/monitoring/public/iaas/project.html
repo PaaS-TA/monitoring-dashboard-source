@@ -331,56 +331,83 @@
 				//fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
 
 				// TODO VM 인스턴스 리스트 조회
-				fnComm.loadData('GET', fnComm.url + 'iaas/server/list', project.getInstanceList);
+				//fnComm.loadData('GET', fnComm.url + 'iaas/server/list', project.getInstanceList);
 
-				// TODO Openstack 프로젝트 조회
+				// TODO Openstack 프로젝트 목록 조회
 				fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
 
-				// 만수
+				// TODO Openstack 프로젝트 및 인스턴스 usage 목록 조회
+				fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', project.getInstanceUsageList)
 
 			},
 
 
 
 			// 2021.11.03 - 프로젝트 목록 콜백함수
-			getProjectList(data) {
-				console.log(data);
+			getProjectList(projectList) {
+
 				var target = document.getElementById('projectList');
 				fnComm.removeHtml(target);
 
-				data.forEach((value, idx) => {
-					var html = `<div class="${value.enabled} projectItem" onclick="onClickProjectItem('${value.id}', this)">
+				fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', function(usageResult){
+					console.log(projectList);
+					console.log(usageResult);
+
+					usageResult.forEach((usage, idx) => {
+						// 프로젝트 정보 merge
+						projectList.forEach((project, idx) => {
+							if (project.id == usage.tenant_id) {
+								usage.enabled = project.enabled;
+								usage.project_name = project.name;
+								usage.floating_ips = project.floatingIps;
+								usage.security_groups = project.secGroups;
+							}
+						});
+						var vcpus = 0;
+						var memoryMb = 0;
+						var diskGb = 0;
+						usage.server_usages.forEach((server, idx) => {
+							vcpus += server.vcpus;
+							memoryMb += server.memory_mb;
+							diskGb += server.local_gb;
+						});
+
+						usage.vcpus = vcpus;
+						usage.memory_mb = memoryMb;
+						usage.local_gb = diskGb;
+
+						var html = `<div class="${usage.enabled} projectItem" onclick="onClickProjectItem('${usage.tenant_id}', this)">
 							<div>
-								<strong>${value.name}</strong>
+								<strong>${usage.project_name}</strong>
 							</div>
 							<div>
 								<dl>
 									<dt>VCPU</dt>
-									<dd>999</dd>
+									<dd>${usage.vcpus}</dd>
 								</dl>
 								<dl>
-									<dt>Memory(GB)</dt>
-									<dd>999/999</dd>
+									<dt>Memory(MB)</dt>
+									<dd>${usage.memory_mb}</dd>
 								</dl>
 							</div>
 							<div>
 								<dl>
 									<dt>Instance</dt>
-									<dd>999/999</dd>
+									<dd>${usage.server_usages.length}</dd>
 								</dl>
 								<dl>
 									<dt>Floating IP</dt>
-									<dd>${value.floatingIps}</dd>
+									<dd>${usage.floating_ips}</dd>
 								</dl>
 							</div>
 							<div>
 								<dl>
 									<dt>Security Group</dt>
-									<dd>999/999</dd>
+									<dd>${usage.security_groups}</dd>
 								</dl>
 								<dl>
-									<dt>Volumes</dt>
-									<dd>999/999</dd>
+									<dt>Volumes(GB)</dt>
+									<dd>${usage.local_gb}</dd>
 								</dl>
 							</div>
 							<div>
@@ -391,9 +418,11 @@
 							</div>
 						</div>`
 
-					fnComm.appendHtml(target, html, 'div');
-				});
+						fnComm.appendHtml(target, html, 'div');
 
+					});
+					project.data = usageResult;
+				});
 			},
 
 			getInstanceList(data) {
@@ -408,15 +437,15 @@
 							<div>
 								<dl class="color1" title="CPU">
 									<dt>C</dt>
-									<dd>${value.Cpu} ms</dd>
+									<dd>${value.vcpus} core</dd>
 								</dl>
 								<dl class="color2" title="Memory">
 									<dt>M</dt>
-									<dd>${value.Memory} MB</dd>
+									<dd>${value.memory_mb} MB</dd>
 								</dl>
 								<dl class="color3" title="Disk">
 									<dt>D</dt>
-									<dd>${value.Disk} GB</dd>
+									<dd>${value.local_gb} GB</dd>
 								</dl>
 								<dl>
 									<dt>CPU Usage</dt>
@@ -434,6 +463,10 @@
 
 					fnComm.appendHtml(target, html, 'div');
 				});
+			},
+
+			getInstanceUsageList(data) {
+				console.log(data);
 			},
 
 			gaugeList(data){
@@ -700,19 +733,19 @@
 			console.log(id);
 			console.log(target);
 
-
-			var params = {
-				tenantId : id
-			};
+			project.data.forEach((item, idx) => {
+				if (item.tenant_id == id) {
+					project.getInstanceList(item.server_usages);
+				}
+			});
 
 			// TODO VM 인스턴스 리스트 조회
-			fnComm.loadData('GET', fnComm.url + 'iaas/server/list?tenantId='+id, project.getInstanceList);
+			//fnComm.loadData('GET', fnComm.url + 'iaas/server/list?tenantId='+id, project.getInstanceList);
 			Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
 			target.classList.add("on");
 		}
 
 		window.onload = () => {
-
 			project.init();
 		};
 	</script>
