@@ -227,6 +227,32 @@ const fnComm = {
 		request.send();
 	},
 
+
+	requestAjax(method, url, callbackFunction, errCallback, list){
+		if(sessionStorage.getItem('token') == null){
+			document.location.href = '../login.html';
+		}
+		var request = new XMLHttpRequest();
+		request.open(method, url);
+		request.setRequestHeader('X-XSRF-TOKEN', sessionStorage.getItem('token'));
+
+		request.onreadystatechange = () => {
+			if (request.readyState === XMLHttpRequest.DONE){
+				if(request.status === 200 && request.responseText != ''){
+					callbackFunction(JSON.parse(request.responseText), list);
+				} else if(request.status === 401){
+					sessionStorage.clear();
+					document.location.href = '../login.html';
+				} else if (request.status === 500) {
+					errCallback(JSON.parse(request.responseText).message);
+					//fnComm.alertPopup('ERROR', JSON.parse(request.responseText).message);
+				};
+			};
+		};
+
+		request.send();
+	},
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// 데이터 저장 - saveData(method, url, data)
 	// (전송타입, url, 데이터)

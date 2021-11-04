@@ -332,14 +332,16 @@
 	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
 	<script type="text/javascript">
 
-		// Chart Close Event
+		// 차트 닫기 버튼을 누르면 C3 Chart 오브젝트들을 destroy 시킨다.
 		document.querySelector('.chartClosed').addEventListener('click', (e) => {
 			document.getElementById('chartWrap').classList.toggle('on', false);
 
-			chartObjectArr.forEach(chartObj => {
+			chartObjectArr.forEach((chartObj, idx) => {
+				chartObj.unload()
+				chartObj.flush();
 				chartObj.destroy();
-			})
-
+				chartObjectArr.splice(idx, 1);
+			});
 		}, false);
 
 		const project = {
@@ -350,18 +352,11 @@
 				// Alarm Count
 				//fnComm.alarmCount('iaas');
 
-				// Workloads Container Summary 데이터로드
-				//fnComm.loadData('GET', fnComm.url + 'caas/monitoring/workerloadsConainerSummary', workloads.workloadsSummary);
-
-				// TODO VM 인스턴스 리스트 조회
-				//fnComm.loadData('GET', fnComm.url + 'iaas/server/list', project.getInstanceList);
-
 				// TODO Openstack 프로젝트 목록 조회
 				fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
 
 				// TODO Openstack 프로젝트 및 인스턴스 usage 목록 조회
 				fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', project.getInstanceUsageList)
-
 			},
 
 
@@ -450,10 +445,13 @@
 
 			getInstanceList(data) {
 				var target = document.getElementById('instanceSummary');
-
 				fnComm.removeHtml(target);
+
+
+
 				data.forEach((value, idx)=>{
-					var html = `<div class="normal">
+					var state = value.state == "active" ? "up" : "down";
+					var html = `<div class="${state}">
 							<div>
 								<strong><a href="javascript:void(0);">${value.name}</a></strong>
 							</div>
@@ -498,22 +496,22 @@
 
 				setTimeout(() => {
 					// TODO CPU Usage 정보
-					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/cpu/usage`, renderChart, '#cpuUsageChart');
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/${instanceId}/cpu/usage`, renderChart, errorToCallChart, '#cpuUsageChart');
 
 					// CPU Load 정보
-					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/cpu/load/average`, renderChart, '#cpuLoadChart');
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/${instanceId}/cpu/load/average`, renderChart, errorToCallChart, '#cpuLoadChart');
 
 					// Memory Usage 정보
-					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/memory/usage`, renderChart, '#memoryUsageChart');
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/${instanceId}/memory/usage`, renderChart, errorToCallChart, '#memoryUsageChart');
 
 					// Disk Usage 정보
-					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/disk/usage`, renderChart, '#diskUsageChart');
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/${instanceId}/disk/usage`, renderChart, errorToCallChart, '#diskUsageChart');
 
 					// Disk IO 정보
-					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/disk/io/rate`, renderChart, '#diskIoChart');
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/${instanceId}/disk/io/rate`, renderChart, errorToCallChart, '#diskIoChart');
 
 					// Network IO Bytes 정보
-					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/network/io/bytes`, renderChart, '#networkByteChart');
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/${instanceId}/network/io/bytes`, renderChart, errorToCallChart, '#networkByteChart');
 
 					// Network IO Packets 정보
 					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/packets${fnComm.setTimer()}`, fnComm.detailChart, '#networkPacktesChart');
@@ -529,8 +527,12 @@
 			},
 		}
 
-		var chartObjectArr =[];
+		function errorToCallChart(message) {
+			if (document.getElementById("alertPop") == null)
+				fnComm.alertPopup('ERROR', message);
+		}
 
+		var chartObjectArr =[];   // C3 Chart 오브젝트 관리를 위한 배열
 		function renderChart(data, target) {
 			let cnt = 0;
 			let yPos = 9;
