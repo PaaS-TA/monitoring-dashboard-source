@@ -280,7 +280,12 @@ const (
 	IAAS_GET_PROJECT_LIST = "IAAS_GET_PROJECT_LIST"
 	IAAS_GET_INSTANCE_USAGE_LIST = "IAAS_GET_INSTANCE_USAGE_LIST"
 
-
+	IAAS_GET_CPU_USAGE = "IAAS_GET_CPU_USAGE"
+	IAAS_GET_MEMORY_USAGE = "IAAS_GET_MEMORY_USAGE"
+	IAAS_GET_DISK_USAGE = "IAAS_GET_DISK_USAGE"
+	IAAS_GET_CPU_LOAD_AVERAGE = "IAAS_GET_CPU_LOAD_AVERAGE"
+	IAAS_GET_DISK_IO_RATE = "IAAS_GET_DISK_IO_RATE"
+	IAAS_GET_NETWORK_IO_BTYES = "IAAS_GET_NETWORK_IO_BTYES"
 )
 
 var Routes = rata.Routes{
@@ -559,5 +564,14 @@ var IaasRoutes = rata.Routes{
 	{Path: "/v2/iaas/server/list", Method: "GET", Name: IAAS_GET_SERVER_LIST},
 	{Path: "/v2/iaas/project/list", Method: "GET", Name: IAAS_GET_PROJECT_LIST},
 	{Path: "/v2/iaas/instance/usage/list", Method: "GET", Name: IAAS_GET_INSTANCE_USAGE_LIST},
+	{Path: "/v2/iaas/instance/:instance_id/cpu/usage/", Method: "GET", Name: IAAS_GET_CPU_USAGE},
+	{Path: "/v2/iaas/instance/:instance_id/memory/usage/", Method: "GET", Name: IAAS_GET_MEMORY_USAGE},
+	{Path: "/v2/iaas/instance/:instance_id/disk/usage/", Method: "GET", Name: IAAS_GET_DISK_USAGE},
+	{Path: "/v2/iaas/instance/:instance_id/cpu/load/average", Method: "GET", Name: IAAS_GET_CPU_LOAD_AVERAGE},
+	{Path: "/v2/iaas/instance/:instance_id/disk/io/rate", Method: "GET", Name: IAAS_GET_DISK_IO_RATE},
+	{Path: "/v2/iaas/instance/:instance_id/network/io/bytes", Method: "GET", Name: IAAS_GET_NETWORK_IO_BTYES},
+
+
+
 
 }

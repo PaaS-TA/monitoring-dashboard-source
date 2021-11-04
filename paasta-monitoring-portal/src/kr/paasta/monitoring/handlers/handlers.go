@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/cavaliercoder/go-zabbix"
 	"io"
 	"net/http"
 	"strings"
@@ -30,7 +31,8 @@ import (
 
 func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
 	iaasTxn *gorm.DB, paasTxn *gorm.DB, iaasElasticClient *elasticsearch.Client, paasElasticClient *elasticsearch.Client,
-	auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig) http.Handler {
+	auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig,
+	zabbixSession *zabbix.Session) http.Handler {
 
 	//Controller선언
 	var loginController *controller.LoginController
@@ -55,6 +57,8 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	logController := iaasContoller.NewLogController(openstackProvider, iaasInfluxClient, iaasElasticClient)
 
 	openstackController := iaasContoller.NewOpenstackController(openstackProvider, iaasInfluxClient)
+	zabbixController := iaasContoller.NewZabbixController(zabbixSession, openstackProvider)
+
 	iaasAlarmController := iaasContoller.GetAlarmController(paasTxn)
 	iaasAlarmPolicyController := iaasContoller.GetAlarmPolicyController(paasTxn)
 
@@ -104,6 +108,14 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_GET_SERVER_LIST : route(openstackController.GetServerList),
 			routes.IAAS_GET_PROJECT_LIST : route(openstackController.GetProjectList),
 			routes.IAAS_GET_INSTANCE_USAGE_LIST : route(openstackController.GetProjectUsage),
+
+			routes.IAAS_GET_CPU_USAGE : route(zabbixController.GetCpuUsage),
+			routes.IAAS_GET_MEMORY_USAGE: route(zabbixController.GetMemoryUsage),
+			routes.IAAS_GET_DISK_USAGE: route(zabbixController.GetDiskUsage),
+			routes.IAAS_GET_CPU_LOAD_AVERAGE: route(zabbixController.GetCpuLoadAverage),
+			routes.IAAS_GET_DISK_IO_RATE: route(zabbixController.GetDiskIORate),
+			routes.IAAS_GET_NETWORK_IO_BTYES: route(zabbixController.GetNetworkIOBytes),
+
 
 			//routes..IAAS_ALARM_NOTIFICATION_LIST:   route(notificationController.GetAlarmNotificationList),
 			//routes..IAAS_ALARM_NOTIFICATION_CREATE: route(notificationController.CreateAlarmNotification),

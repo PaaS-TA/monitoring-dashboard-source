@@ -59,7 +59,9 @@ func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *ht
 	}
 }
 
-
+/**
+	프로젝트(테넌트) 목록과 속한 인스턴스 목록 및 usage 정보를 조회
+ */
 func (osService *OpenstackController) GetProjectUsage(w http.ResponseWriter, r *http.Request) {
 	tenantIdParam := r.URL.Query().Get("tenantId")
 

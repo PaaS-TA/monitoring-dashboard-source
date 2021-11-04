@@ -121,7 +121,6 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 	var listOpts projects.ListOpts
 	result := projects.List(client, listOpts)
 	resultPages, err := result.AllPages()
-	fmt.Println(resultPages)
 
 	if err != nil {
 		fmt.Println(err)
@@ -163,8 +162,7 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 		itemMap["secGroups"] = len(secGroups)
 
 
-
-		service.retrieveSingleProjectUsage(projectId)
+		//service.retrieveSingleProjectUsage(projectId)   // TODO 호출해도 조회안됨...
 
 
 		/*
@@ -179,9 +177,6 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 		itemMap["instances"] = len(serverList)
 		 */
 	}
-
-
-
 	return list, err
 }
 
@@ -194,14 +189,38 @@ func (service *OpenstackService) RetrieveTenantUsage() []usage.TenantUsage {
 	}
 
 	usagePages, _ := usage.AllTenants(computeClient, allTenantsOpts).AllPages()
-	fmt.Println(usagePages)
 	usageList, _ := usage.ExtractAllTenants(usagePages)
 
+	// For Test
+	/*
+	for _, item := range(usageList) {
+		for _, server := range(item.ServerUsages) {
+			id := server.InstanceID
 
+
+			result, _ := servers.Get(computeClient, id).Extract()
+			addressList := result.Addresses
+
+			for _, address := range addressList {
+				tee := address.([]interface{})
+				tee2 := tee[0].(map[string]interface{})
+				ipAddress := tee2["addr"]
+				server.Name += " ("
+				server.Name += ipAddress.(string)
+				server.Name += ")"
+			}
+
+		}
+	}
+	*/
+
+	//service.GetServerDetail("08769233-2599-4ba5-ae54-e8aa92bd11b9")
 
 	return usageList
 }
 
+
+// Unused
 func (service *OpenstackService) retrieveSingleProjectUsage(projectId string) {
 	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
 	//computeClient.Microversion = "2.40"
@@ -213,4 +232,13 @@ func (service *OpenstackService) retrieveSingleProjectUsage(projectId string) {
 	usageList, _ := usage.ExtractSingleTenant(usagePages)
 	fmt.Println(usageList)
 
+}
+
+
+// Unused
+func (service *OpenstackService) GetServerDetail(id string) *servers.Server {
+	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
+
+	result, _ := servers.Get(computeClient, id).Extract()
+	return result
 }

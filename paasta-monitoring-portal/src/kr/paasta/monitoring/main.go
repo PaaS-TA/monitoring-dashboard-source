@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/cavaliercoder/go-zabbix"
 	commonModel "kr/paasta/monitoring/common/model"
 	"net"
 	"net/http"
@@ -119,6 +120,7 @@ func main() {
 	var iaasElasticClient *elasticsearch.Client
 	var openstackProvider model.OpenstackProvider
 
+	var zabbixSession *zabbix.Session
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
 		/*
@@ -129,7 +131,7 @@ func main() {
 		}
 		*/
 
-		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, err = getIaasClent(configMap)
+		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, zabbixSession, err = getIaasClent(configMap)
 
 
 
@@ -149,14 +151,14 @@ func main() {
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
 			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
-			rdClient, sysType, boshClient, cfConfig)
+			rdClient, sysType, boshClient, cfConfig, zabbixSession)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			logger.Error(err)
 		}
 	} else {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
 			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
-			rdClient, sysType, boshClient, cfConfig)
+			rdClient, sysType, boshClient, cfConfig, zabbixSession)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			logger.Error(err)
 		}
@@ -257,7 +259,7 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 }
 
 
-func getIaasClent(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider model.OpenstackProvider, err error) {
+func getIaasClent(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider model.OpenstackProvider, zabbixSession *zabbix.Session, err error) {
 	// Mysql
 	iaasConfigDbCon := new(commonModel.DBConfig)
 	iaasConfigDbCon.DbType = config["iaas.monitoring.db.type"]
@@ -345,6 +347,26 @@ func getIaasClent(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInflu
 	model.RabbitMqIp, _ = config["rabbitmq.ip"]
 	model.RabbitMqPort, _ = config["rabbitmq.port"]
 	model.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
+
+	zabbixHost := config["zabbix.host"]
+	zabbixAdminId := config["zabbix.admin.id"]
+	zabbixAdminPw := config["zabbix.admin.pw"]
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	cache := zabbix.NewSessionFileCache().SetFilePath("./zabbix_session")
+	zabbixSession, err = zabbix.CreateClient(zabbixHost).
+		WithCache(cache).
+		WithHTTPClient(client).
+		WithCredentials(zabbixAdminId, zabbixAdminPw).Connect()
+	if err != nil {
+		utils.Logger.Error(err)
+	}
 
 	return
 }

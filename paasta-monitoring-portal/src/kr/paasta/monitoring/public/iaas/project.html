@@ -269,32 +269,46 @@
 		<div id="chartWrap">
 			<div class="chart on">
 				<h4><span class="chartTitle"></span></h4>
-				<ul class="one">
+				<ul class="chart">
 					<li>
-						<h5>Workloads Usage</h5>
-						<div id="nodeChart" class="gaugeChart"></div>
+						<h5>CPU Usage</h5>
+						<div id="cpuUsageChart"></div>
 					</li>
+					<li>
+						<h5>CPU Load Average</h5>
+						<div id="cpuLoadChart"></div>
+					</li>
+					<li>
+						<h5>Memory Usage</h5>
+						<div id="memoryUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk Usage</h5>
+						<div id="diskUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk IO</h5>
+						<div id="diskIoChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Byte</h5>
+						<div id="networkByteChart"></div>
+					</li>
+					<!--
+					<li>
+						<h5>Network IO Packtes</h5>
+						<div id="networkPacktesChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Drop</h5>
+						<div id="networkDropChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Error</h5>
+						<div id="networkErrorChart"></div>
+					</li>
+					-->
 				</ul>
-				<h5>Workloads Container list</h5>
-				<div class="tableList">
-					<table style="table-layout: fixed">
-						<caption>Workloads Container list</caption>
-						<thead>
-							<tr>
-								<th width="21%">Container Name</th>
-								<th width="14%">Name Space</th>
-								<th width="24%">podName</th>
-								<th width="8%">CPU<br>(ms)</th>
-								<th width="8%">Memory<br>(MB)</th>
-								<th width="8%">Disk<br>(GB)</th>
-								<th width="8%">CPU<br>Usage</th>
-								<th width="8%">Memory<br>Usage</th>
-							</tr>
-						</thead>
-						<tbody id="containerlist">
-						</tbody>
-					</table>
-				</div>
 
 				<!-- // Log Layer -->
 				<div class="logWrap">
@@ -318,6 +332,10 @@
 	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
 	<script type="text/javascript">
 
+		// Chart Close Event
+		document.querySelector('.chartClosed').addEventListener('click', (e) => {
+			document.getElementById('chartWrap').classList.toggle('on', false);
+		}, false);
 
 		const project = {
 			id : '',
@@ -447,288 +465,164 @@
 									<dt>D</dt>
 									<dd>${value.local_gb} GB</dd>
 								</dl>
-								<dl>
+								<dl style="display:none;">
 									<dt>CPU Usage</dt>
 									<dd>${value.CpuUsage} %</dd>
 								</dl>
-								<dl>
+								<dl style="display:none;">
 									<dt>Memory Usage</dt>
 									<dd>${value.MemoryUsage} %</dd>
 								</dl>
 							</div>
-							<div class="summaryBtn" data-name="${value.Name}">
-								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
-							</div>
-						</div>`
-
-					fnComm.appendHtml(target, html, 'div');
-				});
-			},
-
-			getInstanceUsageList(data) {
-				console.log(data);
-			},
-
-			gaugeList(data){
-				// pod Usage 차트
-				fnComm.gaugeChart(data.PodUsage, 'Pod Usage', '#podUsage');
-
-				// CPU Usage 차트
-				fnComm.gaugeChart(data.CpuUsage, 'Cpu Usage', '#cpuUsage');
-
-				// Memory Usage 차트
-				fnComm.gaugeChart(data.MemoryUsage, 'Memory Usage', '#memoryUsage');
-
-				// Disk Usage 차트
-				fnComm.gaugeChart(data.DiskUsage, 'Disk Usage', '#diskUsage');
-
-			},
-
-			workloadsStatus(data) {
-				// Alerts: "7"
-				// Nodes: "3"
-				// PodRestart: "0"
-				// RunningContainer: "55"
-				// RunningPod: "30"
-
-
-				data.forEach(value => {
-					var target ='';
-					let arr = [];
-
-					switch(value.Name) {
-						case 'Deployment':
-							target = '#deployment'
-							arr = [
-								['Total', 0, value.Total, 0, 0, 0, 0],
-								['Available', 0, 0, value.Available, 0, 0, 0],
-								['Updated', 0, 0, 0, value.Updated, 0, 0],
-								['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
-							];
-							break;
-						case 'DaemonSet':
-							target = '#daemonSet'
-							arr = [
-								['Ready', 0, value.Ready, 0, 0, 0, 0],
-								['Available', 0, 0, value.Available, 0, 0, 0],
-								['Misscheduled', 0, 0, 0, value.Misscheduled, 0, 0],
-								['Unavailable', 0, 0, 0, 0, value.Unavailable, 0]
-							];
-							break;
-						case 'Stateful':
-							target = '#stateful'
-							arr = [
-								['Total', 0, value.Total, 0, 0, 0, 0],
-								['Ready', 0, 0, value.Ready, 0, 0, 0],
-								['Updated', 0, 0, 0, value.Updated, 0, 0],
-								['Revision', 0, 0, 0, 0, value.Revision, 0]
-							];
-							break;
-						case 'Pod':
-							target = '#pod'
-							arr = [
-								['Ready', 0, value.Ready, 0, 0, 0, 0],
-								['Running', 0, 0, value.Running, 0, 0, 0],
-								['Restart', 0, 0, 0, value.Restart, 0, 0],
-								['terminated', 0, 0, 0, 0, value.terminated, 0]
-							];
-							break;
-					};
-
-					project.workloadsChart(target, arr)
-				});
-			},
-
-			workloadsChart(target, arr){
-				var chart = c3.generate({
-					bindto: target,
-					data: {
-						columns: arr,
-						labels: true,
-						type: 'spline'
-					},
-					color: {
-						pattern: ['#43be42', '#f6a200', '#f4256c', '#c048c8', '#ccc']
-					},
-					axis: {
-						x: {
-							show: false
-						},
-						y: {
-							show: false
-						}
-					},
-				});
-			},
-
-			workloadsSummary(data) {
-				// Data Example //////////////////////////////////////////////////////
-				// Cpu: "59447.14"
-				// CpuUsage: "0.02"
-				// Disk: "74.7"
-				// DiskUsage: "0.02"
-				// Memory: "353.1"
-				// MemoryUsage: "9.54"
-				// Name: "deployment"
-				//////////////////////////////////////////////////////////////////////
-
-				var target = document.getElementById('instanceSummary');
-
-				fnComm.removeHtml(target);
-
-				data.forEach((value, idx)=>{
-					var html = `<div class="normal">
-							<div>
-								<strong><a href="javascript:void(0);">${value.Name}</a></strong>
-							</div>
-							<div>
-								<dl class="color1" title="CPU">
-									<dt>C</dt>
-									<dd>${value.Cpu} ms</dd>
-								</dl>
-								<dl class="color2" title="Memory">
-									<dt>M</dt>
-									<dd>${value.Memory} MB</dd>
-								</dl>
-								<dl class="color3" title="Disk">
-									<dt>D</dt>
-									<dd>${value.Disk} GB</dd>
-								</dl>
-								<dl>
-									<dt>CPU Usage</dt>
-									<dd>${value.CpuUsage} %</dd>
-								</dl>
-								<dl>
-									<dt>Memory Usage</dt>
-									<dd>${value.MemoryUsage} %</dd>
-								</dl>
-							</div>
-							<div class="summaryBtn" data-name="${value.Name}">
-								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							<div class="summaryBtn" data-id="${value.instance_id}"  data-name="${value.name}">
+								<a href="javascript:void(0);" class="chart" onclick="project.chartView(this)"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
 							</div>
 						</div>`
 
 					fnComm.appendHtml(target, html, 'div');
 				});
 
-				// Application Event (Chart)
-				var elm = document.querySelectorAll('.summaryBtn');
-				for(var i=0 ; i<elm.length ; i++){
-					// Worker Node Info Event
-					elm[i].querySelector('.chart').addEventListener('click', (e) => {
-						if(e.target.nodeName == 'A'){
-							var elmName = e.target.parentNode.getAttribute('data-name');
-						} else {
-							var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
-						};
+				Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
 
-						document.querySelector('.chartTitle').innerHTML = elmName;
-
-						// Workloads Detail Chart 데이터로드
-						fnComm.loadData('GET', fnComm.url + `caas/monitoring/workloadsGraph?WorkloadsName=${elmName}`, project.nodeInfo);
-
-						// Workloads Container list 데이터로드
-						fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?WorkloadsName=${elmName}`, project.containerlist);
-					}, false);
-				};
-
-				// Chart Close Event
-				document.querySelector('.chartClosed').addEventListener('click', (e) => {
-					document.getElementById('chartWrap').classList.toggle('on', false);
-					document.querySelector('.logWrap').classList.toggle('on', false);
-				}, false);
-
-				// LOG Close Event
-				document.querySelector('.logClosed').addEventListener('click', (e) => {
-					document.querySelector('.logWrap').classList.toggle('on', false);
-				}, false);
 			},
-
-			nodeInfo(data){
+			//만수
+			chartView(target) {
+				var instanceId = target.parentNode.getAttribute('data-id');
+				var instanceName = target.parentNode.getAttribute('data-name');
+				document.querySelector('.chartTitle').innerHTML = instanceName;
 				document.getElementById('chartWrap').classList.toggle('on', true);
+				document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
 
 				setTimeout(() => {
-					fnComm.detailChart(data, '#nodeChart');
+					// TODO CPU Usage 정보
+					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/cpu/usage`, renderChart, '#cpuUsageChart');
+
+					// CPU Load 정보
+					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/cpu/load/average`, renderChart, '#cpuLoadChart');
+
+					// Memory Usage 정보
+					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/memory/usage`, renderChart, '#memoryUsageChart');
+
+					// Disk Usage 정보
+					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/disk/usage`, renderChart, '#diskUsageChart');
+
+					// Disk IO 정보
+					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/disk/io/rate`, renderChart, '#diskIoChart');
+
+					// Network IO Bytes 정보
+					fnComm.loadData('GET', `${fnComm.url}iaas/instance/${instanceId}/network/io/bytes`, renderChart, '#networkByteChart');
+
+					// Network IO Packets 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/packets${fnComm.setTimer()}`, fnComm.detailChart, '#networkPacktesChart');
+
+					// Network IO Drop 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/drops${fnComm.setTimer()}`, fnComm.detailChart, '#networkDropChart');
+
+					// Network IO Error 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/errors${fnComm.setTimer()}`, fnComm.detailChart, '#networkErrorChart');
 				},500);
-			},
-
-			containerlist(data) {
-				console.log(data);
-				project.data = data;
-				// ContainerName: "fluentd-gcp-scaler"
-				// Cpu: "22522.09"
-				// CpuUsage: "0.66"
-				// Disk: "23.5"
-				// Memory: "82.8"
-				// MemoryUsage: "2.24"
-				// NameSpace: "kube-system"
-				// PodName: "fluentd-gcp-scaler-7b895cbc89-rzqbq"
-
-				var target = document.getElementById('containerlist');
-
-				fnComm.removeHtml(target);
-
-				data.forEach(value => {
-					var html = `<tr>
-							<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
-							<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
-							<td class="left" title="${value.PodName}">${value.PodName}</td>
-							<td>${value.Cpu}</td>
-							<td>${value.Memory}</td>
-							<td>${value.Disk}</td>
-							<td>${value.CpuUsage}</td>
-							<td>${value.MemoryUsage}</td>
-						</tr>`;
-
-					fnComm.appendHtml(target, html, 'tbody');
-				});
-
-				// Container Event (Log)
-				var elm = document.querySelectorAll('.contName');
-				for(var i=0 ; i<elm.length ; i++){
-					// Pod Node Info Event
-					elm[i].addEventListener('click', (e) => {
-						var containerName = e.target.parentNode.getAttribute('title');
-						var nameSpace = e.target.parentNode.getAttribute('data-sp');
-						var podName = e.target.parentNode.getAttribute('data-po');
-
-						// Container Chart 데이터로드
-						fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerChart);
-
-						// Container Log 데이터로드
-						fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, project.containerLog);
-
-					}, false);
-				};
-
-				// Chart Close Event
-				document.querySelector('.logClosed').addEventListener('click', (e) => {
-					document.querySelector('.logWrap').classList.toggle('on', false);
-				}, false);
-			},
-
-			containerChart(data) {
-				document.querySelector('.logWrap').classList.toggle('on', true);
-
-				setTimeout(() => {
-					fnComm.detailChart(data, '#logChart');
-				},500);
-			},
-
-			containerLog(data) {
-				document.getElementById('logText').innerHTML = data;
-			},
-
-			sortList() {
-				project.data.sort(function(a,b) {
-					return parseFloat(a[sortData]) - parseFloat(b[sortData]);
-				});
-
-				project.containerlist(project.data);
 			},
 		}
-		// 프로젝트 항목 클릭 이벤트
 
+		function renderChart(data, target) {
+			let cnt = 0;
+			let yPos = 9;
+			let detailTime = [];
+			let detailData = [];
+			let chartColor;
+
+			data.forEach((item, idx) => {
+				if(idx === 0){
+					detailTime.push('time');
+				};
+
+				detailData[idx] = [item.label];
+
+				item.data.forEach(data => {
+					if(idx === 0){
+						var timeStamp = new Date((data.Clock)*1000);
+
+						detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2) + ':' + ('0' + timeStamp.getUTCSeconds()).slice(-2));
+					};
+
+					detailData[idx].push(Number(Math.ceil(data.Value)));
+
+					if(yPos < Number(data.Value))
+						yPos = Math.ceil(data.Value);
+				});
+
+				cnt = idx;
+			});
+
+			yPos = Math.ceil((yPos / 10)) * 10;
+
+			var dataType = [];
+			dataType.push(detailTime);
+			for (var i = 0; i <= cnt; i++) {
+				dataType.push(detailData[i]);
+			};
+
+			switch (target){
+				case '#cpuUsageChart':
+				case '#cpuLoadChart':
+					chartColor = ['#ff015a', '#fc6604', '#fcce34', '#cc86cc'];
+					break;
+				case '#memoryUsageChart':
+					chartColor = ['#9cce34'];
+					break;
+				case '#diskUsageChart':
+				case '#diskIoChart':
+					chartColor = ['#3d003d', '#c701c7', '#cc86cc', '#fccefc'];
+					break;
+				case '#networkByteChart':
+				case '#networkPacktesChart':
+				case '#networkDropChart':
+				case '#networkErrorChart':
+					chartColor = ['#649afc', '#b7c3d8'];
+					break;
+				case '#nodeChart':
+					chartColor = ['#649afc', '#ff015a', '#9cce34', '#c701c7'];
+					break;
+				case '#logChart':
+					chartColor = ['#ff015a', '#9cce34', '#649afc'];
+					break;
+			};
+
+			var chart = c3.generate({
+				bindto: target,
+				data: {
+					x: 'time',
+					xFormat: '%H:%M:%S',
+					columns: dataType,
+					labels: false,
+					type: 'spline',
+				},
+				color: {
+					pattern: chartColor
+				},
+				axis: {
+					x: {
+						type: 'timeseries',
+						localtime: false,
+						tick: {
+							count: 2,
+						}
+					},
+					y: {
+						max: yPos,
+						min: 0,
+						tick: {
+							count: 5,
+						}
+					}
+				},
+				point: {
+					show: false
+				}
+			});
+		}
+
+		// 프로젝트 항목 클릭 이벤트
 		function onClickProjectItem(id, target) {
 			console.log(id);
 			console.log(target);
