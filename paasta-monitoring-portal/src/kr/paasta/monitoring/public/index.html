@@ -58,17 +58,17 @@
 								<li class="iaasVcpu">
 									<h4><span>VCPU 사용량</span></h4>
 									<div id="iaasVcpuChart"></div>
-									<span>사용 <strong id="vcpuUsed"></strong>개 / 전체 <em id="vcpuTotal"></em>개</span>
+									<span>사용 <strong id="vcpuUsed"></strong> 개 / 전체 <em id="vcpuTotal"></em> 개</span>
 								</li>
 								<li class="iaasMemery">
 									<h4><span>Memory 사용량</span></h4>
 									<div id="iaasMemoryChart"></div>
-									<span>사용 <strong id="memoryUsed"></strong>MB / 사용가능 <span id="memoryTotal"></span>MB</span>
+									<span>사용 <strong id="memoryUsed"></strong> <span id="memoryUsedUnit"></span> / 전체 <span id="memoryTotal"></span> <span id="memoryTotalUnit"></span></span>
 								</li>
 								<li class="iaasDisk">
 									<h4><span>Disk 사용량</span></h4>
 									<div id="iaasDiskChart"></div>
-									<span>사용 <strong id="diskUsed"></strong>GB / 사용가능 <span id="diskTotal"></span>GB</span>
+									<span>사용 <strong id="diskUsed"></strong> <span id="diskUsedUnit"></span> / 전체 <span id="diskTotal"></span> <span id="diskTotalUnit"></span></span>
 								</li>
 								<li class="iaasIns">
 									<h4>인스턴스</h4>
@@ -733,17 +733,25 @@
 					// MemoryUsage: "4.35"
 					// PodUsage: "0.03"
 
+					var memoryUsed = fnComm.convertUnits(data.memoryUsed, "MB");
+					var memoryTotal = fnComm.convertUnits(data.memory, "MB");
+					var diskUsed = fnComm.convertUnits(data.diskUsed, "GB");
+					var diskTotal = fnComm.convertUnits(data.disk, "GB");
+
 					var vcpuPercent = Math.round(data.vcpuUsed / data.vcpu * 100)
 					var memoryPercent = Math.round(data.memoryUsed / data.memory * 100)
 					var diskPercent = Math.round(data.diskUsed / data.disk * 100)
-					// caasPodChart caasCpuChart caasMemoryChart caasDiskChart
 
 					document.getElementById("vcpuUsed").innerText = data.vcpuUsed;
 					document.getElementById("vcpuTotal").innerText = data.vcpu;
-					document.getElementById("memoryUsed").innerText = data.memoryUsed;
-					document.getElementById("memoryTotal").innerText = data.memory;
-					document.getElementById("diskUsed").innerText = data.diskUsed;
-					document.getElementById("diskTotal").innerText = data.disk;
+					document.getElementById("memoryUsed").innerText = memoryUsed.convertedSize.toFixed(2);
+					document.getElementById("memoryTotal").innerText = memoryTotal.convertedSize.toFixed(2);
+					document.getElementById("diskUsed").innerText = diskUsed.convertedSize.toFixed(2);
+					document.getElementById("diskTotal").innerText = diskTotal.convertedSize.toFixed(2);
+					document.getElementById("memoryUsedUnit").innerText = memoryUsed.convertedUnit;
+					document.getElementById("memoryTotalUnit").innerText = memoryTotal.convertedUnit;
+					document.getElementById("diskUsedUnit").innerText = diskUsed.convertedUnit;
+					document.getElementById("diskTotalUnit").innerText = diskTotal.convertedUnit;
 
 					var chart1 = c3.generate({
 						bindto: '#iaasVcpuChart',
