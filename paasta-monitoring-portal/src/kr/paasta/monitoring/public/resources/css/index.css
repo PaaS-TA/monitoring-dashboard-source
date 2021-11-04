@@ -118,8 +118,12 @@ section {float:left; padding:10px 35px 50px;}
 .chartWrap li {position:relative; flex:1;}
 .chartWrap li div {position:relative; z-index:2; height:230px;}
 .chartWrap li > p {position:absolute; z-index:1; top:0; left:0; width:100%; font-size:38px; line-height:280px; font-weight:100;}
-.chartWrap li .instance {margin-top:60px; line-height:25px; font-size:18px;}
 .chartWrap li > em {display:block; font-size:38px; line-height:40px; font-weight:100;}
+
+.iaasIns div {overflow:hidden; height:auto !important; padding:20px 20px 0 30px;}
+.iaasIns div dl {overflow:hidden;}
+.iaasIns div dl dt {float:left; line-height:27px;}
+.iaasIns div dl dd {float:right; line-height:27px;}
 
 .event {width:30%;}
 .event article > div {position:relative; margin-top:70px;}
@@ -130,7 +134,9 @@ section {float:left; padding:10px 35px 50px;}
 .event article ul li span {float:left; width:50%; padding-left:20px;}
 .event article ul li strong {float:left; width:50%; font-size:28px; font-weight:200; text-align:center; border-left:1px solid #eee;}
 
-.psContent, .ssContent, .csContent, .isContent {display: none;}
+
+.psContent, .ssContent, .csContent, .isContent {display:none;}
+
 
 #alertPop {position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; width:100%; height:100%; background:rgba(255,255,255,.8);}
 #alertPop > div {position:absolute; top:50%; left:50%; width:460px; min-height:181px; margin-left:-230px; margin-top:-100px; text-align:center; border:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1);}
@@ -139,8 +145,9 @@ section {float:left; padding:10px 35px 50px;}
 #alertPop div div {overflow:hidden;}
 #alertPop div div button {width:100%; height:50px; color:#fff; font-size:18px; font-weight:100; background:#333;}
 
-/* 21.10.25 퍼블리싱 작업으로부터 추가됨 */
-.iaasIns div {overflow:hidden; height:auto !important; padding:20px 20px 0 30px;}
-.iaasIns div dl {overflow:hidden;}
-.iaasIns div dl dt {float:left; line-height:27px;}
-.iaasIns div dl dd {float:right; line-height:27px;}
+
+
+
+
+
+
