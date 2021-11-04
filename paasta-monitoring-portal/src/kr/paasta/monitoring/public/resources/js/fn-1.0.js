@@ -286,7 +286,7 @@ const fnComm = {
 			} else {
 				convertedSize = size;
 				convertedUnit = "MB";
-			}
+			};
 		} else if (unit == "GB") {
 			if (size >= 1048576) {
 				convertedSize = size / 1048576;
