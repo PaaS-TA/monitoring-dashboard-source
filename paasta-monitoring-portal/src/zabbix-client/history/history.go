@@ -43,7 +43,7 @@ func GetHistory(session *zabbix.Session, params map[string]interface{}) []zabbix
 	}
 
 	historyParams.SortField = zabbix.SelectFields{"clock"}
-	historyParams.SortOrder = "DESC"
+	historyParams.SortOrder = "ASC"
 
 	result, err := session.GetHistories(historyParams)
 	if err != nil {

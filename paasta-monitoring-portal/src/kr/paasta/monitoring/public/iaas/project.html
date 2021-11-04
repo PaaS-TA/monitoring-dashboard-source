@@ -271,7 +271,7 @@
 				<h4><span class="chartTitle"></span></h4>
 				<ul class="chart">
 					<li>
-						<h5>CPU Usage</h5>
+						<h5>CPU Usage (%)</h5>
 						<div id="cpuUsageChart"></div>
 					</li>
 					<li>
@@ -279,11 +279,11 @@
 						<div id="cpuLoadChart"></div>
 					</li>
 					<li>
-						<h5>Memory Usage</h5>
+						<h5>Memory Usage (%)</h5>
 						<div id="memoryUsageChart"></div>
 					</li>
 					<li>
-						<h5>Disk Usage</h5>
+						<h5>Disk Usage (%)</h5>
 						<div id="diskUsageChart"></div>
 					</li>
 					<li>
@@ -291,7 +291,7 @@
 						<div id="diskIoChart"></div>
 					</li>
 					<li>
-						<h5>Network IO Byte</h5>
+						<h5>Network IO Bytes</h5>
 						<div id="networkByteChart"></div>
 					</li>
 					<!--
@@ -335,6 +335,11 @@
 		// Chart Close Event
 		document.querySelector('.chartClosed').addEventListener('click', (e) => {
 			document.getElementById('chartWrap').classList.toggle('on', false);
+
+			chartObjectArr.forEach(chartObj => {
+				chartObj.destroy();
+			})
+
 		}, false);
 
 		const project = {
@@ -485,13 +490,11 @@
 				Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
 
 			},
-			//만수
+
 			chartView(target) {
 				var instanceId = target.parentNode.getAttribute('data-id');
 				var instanceName = target.parentNode.getAttribute('data-name');
 				document.querySelector('.chartTitle').innerHTML = instanceName;
-				document.getElementById('chartWrap').classList.toggle('on', true);
-				document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
 
 				setTimeout(() => {
 					// TODO CPU Usage 정보
@@ -521,8 +524,12 @@
 					// Network IO Error 정보
 					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/errors${fnComm.setTimer()}`, fnComm.detailChart, '#networkErrorChart');
 				},500);
+				document.getElementById('chartWrap').classList.toggle('on', true);
+				document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
 			},
 		}
+
+		var chartObjectArr =[];
 
 		function renderChart(data, target) {
 			let cnt = 0;
@@ -542,7 +549,7 @@
 					if(idx === 0){
 						var timeStamp = new Date((data.Clock)*1000);
 
-						detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2) + ':' + ('0' + timeStamp.getUTCSeconds()).slice(-2));
+						detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2));
 					};
 
 					detailData[idx].push(Number(Math.ceil(data.Value)));
@@ -588,11 +595,13 @@
 					break;
 			};
 
+			console.log(dataType);
+
 			var chart = c3.generate({
 				bindto: target,
 				data: {
 					x: 'time',
-					xFormat: '%H:%M:%S',
+					xFormat: '%H:%M',
 					columns: dataType,
 					labels: false,
 					type: 'spline',
@@ -620,6 +629,7 @@
 					show: false
 				}
 			});
+			chartObjectArr.push(chart);
 		}
 
 		// 프로젝트 항목 클릭 이벤트

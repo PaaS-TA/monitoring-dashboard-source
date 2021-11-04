@@ -218,6 +218,8 @@ const fnComm = {
 				} else if(request.status === 401){
 					sessionStorage.clear();
 					document.location.href = '../login.html';
+				} else if (request.status === 500) {
+					fnComm.alertPopup('ERROR', JSON.parse(request.responseText).message);
 				};
 			};
 		};
@@ -559,6 +561,8 @@ const fnComm = {
 				chartColor = ['#ff015a', '#9cce34', '#649afc'];
 			break;
 		};
+
+		console.log(dataType);
 
 		var chart = c3.generate({
     		bindto: target,
