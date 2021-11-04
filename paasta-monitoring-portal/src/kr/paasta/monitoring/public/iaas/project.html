@@ -404,28 +404,29 @@
 									<dd>${usage.vcpus}</dd>
 								</dl>
 								<dl>
-									<dt>Memory(MB)</dt>
+									<dt>Memory (MB)</dt>
 									<dd>${usage.memory_mb}</dd>
 								</dl>
 							</div>
 							<div>
 								<dl>
+									<dt>Volumes (GB)</dt>
+									<dd>${usage.local_gb}</dd>
+								</dl>
+								<dl>
 									<dt>Instance</dt>
 									<dd>${usage.server_usages.length}</dd>
 								</dl>
+
+							</div>
+							<div>
 								<dl>
 									<dt>Floating IP</dt>
 									<dd>${usage.floating_ips}</dd>
 								</dl>
-							</div>
-							<div>
 								<dl>
 									<dt>Security Group</dt>
 									<dd>${usage.security_groups}</dd>
-								</dl>
-								<dl>
-									<dt>Volumes(GB)</dt>
-									<dd>${usage.local_gb}</dd>
 								</dl>
 							</div>
 						</div>`
