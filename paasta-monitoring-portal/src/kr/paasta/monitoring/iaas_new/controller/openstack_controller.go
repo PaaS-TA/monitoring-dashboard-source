@@ -90,7 +90,6 @@ func (osService *OpenstackController) GetProjectUsage(w http.ResponseWriter, r *
 
 
 /**
-	@Unused
 	프로젝트 목록(만) 조회
  */
 func (osService *OpenstackController) GetProjectList(w http.ResponseWriter, r *http.Request) {

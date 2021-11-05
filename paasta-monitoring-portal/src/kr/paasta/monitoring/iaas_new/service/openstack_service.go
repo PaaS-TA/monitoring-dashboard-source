@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v3/volumes"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/hypervisors"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/usage"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
@@ -116,7 +117,7 @@ func (service *OpenstackService) GetServerList(params map[string]interface{}) ([
 func (service *OpenstackService) GetProjectList(params map[string]interface{}) ([]interface{}, error) {
 	client := utils.GetKeystoneClient(service.Provider)
 	networkClient := utils.GetNetworkClient(service.Provider, service.OpenstackProvider.Region)
-
+	blockstorageClient := utils.GetBlockStorageClient(service.Provider, service.OpenstackProvider.Region)
 
 	var listOpts projects.ListOpts
 	result := projects.List(client, listOpts)
@@ -127,14 +128,14 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 	}
 	resultBody := resultPages.GetBody()
 	list := resultBody.(map[string][]interface{})["projects"]
-	//test := resultBody.(map[string][]map[string]interface{})["projects"]
 
 	for _, item := range(list) {
 		itemMap := item.(map[string]interface{})
 
-		// Floating IP 조회
+
 		projectId := itemMap["id"].(string)
 
+		// 프로젝트 내 Floating IP 개수 조회
 		var fipListOpts floatingips.ListOpts
 		fipListOpts.ProjectID = projectId
 
@@ -148,6 +149,7 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 		}
 		itemMap["floatingIps"] = len(allFloatingIPs)
 
+		// 프로젝트 내 보안그룹 개수 조회
 		var secGroupListOpts groups.ListOpts
 		secGroupListOpts.ProjectID = projectId
 		secGroupPages, err := groups.List(networkClient, secGroupListOpts).AllPages()
@@ -161,6 +163,15 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 		}
 		itemMap["secGroups"] = len(secGroups)
 
+		// 프로젝트 내 볼륨 개수 조회
+		volumeListOpt := volumes.ListOpts{
+			TenantID: projectId,
+		}
+		volumePages, _ := volumes.List(blockstorageClient, volumeListOpt).AllPages()
+		volumeBody := volumePages.GetBody()
+		volumeList := volumeBody.(map[string][]interface{})["volumes"]
+		itemMap["volumes"] = len(volumeList)
+		//utils.Logger.Debugf("len(result.Attachments) : %v\n", len(result.Attachments))
 
 		//service.retrieveSingleProjectUsage(projectId)   // TODO 호출해도 조회안됨...
 

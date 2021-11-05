@@ -31,8 +31,13 @@ func GetNetworkClient(provider *gophercloud.ProviderClient, region string) *goph
 }
 
 func GetKeystoneClient(provider *gophercloud.ProviderClient) *gophercloud.ServiceClient {
-
 	client, _ := openstack.NewIdentityV3(provider, gophercloud.EndpointOpts{})
+	return client
+}
 
+func GetBlockStorageClient(provider *gophercloud.ProviderClient, region string) *gophercloud.ServiceClient {
+	client, _ := openstack.NewBlockStorageV3(provider, gophercloud.EndpointOpts{
+		Region: region,
+	})
 	return client
 }

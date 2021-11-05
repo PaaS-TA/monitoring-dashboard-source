@@ -161,12 +161,13 @@
 
 					<article class="zoneWrap">
 						<h4>
-							<span>Node</span>
+							<span>Hypervisor</span>
 							<div>
 								<span class="run">Running<strong>999</strong></span><span class="war">Warning<strong>999</strong></span> <span class="cri">Critical<strong>999</strong></span>
 							</div>
 						</h4>
-						<div class="nodeList">
+						<div id="hypervisorList" class="nodeList">
+							<!--
 							<dl class="running">
 								<dt>con01<span>203.255.255.101</span></dt>
 								<dd>
@@ -177,46 +178,7 @@
 									</ul>
 								</dd>
 							</dl>
-							<dl class="warning">
-								<dt>con02<span>203.255.255.101</span></dt>
-								<dd>
-									<ul>
-										<li class="cpu">CPU : <span>99.9%</span></li>
-										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
-										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
-									</ul>
-								</dd>
-							</dl>
-							<dl class="critical">
-								<dt>con03<span>203.255.255.101</span></dt>
-								<dd>
-									<ul>
-										<li class="cpu">CPU : <span>99.9%</span></li>
-										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
-										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
-									</ul>
-								</dd>
-							</dl>
-							<dl class="fail">
-								<dt>con04<span>203.255.255.101</span></dt>
-								<dd>
-									<ul>
-										<li class="cpu">CPU : <span>99.9%</span></li>
-										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
-										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
-									</ul>
-								</dd>
-							</dl>
-							<dl class="running">
-								<dt>con01<span>203.255.255.101</span></dt>
-								<dd>
-									<ul>
-										<li class="cpu">CPU : <span>99.9%</span></li>
-										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
-										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
-									</ul>
-								</dd>
-							</dl>
+							-->
 						</div>
 						<h4>
 							<span>Project</span>
@@ -224,7 +186,8 @@
 								<span class="bak">total<strong>999</strong></span><span class="run">enable<strong>999</strong></span> <span class="cri">disable<strong>999</strong></span>
 							</div>
 						</h4>
-						<div class="nodeList">
+						<div id="projectList" class="nodeList">
+							<!--
 							<dl class="admin">
 								<dt>admin</dt>
 								<dd>
@@ -274,104 +237,7 @@
 									</ul>
 								</dd>
 							</dl>
-							<dl class="demo">
-								<dt>demo</dt>
-								<dd>
-									<ul class="project">
-										<li>
-											<dl>
-												<dt>VCPU</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Memory</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Instance</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>FIP</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Security</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Valumes</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Storage</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-									</ul>
-								</dd>
-							</dl>
-							<dl class="admin">
-								<dt>admin</dt>
-								<dd>
-									<ul class="project">
-										<li>
-											<dl>
-												<dt>VCPU</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Memory</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Instance</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>FIP</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Security</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Valumes</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-										<li>
-											<dl>
-												<dt>Storage</dt>
-												<dd>999</dd>
-											</dl>
-										</li>
-									</ul>
-								</dd>
-							</dl>
+							-->
 						</div>
 					</article>
 
@@ -423,13 +289,12 @@
 				</div>
 		</div>
 		<!-- // Wrap -->
-		<div id="loadWrap">
-			<div class="loader">
-				<svg viewBox="0 0 80 80">
-					<rect x="8" y="8" width="64" height="64"></rect>
-				</svg>
-			</div>
+
+		<!-- loadWrap : start -->
+		<div id="loadWrap" >
+			<div class="loader"></div>
 		</div>
+		<!-- loadWrap : end -->
 	</body>
 	
 	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
@@ -438,22 +303,35 @@
 	<script type="text/javascript">
 		window.onload = () => {
 			const main = {
+				loader : document.getElementById("loadWrap"),
+				isLoadedHypervisor : false,
+				isLoadedProject : false,
+
 				init() {
 					// Alarm Count
 					fnComm.alarmCount('paas');
 
+					main.loader.style.display = "flex";
+
 					// TODO: IaasS-Monitoring Summary
 					fnComm.loadData('GET', `${fnComm.url}iaas/hyper/statistics`, main.iaasCount);
-					
+
+					// TODO Openstack 프로젝트 목록 조회
+					fnComm.loadData('GET', fnComm.url + 'iaas/project/list', main.getProjectList)
+
+					//TODO 하이퍼바이저 목록 출력
+					fnComm.loadData('GET', fnComm.url + 'iaas/hypervisor/list', main.getHypervisorList);
+
+
 					// BOSH 컨디션 차트
-					fnComm.loadData('GET', `${fnComm.url}paas/bosh/overview`, fnComm.boshConditionChart);
+					//fnComm.loadData('GET', `${fnComm.url}paas/bosh/overview`, fnComm.boshConditionChart);
 					// PaaS 컨디션 차트
-					fnComm.loadData('GET', `${fnComm.url}paas/paasta/overview`, fnComm.paasConditionChart);
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/overview`, fnComm.paasConditionChart);
 					// CONTAINER 컨디션 차트
-					fnComm.loadData('GET', `${fnComm.url}paas/container/overview`, fnComm.contConditionChart);
+					//fnComm.loadData('GET', `${fnComm.url}paas/container/overview`, fnComm.contConditionChart);
 
 					// CONTAINER 컨디션 리스트 - 셀렉트 생성
-					fnComm.loadData('GET', `${fnComm.url}paas/container/summary?pageIndex=1&pageItems=1000`, main.zoneCreateSelect);
+					//fnComm.loadData('GET', `${fnComm.url}paas/container/summary?pageIndex=1&pageItems=1000`, main.zoneCreateSelect);
 
 					// 오늘 날짜
 					var today = new Date();
@@ -466,18 +344,147 @@
 					if(mm < 10) mm = '0'+mm;
 					if(nn < 10) nn = '0'+nn;
 					
-					fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
+					//fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
+
+
 
 					var target = document.getElementById('containerZone');
 					target.addEventListener('change', () => {
 						let zoneValue = target.options[target.selectedIndex].value;
 						console.log(zoneValue);
 						
-						fnComm.loadData('GET', `${fnComm.url}paas/container/relationship/${zoneValue}`, main.zoneCreateList);
+						//fnComm.loadData('GET', `${fnComm.url}paas/container/relationship/${zoneValue}`, main.zoneCreateList);
 						//main.zoneCreateList(zoneValue);
 					});
 
 					//document.getElementById('loadWrap').style.display = 'none';
+				},
+
+				getProjectList(projectList) {
+					var target = document.getElementById('projectList');
+					fnComm.removeHtml(target);
+
+					fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', function(usageResult){
+						//console.log(projectList);
+						//console.log(usageResult);
+
+						usageResult.forEach((usage, idx) => {
+							// 프로젝트 정보 merge
+							projectList.forEach((project, idx) => {
+								if (project.id == usage.tenant_id) {
+									usage.enabled = project.enabled;
+									usage.project_name = project.name;
+									usage.floating_ips = project.floatingIps;
+									usage.security_groups = project.secGroups;
+									usage.volumes = project.volumes;
+								}
+							});
+							var vcpus = 0;
+							var memoryMb = 0;
+							var diskGb = 0;
+							usage.server_usages.forEach((server, idx) => {
+								vcpus += server.vcpus;
+								memoryMb += server.memory_mb;
+								diskGb += server.local_gb;
+							});
+
+							usage.vcpus = vcpus;
+							usage.memory_mb = memoryMb;
+							usage.local_gb = diskGb;
+
+
+							var html = `<dl class="admin">
+								<dt>${usage.project_name}</dt>
+								<dd>
+									<ul class="project">
+										<li>
+											<dl>
+												<dt>VCPU</dt>
+												<dd>${usage.vcpus}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Memory</dt>
+												<dd>${usage.memory_mb}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Instance</dt>
+												<dd>${usage.server_usages.length}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>FIP</dt>
+												<dd>${usage.floating_ips}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Security</dt>
+												<dd>${usage.security_groups}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Volumes</dt>
+												<dd>${usage.volumes}</dd>
+											</dl>
+										</li>
+									</ul>
+								</dd>
+							</dl>`
+
+							fnComm.appendHtml(target, html, 'div');
+
+						});
+					});
+
+					main.isLoadedProject = true;
+					if (main.isLoadedHypervisor && main.isLoadedProject) {
+						// 로딩 딜레이 추가
+						setTimeout(function () {
+							main.loader.style.display = "none";
+						}, 1500);
+					}
+
+				},
+
+				// 만수
+				getHypervisorList(resultList) {
+					var target = document.getElementById("hypervisorList");
+					fnComm.removeHtml(target);
+
+					resultList.forEach((resultItem, idx)=>{
+
+						var cpuUsage = ((resultItem.vcpus_used / resultItem.vcpus ) * 100).toFixed(1);
+						var memoryUsage = ((resultItem.memory_mb_used / resultItem.memory_mb ) * 100).toFixed(1);
+						var diskUsage = ((resultItem.local_gb_used / resultItem.local_gb ) * 100).toFixed(1);
+
+						// class = running, warning, critical, fail
+						var html = `<dl class="running">
+								<dt>${resultItem.hypervisor_hostname}<span>${resultItem.host_ip}</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>${cpuUsage}%</span></li>
+										<li class="memo">Memory (MB) : <span>${memoryUsage}%</span><br>Total : <span>${resultItem.memory_mb} MB</span></li>
+										<li class="disk">Disk(GB) : <span>${diskUsage}%</span><br>Total : <span>${resultItem.local_gb} GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>`;
+
+						fnComm.appendHtml(target, html, 'div');
+
+					});
+					main.isLoadedHypervisor = true;
+					if (main.isLoadedHypervisor && main.isLoadedProject) {
+						// 로딩 딜레이 추가
+						setTimeout(function () {
+							main.loader.style.display = "none";
+						}, 1500);
+					}
 				},
 
 				zoneCreateSelect(data) {
