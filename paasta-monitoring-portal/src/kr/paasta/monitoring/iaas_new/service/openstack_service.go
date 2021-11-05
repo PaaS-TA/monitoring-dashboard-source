@@ -266,7 +266,9 @@ func (service *OpenstackService) GetHypervisorList() ([]interface{}, error) {
 	return hypervisorList, err
 }
 
-
+/**
+	@Unused
+ */
 func (service *OpenstackService) getHypervisorDetail(hypervisorId string) (*hypervisors.Hypervisor, error) {
 	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
 

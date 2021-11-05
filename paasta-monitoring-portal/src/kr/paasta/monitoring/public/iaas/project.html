@@ -325,6 +325,13 @@
 		</div>
 
 	</div>
+
+	<!-- loadWrap : start -->
+	<div id="loadWrap" >
+		<div class="loader"></div>
+	</div>
+	<!-- loadWrap : end -->
+
 	<!-- // Wrap -->
 
 	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
@@ -347,18 +354,19 @@
 		const project = {
 			id : '',
 			data : [],
-
+			loader : document.getElementById("loadWrap"),
 			init() {
 				// Alarm Count
 				//fnComm.alarmCount('iaas');
+
+				document.getElementById("loadWrap").style.display = "flex";
 
 				// TODO Openstack 프로젝트 목록 조회
 				fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
 
 				// TODO Openstack 프로젝트 및 인스턴스 usage 목록 조회
-				fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', project.getInstanceUsageList)
+				//fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', project.getInstanceUsageList)
 			},
-
 
 
 			// 2021.11.03 - 프로젝트 목록 콜백함수
@@ -435,6 +443,7 @@
 
 					});
 					project.data = usageResult;
+					project.loader.style.display = "none";
 				});
 			},
 
