@@ -279,7 +279,7 @@
 					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/clusterAvg`, total.caasCount);
 
 					// IaaS Event View
-					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/podStat`, total.iaasEvent);
+					fnComm.loadData('GET', `${fnComm.url}iaas/hyper/statistics`, total.iaasEvent);
 					// PaaS Event View
 					fnComm.loadData('GET', `${fnComm.url}paas/all/overview`, total.paasEvent);
 					// CaaS Event View(POD)
@@ -915,15 +915,13 @@
 				},
 
 				iaasEvent(data){
-					for(var name in data){
-						if(parseInt(data[name]) > 0){
-							var html = `<li>
-								<span>${name}</span>
-								<strong>${data[name]}</strong>
-							</li>`;
+					if(data["hypervisorCount"] > 0){
+						var html = `<li>
+							<span>Hypervisor Count</span>
+							<strong>${data["hypervisorCount"]}</strong>
+						</li>`;
 
-							fnComm.appendHtml(document.getElementById('iaasEvent'), html, 'ul');
-						};
+						fnComm.appendHtml(document.getElementById('iaasEvent'), html, 'ul');
 					};
 				},
 			}
