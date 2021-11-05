@@ -103,7 +103,8 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_LOG_RECENT:   route(logController.GetDefaultRecentLog),
 			routes.IAAS_LOG_SPECIFIC: route(logController.GetSpecificTimeRangeLog),
 
-			// TODO
+			// TODO 2021.11.01 - IAAS 모니터링 신규 추가
+			routes.IAAS_GET_HYPERVISOR_LIST: route(openstackController.GetHypervisorList),
 			routes.IAAS_GET_HYPER_STATISTICS : route(openstackController.GetHypervisorStatistics),
 			routes.IAAS_GET_SERVER_LIST : route(openstackController.GetServerList),
 			routes.IAAS_GET_PROJECT_LIST : route(openstackController.GetProjectList),

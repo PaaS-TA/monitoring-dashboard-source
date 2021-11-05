@@ -242,3 +242,35 @@ func (service *OpenstackService) GetServerDetail(id string) *servers.Server {
 	result, _ := servers.Get(computeClient, id).Extract()
 	return result
 }
+
+
+func (service *OpenstackService) GetHypervisorList() ([]interface{}, error) {
+	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
+
+	withServices := false
+	opts := hypervisors.ListOpts{
+		WithServers: &withServices,
+	}
+
+	allPages, err := hypervisors.List(computeClient, opts).AllPages()
+	if err != nil {
+		utils.Logger.Error(err)
+	}
+
+	resultBody := allPages.GetBody()
+
+	hypervisorMap := resultBody.(map[string]interface{})["hypervisors"]
+
+	hypervisorList := hypervisorMap.([]interface{})
+
+	return hypervisorList, err
+}
+
+
+func (service *OpenstackService) getHypervisorDetail(hypervisorId string) (*hypervisors.Hypervisor, error) {
+	computeClient, _ := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
+
+	result, err := hypervisors.Get(computeClient, hypervisorId).Extract()
+
+	return result, err
+}
