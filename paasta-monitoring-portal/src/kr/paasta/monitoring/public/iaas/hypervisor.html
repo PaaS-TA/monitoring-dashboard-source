@@ -229,6 +229,12 @@
 
 		</div>
 
+		<!-- loadWrap : start -->
+		<div id="loadWrap" >
+			<div class="loader"></div>
+		</div>
+		<!-- loadWrap : end -->
+
 	</div>
 	<!-- // Wrap -->
 
@@ -363,7 +369,11 @@
 			logPage : 1,
 			logSum : 1,
 
+			loader : document.getElementById("loadWrap"),
+
 			init() {
+				document.getElementById("loadWrap").style.display = "flex";
+
 				// Alarm Count
 				fnComm.alarmCount('paas');
 
@@ -463,6 +473,7 @@
 				});
 
 				//Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
+				document.getElementById("loadWrap").style.display = "none";
 			},
 
 			chartView(target) {
