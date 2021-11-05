@@ -37,6 +37,10 @@ func (osService *OpenstackController) GetHypervisorStatistics(w http.ResponseWri
 	}
 }
 
+
+/**
+	서버 목록 조회
+ */
 func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *http.Request) {
 
 	tenantIdParam := r.URL.Query().Get("tenantId")
@@ -58,6 +62,7 @@ func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *ht
 		utils.RenderJsonResponse(result, w)
 	}
 }
+
 
 /**
 	프로젝트(테넌트) 목록과 속한 인스턴스 목록 및 usage 정보를 조회
@@ -84,6 +89,10 @@ func (osService *OpenstackController) GetProjectUsage(w http.ResponseWriter, r *
 }
 
 
+/**
+	@Unused
+	프로젝트 목록(만) 조회
+ */
 func (osService *OpenstackController) GetProjectList(w http.ResponseWriter, r *http.Request) {
 	provider, _, err := utils.GetOpenstackProvider(r)
 
@@ -96,9 +105,23 @@ func (osService *OpenstackController) GetProjectList(w http.ResponseWriter, r *h
 	} else {
 		utils.RenderJsonResponse(result, w)
 	}
+}
 
 
+/**
+	하이퍼바이저 목록 (상세 정보 포함) 조회
+ */
+func (osService *OpenstackController) GetHypervisorList(w http.ResponseWriter, r *http.Request) {
+	provider, _, err := utils.GetOpenstackProvider(r)
 
+	result, err := service.GetOpenstackService(osService.OpenstackProvider, provider, osService.influxClient).GetHypervisorList()
+
+	if err != nil {
+		model.MonitLogger.Error("GetProjectList error :", err)
+		utils.ErrRenderJsonResponse(err, w)
+	} else {
+		utils.RenderJsonResponse(result, w)
+	}
 }
 
 

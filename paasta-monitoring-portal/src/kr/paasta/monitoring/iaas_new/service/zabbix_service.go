@@ -44,11 +44,24 @@ func (zabbixService *ZabbixService) getHostIpAddress(req *http.Request, instance
 	return ipAddress
 }
 
-func (zabbixService *ZabbixService) getZabbixHostDetail(ipAddr string) (zabbix.Host, error) {
+/**
+	Zabbix 호스트 정보를 조회
+		- IP주소나 호스트 이름으로 조회 가능
+ */
+func (zabbixService *ZabbixService) getZabbixHostDetail(paramMap map[string]interface{}) (zabbix.Host, error) {
 	// IP주소로 호스트 정보 조회
 	hostParams := make(map[string]interface{}, 0)
 	filterMap := make(map[string]interface{}, 0)
-	filterMap["ip"] = ipAddr
+
+	ipAddr, ok := paramMap["ip"].(string)
+	if ok {
+		filterMap["ip"] = ipAddr
+	}
+	hostName, ok := paramMap["host"].(string)
+	if ok {
+		filterMap["host"] = hostName
+	}
+
 	hostParams["filter"] = filterMap
 	result, err := host.GetHostList(zabbixService.ZabbixSession, hostParams)
 	if err != nil {
@@ -56,17 +69,32 @@ func (zabbixService *ZabbixService) getZabbixHostDetail(ipAddr string) (zabbix.H
 	}
 	if len(result) == 0 {
 		_result := zabbix.Host{}
-		return _result, fmt.Errorf("%s is not exist host.", ipAddr)
+		var target string
+		if ipAddr == "" {
+			target = hostName
+		} else {
+			target = ipAddr
+		}
+		return _result, fmt.Errorf("%s is not exist host.", target)
 	}
 	return result[0], nil
 }
 
 
 
-func (zabbixService *ZabbixService) GetCpuUsage(instanceId string, req *http.Request) ([]zabbix.History, error) {
+func (zabbixService *ZabbixService) GetCpuUsage(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
 
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -95,10 +123,18 @@ func (zabbixService *ZabbixService) GetCpuUsage(instanceId string, req *http.Req
 }
 
 
-func (zabbixService *ZabbixService) GetCpuLoadAverage(instanceId string, req *http.Request, interval int) ([]zabbix.History, error) {
+func (zabbixService *ZabbixService) GetCpuLoadAverage(instanceId string, hypervisorName string, req *http.Request, interval int) ([]zabbix.History, error) {
 
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -138,9 +174,17 @@ func (zabbixService *ZabbixService) GetCpuLoadAverage(instanceId string, req *ht
 }
 
 
-func (zabbixService *ZabbixService) GetMemoryUsage(instanceId string, req *http.Request) ([]zabbix.History, error) {
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+func (zabbixService *ZabbixService) GetMemoryUsage(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -169,9 +213,17 @@ func (zabbixService *ZabbixService) GetMemoryUsage(instanceId string, req *http.
 }
 
 
-func (zabbixService *ZabbixService) GetDiskUsage(instanceId string, req *http.Request) ([]zabbix.History, error) {
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+func (zabbixService *ZabbixService) GetDiskUsage(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -200,9 +252,17 @@ func (zabbixService *ZabbixService) GetDiskUsage(instanceId string, req *http.Re
 	return result, err
 }
 
-func (zabbixService *ZabbixService) GetDiskReadRate(instanceId string, req *http.Request) ([]zabbix.History, error) {
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+func (zabbixService *ZabbixService) GetDiskReadRate(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -231,9 +291,17 @@ func (zabbixService *ZabbixService) GetDiskReadRate(instanceId string, req *http
 	return result, err
 }
 
-func (zabbixService *ZabbixService) GetDiskWriteRate(instanceId string, req *http.Request) ([]zabbix.History, error) {
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+func (zabbixService *ZabbixService) GetDiskWriteRate(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -263,9 +331,17 @@ func (zabbixService *ZabbixService) GetDiskWriteRate(instanceId string, req *htt
 }
 
 
-func (zabbixService *ZabbixService) GetNetworkBitReceived(instanceId string, req *http.Request) ([]zabbix.History, error) {
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+func (zabbixService *ZabbixService) GetNetworkBitReceived(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err
@@ -295,9 +371,17 @@ func (zabbixService *ZabbixService) GetNetworkBitReceived(instanceId string, req
 }
 
 
-func (zabbixService *ZabbixService) GetNetworkBitSent(instanceId string, req *http.Request) ([]zabbix.History, error) {
-	hostIp := zabbixService.getHostIpAddress(req, instanceId)
-	zabbixHost, err := zabbixService.getZabbixHostDetail(hostIp)
+func (zabbixService *ZabbixService) GetNetworkBitSent(instanceId string, hypervisorName string, req *http.Request) ([]zabbix.History, error) {
+	paramMap := make(map[string]interface{})
+	if instanceId != "" {
+		hostIp := zabbixService.getHostIpAddress(req, instanceId)
+		paramMap["ip"] = hostIp
+	}
+	if hypervisorName != "" {
+		paramMap["host"] = hypervisorName
+	}
+
+	zabbixHost, err := zabbixService.getZabbixHostDetail(paramMap)
 	if err != nil {
 		utils.Logger.Error(err.Error())
 		return nil, err

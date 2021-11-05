@@ -275,6 +275,7 @@ const (
 	IAAS_ALARM_APP_NETWORK_USAGES       = "IAAS_ALARM_APP_NETWORK_USAGES"
 
 	// TODO 2021.11.01 - IAAS 모니터링
+	IAAS_GET_HYPERVISOR_LIST = "IAAS_GET_HYPERVISOR_LIST"
 	IAAS_GET_HYPER_STATISTICS = "IAAS_GET_HYPER_STATISTICS"
 	IAAS_GET_SERVER_LIST = "IAAS_GET_SERVER_LIST"
 	IAAS_GET_PROJECT_LIST = "IAAS_GET_PROJECT_LIST"
@@ -560,16 +561,18 @@ var IaasRoutes = rata.Routes{
 	//{Path: "/v2/iaas/alarm/app/network/:guid/:idx/usages", Method: "GET", Name: IAAS_ALARM_APP_NETWORK_USAGES},
 
 	//TODO
+	{Path: "/v2/iaas/hypervisor/list", Method: "GET", Name: IAAS_GET_HYPERVISOR_LIST},
 	{Path: "/v2/iaas/hyper/statistics", Method: "GET", Name: IAAS_GET_HYPER_STATISTICS},
 	{Path: "/v2/iaas/server/list", Method: "GET", Name: IAAS_GET_SERVER_LIST},
 	{Path: "/v2/iaas/project/list", Method: "GET", Name: IAAS_GET_PROJECT_LIST},
 	{Path: "/v2/iaas/instance/usage/list", Method: "GET", Name: IAAS_GET_INSTANCE_USAGE_LIST},
-	{Path: "/v2/iaas/instance/:instance_id/cpu/usage/", Method: "GET", Name: IAAS_GET_CPU_USAGE},
-	{Path: "/v2/iaas/instance/:instance_id/memory/usage/", Method: "GET", Name: IAAS_GET_MEMORY_USAGE},
-	{Path: "/v2/iaas/instance/:instance_id/disk/usage/", Method: "GET", Name: IAAS_GET_DISK_USAGE},
-	{Path: "/v2/iaas/instance/:instance_id/cpu/load/average", Method: "GET", Name: IAAS_GET_CPU_LOAD_AVERAGE},
-	{Path: "/v2/iaas/instance/:instance_id/disk/io/rate", Method: "GET", Name: IAAS_GET_DISK_IO_RATE},
-	{Path: "/v2/iaas/instance/:instance_id/network/io/bytes", Method: "GET", Name: IAAS_GET_NETWORK_IO_BTYES},
+	// IAAS 모니터링 차트 데이터
+	{Path: "/v2/iaas/instance/cpu/usage/", Method: "GET", Name: IAAS_GET_CPU_USAGE},
+	{Path: "/v2/iaas/instance/memory/usage/", Method: "GET", Name: IAAS_GET_MEMORY_USAGE},
+	{Path: "/v2/iaas/instance/disk/usage/", Method: "GET", Name: IAAS_GET_DISK_USAGE},
+	{Path: "/v2/iaas/instance/cpu/load/average", Method: "GET", Name: IAAS_GET_CPU_LOAD_AVERAGE},
+	{Path: "/v2/iaas/instance/disk/io/rate", Method: "GET", Name: IAAS_GET_DISK_IO_RATE},
+	{Path: "/v2/iaas/instance/network/io/bytes", Method: "GET", Name: IAAS_GET_NETWORK_IO_BTYES},
 
 
 
