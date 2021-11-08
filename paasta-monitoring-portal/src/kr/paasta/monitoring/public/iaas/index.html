@@ -395,6 +395,8 @@
 							usage.memory_mb = memoryMb;
 							usage.local_gb = diskGb;
 
+							var mem = fnComm.convertUnits(usage.memory_mb, "MB");
+							var disk = fnComm.convertUnits(usage.local_gb, "GB");
 
 							var html = `<dl class="admin">
 								<dt>${usage.project_name}</dt>
@@ -409,7 +411,7 @@
 										<li>
 											<dl>
 												<dt>Memory</dt>
-												<dd>${usage.memory_mb}</dd>
+												<dd>${mem.convertedSize} ${mem.convertedUnit}</dd>
 											</dl>
 										</li>
 										<li>
@@ -433,7 +435,7 @@
 										<li>
 											<dl>
 												<dt>Volumes</dt>
-												<dd>${usage.volumes}</dd>
+												<dd>${disk.convertedSize.toFixed(2)} ${disk.convertedUnit}</dd>
 											</dl>
 										</li>
 									</ul>

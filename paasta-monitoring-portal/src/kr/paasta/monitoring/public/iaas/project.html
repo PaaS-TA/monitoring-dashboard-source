@@ -402,6 +402,9 @@
 						usage.memory_mb = memoryMb;
 						usage.local_gb = diskGb;
 
+						var mem = fnComm.convertUnits(usage.memory_mb, "MB");
+						var disk = fnComm.convertUnits(usage.local_gb, "GB");
+
 						var html = `<div class="${usage.enabled} projectItem" onclick="onClickProjectItem('${usage.tenant_id}', this)">
 							<div>
 								<strong>${usage.project_name}</strong>
@@ -412,14 +415,14 @@
 									<dd>${usage.vcpus}</dd>
 								</dl>
 								<dl>
-									<dt>Memory (MB)</dt>
-									<dd>${usage.memory_mb}</dd>
+									<dt>Memory</dt>
+									<dd>${mem.convertedSize} ${mem.convertedUnit}</dd>
 								</dl>
 							</div>
 							<div>
 								<dl>
-									<dt>Volumes (GB)</dt>
-									<dd>${usage.local_gb}</dd>
+									<dt>Volumes</dt>
+									<dd>${disk.convertedSize.toFixed(2)} ${disk.convertedUnit}</dd>
 								</dl>
 								<dl>
 									<dt>Instance</dt>
