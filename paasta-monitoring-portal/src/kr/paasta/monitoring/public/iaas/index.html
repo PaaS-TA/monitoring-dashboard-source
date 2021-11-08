@@ -477,14 +477,17 @@
 						var memoryUsage = ((resultItem.memory_mb_used / resultItem.memory_mb ) * 100).toFixed(1);
 						var diskUsage = ((resultItem.local_gb_used / resultItem.local_gb ) * 100).toFixed(1);
 
+						var totalMem = fnComm.convertUnits(resultItem.memory_mb, "MB");
+						var totalDisk = fnComm.convertUnits(resultItem.local_gb, "GB");
+
 						// class = running, warning, critical, fail
 						var html = `<dl class="running">
 								<dt>${resultItem.hypervisor_hostname}<span>${resultItem.host_ip}</span></dt>
 								<dd>
 									<ul>
 										<li class="cpu">CPU : <span>${cpuUsage}%</span></li>
-										<li class="memo">Memory (MB) : <span>${memoryUsage}%</span><br>Total : <span>${resultItem.memory_mb} MB</span></li>
-										<li class="disk">Disk(GB) : <span>${diskUsage}%</span><br>Total : <span>${resultItem.local_gb} GB</span><br>Status : <span>Healthy</span></li>
+										<li class="memo">Memory (MB) : <span>${memoryUsage}%</span><br>Total : <span>${totalMem.convertedSize.toFixed(2)} ${totalMem.convertedUnit}</span></li>
+										<li class="disk">Disk(GB) : <span>${diskUsage}%</span><br>Total : <span>${totalDisk.convertedSize.toFixed(2)} ${totalDisk.convertedUnit}</span><br>Status : <span>Healthy</span></li>
 									</ul>
 								</dd>
 							</dl>`;

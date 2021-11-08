@@ -430,6 +430,11 @@
 					var cpuUsage = (resultItem.vcpus_used/resultItem.vcpus * 100).toFixed(1);
 					var memoryUsage = (resultItem.memory_mb_used/resultItem.memory_mb * 100).toFixed(1);
 
+					var usedMem = fnComm.convertUnits(resultItem.memory_mb_used, "MB");
+					var totalMem = fnComm.convertUnits(resultItem.memory_mb, "MB");
+					var usedDisk = fnComm.convertUnits(resultItem.local_gb_used, "GB");
+					var totalDisk = fnComm.convertUnits(resultItem.local_gb, "GB");
+
 					var html = `<div class="${resultItem.state}">
 							<div>
 								<strong>${resultItem.hypervisor_hostname}</strong>
@@ -441,12 +446,12 @@
 									<dd>${resultItem.vcpus_used}/${resultItem.vcpus}</dd>
 								</dl>
 								<dl>
-									<dt>Memory (MB)</dt>
-									<dd>${resultItem.memory_mb_used}/${resultItem.memory_mb}</dd>
+									<dt>Memory</dt>
+									<dd>${usedMem.convertedSize.toFixed(2)} ${usedMem.convertedUnit} / ${totalMem.convertedSize.toFixed(2)} ${totalMem.convertedUnit}</dd>
 								</dl>
 								<dl>
-									<dt>Disk (GB)</dt>
-									<dd>${resultItem.local_gb_used}/${resultItem.local_gb}</dd>
+									<dt>Disk</dt>
+									<dd>${usedDisk.convertedSize.toFixed(2)} ${usedDisk.convertedUnit} / ${totalDisk.convertedSize.toFixed(2)} ${totalDisk.convertedUnit}</dd>
 								</dl>
 							</div>
 							<div>
