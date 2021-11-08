@@ -460,6 +460,15 @@
 					var target = document.getElementById("hypervisorList");
 					fnComm.removeHtml(target);
 
+					resultList.sort(function (a, b) {
+						if (a.hypervisor_hostname > b.hypervisor_hostname) {
+							return 1;
+						} else if (a.hypervisor_hostname < b.hypervisor_hostname) {
+							return -1;
+						};
+						return 0;
+					});
+
 					resultList.forEach((resultItem, idx)=>{
 
 						var cpuUsage = ((resultItem.vcpus_used / resultItem.vcpus ) * 100).toFixed(1);
