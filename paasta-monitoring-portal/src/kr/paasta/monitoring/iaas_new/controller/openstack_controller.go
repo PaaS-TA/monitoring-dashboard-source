@@ -39,12 +39,12 @@ func (osService *OpenstackController) GetHypervisorStatistics(w http.ResponseWri
 
 
 /**
+	@Unused
 	서버 목록 조회
  */
 func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *http.Request) {
 
 	tenantIdParam := r.URL.Query().Get("tenantId")
-
 
 	provider, _, err := utils.GetOpenstackProvider(r)
 

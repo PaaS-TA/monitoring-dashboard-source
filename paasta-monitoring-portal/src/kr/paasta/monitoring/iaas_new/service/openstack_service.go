@@ -63,7 +63,8 @@ func (service *OpenstackService) GetHypervisorStatistics(userName string) (map[s
 
 
 /**
-@parameter
+	@Unused
+	@parameter
 	- params [map]
 		- host [string] : 호스트 이름
 		- name [string] : 서버 이름
@@ -131,7 +132,6 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 
 	for _, item := range(list) {
 		itemMap := item.(map[string]interface{})
-
 
 		projectId := itemMap["id"].(string)
 

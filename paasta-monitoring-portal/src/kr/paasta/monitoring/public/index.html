@@ -75,35 +75,35 @@
 									<div>
 										<dl>
 											<dt>Max Instance</dt>
-											<dd><strong>999</strong>개</dd>
+											<dd><strong id="instanceCnt">0</strong>개</dd>
 										</dl>
 										<dl>
 											<dt>Running / OK</dt>
-											<dd><strong>999</strong>개</dd>
+											<dd><strong id="runningCnt">0</strong>개</dd>
 										</dl>
 										<dl>
-											<dt>No Stauta</dt>
-											<dd><strong>999</strong>개</dd>
-										</dl>
-										<dl>
-											<dt>Idle / Blocked</dt>
-											<dd><strong>999</strong>개</dd>
+											<dt>No State</dt>
+											<dd><strong id="nostateCnt">0</strong>개</dd>
 										</dl>
 										<dl>
 											<dt>Paused</dt>
-											<dd><strong>999</strong>개</dd>
+											<dd><strong id="pauseCnt">0</strong>개</dd>
+										</dl>
+										<dl>
+											<dt>Crashed</dt>
+											<dd><strong id="crashedCnt">0</strong>개</dd>
 										</dl>
 										<dl>
 											<dt>Shutting down</dt>
-											<dd><strong>999</strong>개</dd>
+											<dd><strong id="shutdownCnt">0</strong>개</dd>
 										</dl>
 										<dl>
-											<dt>Shut Off</dt>
-											<dd><strong>999</strong>개</dd>
+											<dt>Suspended</dt>
+											<dd><strong id="suspendedCnt">0</strong>개</dd>
 										</dl>
 										<dl>
 											<dt>Zabbix API Version</dt>
-											<dd><strong>999</strong>개</dd>
+											<dd><strong id="zabbixVersion">0</strong>개</dd>
 										</dl>
 									</div>
 								</li>
@@ -264,7 +264,9 @@
 					};
 
 					// TODO : IaaS-Monitoring Summary
-					fnComm.loadData('GET', `${fnComm.url}iaas/hyper/statistics`, total.iaasCount);
+					fnComm.loadData('GET', `${fnComm.url}iaas/hyper/statistics`, total.iaasHypervisorSummary);
+
+					fnComm.loadData('GET', `${fnComm.url}iaas/server/list`, total.iaasInstanceSummary);
 
 					// PaaS-Monitoring BOSH Summary
 					fnComm.loadData('GET', `${fnComm.url}paas/bosh/overview`, total.boshDraw);
@@ -278,8 +280,6 @@
 					// CaaS-Monitoring Summary
 					fnComm.loadData('GET', `${fnComm.url}caas/monitoring/clusterAvg`, total.caasCount);
 
-					// IaaS Event View
-					fnComm.loadData('GET', `${fnComm.url}iaas/hyper/statistics`, total.iaasEvent);
 					// PaaS Event View
 					fnComm.loadData('GET', `${fnComm.url}paas/all/overview`, total.paasEvent);
 					// CaaS Event View(POD)
@@ -725,7 +725,7 @@
 					});
 				},
 
-				iaasCount(data){
+				iaasHypervisorSummary(data){
 					// CpuUsage: "1.20"
 					// DiskUsage: "15.90"
 					// MemoryUsage: "4.35"
@@ -873,6 +873,56 @@
 							show: false
 						}
 					});
+
+					if (data["hypervisorCount"] >= 0) {
+						var html = `<li>
+							<span>Hypervisor Count</span>
+							<strong>${data["hypervisorCount"]}</strong>
+						</li>`;
+						fnComm.appendHtml(document.getElementById('iaasEvent'), html, 'ul');
+					}
+				},
+
+				iaasInstanceSummary(resultList) {
+					console.log(resultList);
+					var instanceCnt = resultList.length;
+					var runningCnt = 0;
+					var noStateCnt = 0;
+					var pauseCnt = 0;
+					var shutdownCnt = 0;
+					var crashedCnt = 0;
+					var suspendedCnt = 0;
+					resultList.forEach((item, idx) => {
+						var powerState = item["OS-EXT-STS:power_state"];
+						switch (powerState) {
+							case 0 :
+								noStateCnt++;
+								break;
+							case 1 :
+								runningCnt++;
+								break;
+							case 3 :
+								pauseCnt++;
+								break;
+							case 4 :
+								shutdownCnt++;
+								break;
+							case 6 :
+								crashedCnt++;
+								break;
+							case 7 :
+								suspendedCnt++;
+								break;
+						}
+					});
+					// 만수
+					document.getElementById("instanceCnt").innerText = instanceCnt;
+					document.getElementById("runningCnt").innerText = runningCnt;
+					document.getElementById("nostateCnt").innerText = noStateCnt;
+					document.getElementById("pauseCnt").innerText = pauseCnt;
+					document.getElementById("crashedCnt").innerText = crashedCnt;
+					document.getElementById("shutdownCnt").innerText = shutdownCnt;
+					document.getElementById("suspendedCnt").innerText = suspendedCnt;
 				},
 
 				paasEvent(data){
