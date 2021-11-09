@@ -66,35 +66,31 @@
 						<h4><strong style="color: #333333;">인스턴스</strong></h4>
 						<dl>
 							<dt>Max Instance</dt>
-							<dd><strong>999</strong>개</dd>
+							<dd><strong id="instanceCnt">0</strong>개</dd>
 						</dl>
 						<dl>
 							<dt>Running / OK</dt>
-							<dd><strong>999</strong>개</dd>
+							<dd><strong id="runningCnt">0</strong>개</dd>
 						</dl>
 						<dl>
-							<dt>No Stauta</dt>
-							<dd><strong>999</strong>개</dd>
-						</dl>
-						<dl>
-							<dt>Idle / Blocked</dt>
-							<dd><strong>999</strong>개</dd>
+							<dt>No State</dt>
+							<dd><strong id="nostateCnt">0</strong>개</dd>
 						</dl>
 						<dl>
 							<dt>Paused</dt>
-							<dd><strong>999</strong>개</dd>
+							<dd><strong id="pauseCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Crashed</dt>
+							<dd><strong id="crashedCnt">0</strong>개</dd>
 						</dl>
 						<dl>
 							<dt>Shutting down</dt>
-							<dd><strong>999</strong>개</dd>
+							<dd><strong id="shutdownCnt">0</strong>개</dd>
 						</dl>
 						<dl>
-							<dt>Shut Off</dt>
-							<dd><strong>999</strong>개</dd>
-						</dl>
-						<dl>
-							<dt>Croshed</dt>
-							<dd><strong>999</strong>개</dd>
+							<dt>Suspended</dt>
+							<dd><strong id="suspendedCnt">0</strong>개</dd>
 						</dl>
 					</div>
 				</div>
@@ -125,48 +121,12 @@
 							</li>
 						</ul>
 					</nav>
-					<!--
-					<div class="timePop">
-						<h4>Time Range</h4>
-						<div class="timer">
-							<div>
-								<input type="radio" name="timeRange" id="tr01" value="15m" data-group="1m" checked>
-								<label for="tr01">최근 15분</label>
-								<input type="radio" name="timeRange" id="tr02" value="30m" data-group="2m">
-								<label for="tr02">최근 30분</label>
-								<input type="radio" name="timeRange" id="tr03" value="1h" data-group="4m">
-								<label for="tr03">최근 1시간</label>
-								<input type="radio" name="timeRange" id="tr04" value="3h" data-group="12m">
-								<label for="tr04">최근 3시간</label>
-								<input type="radio" name="timeRange" id="tr05" value="6h" data-group="24m">
-								<label for="tr05">최근 6시간</label>
-								<input type="radio" name="timeRange" id="tr06" value="12h" data-group="48m">
-								<label for="tr06">최근 12시간</label>
-								<input type="radio" name="timeRange" id="tr07" value="1d" data-group="1h36m">
-								<label for="tr07">최근 1일</label>
-								<input type="radio" name="timeRange" id="tr08" value="7d" data-group="11h12m">
-								<label for="tr08">최근 이번주</label>
-								<input type="radio" name="timeRange" id="tr09" value="30d" data-group="48h">
-								<label for="tr09">최근 이번달</label>
-							</div>
-							<div style="display:none;">
-								<input type="radio" name="timeRange" id="tr10">
-								<label for="tr10">수동설정</label>
-								<input type="text" id="from" name="from">
-								<input type="text" id="to" name="to">
-							</div>
-						</div>
-
-						<a href="javascript:void(0);" class="close">close</a>
-					</div>
-					-->
 					<article class="zoneWrap">
 						<h4>
 							<span>Hypervisor</span>
 							<div>
-								<span class="run">Running<strong id="hypervisorRunningCnt">999</strong></span>
-								<span class="war">Warning<strong id="hypervisorWarningCnt">999</strong></span>
-								<span class="cri">Critical<strong id="hypervisorCriticalCnt">999</strong></span>
+								<span class="run">enable<strong id="hypervisorEnableCnt">0</strong></span>
+								<span class="war">disable<strong id="hypervisorDisableCnt">0</strong></span>
 							</div>
 						</h4>
 						<div id="hypervisorList" class="nodeList">
@@ -186,7 +146,9 @@
 						<h4>
 							<span>Project</span>
 							<div>
-								<span class="bak">total<strong>999</strong></span><span class="run">enable<strong>999</strong></span> <span class="cri">disable<strong>999</strong></span>
+								<span class="bak">total<strong id="projectTotalCnt">0</strong></span>
+								<span class="run">enable<strong id="projectEnableCnt">0</strong></span>
+								<span class="cri">disable<strong id="projectDisableCnt">0</strong></span>
 							</div>
 						</h4>
 						<div id="projectList" class="nodeList">
@@ -325,42 +287,8 @@
 					//TODO 하이퍼바이저 목록 출력
 					fnComm.loadData('GET', fnComm.url + 'iaas/hypervisor/list', main.getHypervisorList);
 
+					fnComm.loadData('GET', `${fnComm.url}iaas/server/list`, main.iaasInstanceSummary);
 
-					// BOSH 컨디션 차트
-					//fnComm.loadData('GET', `${fnComm.url}paas/bosh/overview`, fnComm.boshConditionChart);
-					// PaaS 컨디션 차트
-					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/overview`, fnComm.paasConditionChart);
-					// CONTAINER 컨디션 차트
-					//fnComm.loadData('GET', `${fnComm.url}paas/container/overview`, fnComm.contConditionChart);
-
-					// CONTAINER 컨디션 리스트 - 셀렉트 생성
-					//fnComm.loadData('GET', `${fnComm.url}paas/container/summary?pageIndex=1&pageItems=1000`, main.zoneCreateSelect);
-
-					// 오늘 날짜
-					var today = new Date();
-					var dd = today.getDate();
-					var mm = today.getMonth()+1;
-					var nn = today.getMonth();
-					var yyyy = today.getFullYear();
-
-					if(dd < 10) dd = '0'+dd;
-					if(mm < 10) mm = '0'+mm;
-					if(nn < 10) nn = '0'+nn;
-					
-					//fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
-
-
-
-					var target = document.getElementById('containerZone');
-					target.addEventListener('change', () => {
-						let zoneValue = target.options[target.selectedIndex].value;
-						console.log(zoneValue);
-						
-						//fnComm.loadData('GET', `${fnComm.url}paas/container/relationship/${zoneValue}`, main.zoneCreateList);
-						//main.zoneCreateList(zoneValue);
-					});
-
-					//document.getElementById('loadWrap').style.display = 'none';
 				},
 
 				getProjectList(projectList) {
@@ -368,10 +296,14 @@
 					fnComm.removeHtml(target);
 
 					fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', function(usageResult){
-						//console.log(projectList);
-						//console.log(usageResult);
+						console.log(projectList);
+						console.log(usageResult);
+
+						var enableCnt = 0;
+						var disableCnt = 0;
 
 						usageResult.forEach((usage, idx) => {
+
 							// 프로젝트 정보 merge
 							projectList.forEach((project, idx) => {
 								if (project.id == usage.tenant_id) {
@@ -380,6 +312,13 @@
 									usage.floating_ips = project.floatingIps;
 									usage.security_groups = project.secGroups;
 									usage.volumes = project.volumes;
+
+									if (usage.enabled) {
+										console.log(enableCnt);
+										enableCnt++;
+									} else {
+										disableCnt++;
+									}
 								}
 							});
 							var vcpus = 0;
@@ -445,7 +384,12 @@
 							fnComm.appendHtml(target, html, 'div');
 
 						});
+						document.getElementById("projectTotalCnt").innerText = usageResult.length;
+						document.getElementById("projectEnableCnt").innerText = enableCnt;
+						document.getElementById("projectDisableCnt").innerText = disableCnt;
 					});
+
+
 
 					main.isLoadedProject = true;
 					if (main.isLoadedHypervisor && main.isLoadedProject) {
@@ -457,7 +401,6 @@
 
 				},
 
-				// 만수
 				getHypervisorList(resultList) {
 					var target = document.getElementById("hypervisorList");
 					fnComm.removeHtml(target);
@@ -471,6 +414,8 @@
 						return 0;
 					});
 
+					var enableCnt = 0;
+					var disableCnt = 0;
 					resultList.forEach((resultItem, idx)=>{
 
 						var cpuUsage = ((resultItem.vcpus_used / resultItem.vcpus ) * 100).toFixed(1);
@@ -491,10 +436,18 @@
 									</ul>
 								</dd>
 							</dl>`;
-
 						fnComm.appendHtml(target, html, 'div');
 
+						if (resultItem.status == 'enabled') {
+							enableCnt++;
+						} else {
+							disableCnt++;
+						}
 					});
+
+					document.getElementById("hypervisorEnableCnt").innerText = enableCnt;
+					document.getElementById("hypervisorDisableCnt").innerText = disableCnt;
+
 					main.isLoadedHypervisor = true;
 					if (main.isLoadedHypervisor && main.isLoadedProject) {
 						// 로딩 딜레이 추가
@@ -504,170 +457,6 @@
 					}
 				},
 
-				zoneCreateSelect(data) {
-					//////////////////////////////////////////////////////////////////////
-					// 메인 그리드 Zone-Containers : 셀렉터
-					// Data Example //////////////////////////////////////////////////////
-					// appCnt: "1"
-					// cellCnt: "1"
-					// cellName: ""
-					// containerCnt: "2"
-					// criticalCnt: "0"
-					// failedCnt: "0"
-					// runningCnt: "2"
-					// warningCnt: "0"
-					// zoneName: "z1"
-					//////////////////////////////////////////////////////////////////////
-					var target = document.getElementById('containerZone');
-					
-					fnComm.removeHtml(target);
-
-					data.data.forEach(value => {
-						var html = `<option value="${value.zoneName}">Cell-${value.zoneName} / ${value.cellCnt}</option>`;
-						
-						fnComm.appendHtml(target, html, 'select');
-					});
-
-					target.options[0].selected = true;
-					
-					// CONTAINER 컨디션 리스트 - 상세이스트 생성
-					fnComm.loadData('GET', `${fnComm.url}paas/container/relationship/${data.data[0].zoneName}`, main.zoneCreateList);
-				},
-				
-				zoneCreateList(data) {
-					//////////////////////////////////////////////////////////////////////
-					// 메인 그리드 Zone-Containers : 리스트
-					// Data Example //////////////////////////////////////////////////////
-					// appCnt: "1"
-					// cellCnt: ""
-					// cellIp: "10.20.10.136"
-					// cellName: "diego-cell/0"
-					// containerCnt: "2"
-					// containers: (2) [{
-					//   0: {
-					//     appName: "hello",
-					//     appIndex: "1",
-					//     status: "running",
-					//     containerId: "wqsq7f3rfsfp-0"
-					//   }
-					// }]
-					// criticalCnt: "0"
-					// failedCnt: "0"
-					// runningCnt: "2"
-					// warningCnt: "0"
-					// zoneName: "z1"
-					//////////////////////////////////////////////////////////////////////
-					var target = document.querySelector('.cellList');
-
-					fnComm.removeHtml(target);
-
-					console.log('removeHtml');
-
-					// cell 데이터 있을 시 실행
-					if(data != null && data.length > 0){
-						data.forEach((value, idx)=>{
-							var html = `<dl>
-								<dt>${value.cellName}</dt>
-							<dd>`;
-
-							// containers 데이터 있을 시 실행
-							if(value.containers != null && value.containers.length > 0){
-								value.containers.forEach((value, idx)=>{
-									html += `<a href="javascript:void(0);" class="contChart ${value.status}" data-id="${value.containerId}" data-name="${value.appName}">
-										<div class="flag">
-											<dl>
-												<dt>Index</dt>
-												<dd>${value.appIndex}</dd>
-											</dl>
-											<dl>
-												<dt>Name</dt>
-												<dd>${value.appName}</dd>
-											</dl>
-										</div>
-									</a>`;
-								});
-							};
-
-							html += '</dd></dl>';
-							
-							fnComm.appendHtml(target, html, 'div');
-						});
-						
-						// Button Event (Process, Chart, Log)
-						var elm = document.querySelectorAll('.contChart');
-						for(var i=0 ; i<elm.length ; i++){
-							// Chart Event
-							elm[i].addEventListener('click', (e) => {
-								document.querySelector('.chartTitle').innerHTML = e.target.getAttribute('data-name');
-								main.chartView(e.target.getAttribute('data-id'));
-							}, false);
-							
-							// Chart Event
-							document.querySelector('.chartClosed').addEventListener('click', (e) => {
-								document.getElementById('chartWrap').classList.toggle('on', false);
-							}, false);
-						};
-						
-					};
-				},
-
-				chartView(elmID) {
-					document.getElementById('chartWrap').classList.toggle('on', true);
-					document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
-
-					setTimeout(() => {
-						// CPU Usage 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/cpu/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#cpuUsageChart');
-
-						// CPU Load 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/cpu/${elmID}/loads` + fnComm.setTimer(), fnComm.detailChart, '#cpuLoadChart');
-
-						// Memory Usage 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/memory/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#memoryUsageChart');
-
-						// Disk Usage 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/disk/${elmID}/usages` + fnComm.setTimer(), fnComm.detailChart, '#diskUsageChart');
-
-						// Network IO Bytes 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/network/${elmID}/bytes` + fnComm.setTimer(), fnComm.detailChart, '#networkByteChart');
-						
-						// Network IO Drop 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/network/${elmID}/drops` + fnComm.setTimer(), fnComm.detailChart, '#networkDropChart');
-						
-						// Network IO Error 정보
-						fnComm.loadData('GET', `${fnComm.url}paas/container/network/${elmID}/errors` + fnComm.setTimer(), fnComm.detailChart, '#networkErrorChart');
-					},500);
-				},
-
-				alarmCreateList(data) {
-					var target = document.querySelector('.alarmList');
-
-					fnComm.removeHtml(target);
-
-					if(data.data.length > 0){
-						data.data.forEach(value => {
-							var html = `<li class="${value.level}">
-								<h6><span>${value.regDate}</span></h6>
-								<dl>
-									<dt>Type</dt>
-									<dd>${value.alarmType}</dd>
-								</dl>
-								<dl>
-									<dt>Title</dt>
-									<dd>${value.alarmTitle}</dd>
-								</dl>
-							</li>`;
-
-							fnComm.appendHtml(target, html, 'div');
-						});
-
-						fnComm.linkHtml(document.querySelector('.alarmList').querySelectorAll('li'), 'alarm_status.html');
-					} else {
-						var html = `<li class="none">최근 한달간 알람이 없습니다.</li>`
-
-						fnComm.appendHtml(target, html, 'div');
-					}
-				},
 
 				iaasCount(data){
 					// CpuUsage: "1.20"
@@ -817,6 +606,48 @@
 							show: false
 						}
 					});
+				},
+
+				iaasInstanceSummary(resultList) {
+					console.log(resultList);
+					var instanceCnt = resultList.length;
+					var runningCnt = 0;
+					var noStateCnt = 0;
+					var pauseCnt = 0;
+					var shutdownCnt = 0;
+					var crashedCnt = 0;
+					var suspendedCnt = 0;
+					resultList.forEach((item, idx) => {
+						var powerState = item["OS-EXT-STS:power_state"];
+						switch (powerState) {
+							case 0 :
+								noStateCnt++;
+								break;
+							case 1 :
+								runningCnt++;
+								break;
+							case 3 :
+								pauseCnt++;
+								break;
+							case 4 :
+								shutdownCnt++;
+								break;
+							case 6 :
+								crashedCnt++;
+								break;
+							case 7 :
+								suspendedCnt++;
+								break;
+						}
+					});
+
+					document.getElementById("instanceCnt").innerText = instanceCnt;
+					document.getElementById("runningCnt").innerText = runningCnt;
+					document.getElementById("nostateCnt").innerText = noStateCnt;
+					document.getElementById("pauseCnt").innerText = pauseCnt;
+					document.getElementById("crashedCnt").innerText = crashedCnt;
+					document.getElementById("shutdownCnt").innerText = shutdownCnt;
+					document.getElementById("suspendedCnt").innerText = suspendedCnt;
 				},
 			}
 
