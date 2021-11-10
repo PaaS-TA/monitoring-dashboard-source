@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/model"
+	"kr/paasta/iaas-monitoring-batch/model"
 	//"time"
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"kr/paasta/monitoring-batch/config"
+	"kr/paasta/iaas-monitoring-batch/config"
 	"log"
 	"os"
 	"os/signal"
@@ -29,7 +29,7 @@ func main() {
 		}
 	}()
 	//===============================================================
-	//logger, _ := cflager.New("paasta-monitoring-batch")
+	//logger, _ := cflager.New("paasta-iaas-monitoring-batch")
 
 	var startTime time.Time
 	//============================================

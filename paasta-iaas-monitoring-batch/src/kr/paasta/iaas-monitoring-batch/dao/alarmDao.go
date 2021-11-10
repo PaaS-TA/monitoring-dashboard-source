@@ -3,9 +3,9 @@ package dao
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
+	"kr/paasta/iaas-monitoring-batch/model"
+	"kr/paasta/iaas-monitoring-batch/model/base"
+	"kr/paasta/iaas-monitoring-batch/util"
 	"log"
 	"time"
 )

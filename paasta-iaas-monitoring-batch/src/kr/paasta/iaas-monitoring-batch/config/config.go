@@ -38,7 +38,7 @@ type Config struct {
 
 
 func InitializeConfig() *Config {
-	filePath, _ := filepath.Abs("src/kr/paasta/monitoring-batch/config.ini")
+	filePath, _ := filepath.Abs("src/kr/paasta/iaas-monitoring-batch/config.ini")
 	configMap, err := readConfig(filePath)
 	if err != nil {
 		os.Exit(0)

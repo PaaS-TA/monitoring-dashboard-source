@@ -4,8 +4,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"kr/paasta/monitoring-batch/config"
-	"kr/paasta/monitoring-batch/model/base"
+	"kr/paasta/iaas-monitoring-batch/config"
+	"kr/paasta/iaas-monitoring-batch/model/base"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -24,9 +24,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
+	"kr/paasta/iaas-monitoring-batch/dao"
+	"kr/paasta/iaas-monitoring-batch/model"
+	"kr/paasta/iaas-monitoring-batch/util"
 )
 
 type AlarmService struct {
@@ -47,7 +47,7 @@ var hostList []zabbix.Host
 func AlarmServiceBuilder(configData *config.Config) *AlarmService {
 	dbConnStr := util.GetConnectionString(configData.DbHost, configData.DbPort, configData.DbUser, configData.DbPasswd, configData.DbName)
 
-	log.Printf("dbConnStr : %v\n", dbConnStr+"?charset=utf8&parseTime=true")
+	//log.Printf("dbConnStr : %v\n", dbConnStr+"?charset=utf8&parseTime=true")
 
 	dbConn, err := gorm.Open(configData.DbType, dbConnStr+"?charset=utf8&parseTime=true")
 	if err != nil {

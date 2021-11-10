@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"io/ioutil"
-	md "kr/paasta/monitoring-batch/model"
+	md "kr/paasta/iaas-monitoring-batch/model"
 	"net/http"
 	"net/url"
 	"strconv"
