@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"syscall"
 	"time"
@@ -68,7 +69,8 @@ func main() {
 	//fmt.Println("gmtTimeGapHour::::", gmtTimeGapHour)
 
 	// 설정데이터 초기화
-	configData := config.InitializeConfig()
+	filePath, _ := filepath.Abs(`config.ini`)
+	configData := config.InitializeConfig(filePath)
 
 	members := grouper.Members {
 		{"monitoring_batch_processor", NewIfritRunner(configData) },

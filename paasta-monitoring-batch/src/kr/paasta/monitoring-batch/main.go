@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 	"bufio"
 	"strings"
@@ -40,6 +41,9 @@ func main() {
 	var startTime time.Time
 	//============================================
 	// 기본적인 프로퍼티 설정 정보 읽어오기
+	filePath, _ := filepath.Abs(`config.ini`)
+	fmt.Printf("config file path : %v\n", filePath)
+
 	config, err := readConfig(`config.ini`)
 	if err != nil {
 		//logger.Fatal("read config file error :", err)

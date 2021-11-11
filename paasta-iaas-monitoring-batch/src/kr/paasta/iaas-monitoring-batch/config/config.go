@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -37,8 +36,8 @@ type Config struct {
 }
 
 
-func InitializeConfig() *Config {
-	filePath, _ := filepath.Abs("src/kr/paasta/iaas-monitoring-batch/config.ini")
+func InitializeConfig(filePath string) *Config {
+	//filePath, _ := filepath.Abs("config.ini")
 	configMap, err := readConfig(filePath)
 	if err != nil {
 		os.Exit(0)
