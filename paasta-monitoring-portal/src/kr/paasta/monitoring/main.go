@@ -96,6 +96,7 @@ func main() {
 	}
 
 	// 2021.09.06 - 왜 있는건지??
+	// 2021.11.11 - @Deprecated
 	// memberInfo table (use common database table)
 	//createTable(paasDbAccessObj)
 
@@ -166,6 +167,7 @@ func main() {
 }
 
 // 2021.09.06 - 이거 왜 있는지??
+// 2021.11.11 - @Deprecated
 //func createTable(dbClient *gorm.DB) {
 //	dbClient.Debug().AutoMigrate(&MemberInfo{})
 //}
