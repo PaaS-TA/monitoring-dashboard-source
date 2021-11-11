@@ -486,8 +486,8 @@ var SaasRoutes = rata.Routes{
 // TODO 2021.11.01 - IAAS 모니터링
 var IaasRoutes = rata.Routes{
 	//{Path: "/v2/dashboard",								Method: "GET", Name: DASHBOARD                              },
-	//{Path: "/v2/member/join/check/duplication/iaas/:id", Method: "GET", Name: MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID},
-	//{Path: "/v2/member/join/check/iaas", Method: "POST", Name: MEMBER_JOIN_CHECK_IAAS},
+	{Path: "/v2/member/join/check/duplication/iaas/:id", Method: "GET", Name: MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID},
+	{Path: "/v2/member/join/check/iaas", Method: "POST", Name: MEMBER_JOIN_CHECK_IAAS},
 
 	{Path: "/v2/iaas/main/summary", Method: "GET", Name: IAAS_MAIN_SUMMARY},
 	{Path: "/v2/iaas/node/manage/summary", Method: "GET", Name: IAAS_NODE_MANAGE_SUMMARY},

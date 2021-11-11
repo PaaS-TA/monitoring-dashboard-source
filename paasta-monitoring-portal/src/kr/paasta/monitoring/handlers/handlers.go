@@ -67,8 +67,8 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 		//iaasActions = iaasHttp.InitHandler(paasTxn, openstackProvider, iaasInfluxClient, iaasElasticClient)
 
 		iaasActions = rata.Handlers {
-			//routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
-			//routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
+			routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
+			routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
 
 			//Integrated with routes
 			routes.IAAS_MAIN_SUMMARY:                  route(mainController.OpenstackSummary),
