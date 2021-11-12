@@ -223,10 +223,7 @@
 								<p>Telegram 메신져에서 @BotFather 채널에 참여 후 /newbot 명령으로 알람 Bot을 생성하여 아래 등록해주시기 바랍니다.<a href="#">등록방법</a></p>
 								<fieldset>
 									<select id="dvSelect">
-										<option value="all">All</option>
-										<option value="bos">Bosh</option>
-										<option value="pas">PaaS-TA</option>
-										<option value="con">Container</option>
+										<option value="ias">IaaS</option>
 									</select>
 									<input type="text" placeholder="Bot ID" class="snsid">
 									<input type="text" placeholder="Token Value" class="token">
@@ -435,10 +432,7 @@
 							var item = data[i];
 							var sendYnCheckedTxt = item.snsSendYn == 'Y' ? 'checked' : '';
 							var snsSendYnTxt = item.snsSendYn == 'Y' ? '발송가능' : '발송불가';
-							var originTypeTxt = item.originType == 'all' ? 'ALL' :
-									item.originType == 'bos' ? 'Bosh' :
-											item.originType == 'con' ? 'Container' :
-													item.originType == 'pas' ? 'PaaS-TA' : '';
+							var originTypeTxt = item.originType == 'ias' ? 'IaaS' : '';
 
 							htmlStr += "<li style=\"display:inline-block; width:100%\">"
 								+ "<input class=\"list-checkinput\"type=\"checkbox\" id=\"" + item.id + "\" value=\"" + item.snsSendYn + "\"/>"

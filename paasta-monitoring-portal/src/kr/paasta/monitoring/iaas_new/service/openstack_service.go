@@ -37,7 +37,7 @@ func (service *OpenstackService) GetHypervisorStatistics(userName string) (map[s
 		fmt.Println(err)
 	}
 
-	hypervisorStatistics, err := hypervisors.GetStatistics(client).Extract();
+	hypervisorStatistics, err := hypervisors.GetStatistics(client).Extract()
 	if err != nil {
 		fmt.Println(err)
 	}

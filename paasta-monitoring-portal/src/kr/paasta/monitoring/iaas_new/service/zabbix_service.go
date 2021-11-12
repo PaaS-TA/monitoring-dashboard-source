@@ -117,7 +117,7 @@ func (zabbixService *ZabbixService) GetCpuUsage(instanceId string, hypervisorNam
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -168,7 +168,7 @@ func (zabbixService *ZabbixService) GetCpuLoadAverage(instanceId string, hypervi
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -207,7 +207,7 @@ func (zabbixService *ZabbixService) GetMemoryUsage(instanceId string, hypervisor
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -247,7 +247,7 @@ func (zabbixService *ZabbixService) GetDiskUsage(instanceId string, hypervisorNa
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -286,7 +286,7 @@ func (zabbixService *ZabbixService) GetDiskReadRate(instanceId string, hyperviso
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -325,7 +325,7 @@ func (zabbixService *ZabbixService) GetDiskWriteRate(instanceId string, hypervis
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -365,7 +365,7 @@ func (zabbixService *ZabbixService) GetNetworkBitReceived(instanceId string, hyp
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
@@ -405,7 +405,7 @@ func (zabbixService *ZabbixService) GetNetworkBitSent(instanceId string, hypervi
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(zabbixService.ZabbixSession, params)
+	result, err := history.GetHistory(zabbixService.ZabbixSession, params)
 
 	return result, err
 }
