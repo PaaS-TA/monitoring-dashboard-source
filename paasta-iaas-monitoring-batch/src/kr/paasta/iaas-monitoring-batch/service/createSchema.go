@@ -20,7 +20,7 @@ func CreateAlarmPolicyInitialData(dbClient *gorm.DB) {
 	memoryAlarmPolicy := model.AlarmPolicy{Id: 2, OriginType: "ias", AlarmType: "memory", WarningThreshold: 85, CriticalThreshold: 90, RepeatTime: 10 , MeasureTime: 600 , Comment: "Initial Data"}
 	diskAlarmPolicy   := model.AlarmPolicy{Id: 3, OriginType: "ias", AlarmType: "disk", WarningThreshold: 85, CriticalThreshold: 90, RepeatTime: 10 , MeasureTime: 600 , Comment: "Initial Data"}
 
-	alarmTagetBosh    := model.AlarmTarget{Id:1, OriginType: "ias", MailAddress: "adminUser@gmail.com", MailSendYn: "Y" }
+	alarmTagetBosh    := model.AlarmTarget{Id:4, OriginType: "ias", MailAddress: "adminUser@gmail.com", MailSendYn: "Y" }
 
 	dbClient.FirstOrCreate(&cpuAlarmPolicy)
 	dbClient.FirstOrCreate(&memoryAlarmPolicy)
