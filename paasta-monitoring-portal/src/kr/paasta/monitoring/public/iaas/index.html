@@ -300,7 +300,7 @@
 					if(mm < 10) mm = '0'+mm;
 					if(nn < 10) nn = '0'+nn;
 
-					fnComm.loadData('GET', `${fnComm.url}iaas/alarm/statuses?pageItems=1000&pageIndex=1&originType=&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
+					fnComm.loadData('GET', `${fnComm.url}iaas/alarm/statuses?pageItems=1000&pageIndex=1&originType=ias&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
 
 				},
 

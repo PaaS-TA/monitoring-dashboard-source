@@ -36,7 +36,7 @@ func (h *AlarmDao) GetAlarmList(request model.AlarmRequest, txn *gorm.DB) ([]mod
 			startDataRow = endDataRow - request.PagingReq.PageItem
 		}
 
-		var queryWhere = " ( EXISTS ( SELECT id FROM vms WHERE id = A.origin_id  and A.origin_type= 'ias' ) or A.origin_type != 'ias' ) and"
+		var queryWhere = " "
 
 		if request.OriginType != "" {
 			queryWhere += " origin_type = '" + request.OriginType + "' and"
