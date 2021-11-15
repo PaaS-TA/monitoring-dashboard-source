@@ -289,6 +289,49 @@
 
 					fnComm.loadData('GET', `${fnComm.url}iaas/server/list`, main.iaasInstanceSummary);
 
+					// 오늘 날짜 계산
+					var today = new Date();
+					var dd = today.getDate();
+					var mm = today.getMonth()+1;
+					var nn = today.getMonth();
+					var yyyy = today.getFullYear();
+
+					if(dd < 10) dd = '0'+dd;
+					if(mm < 10) mm = '0'+mm;
+					if(nn < 10) nn = '0'+nn;
+
+					fnComm.loadData('GET', `${fnComm.url}iaas/alarm/statuses?pageItems=1000&pageIndex=1&originType=&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
+
+				},
+
+				alarmCreateList(data) {
+					var target = document.querySelector('.alarmList');
+
+					fnComm.removeHtml(target);
+
+					if(data.data.length > 0){
+						data.data.forEach(value => {
+							var html = `<li class="${value.level}">
+								<h6><span>${value.regDate}</span></h6>
+								<dl>
+									<dt>Type</dt>
+									<dd>${value.alarmType}</dd>
+								</dl>
+								<dl>
+									<dt>Title</dt>
+									<dd>${value.alarmTitle}</dd>
+								</dl>
+							</li>`;
+
+							fnComm.appendHtml(target, html, 'div');
+						});
+
+						fnComm.linkHtml(document.querySelector('.alarmList').querySelectorAll('li'), 'alarm_status.html');
+					} else {
+						var html = `<li class="none">최근 한달간 알람이 없습니다.</li>`
+
+						fnComm.appendHtml(target, html, 'div');
+					}
 				},
 
 				getProjectList(projectList) {
