@@ -336,14 +336,14 @@ func (service *AlarmService) alarmSender(alarmThreshold base.AlarmThreshold, ala
 	alarmData := dao.GetAlarm(alarm, service.DbConn)
 
 	date := alarmData.RegDate.Add(time.Duration(9) * time.Hour).Format("2006-01-02 15:04:05")
-	elaspeTime := time.Now().Unix() - alarmData.RegDate.Unix()
+	elaspeTime := time.Now().Unix() - alarmData.RegDate.Add(time.Duration(9) * time.Hour).Unix()
 	elaspeMinute := strconv.FormatInt(elaspeTime / 60, 10)
 
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		service.SendMail(alarm, alarmThreshold, usage)
+		service.SendMail(alarmData, alarmThreshold, usage)
 	}()
 	go func() {
 		defer wg.Done()
