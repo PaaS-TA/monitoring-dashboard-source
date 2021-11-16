@@ -108,7 +108,10 @@ func (zabbixService *ZabbixService) GetCpuUsage(instanceId string, hypervisorNam
 	keywordArr[0] = common.SYSTEM_CPU_UTIL
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -159,7 +162,10 @@ func (zabbixService *ZabbixService) GetCpuLoadAverage(instanceId string, hypervi
 
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -198,7 +204,10 @@ func (zabbixService *ZabbixService) GetMemoryUsage(instanceId string, hypervisor
 	keywordArr[0] = common.VM_MEMORY_UTILIZATION
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -238,7 +247,10 @@ func (zabbixService *ZabbixService) GetDiskUsage(instanceId string, hypervisorNa
 	keywordArr[0] = common.SPACE_UTILIZATION
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -277,7 +289,10 @@ func (zabbixService *ZabbixService) GetDiskReadRate(instanceId string, hyperviso
 	keywordArr[0] = common.DISK_READ_RATE
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -316,7 +331,10 @@ func (zabbixService *ZabbixService) GetDiskWriteRate(instanceId string, hypervis
 	keywordArr[0] = common.DISK_WRITE_RATE
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -356,7 +374,11 @@ func (zabbixService *ZabbixService) GetNetworkBitReceived(instanceId string, hyp
 	keywordArr[0] = common.NETWORK_INPUT_PACKET
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		utils.Logger.Errorf("%v\n", err)
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -396,7 +418,11 @@ func (zabbixService *ZabbixService) GetNetworkBitSent(instanceId string, hypervi
 	keywordArr[0] = common.NETWORK_OUTPUT_PACKET
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	itemResult, err := item.GetItemList(zabbixService.ZabbixSession, itemParams)
+	if err != nil {
+		utils.Logger.Errorf("%v\n", err)
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType

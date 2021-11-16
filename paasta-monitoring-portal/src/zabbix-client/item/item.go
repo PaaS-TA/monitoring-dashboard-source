@@ -20,7 +20,7 @@ Parameters
 		itemKey (string)   : item의 key값으로 검색 (와일드카드 사용가능)
 
 */
-func GetItemList(session *zabbix.Session, params map[string]interface{}) []zabbix.Item {
+func GetItemList(session *zabbix.Session, params map[string]interface{}) ([]zabbix.Item, error) {
 
 	var itemParams zabbix.ItemGetParams
 
@@ -56,6 +56,7 @@ func GetItemList(session *zabbix.Session, params map[string]interface{}) []zabbi
 	result, err := session.GetItems(itemParams)
 	if err != nil {
 		log.Fatalf("%v\n", err)
+		return nil, err
 	}
 	//utils.PrintJson(result)
 
@@ -66,5 +67,5 @@ func GetItemList(session *zabbix.Session, params map[string]interface{}) []zabbi
 	}
 
 
-	return result
+	return result, err
 }

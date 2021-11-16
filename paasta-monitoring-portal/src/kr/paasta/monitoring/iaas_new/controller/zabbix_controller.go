@@ -34,6 +34,7 @@ func (zabbix *ZabbixController) GetCpuUsage(w http.ResponseWriter, req *http.Req
 	resultList[0] = resultMap
 
 	if err != nil {
+		utils.Logger.Error(err)
 		model.MonitLogger.Error("GetServerList error :", err)
 		errMessage := model.ErrMessage{}
 		errMessage["Message"] = err.Error()
@@ -61,6 +62,7 @@ func (zabbix *ZabbixController) GetMemoryUsage(w http.ResponseWriter, req *http.
 	resultList[0] = resultMap
 
 	if err != nil {
+		utils.Logger.Error(err)
 		model.MonitLogger.Error("GetServerList error :", err)
 		errMessage := model.ErrMessage{}
 		errMessage["Message"] = err.Error()
@@ -88,6 +90,7 @@ func (zabbix *ZabbixController) GetDiskUsage(w http.ResponseWriter, req *http.Re
 	resultList[0] = resultMap
 
 	if err != nil {
+		utils.Logger.Error(err)
 		model.MonitLogger.Error("GetServerList error :", err)
 		errMessage := model.ErrMessage{}
 		errMessage["Message"] = err.Error()
@@ -127,6 +130,7 @@ func (zabbix *ZabbixController) GetCpuLoadAverage(w http.ResponseWriter, req *ht
 	resultList[2] = resultMapInterval15
 
 	if err != nil {
+		utils.Logger.Error(err)
 		model.MonitLogger.Error("GetServerList error :", err)
 		errMessage := model.ErrMessage{}
 		errMessage["Message"] = err.Error()
@@ -158,6 +162,7 @@ func (zabbix *ZabbixController) GetDiskIORate(w http.ResponseWriter, req *http.R
 	resultList[1] = resultMapWriteRate
 
 	if err != nil {
+		utils.Logger.Error(err)
 		model.MonitLogger.Error("GetServerList error :", err)
 		errMessage := model.ErrMessage{}
 		errMessage["Message"] = err.Error()
@@ -189,6 +194,7 @@ func (zabbix *ZabbixController) GetNetworkIOBytes(w http.ResponseWriter, req *ht
 	resultList[1] = resultMapSentBytes
 
 	if err != nil {
+		utils.Logger.Error(err)
 		model.MonitLogger.Error("GetServerList error :", err)
 		errMessage := model.ErrMessage{}
 		errMessage["Message"] = err.Error()
