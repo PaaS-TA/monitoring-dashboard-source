@@ -116,14 +116,15 @@ section {float:left; padding:10px 35px 50px;}
 .paas {width:100%;}
 .chartWrap {display:flex; width:100%; text-align:center;}
 .chartWrap li {position:relative; flex:1;}
-.chartWrap li div {position:relative; z-index:2; height:230px;}
+.chartWrap li div {position:relative; z-index:2; width:100% !important; height:230px;}
+.chartWrap li div svg {width:256px !important;}
 .chartWrap li > p {position:absolute; z-index:1; top:0; left:0; width:100%; font-size:38px; line-height:280px; font-weight:100;}
 .chartWrap li > em {display:block; font-size:38px; line-height:40px; font-weight:100;}
 
-.iaasIns div {overflow:hidden; height:auto !important; padding:20px 20px 0 30px;}
+.iaasIns div {overflow:hidden; height:auto !important; padding:20px 0 0 40px;}
 .iaasIns div dl {overflow:hidden;}
-.iaasIns div dl dt {float:left; line-height:27px;}
-.iaasIns div dl dd {float:right; line-height:27px;}
+.iaasIns div dl dt {float:left; font-size:14px; line-height:27px;}
+.iaasIns div dl dd {float:right; font-size:14px; line-height:27px;}
 
 .event {width:30%;}
 .event article > div {position:relative; margin-top:70px;}
