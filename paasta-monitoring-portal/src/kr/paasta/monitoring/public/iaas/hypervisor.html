@@ -352,6 +352,16 @@
 						max: yPos,
 						min: 0,
 						tick: {
+							/*
+							format : function(data) {
+
+								console.log("chart Origin", data);
+								var convertResult = fnComm.convertUnits(data, 'MB');
+								console.log("chart", convertResult);
+								var result = convertResult.convertedSize + '' + convertResult.convertedUnit;
+								return result;
+							},
+							*/
 							count: 5,
 						}
 					}
@@ -443,7 +453,7 @@
 							</div>
 							<div>
 								<dl>
-									<dt>CPU</dt>
+									<dt>VCPU</dt>
 									<dd>${resultItem.vcpus_used}/${resultItem.vcpus}</dd>
 								</dl>
 								<dl>
