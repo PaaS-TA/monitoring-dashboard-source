@@ -3,7 +3,7 @@ package item
 import (
 	"fmt"
 	"github.com/cavaliercoder/go-zabbix"
-	"log"
+	"kr/paasta/monitoring/utils"
 )
 
 var isDebug bool
@@ -55,7 +55,7 @@ func GetItemList(session *zabbix.Session, params map[string]interface{}) ([]zabb
 
 	result, err := session.GetItems(itemParams)
 	if err != nil {
-		log.Fatalf("%v\n", err)
+		utils.Logger.Errorf("%v\n", err)
 		return nil, err
 	}
 	//utils.PrintJson(result)
