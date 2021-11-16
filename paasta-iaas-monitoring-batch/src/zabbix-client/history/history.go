@@ -20,7 +20,7 @@ getHistory
 		- offset (int)    : 불러올 데이터 개수
 		- type (int)      : 데이터 타입
 */
-func GetHistory(session *zabbix.Session, params map[string]interface{}) []zabbix.History {
+func GetHistory(session *zabbix.Session, params map[string]interface{}) ([]zabbix.History, error) {
 	var historyParams zabbix.HistoryGetParams
 
 	itemArr := make([]string, 1)
@@ -43,7 +43,7 @@ func GetHistory(session *zabbix.Session, params map[string]interface{}) []zabbix
 	}
 
 	historyParams.SortField = zabbix.SelectFields{"clock"}
-	historyParams.SortOrder = "DESC"
+	historyParams.SortOrder = "ASC"
 
 	result, err := session.GetHistories(historyParams)
 	if err != nil {
@@ -53,5 +53,5 @@ func GetHistory(session *zabbix.Session, params map[string]interface{}) []zabbix
 	if isDebug {
 		utils.PrintJson(result)
 	}
-	return result
+	return result, err
 }

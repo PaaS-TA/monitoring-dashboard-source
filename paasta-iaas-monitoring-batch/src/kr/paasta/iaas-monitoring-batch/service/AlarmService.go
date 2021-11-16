@@ -135,16 +135,16 @@ func (service *AlarmService) alarmChecker() {
 	alarmThreshold.OriginType = base.ORIGIN_TYPE_IAAS
 
 	// Zabbix에서 데이터 불러오기
-	hostList = getHosts(service.Session)
+	hostList, _ = getHosts(service.Session)
 
 	hostIdArr := make([]string, len(hostList))
 	for idx, host := range hostList {
 		hostIdArr[idx] = host.HostID
 	}
 
-	cpuUsage := getCpuUsage(service.Session, hostIdArr)
-	memoryUsage := getMemoryUsage(service.Session, hostIdArr)
-	diskUsage := getDiskUsage(service.Session, hostIdArr)
+	cpuUsage, _ := getCpuUsage(service.Session, hostIdArr)
+	memoryUsage, _ := getMemoryUsage(service.Session, hostIdArr)
+	diskUsage, _ := getDiskUsage(service.Session, hostIdArr)
 
 	// CPU 사용량 체크
 	for _, item := range cpuUsage {
@@ -378,10 +378,13 @@ func createSession(configData *config.Config) *zabbix.Session {
 }
 
 
-func getHosts(session *zabbix.Session) []zabbix.Host {
+func getHosts(session *zabbix.Session) ([]zabbix.Host, error) {
 	groupParams := make(map[string]interface{}, 0)
 	groupParams["name"] = "PaaS-TA Group"   // TODO : 차후 fix될 호스트그룹명을 명시할 것.. 'PaaS-TA Group'
-	hostgroupList := hostgroup.GetHostgroup(session, groupParams)
+	hostgroupList, err := hostgroup.GetHostgroup(session, groupParams)
+	if err != nil {
+		return nil, err
+	}
 
 	groupId := hostgroupList[0].GroupID
 
@@ -389,48 +392,51 @@ func getHosts(session *zabbix.Session) []zabbix.Host {
 	groupIds := make([]string, 1)
 	groupIds[0] = groupId
 	hostParams["groupIds"] = groupIds
-	hostList := host.GetHostList(session, hostParams)
+	hostList, err := host.GetHostList(session, hostParams)
 
-	return hostList
+	return hostList, err
 }
 
 
 /**
 	CPU 사용량 조회
  */
-func getCpuUsage(session *zabbix.Session, hostIdArr []string) []zabbix.Item {
+func getCpuUsage(session *zabbix.Session, hostIdArr []string) ([]zabbix.Item, error) {
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
 	keywordArr[0] = common.SYSTEM_CPU_UTIL
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIdArr
-	return item.GetItemList(session, itemParams)
+	result, err := item.GetItemList(session, itemParams)
+	return result, err
 }
 
 
 /**
 	메모리 사용량 조회
  */
-func getMemoryUsage(session *zabbix.Session, hostIdArr []string) []zabbix.Item {
+func getMemoryUsage(session *zabbix.Session, hostIdArr []string) ([]zabbix.Item, error) {
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
 	keywordArr[0] = common.VM_MEMORY_UTILIZATION
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIdArr
-	return item.GetItemList(session, itemParams)
+	result, err := item.GetItemList(session, itemParams)
+	return result, err
 }
 
 
 /**
 	디스크 사용량 조회
  */
-func getDiskUsage(session *zabbix.Session, hostIdArr []string) []zabbix.Item {
+func getDiskUsage(session *zabbix.Session, hostIdArr []string) ([]zabbix.Item, error) {
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
 	keywordArr[0] = common.SPACE_UTILIZATION
 	itemParams["itemKey"] = keywordArr
 	itemParams["hostIds"] = hostIdArr
-	return item.GetItemList(session, itemParams)
+	result, err := item.GetItemList(session, itemParams)
+	return result, err
 }
 
 

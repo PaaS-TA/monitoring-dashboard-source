@@ -1,8 +1,6 @@
 package host
 
 import (
-	"log"
-
 	"github.com/cavaliercoder/go-zabbix"
 
 	"zabbix-client/utils"
@@ -21,7 +19,7 @@ func init() {
 			- groupIds ([]string) : 호스트가 속한 그룹의 ID 배열
 			- hostIds ([]string) : 호스트 ID 배열
  */
-func GetHostList(session *zabbix.Session, params map[string]interface{}) []zabbix.Host {
+func GetHostList(session *zabbix.Session, params map[string]interface{}) ([]zabbix.Host, error) {
 	var hostParams zabbix.HostGetParams
 
 	filterMap, ok := params["filter"]
@@ -39,13 +37,10 @@ func GetHostList(session *zabbix.Session, params map[string]interface{}) []zabbi
 	hostParams.SelectInterfaces = zabbix.SelectFields{"ip"}
 	hostParams.OutputFields = "extend"
 	result, err := session.GetHosts(hostParams)
-	if err != nil {
-		log.Fatalf("%v\n", err)
-	}
 
 	if isDebug {
 		utils.PrintJson(result)
 	}
 
-	return result
+	return result, err
 }
