@@ -15,7 +15,11 @@ func GetHostInfo(session *zabbix.Session, ipAddr string) (zabbix.Host, error) {
 	filterMap := make(map[string]interface{}, 0)
 	filterMap["ip"] = ipAddr
 	hostParams["filter"] = filterMap
-	result := host.GetHostList(session, hostParams)
+	result, err := host.GetHostList(session, hostParams)
+	if err != nil {
+		_result := zabbix.Host{}
+		return _result, err
+	}
 
 	if len(result) == 0 {
 		_result := zabbix.Host{}
@@ -24,7 +28,7 @@ func GetHostInfo(session *zabbix.Session, ipAddr string) (zabbix.Host, error) {
 	return result[0], nil
 }
 
-func GetHistory(session *zabbix.Session, itemKey string, hostId string) []zabbix.History {
+func GetHistory(session *zabbix.Session, itemKey string, hostId string) ([]zabbix.History, error) {
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 2)
 	keywordArr[0] = itemKey
@@ -33,7 +37,10 @@ func GetHistory(session *zabbix.Session, itemKey string, hostId string) []zabbix
 	hostIds := make([]string, 1)
 	hostIds[0] = hostId
 	itemParams["hostIds"] = hostIds
-	itemResult := item.GetItemList(session, itemParams)
+	itemResult, err := item.GetItemList(session, itemParams)
+	if err != nil {
+		return nil, err
+	}
 
 	itemId := strconv.Itoa(itemResult[0].ItemID)
 	itemType := itemResult[0].LastValueType
@@ -42,6 +49,6 @@ func GetHistory(session *zabbix.Session, itemKey string, hostId string) []zabbix
 	params["itemId"] = itemId
 	params["itemType"] = itemType
 	params["offset"] = 10
-	result := history.GetHistory(session, params)
-	return result
+	result, err := history.GetHistory(session, params)
+	return result, err
 }

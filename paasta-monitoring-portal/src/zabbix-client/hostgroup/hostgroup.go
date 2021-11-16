@@ -12,7 +12,7 @@ func init() {
 	isDebug = false
 }
 
-func GetHostgroup(session *zabbix.Session, params map[string]interface{}) []zabbix.Hostgroup {
+func GetHostgroup(session *zabbix.Session, params map[string]interface{}) ([]zabbix.Hostgroup, error) {
 	var hostgroupParams zabbix.HostgroupGetParams
 
 	name, ok := params["name"]
@@ -32,5 +32,5 @@ func GetHostgroup(session *zabbix.Session, params map[string]interface{}) []zabb
 		utils.PrintJson(result)
 	}
 
-	return result
+	return result, err
 }
