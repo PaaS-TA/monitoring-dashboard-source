@@ -116,10 +116,11 @@ section {float:left; padding:10px 35px 50px;}
 .paas {width:100%;}
 .chartWrap {display:flex; width:100%; text-align:center;}
 .chartWrap li {position:relative; flex:1;}
-.chartWrap li div {position:relative; z-index:2; width:100% !important; height:230px;}
+.chartWrap li div {position:relative; display:inline-block; z-index:2; width:256px !important; height:230px;}
 .chartWrap li div svg {width:256px !important;}
 .chartWrap li > p {position:absolute; z-index:1; top:0; left:0; width:100%; font-size:38px; line-height:280px; font-weight:100;}
 .chartWrap li > em {display:block; font-size:38px; line-height:40px; font-weight:100;}
+.chartWrap li > span {display:block;}
 
 .iaasIns div {overflow:hidden; height:auto !important; padding:20px 0 0 40px;}
 .iaasIns div dl {overflow:hidden;}
