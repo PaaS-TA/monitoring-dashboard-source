@@ -73,6 +73,7 @@ func (service *OpenstackService) GetHypervisorStatistics(userName string) (map[s
 */
 func (service *OpenstackService) GetServerList(params map[string]interface{}) ([]interface{}, error) {
 	client, err := utils.GetComputeClient(service.Provider, service.OpenstackProvider.Region)
+	client.Microversion = "2.47"
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -100,7 +101,6 @@ func (service *OpenstackService) GetServerList(params map[string]interface{}) ([
 			listOpts.AllTenants = allTenants
 		}
 	}
-
 	result := servers.List(client, listOpts)
 	resultPages, err := result.AllPages()
 	if err != nil {
@@ -202,7 +202,7 @@ func (service *OpenstackService) RetrieveTenantUsage() []usage.TenantUsage {
 	usagePages, _ := usage.AllTenants(computeClient, allTenantsOpts).AllPages()
 	usageList, _ := usage.ExtractAllTenants(usagePages)
 
-	// For Test
+	// IP 정보는 별도로 조회해야 하지만.. 속도가 너무 느려짐..
 	/*
 	for _, item := range(usageList) {
 		for _, server := range(item.ServerUsages) {
@@ -211,7 +211,6 @@ func (service *OpenstackService) RetrieveTenantUsage() []usage.TenantUsage {
 
 			result, _ := servers.Get(computeClient, id).Extract()
 			addressList := result.Addresses
-
 			for _, address := range addressList {
 				tee := address.([]interface{})
 				tee2 := tee[0].(map[string]interface{})
@@ -219,6 +218,8 @@ func (service *OpenstackService) RetrieveTenantUsage() []usage.TenantUsage {
 				server.Name += " ("
 				server.Name += ipAddress.(string)
 				server.Name += ")"
+
+				fmt.Println(server.Name)
 			}
 
 		}

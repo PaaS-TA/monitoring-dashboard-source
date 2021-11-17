@@ -39,12 +39,10 @@ func (osService *OpenstackController) GetHypervisorStatistics(w http.ResponseWri
 
 
 /**
-	@Unused
 	서버 목록 조회
  */
 func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *http.Request) {
-
-	tenantIdParam := r.URL.Query().Get("tenantId")
+	tenantIdParam := r.URL.Query().Get("tenant_id")
 
 	provider, _, err := utils.GetOpenstackProvider(r)
 
@@ -65,7 +63,8 @@ func (osService *OpenstackController) GetServerList(w http.ResponseWriter, r *ht
 
 
 /**
-	프로젝트(테넌트) 목록과 속한 인스턴스 목록 및 usage 정보를 조회
+	프로젝트(테넌트) 목록과 usage 정보를 조회
+		- 프로젝트에 속한 인스턴스 목록과 usage 조회도 가능하나 현재는 비활성화 되어 있음
  */
 func (osService *OpenstackController) GetProjectUsage(w http.ResponseWriter, r *http.Request) {
 	tenantIdParam := r.URL.Query().Get("tenantId")

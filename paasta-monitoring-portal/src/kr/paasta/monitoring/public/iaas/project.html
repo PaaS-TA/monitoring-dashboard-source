@@ -360,13 +360,14 @@
 				// Alarm Count
 				//fnComm.alarmCount('iaas');
 
-				document.getElementById("loadWrap").style.display = "flex";
+				project.loader.style.display = "flex";
 
 				// TODO Openstack 프로젝트 목록 조회
 				fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
 
 				// TODO Openstack 프로젝트 및 인스턴스 usage 목록 조회
 				//fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', project.getInstanceUsageList)
+
 			},
 
 
@@ -375,7 +376,6 @@
 
 				var target = document.getElementById('projectList');
 				fnComm.removeHtml(target);
-
 				fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', function(usageResult){
 					//console.log(projectList);
 					//console.log(usageResult);
@@ -446,9 +446,6 @@
 						fnComm.appendHtml(target, html, 'div');
 
 					});
-
-					console.log(document.getElementById("projectList").firstChild)
-
 					project.data = usageResult;
 
 					// project.html 페이지가 처음 열릴 때 오픈스택 프로젝트 목록 중 첫번째 프로젝트의 인스턴스 목록을 보여주도록 함.
@@ -456,19 +453,22 @@
 					var firstElemId = projectList[0].id;
 					firstElem.addEventListener("onload", onClickProjectItem(firstElemId, firstElem));
 
-					project.loader.style.display = "none";
+					//project.loader.style.display = "none";
 				});
-
 			},
 
 			getInstanceList(data) {
+				console.log(data);
 				var target = document.getElementById('instanceSummary');
 				fnComm.removeHtml(target);
 
-
-
 				data.forEach((value, idx)=>{
-					var state = value.state == "active" ? "up" : "down";
+					var state = value.status == "ACTIVE" ? "up" : "down";
+
+					var addressMap = value.addresses;
+					var ipAddr = addressMap[Object.keys(addressMap)[0]][0].addr;
+					//console.log(ipAddr);
+
 					var html = `<div class="${state}">
 							<div>
 								<strong><a href="javascript:void(0);">${value.name}</a></strong>
@@ -476,15 +476,19 @@
 							<div>
 								<dl class="color1" title="CPU">
 									<dt>C</dt>
-									<dd>${value.vcpus} core</dd>
+									<dd>${value.flavor.vcpus} core</dd>
 								</dl>
 								<dl class="color2" title="Memory">
 									<dt>M</dt>
-									<dd>${value.memory_mb} MB</dd>
+									<dd>${value.flavor.ram} MB</dd>
 								</dl>
 								<dl class="color3" title="Disk">
 									<dt>D</dt>
-									<dd>${value.local_gb} GB</dd>
+									<dd>${value.flavor.disk} GB</dd>
+								</dl>
+								<dl class="color4" title="IP">
+									<dt>IP</dt>
+									<dd>${ipAddr}</dd>
 								</dl>
 								<dl style="display:none;">
 									<dt>CPU Usage</dt>
@@ -495,7 +499,7 @@
 									<dd>${value.MemoryUsage} %</dd>
 								</dl>
 							</div>
-							<div class="summaryBtn" data-id="${value.instance_id}"  data-name="${value.name}">
+							<div class="summaryBtn" data-id="${value.id}"  data-name="${value.name}">
 								<a href="javascript:void(0);" class="chart" onclick="project.chartView(this)"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
 							</div>
 						</div>`
@@ -503,8 +507,7 @@
 					fnComm.appendHtml(target, html, 'div');
 				});
 
-				Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
-
+				project.loader.style.display = "none";
 			},
 
 			chartView(target) {
@@ -656,17 +659,13 @@
 
 		// 프로젝트 항목 클릭 이벤트
 		function onClickProjectItem(id, target) {
-			console.log(id);
-			console.log(target);
 
-			project.data.forEach((item, idx) => {
-				if (item.tenant_id == id) {
-					project.getInstanceList(item.server_usages);
-				}
-			});
-
+			// 사용자가 프로젝트 클릭했을 때에도 로딩 UI를 제어하기 위해..
+			if (project.loader.style.display == "none") {
+				project.loader.style.display = "flex";
+			}
 			// TODO VM 인스턴스 리스트 조회
-			//fnComm.loadData('GET', fnComm.url + 'iaas/server/list?tenantId='+id, project.getInstanceList);
+			fnComm.requestAjax('GET', fnComm.url + 'iaas/server/list?tenant_id='+id, project.getInstanceList);
 			Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
 			target.classList.add("on");
 		}
