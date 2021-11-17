@@ -213,7 +213,7 @@
 				</div>
 
 				<article>
-					<h4>Instance List (<span>admin</span>)</h4>
+					<h4>Instance List <span id="project_name_title"></span></h4>
 					<div id="instanceSummary" class="summaryList">
 						<!--
 						<div class="normal">
@@ -408,7 +408,7 @@
 
 						var html = `<div class="${usage.enabled} projectItem" onclick="onClickProjectItem('${usage.tenant_id}', this)">
 							<div>
-								<strong>${usage.project_name}</strong>
+								<strong class="project_name">${usage.project_name}</strong>
 							</div>
 							<div>
 								<dl>
@@ -468,6 +468,7 @@
 					var addressMap = value.addresses;
 					var ipAddr = addressMap[Object.keys(addressMap)[0]][0].addr;
 					//console.log(ipAddr);
+					var elapsedTimeStr = fnComm.calElapsedTime(value['OS-SRV-USG:launched_at'], 9);
 
 					var html = `<div class="${state}">
 							<div>
@@ -490,13 +491,17 @@
 									<dt>IP</dt>
 									<dd>${ipAddr}</dd>
 								</dl>
-								<dl style="display:none;">
-									<dt>CPU Usage</dt>
-									<dd>${value.CpuUsage} %</dd>
+								<dl class="color5" title="IP">
+									<dt>Flavor</dt>
+									<dd>${value.flavor.original_name}</dd>
 								</dl>
-								<dl style="display:none;">
-									<dt>Memory Usage</dt>
-									<dd>${value.MemoryUsage} %</dd>
+								<dl class="color6" title="IP">
+									<dt>Region</dt>
+									<dd>${value['OS-EXT-AZ:availability_zone']}</dd>
+								</dl>
+								<dl class="color7" title="IP">
+									<dt>Age</dt>
+									<dd>${elapsedTimeStr}</dd>
 								</dl>
 							</div>
 							<div class="summaryBtn" data-id="${value.id}"  data-name="${value.name}">
@@ -659,6 +664,8 @@
 
 		// 프로젝트 항목 클릭 이벤트
 		function onClickProjectItem(id, target) {
+			var projectName = '(' + target.querySelector('.project_name').innerText + ')';
+			document.getElementById("project_name_title").innerText = projectName;
 
 			// 사용자가 프로젝트 클릭했을 때에도 로딩 UI를 제어하기 위해..
 			if (project.loader.style.display == "none") {

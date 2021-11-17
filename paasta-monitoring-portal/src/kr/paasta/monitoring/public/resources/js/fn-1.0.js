@@ -667,4 +667,36 @@ const fnComm = {
 	detailLog(data){
 		console.log(data);
 	},
+
+	calElapsedTime(dateTimeStr, timeGap) {
+		var now = new Date();
+		now.setHours(now.getHours() - timeGap);   // 시차가 있다면 시차를 반영한다.
+		var targetDate = new Date(dateTimeStr);
+
+		var elapsed;
+		if (now.getFullYear() > targetDate.getFullYear()) {
+			elapsed = now.getFullYear() - targetDate.getFullYear();
+			elapsed = elapsed + ' year';
+		} else if (now.getMonth() > targetDate.getMonth()) {
+			elapsed = now.getMonth() - targetDate.getMonth();
+			elapsed = elapsed + ' month';
+		} else if (now.getDate() > targetDate.getDate()) {
+			elapsed = now.getDate() - targetDate.getDate();
+			elapsed = elapsed + ' day';
+		} else if (now.getDate() == targetDate.getDate()) {
+			var nowTime = now.getTime();
+			var targetTime = targetDate.getTime();
+
+			if (nowTime > targetTime) {
+				var elapsedTime = nowTime - targetTime;
+				const hour = String(Math.floor((elapsedTime/ (1000 * 60 *60 )) % 24 )).padStart(2, "0"); // 시
+				const minutes = String(Math.floor((elapsedTime  / (1000 * 60 )) % 60 )).padStart(2, "0"); // 분
+				const second = String(Math.floor((elapsedTime / 1000 ) % 60)).padStart(2, "0"); // 초
+				elapsed = hour + ':' + minutes + ':' + second;
+			}
+		}
+		return elapsed;
+
+
+	}
 };

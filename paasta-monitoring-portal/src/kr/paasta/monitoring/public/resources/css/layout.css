@@ -308,20 +308,20 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList > div div dl {float:left; margin-right:15px;}
 .summaryList > div div dl dt {float:left; color:#222; font-size:14px; font-weight:400; line-height:inherit;}
 .summaryList > div div dl.color1 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#e91a61; border-radius:12px;}
-.summaryList > div div dl.color1 dd {width:85px;}
+.summaryList > div div dl.color1 dd {width:auto; margin-right: 10px;}
 .summaryList > div div dl.color2 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#55c554; border-radius:12px;}
-.summaryList > div div dl.color2 dd {width:85px;}
+.summaryList > div div dl.color2 dd {width:auto; margin-right: 10px;}
 .summaryList > div div dl.color3 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#4868a3; border-radius:12px;}
-.summaryList > div div dl.color3 dd {width:85px;}
+.summaryList > div div dl.color3 dd {width:auto; margin-right: 10px;}
 .summaryList > div div dl.color4 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#ff46d1; border-radius:12px;}
-.summaryList > div div dl.color4 dd {width:88px;}
+.summaryList > div div dl.color4 dd {width:auto; margin-right: 10px;}
 .summaryList > div div dl.color5 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#f6a200; border-radius:12px;}
-.summaryList > div div dl.color5 dd {width:88px;}
+.summaryList > div div dl.color5 dd {width:auto; margin-right: 10px;}
 .summaryList > div div dl.color6 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#702cee; border-radius:12px;}
-.summaryList > div div dl.color6 dd {width:88px;}
+.summaryList > div div dl.color6 dd {width:auto; margin-right: 10px;}
 .summaryList > div div dl.color7 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#666; border-radius:12px;}
-.summaryList > div div dl.color7 dd {width:88px;}
-.summaryList > div div dl dd {float:left; padding-left:10px; color:#222; font-size:14px; line-height:inherit;}
+.summaryList > div div dl.color7 dd {width:auto; margin-right: 10px;}
+.summaryList > div div dl dd {float:left; padding-left:7px; color:#222; font-size:14px; line-height:inherit;}
 
 .summaryList > div div dl.running dt,
 .summaryList > div div dl.running dd {color:#55c554;}
