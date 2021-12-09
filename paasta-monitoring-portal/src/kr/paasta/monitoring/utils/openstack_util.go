@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"github.com/rackspace/gophercloud"
-	"github.com/rackspace/gophercloud/openstack"
-	"kr/paasta/monitoring/iaas/model"
-	//"fmt"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
+
+	"kr/paasta/monitoring/iaas_new/model"
 )
 
 func GetComputeClient(provider *gophercloud.ProviderClient, region string) (*gophercloud.ServiceClient, error) {
@@ -20,9 +20,24 @@ func GetComputeClient(provider *gophercloud.ProviderClient, region string) (*gop
 	return client, nil
 }
 
+func GetNetworkClient(provider *gophercloud.ProviderClient, region string) *gophercloud.ServiceClient {
+
+	//fmt.Println("provider======+>", provider)
+	client, _ := openstack.NewNetworkV2(provider, gophercloud.EndpointOpts{
+		Region: region,
+	})
+
+	return client
+}
+
 func GetKeystoneClient(provider *gophercloud.ProviderClient) *gophercloud.ServiceClient {
+	client, _ := openstack.NewIdentityV3(provider, gophercloud.EndpointOpts{})
+	return client
+}
 
-	client := openstack.NewIdentityV3(provider)
-
+func GetBlockStorageClient(provider *gophercloud.ProviderClient, region string) *gophercloud.ServiceClient {
+	client, _ := openstack.NewBlockStorageV3(provider, gophercloud.EndpointOpts{
+		Region: region,
+	})
 	return client
 }

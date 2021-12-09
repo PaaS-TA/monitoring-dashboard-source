@@ -2,9 +2,14 @@ package controller
 
 import (
 	"bufio"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/cavaliercoder/go-zabbix"
 	"github.com/cihub/seelog"
+	"net"
+	"time"
+
 	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
@@ -12,14 +17,14 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"github.com/monasca/golang-monascaclient/monascaclient"
+
+	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/olivere/elastic.v3"
 	"io"
 	"io/ioutil"
 	comModels "kr/paasta/monitoring/common/model"
-	iaasModels "kr/paasta/monitoring/iaas/model"
+	iaasModels "kr/paasta/monitoring/iaas_new/model"
 	bm "kr/paasta/monitoring/paas/model"
 	paasModels "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"
@@ -79,14 +84,14 @@ var _ = Describe("Controller BeforeSuite", func() {
 		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>...  1")
 
 		//config, err := readConfig(`../../config.ini`)
-		config, err := readConfig(`/home/ubuntu/workspace/user/arom/PaaS-TA-Monitoring/paasta-monitoring-portal/src/kr/paasta/monitoring/config.ini`)
+		config, err := readConfig(`config.ini`)
 		if err != nil {
 			fmt.Printf("read config file error: %s", err)
 			fmt.Errorf("read config file error: %s", err)
 			os.Exit(0)
 		}
 
-		xmlFile, err := ReadXmlConfig(`/home/ubuntu/workspace/user/arom/PaaS-TA-Monitoring/paasta-monitoring-portal/src/kr/paasta/monitoring/log_config.xml`)
+		xmlFile, err := ReadXmlConfig(`log_config.xml`)
 		if err != nil {
 			log.Println(err)
 			os.Exit(-1)
@@ -116,10 +121,10 @@ var _ = Describe("Controller BeforeSuite", func() {
 		iaasConnectionString := utils.GetConnectionString(iaasConfigDbCon.Host, iaasConfigDbCon.Port, iaasConfigDbCon.UserName,
 			iaasConfigDbCon.UserPassword, iaasConfigDbCon.DbName)
 
-		fmt.Println("String:", iaasConnectionString)
+		//fmt.Println("String:", iaasConnectionString)
 		iaasDbAccessObj, dbErr := gorm.Open(iaasConfigDbCon.DbType, iaasConnectionString+"?charset=utf8&parseTime=true")
 		if dbErr != nil {
-			fmt.Println("err::", dbErr)
+			//fmt.Println("err::", dbErr)
 		}
 
 		//iaasDbAccessObj.Debug().AutoMigrate(&iaasModels.AlarmActionHistory{})
@@ -166,18 +171,31 @@ var _ = Describe("Controller BeforeSuite", func() {
 		})
 
 		// IaaS ElasticSearch
-		iaasElasticUrl, _ := config["iaas.elastic.url"]
-		iaasElasticClient, err := elastic.NewClient(
-			elastic.SetURL(fmt.Sprintf("http://%s", iaasElasticUrl)),
-			elastic.SetSniff(false),
-		)
+		var iaasElasticClient *elasticsearch.Client
+		var paasElasticClient *elasticsearch.Client
 
-		// PaaS ElasticSearch
-		paasElasticUrl, _ := config["paas.elastic.url"]
-		paasElasticClient, err := elastic.NewClient(
-			elastic.SetURL(fmt.Sprintf("http://%s", paasElasticUrl)),
-			elastic.SetSniff(false),
-		)
+		elasticsearchUsername, _ := config["paas.elasticsearch.username"]
+		elasticsearchPassword, _ := config["paas.elasticsearch.password"]
+		elasticsearchUrl, _ := config["paas.elasticsearch.url"]
+		elasticsearchHttpsEnabled, _ := strconv.ParseBool(config["paas.elasticsearch.https_enabled"])
+		cfg := elasticsearch.Config{
+			Username: elasticsearchUsername,
+			Password: elasticsearchPassword,
+			Addresses: []string{
+				elasticsearchUrl,
+			},
+			Transport: &http.Transport{
+				MaxIdleConnsPerHost:   10,
+				ResponseHeaderTimeout: time.Second,
+				DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+				TLSClientConfig: &tls.Config{
+					MaxVersion:         tls.VersionTLS11,
+					InsecureSkipVerify: elasticsearchHttpsEnabled,
+				},
+			},
+		}
+		iaasElasticClient, _ = elasticsearch.NewClient(cfg)
+		paasElasticClient, _ = elasticsearch.NewClient(cfg)
 
 		var openstackProvider iaasModels.OpenstackProvider
 		openstackProvider.Region, _ = config["default.region"]
@@ -208,13 +226,6 @@ var _ = Describe("Controller BeforeSuite", func() {
 		iaasModels.RabbitMqPort, _ = config["rabbitmq.port"]
 		iaasModels.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
 
-		monClient := monascaclient.New()
-		monClient.SetBaseURL(config["monasca.url"])
-		timeOut, _ := strconv.Atoi(config["monasca.connect.timeout"])
-		monClient.SetTimeout(timeOut)
-
-		tls, _ := strconv.ParseBool(config["monasca.secure.tls"])
-		monClient.SetInsecure(tls)
 
 		auth := gophercloud.AuthOptions{
 			DomainName:       config["default.domain"],
@@ -243,6 +254,15 @@ var _ = Describe("Controller BeforeSuite", func() {
 		rdClient := redis.NewClient(&redis.Options{
 			Addr:     config["redis.addr"],
 			Password: config["redis.password"],
+			//DB:       0,  // use default DB
+			//Addr:     "localhost:6379",
+			//Password: "", // no password set
+			//DB:       0,  // use default DB
+			//DialTimeout:  10 * time.Second,
+			//ReadTimeout:  30 * time.Second,
+			//WriteTimeout: 30 * time.Second,
+			//PoolSize:     10,
+			//PoolTimeout:  30 * time.Second,
 		})
 
 		sysType := config["system.monitoring.type"]
@@ -267,21 +287,26 @@ var _ = Describe("Controller BeforeSuite", func() {
 			CaasBrokerHost: config["caas.monitoring.broker.host"],
 		}
 
+		var zabbixSession *zabbix.Session
+
 		// Handler
 		var handler http.Handler
 		handler = NewHandler(openstackProvider, iaasInfluxServerClient, paasInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
-			rdClient, sysType, boshClient, cfConfig)
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, auth, databases,
+			rdClient, sysType, boshClient, cfConfig, zabbixSession)
 
 		server = httptest.NewServer(handler)
 		testUrl = server.URL
 
+		fmt.Println(testUrl)
 		// Login Test
+		testUrl = "http://127.0.0.1:8080"
 		res, err := DoGetPing(testUrl + "/v2/ping")
 
 		var userInfo comModels.UserInfo
 		userInfo.Username = "admin"
-		userInfo.Password = "1234"
+		userInfo.Password = "admin"
+
 
 		TestToken = res.Token
 
@@ -310,7 +335,6 @@ func UseLogger(newLogger seelog.LoggerInterface) {
 }
 
 func DoGetPing(url string) (*PingResponse, error) {
-
 	client := &http.Client{}
 
 	req, _ := http.NewRequest("GET", url, nil)
@@ -337,7 +361,7 @@ func DoGet(url string) (*Response, error) {
 	req.Header.Add(iaasModels.CSRF_TOKEN_NAME, TestToken)
 	req.Header.Add(iaasModels.TEST_TOKEN_NAME, TestToken)
 	req.Header.Add("username", "admin")
-	req.Header.Add("password", "1234")
+	req.Header.Add("password", "admin")
 
 	response, err := client.Do(req)
 	if err != nil {

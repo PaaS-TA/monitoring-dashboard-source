@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
-	"github.com/rackspace/gophercloud"
+	"github.com/gophercloud/gophercloud"
 	"io/ioutil"
 	"kr/paasta/monitoring/common/dao"
 	cm "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/iaas/model"
 	pm "kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"kr/paasta/monitoring/utils"
 	"net/http"
 	"net/url"
@@ -96,7 +96,7 @@ func (n MemberService) MemberJoinSave(req cm.UserInfo) error {
 
 		n.openstackProvider.Username = result.IaasUserId
 		n.openstackProvider.Password = result.IaasUserPw
-		provider, err := utils.GetAdminToken(n.openstackProvider)
+		provider, err := utils.GetOpenstackToken(n.openstackProvider)
 		if err != nil {
 			fmt.Println("MemberAuthCheck iaas error::", err.Error())
 			//return req, provider, err
@@ -221,11 +221,11 @@ func (s MemberService) GetIaasToken(apiRequest cm.UserInfo, reqCsrfToken string)
 	s.openstackProvider.Username = apiRequest.IaasUserId
 	s.openstackProvider.Password = apiRequest.IaasUserPw
 
-	provider, err := utils.GetAdminToken(s.openstackProvider)
+	provider, err := utils.GetOpenstackToken(s.openstackProvider)
 	result := ""
 
 	if err != nil {
-		fmt.Println("IaaS(OpenStack) login result:", err.Error())
+		utils.Logger.Error(err.Error())
 
 		if strings.Contains(err.Error(), "Unauthorized") {
 			return "unauthorized"
@@ -235,11 +235,9 @@ func (s MemberService) GetIaasToken(apiRequest cm.UserInfo, reqCsrfToken string)
 		}
 		//utils.RenderJsonLogoutResponse("", w)
 	} else {
-		rdresult := s.RdClient.Get(reqCsrfToken)
-		//fmt.Println("rdresult.Val() :::", rdresult.Val())
-		//fmt.Println("RdClient.Get :::", reqCsrfToken, ", provider.TokenID :::", provider.TokenID)
+		userAuthInfo := s.RdClient.Get(reqCsrfToken)
 
-		if rdresult.Val() == "" {
+		if userAuthInfo.Val() == "" {
 			s.RdClient.HSet(reqCsrfToken, "iaasUserId", apiRequest.IaasUserId)
 			s.RdClient.HSet(reqCsrfToken, "iaasToken", provider.TokenID)
 		}
@@ -305,10 +303,7 @@ func (n MemberService) CaasServiceCheck(apiRequest cm.UserInfo, reqCsrfToken str
 	return result
 }
 
-//func (n MemberService) mergeAppResource(item Item) Item {
-//
-//	return item
-//}
+
 
 func (n MemberService) MemberJoinCheckDuplicationIaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
 	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationIaasId(req, n.txn)
@@ -318,9 +313,6 @@ func (n MemberService) MemberJoinCheckDuplicationPaasId(req cm.UserInfo) (userIn
 	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationPaasId(req, n.txn)
 }
 
-//func (n MemberService) MemberJoinCheckDuplicationSaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
-//	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationSaasId(req, n.txn)
-//}
 
 func (n MemberService) MemberJoinCheckDuplicationCaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
 	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationCaasId(req, n.txn)

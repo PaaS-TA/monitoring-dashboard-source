@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"reflect"
 	"strconv"
 	"time"

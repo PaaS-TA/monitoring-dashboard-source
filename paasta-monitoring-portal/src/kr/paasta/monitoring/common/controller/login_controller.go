@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	//"github.com/cloudfoundry-community/go-cfclient"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/monasca/golang-monascaclient/monascaclient"
@@ -13,7 +12,7 @@ import (
 	"github.com/jinzhu/gorm"
 	cm "kr/paasta/monitoring/common/model"
 	"kr/paasta/monitoring/common/service"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	pm "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"
 	"net/http"
@@ -23,7 +22,6 @@ import (
 type LoginController struct {
 	OpenstackProvider model.OpenstackProvider
 	MonAuth           monascagopher.AuthOptions
-	MonClient         monascaclient.Client
 	//CfProvider        cfclient.Config
 	txn      *gorm.DB
 	RdClient *redis.Client
@@ -31,11 +29,10 @@ type LoginController struct {
 	CfConfig pm.CFConfig
 }
 
-func NewLoginController(openstackProvider model.OpenstackProvider, monsClient monascaclient.Client, auth monascagopher.AuthOptions, txn *gorm.DB, rdClient *redis.Client, sysType string, cfConfig pm.CFConfig) *LoginController {
+func NewLoginController(openstackProvider model.OpenstackProvider, auth monascagopher.AuthOptions, txn *gorm.DB, rdClient *redis.Client, sysType string, cfConfig pm.CFConfig) *LoginController {
 	return &LoginController{
 		OpenstackProvider: openstackProvider,
 		MonAuth:           auth,
-		MonClient:         monsClient,
 		//CfProvider: cfProvider,
 		txn:      txn,
 		RdClient: rdClient,
@@ -49,7 +46,6 @@ func NewIaasLoginController(openstackProvider model.OpenstackProvider, monsClien
 	return &LoginController{
 		OpenstackProvider: openstackProvider,
 		MonAuth:           auth,
-		MonClient:         monsClient,
 		txn:               txn,
 		RdClient:          rdClient,
 		sysType:           sysType,
@@ -89,7 +85,7 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 
 	reqCsrfToken := r.Header.Get(model.CSRF_TOKEN_NAME)
 
-	fmt.Println("Login Test CSRF_TOKEN: !!!", reqCsrfToken)
+	utils.Logger.Debugf("CSRF_TOKEN : %v\n", reqCsrfToken)
 
 	var apiRequest cm.UserInfo
 	apiRequest.Token = reqCsrfToken
@@ -130,6 +126,7 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 			utils.ErrRenderJsonResponse(loginErr, w)
 			return
 		} else {
+			model.MonitLogger.Debug(userInfo)
 
 			services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
 			userInfo.SysType = s.sysType
@@ -143,7 +140,7 @@ func (s *LoginController) Logout(w http.ResponseWriter, r *http.Request) {
 
 	reqCsrfToken := r.Header.Get(model.CSRF_TOKEN_NAME)
 
-	fmt.Println("logout reqCsrfToken=", reqCsrfToken)
+	utils.Logger.Debugf("reqCsrfToken : %v\n", reqCsrfToken)
 
 	s.RdClient.Del(reqCsrfToken)
 

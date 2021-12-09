@@ -14,7 +14,7 @@ const fnComm = {
 		document.querySelector('.timeSetting').addEventListener('click', () => {
 			document.querySelector('.timePop').classList.toggle('on', true);
 		});
-		
+
 		document.querySelector('.timePop > a').addEventListener('click', () => {
 			document.querySelector('.timePop').classList.toggle('on', false);
 		});
@@ -51,7 +51,7 @@ const fnComm = {
 				};
 			};
 		};
-		
+
 		request.send(`{"username":"${user}","password":"${pw}"}`);
 	},
 
@@ -65,7 +65,7 @@ const fnComm = {
 			console.log(request);
 
 			var tokenArray = request.getAllResponseHeaders().toLowerCase().split('\n');
-			
+
 			for(let value of tokenArray){
 				if(value.indexOf('x-xsrf-token') != -1){
 					console.log(value.split(': ')[1]);
@@ -84,7 +84,7 @@ const fnComm = {
 	alarmCount(type){
 		document.querySelector('.outBtn strong').innerHTML = sessionStorage.getItem('user');
 		document.querySelector('.outBtn span').innerHTML = sessionStorage.getItem('mail');
-		
+
 		// 오늘 날짜
 		var today = new Date();
 		var dd = today.getDate();
@@ -95,7 +95,7 @@ const fnComm = {
 		if(dd < 10) dd = '0'+dd;
 		if(mm < 10) mm = '0'+mm;
 		if(nn < 10) nn = '0'+nn;
-		
+
 		// 검색 Default set
 		var form = `${yyyy}-${nn}-${dd}`;
 		var to = `${yyyy}-${mm}-${dd}`;
@@ -112,9 +112,9 @@ const fnComm = {
 				url = `${fnComm.url}saas/app/application/alarmCount?searchDateFrom=${form}&searchDateTo=${to}`;
 			break;
 		};
-		
+
 		var request = new XMLHttpRequest();
-		
+
 		try {
 			request.open('GET', url, false);
 			request.setRequestHeader('X-XSRF-TOKEN', sessionStorage.getItem('token'));
@@ -125,7 +125,7 @@ const fnComm = {
 						if(JSON.parse(request.responseText).totalCnt > 0){
 							document.querySelector('.alarmView').classList.toggle('on', true);
 							document.querySelector('.alarmView span').innerHTML = JSON.parse(request.responseText).totalCnt;
-							
+
 							document.querySelector('.alarmView span').addEventListener('click', () => {
 								location.href = 'alarm_status.html';
 							});
@@ -142,10 +142,18 @@ const fnComm = {
 
 			var type = sessionStorage.getItem('sysType').split(',');
 
+			// config.ini에 설정된 타입에 따라 헤더 메뉴의 show/hide 여부를 제어함
 			for(var i=0 ; i<type.length ; i++){
-				document.querySelector(`.global .${type[i]}`).style.display= 'inline-block';
+				if (type[i] !== 'ALL') {
+					document.querySelector(`.global .${type[i]}`).style.display = 'inline-block';
+				} else {
+					document.querySelector(`.global .IaaS`).style.display = 'inline-block';
+					document.querySelector(`.global .PaaS`).style.display = 'inline-block';
+					document.querySelector(`.global .SaaS`).style.display = 'inline-block';
+					document.querySelector(`.global .CaaS`).style.display = 'inline-block';
+				}
 			};
-		
+
 			// logout 이벤트
 			document.querySelector('.logout').addEventListener('click', (e) => {
 				sessionStorage.clear();
@@ -173,7 +181,7 @@ const fnComm = {
 		document.querySelector('.timeSetting').addEventListener('click', (e) => {
 			document.querySelector('.timePop').classList.toggle('on');
 		}, false);
-		
+
 		document.querySelector('.timePop .close').addEventListener('click', (e) => {
 			document.querySelector('.timePop').classList.toggle('on');
 		}, false);
@@ -210,6 +218,34 @@ const fnComm = {
 				} else if(request.status === 401){
 					sessionStorage.clear();
 					document.location.href = '../login.html';
+				} else if (request.status === 500) {
+					fnComm.alertPopup('ERROR', JSON.parse(request.responseText).message);
+				};
+			};
+		};
+
+		request.send();
+	},
+
+
+	requestAjax(method, url, callbackFunction, errCallback, list){
+		if(sessionStorage.getItem('token') == null){
+			document.location.href = '../login.html';
+		}
+		var request = new XMLHttpRequest();
+		request.open(method, url);
+		request.setRequestHeader('X-XSRF-TOKEN', sessionStorage.getItem('token'));
+
+		request.onreadystatechange = () => {
+			if (request.readyState === XMLHttpRequest.DONE){
+				if(request.status === 200 && request.responseText != ''){
+					callbackFunction(JSON.parse(request.responseText), list);
+				} else if(request.status === 401){
+					sessionStorage.clear();
+					document.location.href = '../login.html';
+				} else if (request.status === 500) {
+					errCallback(JSON.parse(request.responseText).message);
+					//fnComm.alertPopup('ERROR', JSON.parse(request.responseText).message);
 				};
 			};
 		};
@@ -225,7 +261,7 @@ const fnComm = {
 		var request = new XMLHttpRequest();
 		request.open(method, url);
 		request.setRequestHeader('X-XSRF-TOKEN', sessionStorage.getItem('token'));
-		
+
 		console.log(sessionStorage.getItem('token'));
 
 		request.onreadystatechange = () => {
@@ -265,6 +301,34 @@ const fnComm = {
     numberComma(digit, number){
         return number.toFixed(digit).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
+
+	convertUnits(size, unit){
+		var convertedSize, convertedUnit;
+		if (unit == "MB") {
+			if (size >= 1048576) {
+				convertedSize = size / 1048576;
+				convertedUnit = "TB";
+			} else if (size >= 1024) {
+				convertedSize = size / 1024;
+				convertedUnit = "GB";
+			} else {
+				convertedSize = size;
+				convertedUnit = "MB";
+			};
+		} else if (unit == "GB") {
+			if (size >= 1048576) {
+				convertedSize = size / 1048576;
+				convertedUnit = "PB";
+			} else if (size >= 1024) {
+				convertedSize = size / 1024;
+				convertedUnit = "TB";
+			} else {
+				convertedSize = size;
+				convertedUnit = "GB";
+			};
+		};
+		return {convertedSize, convertedUnit};
+	},
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// 날짜 컨버팅 - unixTime(time)
@@ -321,7 +385,7 @@ const fnComm = {
 
 		document.getElementById('alertPop').querySelector('.closed').addEventListener('click', (e) => {
 			if(callback) callback();
-			
+
 			document.body.removeChild(document.getElementById('alertPop'));
 		}, false);
 	},
@@ -351,7 +415,7 @@ const fnComm = {
     countUp(el, num) {
 		var cnt = 0;
 		var dif = 0;
-		
+
 		var thisID = setInterval(function(){
 			if(cnt < num){
 				dif = num - cnt;
@@ -405,11 +469,11 @@ const fnComm = {
     		bindto: '#paasChart',
 			data: {
 				columns: [
-					['Running', 0, data.running, 0, 0, 0, 0, 0],
-					['Warning', 0, 0, data.warning, 0, 0, 0, 0],
-					['Critical', 0, 0, 0, data.critical, 0, 0, 0],
-					['Failed', 0, 0, 0, 0, data.failed, 0, 0],
-					['Total', 0, 0, 0, 0, 0, data.total, 0]
+					['Running', 0, data.Running, 0, 0, 0, 0, 0],
+					['Warning', 0, 0, data.Warning, 0, 0, 0, 0],
+					['Critical', 0, 0, 0, data.Critical, 0, 0, 0],
+					['Failed', 0, 0, 0, 0, data.Failed, 0, 0],
+					['Total', 0, 0, 0, 0, 0, data.Total, 0]
 				],
 				labels: true,
 				type: 'spline'
@@ -467,7 +531,7 @@ const fnComm = {
 		let detailTime = [];
 		let detailData = [];
 		let chartColor;
-		
+
 		data.forEach((load, idx) => {
 			if(idx === 0){
 				detailTime.push('time');
@@ -491,7 +555,7 @@ const fnComm = {
 		});
 
 		yPos = Math.ceil((yPos / 10)) * 10;
-		
+
 		var dataType = [];
 		dataType.push(detailTime);
 		for (var i = 0; i <= cnt; i++) {
@@ -523,6 +587,8 @@ const fnComm = {
 				chartColor = ['#ff015a', '#9cce34', '#649afc'];
 			break;
 		};
+
+		console.log(dataType);
 
 		var chart = c3.generate({
     		bindto: target,
@@ -557,7 +623,7 @@ const fnComm = {
 			}
 		});
 	},
-	
+
 	// Gauge 차트 //////////////////////////////////////////////////////////////////////////
 	gaugeChart(data, category, target){
 		var chart = c3.generate({
@@ -601,4 +667,36 @@ const fnComm = {
 	detailLog(data){
 		console.log(data);
 	},
+
+	calElapsedTime(dateTimeStr, timeGap) {
+		var now = new Date();
+		now.setHours(now.getHours() - timeGap);   // 시차가 있다면 시차를 반영한다.
+		var targetDate = new Date(dateTimeStr);
+
+		var elapsed;
+		if (now.getFullYear() > targetDate.getFullYear()) {
+			elapsed = now.getFullYear() - targetDate.getFullYear();
+			elapsed = elapsed + ' year';
+		} else if (now.getMonth() > targetDate.getMonth()) {
+			elapsed = now.getMonth() - targetDate.getMonth();
+			elapsed = elapsed + ' month';
+		} else if (now.getDate() > targetDate.getDate()) {
+			elapsed = now.getDate() - targetDate.getDate();
+			elapsed = elapsed + ' day';
+		} else if (now.getDate() == targetDate.getDate()) {
+			var nowTime = now.getTime();
+			var targetTime = targetDate.getTime();
+
+			if (nowTime > targetTime) {
+				var elapsedTime = nowTime - targetTime;
+				const hour = String(Math.floor((elapsedTime/ (1000 * 60 *60 )) % 24 )).padStart(2, "0"); // 시
+				const minutes = String(Math.floor((elapsedTime  / (1000 * 60 )) % 60 )).padStart(2, "0"); // 분
+				const second = String(Math.floor((elapsedTime / 1000 ) % 60)).padStart(2, "0"); // 초
+				elapsed = hour + ':' + minutes + ':' + second;
+			}
+		}
+		return elapsed;
+
+
+	}
 };

@@ -103,7 +103,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 #container {position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; display:flex; min-width:1580px; padding-left:90px; background:#fafafa;}
 
-.contentsLeft {position:relative; flex:1; width:450px; padding:20px 30px; border-right:1px solid #eee;}
+.contentsLeft {position:relative; overflow-y:auto; flex:1; width:450px; padding:20px 30px; border-right:1px solid #eee;}
 .contentsLeft h3 {margin-top:90px; font-size:24px; color:#ccc; font-weight:400; text-align:center;}
 .contentsLeft h4 {margin-top:60px; font-size:26px; color:#333; font-weight:100; line-height:60px; text-align:center;}
 .contentsLeft h4 span {position:relative; display:inline-block; margin-left:15px; padding-left:15px; height:60px; color:#f576c3; text-align:center; text-transform:uppercase;}
@@ -116,6 +116,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .contentsLeft h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius:12px; transition:.5s;}
 .contentsLeft h4 input[type=checkbox]:checked + label {text-indent:102px; background:#f576c3;}
 .contentsLeft h4 input[type=checkbox]:checked + label:after {border:0;left:43px;}
+.contentsLeft .center {text-align:center;}
 .contentsLeft .chartView {width:100%; height:120px;}
 .contentsLeft .gaugeChart {width:100%; height:140px; margin-top:30px;}
 .contentsLeft .donutChart {overflow:hidden;}
@@ -134,6 +135,12 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .contentsLeft .topList > div div .pid {width:25%;}
 .contentsLeft .topList > div div .process {width:50%;}
 .contentsLeft .topList > div div .memory {width:25%;}
+.contentsLeft .insList {overflow:hidden;}
+.contentsLeft .insList dl {float:left; width:50%; line-height:24px;}
+.contentsLeft .insList dl:nth-child(even) {padding-right:15px;}
+.contentsLeft .insList dl:nth-child(odd) {padding-left:15px;}
+.contentsLeft .insList dl dt {float:left; font-size:14px;}
+.contentsLeft .insList dl dd {float:right; font-size:14px;}
 .contentsLeft .cellCollection {display:inline-block; width:100%;}
 .contentsLeft .cellCollection p {padding:50px 0; color:#666; font-size:32px; font-weight:200; text-align:center;}
 .contentsLeft .cellCollection > dl {display:inline-block; width:100%; margin-top:5px; background:#fff; box-shadow:2px 2px 5px rgba(200,200,200,.2);}
@@ -286,6 +293,8 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList > div.normal:before {content:'N'; background:#ddd;}
 .summaryList > div.TRUE:before {content:'T'; background:#55c554;}
 .summaryList > div.FALSE:before {content:'F'; background:#e91a61;}
+.summaryList > div.up:before {content:'U'; background:#55c554;}
+.summaryList > div.down:before {content:'D'; background:#ddd;}
 .summaryList > div > span {position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px; text-transform:uppercase;}
 .summaryList > div > span.running {background:#55c554;}
 .summaryList > div > span.warning {background:#fba602;}
@@ -299,12 +308,20 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList > div div dl {float:left; margin-right:15px;}
 .summaryList > div div dl dt {float:left; color:#222; font-size:14px; font-weight:400; line-height:inherit;}
 .summaryList > div div dl.color1 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#e91a61; border-radius:12px;}
-.summaryList > div div dl.color1 dd {width:85px;}
+.summaryList > div div dl.color1 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
 .summaryList > div div dl.color2 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#55c554; border-radius:12px;}
-.summaryList > div div dl.color2 dd {width:85px;}
+.summaryList > div div dl.color2 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
 .summaryList > div div dl.color3 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#4868a3; border-radius:12px;}
-.summaryList > div div dl.color3 dd {width:85px;}
-.summaryList > div div dl dd {float:left; padding-left:10px; color:#222; font-size:14px; line-height:inherit;}
+.summaryList > div div dl.color3 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color4 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#ff46d1; border-radius:12px;}
+.summaryList > div div dl.color4 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color5 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#f6a200; border-radius:12px;}
+.summaryList > div div dl.color5 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color6 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#702cee; border-radius:12px;}
+.summaryList > div div dl.color6 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color7 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#666; border-radius:12px;}
+.summaryList > div div dl.color7 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl dd {float:left; padding-left:7px; color:#222; font-size:14px; line-height:inherit;}
 
 .summaryList > div div dl.running dt,
 .summaryList > div div dl.running dd {color:#55c554;}
@@ -322,6 +339,22 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .summaryList .summaryBtn a.process {background:#656872}
 .summaryList .summaryBtn a.chart {background:#ed7161}
 .summaryList .summaryBtn a.log {background:#80c2b8}
+
+.projectList {position:relative;}
+.projectList > div {position:relative; margin-top:15px; padding:15px; min-height:100px; border:1px solid #fafafa; cursor:pointer; transition:.5s;}
+.projectList > div:hover,
+.projectList > div.on {border:1px solid #fba602; background-color:#fff; box-shadow:3px 3px 10px rgba(0,0,0,.1);}
+.projectList > div:before {content:''; position:absolute; top:18px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
+.projectList > div.true:before {content:'T'; background:#55c554;}
+.projectList > div.false:before {content:'F'; background:#e91a61;}
+.projectList > div > div {overflow:hidden; padding-left:80px; line-height:24px;}
+.projectList > div > div:first-child {margin-bottom:10px;}
+.projectList > div > div strong {float:left; width:88%; overflow:hidden; font-size:18px; color:#222; font-weight:300; line-height:24px;}
+.projectList > div > div em {float:left; width:20%; margin-left:5%; color:#999; font-size:14px; font-weight:300; line-height:inherit;}
+.projectList > div > div dl {float:left; margin-left:15px;}
+.projectList > div > div dl:first-child {margin-left:0;}
+.projectList > div > div dl dt {float:left;color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.projectList > div > div dl dd {float:left; margin-left:10px; padding:0 10px; color:#666; font-size:14px; line-height:inherit; background:#f7f7f7;}
 
 .tableList {border-spacing:5px; border-top:2px solid #ddd;}
 .tableList thead tr th {min-height:60px; padding:10px 5px; font-size:18px; font-weight:200; line-height:22px; border-bottom:2px solid #ddd;}
@@ -396,7 +429,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .statusList .summaryBtn a span {display:block; line-height:18px;}
 .statusList .summaryBtn a.process {background:#656872;}
 .statusList .summaryBtn a.chart {background:#ed7161;}
-.statusList .summaryBtn a.log {background:#80c2b8};
+.statusList .summaryBtn a.log {background:#80c2b8;}
 
 .ovChart {height:250px;}
 
@@ -676,6 +709,14 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 .zoneWrap h4 span {float:left; height:60px; margin-right:25px;}
 .zoneWrap h4 select {float:right; margin-top:15px;}
+.zoneWrap h4 div {float:right;}
+.zoneWrap h4 div span:before {content:' ㆍ ' }
+.zoneWrap h4 div span {font-size:20px; margin-left:30px;}
+.zoneWrap h4 div span strong {font-size:20px !important; margin-left:15px; font-weight:800;}
+.zoneWrap h4 div span.run strong {color:#45b1ff !important;}
+.zoneWrap h4 div span.war strong {color:#fba602 !important;}
+.zoneWrap h4 div span.cri strong {color:#e91a61 !important;}
+.zoneWrap h4 div span.bak strong {color:#333 !important;}
 .zoneWrap .cellList {display:inline-block; width:100%; min-height:200px;}
 .zoneWrap .cellList > dl {display:inline-block; width:100%; margin-top:15px; border-bottom:1px solid #eee;}
 .zoneWrap .cellList > dl:first-child {margin-top:0;  border-top:1px solid #eee;}
@@ -694,12 +735,36 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .zoneWrap .cellList > dl > dd a .flag {position:absolute; bottom:35px; left:0; z-index:-1; color:#222; width:160px; padding:10px; border:1px solid #222; background:#fff; opacity:0; transition:.5s;}
 .zoneWrap .cellList > dl > dd a:hover .flag {opacity:1; z-index:1; box-shadow:2px 2px 5px rgba(0,0,0,.3);}
 .zoneWrap .cellList > dl > dd a .flag:after {content:''; position:absolute; bottom:-6px; left:5px; width:10px; height:10px; border-bottom:1px solid #222; border-right:1px solid #222; background:#fff; transform:rotate(45deg)}
-
 .zoneWrap .cellList > dl > dd a .flag dl {overflow:hidden; width:140px;}
 .zoneWrap .cellList > dl > dd a .flag dl dt {float:left; width:40px; color:#333; font-size:12px; font-weight:400; text-align:left; line-height:18px; white-space:nowrap;}
 .zoneWrap .cellList > dl > dd a .flag dl dd {float:left; width:100px; color:#666; font-size:12px; text-align:left; line-height:18px; white-space:nowrap;}
 
-#contents article.alarmWrap h4{border-bottom:0;}
+.zoneWrap .nodeList {overflow:hidden; min-height:200px;}
+.zoneWrap .nodeList > dl {float:left; width:49%; margin-top:10px; padding:10px; border:1px solid #eee;}
+.zoneWrap .nodeList > dl.admin {padding:10px; border:1px solid #55c554;}
+.zoneWrap .nodeList > dl.demo {padding:10px; border:1px solid #ccc;}
+.zoneWrap .nodeList > dl:nth-child(even) {margin-left:2%;}
+.zoneWrap .nodeList > dl > dt {position:relative; overflow:hidden; margin-bottom:10px; padding-left:55px; color:#000; font-size:26px; font-weight:400; line-height:40px; background:#f5f5f5;}
+.zoneWrap .nodeList > dl.admin > dt,
+.zoneWrap .nodeList > dl.demo > dt {padding-left:15px;}
+.zoneWrap .nodeList > dl > dt:after {content:''; position:absolute; top:0; left:0; width:40px; height:40px; color:#fff; font-size:24px; font-weight:100; text-align:center; line-height:40px;}
+.zoneWrap .nodeList > dl.running > dt:after {content:'R'; background:#55c554;}
+.zoneWrap .nodeList > dl.warning > dt:after {content:'W'; background:#fba602;}
+.zoneWrap .nodeList > dl.critical > dt:after {content:'C'; background:#e91a61;}
+.zoneWrap .nodeList > dl.fail > dt:after {content:'F'; background:#c048c8;}
+.zoneWrap .nodeList > dl > dt span {float:right; padding-right:20px; font-size:16px; font-weight:200;}
+.zoneWrap .nodeList > dl > dd ul {overflow:hidden; display:flex; justify-content:space-between;}
+.zoneWrap .nodeList > dl > dd ul li {padding-left:10px; font-size:14px; border-left:8px solid #000;}
+.zoneWrap .nodeList > dl > dd ul li:nth-child(1) {color:#fba602; border-color:#fba602;}
+.zoneWrap .nodeList > dl > dd ul li:nth-child(2) {color:#ed1b59; border-color:#ed1b59;}
+.zoneWrap .nodeList > dl > dd ul li:nth-child(3) {padding-right:10px; color:#55c554; border-color:#55c554;}
+.zoneWrap .nodeList > dl > dd ul.project li {padding-left:0; color:#333; border-left:0;}
+.zoneWrap .nodeList > dl > dd ul.project li dl {display:flex; flex-direction:column; justify-content:center; text-align:center;}
+.zoneWrap .nodeList > dl > dd ul.project li dl dt {margin-bottom:5px;}
+.zoneWrap .nodeList > dl > dd ul.project li dl dd {padding:3px 10px; border:1px solid #55c554; border-radius:5px;}
+.zoneWrap .nodeList > dl.demo > dd ul.project li dl dd {border:1px solid #ccc;}
+
+#contents article.alarmWrap h4 {border-bottom:0;}
 .alarmList {overflow:hidden;}
 .alarmList li {float:left; width:32%; margin-left:1%; margin-bottom:20px; border:1px solid #eee; cursor:pointer; transition:.5s;}
 .alarmList li.none {width:100%; height:300px; text-align:center; line-height:300px;}
@@ -723,22 +788,18 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 
 
 /********************************** loader ******************************************/
-#loadWrap {position:fixed; top:0; left:0; z-index:99999; width:100%; height:100%; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; display:none;}
-#loadWrap .loader {display:inline-block; margin:0 16px; width:44px; height:44px; position:relative;}
-#loadWrap .loader:before {content:''; width:6px; height:6px; border-radius:50%; position:absolute; display:block; background:#fff; top:37px; left:19px; transform:translate(-18px, -18px); animation:dotRect 3s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;}
-#loadWrap .loader svg {display:block; width:100%; height:100%;}
-#loadWrap .loader svg rect {fill:none; stroke:#fff; stroke-width:10px; stroke-linejoin:round; stroke-linecap:round; stroke-dasharray:192 64 192 64; stroke-dashoffset:0; animation:pathRect 3s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;}
+#loadWrap {position:fixed; top:0; left:0; z-index:99999; width:100%; height:100%; background:rgba(0,0,0,.3); display:flex; justify-content:center; align-items:center; display:none;}
+#loadWrap .loader {width:8vmax; height:8vmax; border-right:4px solid #ffffff; border-radius:100%; animation:spinRight 800ms linear infinite;}
+#loadWrap .loader:before,
+#loadWrap .loader:after {content:''; width:6vmax; height:6vmax; display:block; position:absolute; top:calc(50% - 3vmax); left:calc(50% - 3vmax); border-left:3px solid #ffffff; border-radius:100%; animation:spinLeft 800ms linear infinite;}
+#loadWrap .loader:after {width:4vmax; height:4vmax; top:calc(50% - 2vmax); left:calc(50% - 2vmax); border:0; border-right:2px solid #ffffff; animation:none;}
 
-@keyframes pathRect {
-    25% {stroke-dashoffset:64;}
-    50% {stroke-dashoffset:128;}
-    75% {stroke-dashoffset:192;}
-    100% {stroke-dashoffset:256;}
-}
-
-@keyframes dotRect {
-    25% {transform:translate(0, 0);}
-    50% {transform:translate(18px, -18px);}
-    75% {transform:translate(0, -36px);}
-    100% {transform:translate(-18px, -18px);}
-}
+@keyframes spinLeft {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(720deg);}
+  }
+  
+  @keyframes spinRight {
+    from {transform:rotate(360deg);}
+    to {transform:rotate(0deg);}
+  }

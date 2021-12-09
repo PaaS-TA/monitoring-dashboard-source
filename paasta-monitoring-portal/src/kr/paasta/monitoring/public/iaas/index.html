@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>PaaS-TA Monitoring</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css" />
+	</head>
+	<body>
+
+		<!-- Wrap -->
+		<div id="wrap">
+			
+			<!-- Header -->
+			<header>
+				<h1><a href="../index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring" ></a></h1>
+				
+				<ul class="global">
+					<li class="IaaS"><a href="#" class="top-menu-active">IaaS</a></li>
+					<li class="PaaS"><a href="../paas/index.html" >PaaS</a></li>
+					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+				</ul>
+				
+				<!-- Navigation -->
+				<nav>
+					<ul>
+						<li><a href="index.html" class="on"><em><img src="../resources/img/nav_home.png" alt="home" ></em></a></li>
+						<li><a href="hypervisor.html">H<span>ypervisor</span></a></li>
+						<li><a href="project.html">P<span>roject</span></a></li>
+						<li>
+							<a href="alarm_policy.html">A<span>larm</span></a>
+							<ul>
+								<li><a href="alarm_policy.html">Policy</a></li>
+								<li><a href="alarm_status.html">Status</a></li>
+								<li><a href="alarm_statis.html">Statistics</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- // Navigation -->
+				
+			</header>
+			<!-- // Header -->
+
+			<!-- Container -->
+			<div id="container" class="gaugeWrap">
+				<div class="contentsLeft">
+					<!-- Overview -->
+					<h3>Summary</h3>
+					<h4><strong style="color: #333333;">VCPU 사용량</strong></h4>
+					<div id="iaasVcpuChart"></div>
+					<div class="center">사용 <strong id="vcpuUsed"></strong> 개 / 전체 <em id="vcpuTotal"></em> 개</div>
+
+					<h4><strong style="color: #333333;">Memory 사용량</strong></h4>
+					<div id="iaasMemoryChart"></div>
+					<div class="center">사용 <strong id="memoryUsed"></strong> <span id="memoryUsedUnit"></span> / 전체 <span id="memoryTotal"></span> <span id="memoryTotalUnit"></span></div>
+
+					<h4><strong style="color: #333333;">Disk 사용량</strong></h4>
+					<div id="iaasDiskChart"></div>
+					<div class="center">사용 <strong id="diskUsed"></strong> <span id="diskUsedUnit"></span> / 전체 <span id="diskTotal"></span> <span id="diskTotalUnit"></span></div>
+
+					<!-- // Overview -->
+					<div class="insList">
+						<h4><strong style="color: #333333;">인스턴스</strong></h4>
+						<dl>
+							<dt>Max Instance</dt>
+							<dd><strong id="instanceCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Running / OK</dt>
+							<dd><strong id="runningCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>No State</dt>
+							<dd><strong id="nostateCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Paused</dt>
+							<dd><strong id="pauseCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Crashed</dt>
+							<dd><strong id="crashedCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Shutting down</dt>
+							<dd><strong id="shutdownCnt">0</strong>개</dd>
+						</dl>
+						<dl>
+							<dt>Suspended</dt>
+							<dd><strong id="suspendedCnt">0</strong>개</dd>
+						</dl>
+					</div>
+				</div>
+
+
+
+
+				<!-- Contents -->
+				<section id="contents">
+					<nav>
+						<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar" ></a>
+						<ul>
+							<li>
+								<a href="javascript:void(0);" class="alarmView">
+									<img src="../resources/img/btn_header_alarm.png" alt="alarm" >
+									<img src="../resources/img/btn_header_alarm_on.png" alt="alarm" >
+									<span>0</span>
+								</a>
+							</li>
+							<li class="outBtn">
+								<a href="javascript:void(0);">
+									<img src="../resources/img/btn_header_user.png" alt="user" >
+									<div><strong>username</strong><span>username</span></div>
+								</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user" ><span>Sign Out</span></a>
+							</li>
+						</ul>
+					</nav>
+					<article class="zoneWrap">
+						<h4>
+							<span>Hypervisor</span>
+							<div>
+								<span class="run">enable<strong id="hypervisorEnableCnt">0</strong></span>
+								<span class="war">disable<strong id="hypervisorDisableCnt">0</strong></span>
+							</div>
+						</h4>
+						<div id="hypervisorList" class="nodeList">
+							<!--
+							<dl class="running">
+								<dt>con01<span>203.255.255.101</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">CPU : <span>99.9%</span></li>
+										<li class="memo">Memory(GB) : <span>99.9%</span><br>Total : <span>999 GB</span></li>
+										<li class="disk">Disk(GB) : <span>99.9%</span><br>Total : <span>99999 GB</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>
+							-->
+						</div>
+						<h4>
+							<span>Project</span>
+							<div>
+								<span class="bak">total<strong id="projectTotalCnt">0</strong></span>
+								<span class="run">enable<strong id="projectEnableCnt">0</strong></span>
+								<span class="cri">disable<strong id="projectDisableCnt">0</strong></span>
+							</div>
+						</h4>
+						<div id="projectList" class="nodeList">
+							<!--
+							<dl class="admin">
+								<dt>admin</dt>
+								<dd>
+									<ul class="project">
+										<li>
+											<dl>
+												<dt>VCPU</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Memory</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Instance</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>FIP</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Security</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Valumes</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Storage</dt>
+												<dd>999</dd>
+											</dl>
+										</li>
+									</ul>
+								</dd>
+							</dl>
+							-->
+						</div>
+					</article>
+
+					<article class="alarmWrap">
+						<h4>Alarm Issue View</h4>
+						<ul class="alarmList">
+						</ul>
+					</article>
+					
+				</section>
+				<!-- // Contents -->
+
+			</div>
+			<!-- // Container -->
+
+			<div id="chartWrap">
+					<h4><span class="chartTitle"></span></h4>
+					<ul class="chart">
+						<li>
+							<h5>CPU Usage</h5>
+							<div id="cpuUsageChart"></div>
+						</li>
+						<li>
+							<h5>CPU Load Average</h5>
+							<div id="cpuLoadChart"></div>
+						</li>
+						<li>
+							<h5>Memory Usage</h5>
+							<div id="memoryUsageChart"></div>
+						</li>
+						<li>
+							<h5>Disk Usage</h5>
+							<div id="diskUsageChart"></div>
+						</li>
+						<li>
+							<h5>Network IO Byte</h5>
+							<div id="networkByteChart"></div>
+						</li>
+						<li>
+							<h5>Network IO Drop</h5>
+							<div id="networkDropChart"></div>
+						</li>
+						<li>
+							<h5>Network IO Error</h5>
+							<div id="networkErrorChart"></div>
+						</li>
+					</ul>
+					<a href="javascript:void(0);" class="chartClosed"></a>
+				</div>
+		</div>
+		<!-- // Wrap -->
+
+		<!-- loadWrap : start -->
+		<div id="loadWrap" >
+			<div class="loader"></div>
+		</div>
+		<!-- loadWrap : end -->
+	</body>
+	
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	<script type="text/javascript">
+		window.onload = () => {
+			const main = {
+				loader : document.getElementById("loadWrap"),
+				isLoadedHypervisor : false,
+				isLoadedProject : false,
+
+				init() {
+					// Alarm Count
+					fnComm.alarmCount('paas');
+
+					main.loader.style.display = "flex";
+
+					// TODO: IaasS-Monitoring Summary
+					fnComm.loadData('GET', `${fnComm.url}iaas/hyper/statistics`, main.iaasCount);
+
+					// TODO Openstack 프로젝트 목록 조회
+					fnComm.loadData('GET', fnComm.url + 'iaas/project/list', main.getProjectList)
+
+					//TODO 하이퍼바이저 목록 출력
+					fnComm.loadData('GET', fnComm.url + 'iaas/hypervisor/list', main.getHypervisorList);
+
+					fnComm.loadData('GET', `${fnComm.url}iaas/server/list`, main.iaasInstanceSummary);
+
+					// 오늘 날짜 계산
+					var today = new Date();
+					var dd = today.getDate();
+					var mm = today.getMonth()+1;
+					var nn = today.getMonth();
+					var yyyy = today.getFullYear();
+
+					if(dd < 10) dd = '0'+dd;
+					if(mm < 10) mm = '0'+mm;
+					if(nn < 10) nn = '0'+nn;
+
+					fnComm.loadData('GET', `${fnComm.url}iaas/alarm/statuses?pageItems=1000&pageIndex=1&originType=ias&alarmType=&resolveStatus=&level=&searchDateFrom=${yyyy}-${nn}-${dd}&searchDateTo=${yyyy}-${mm}-${dd}`, main.alarmCreateList);
+
+				},
+
+				alarmCreateList(data) {
+					var target = document.querySelector('.alarmList');
+
+					fnComm.removeHtml(target);
+
+					if(data.data.length > 0){
+						data.data.forEach(value => {
+							var html = `<li class="${value.level}">
+								<h6><span>${value.regDate}</span></h6>
+								<dl>
+									<dt>Type</dt>
+									<dd>${value.alarmType}</dd>
+								</dl>
+								<dl>
+									<dt>Title</dt>
+									<dd>${value.alarmTitle}</dd>
+								</dl>
+							</li>`;
+
+							fnComm.appendHtml(target, html, 'div');
+						});
+
+						fnComm.linkHtml(document.querySelector('.alarmList').querySelectorAll('li'), 'alarm_status.html');
+					} else {
+						var html = `<li class="none">최근 한달간 알람이 없습니다.</li>`
+
+						fnComm.appendHtml(target, html, 'div');
+					}
+				},
+
+				getProjectList(projectList) {
+					var target = document.getElementById('projectList');
+					fnComm.removeHtml(target);
+
+					fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', function(usageResult){
+						console.log(projectList);
+						console.log(usageResult);
+
+						var enableCnt = 0;
+						var disableCnt = 0;
+
+						usageResult.forEach((usage, idx) => {
+
+							// 프로젝트 정보 merge
+							projectList.forEach((project, idx) => {
+								if (project.id == usage.tenant_id) {
+									usage.enabled = project.enabled;
+									usage.project_name = project.name;
+									usage.floating_ips = project.floatingIps;
+									usage.security_groups = project.secGroups;
+									usage.volumes = project.volumes;
+
+									if (usage.enabled) {
+										console.log(enableCnt);
+										enableCnt++;
+									} else {
+										disableCnt++;
+									}
+								}
+							});
+							var vcpus = 0;
+							var memoryMb = 0;
+							var diskGb = 0;
+							usage.server_usages.forEach((server, idx) => {
+								vcpus += server.vcpus;
+								memoryMb += server.memory_mb;
+								diskGb += server.local_gb;
+							});
+
+							usage.vcpus = vcpus;
+							usage.memory_mb = memoryMb;
+							usage.local_gb = diskGb;
+
+							var mem = fnComm.convertUnits(usage.memory_mb, "MB");
+							var disk = fnComm.convertUnits(usage.local_gb, "GB");
+
+							var html = `<dl class="admin">
+								<dt>${usage.project_name}</dt>
+								<dd>
+									<ul class="project">
+										<li>
+											<dl>
+												<dt>VCPU</dt>
+												<dd>${usage.vcpus}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Memory</dt>
+												<dd>${mem.convertedSize} ${mem.convertedUnit}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Instance</dt>
+												<dd>${usage.server_usages.length}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>FIP</dt>
+												<dd>${usage.floating_ips}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Security</dt>
+												<dd>${usage.security_groups}</dd>
+											</dl>
+										</li>
+										<li>
+											<dl>
+												<dt>Volumes</dt>
+												<dd>${disk.convertedSize.toFixed(2)} ${disk.convertedUnit}</dd>
+											</dl>
+										</li>
+									</ul>
+								</dd>
+							</dl>`
+
+							fnComm.appendHtml(target, html, 'div');
+
+						});
+						document.getElementById("projectTotalCnt").innerText = usageResult.length;
+						document.getElementById("projectEnableCnt").innerText = enableCnt;
+						document.getElementById("projectDisableCnt").innerText = disableCnt;
+					});
+
+
+
+					main.isLoadedProject = true;
+					if (main.isLoadedHypervisor && main.isLoadedProject) {
+						// 로딩 딜레이 추가
+						setTimeout(function () {
+							main.loader.style.display = "none";
+						}, 1500);
+					}
+
+				},
+
+				getHypervisorList(resultList) {
+					var target = document.getElementById("hypervisorList");
+					fnComm.removeHtml(target);
+
+					resultList.sort(function (a, b) {
+						if (a.hypervisor_hostname > b.hypervisor_hostname) {
+							return 1;
+						} else if (a.hypervisor_hostname < b.hypervisor_hostname) {
+							return -1;
+						};
+						return 0;
+					});
+
+					var enableCnt = 0;
+					var disableCnt = 0;
+					resultList.forEach((resultItem, idx)=>{
+
+						var cpuUsage = ((resultItem.vcpus_used / resultItem.vcpus ) * 100).toFixed(1);
+						var memoryUsage = ((resultItem.memory_mb_used / resultItem.memory_mb ) * 100).toFixed(1);
+						var diskUsage = ((resultItem.local_gb_used / resultItem.local_gb ) * 100).toFixed(1);
+
+						var totalMem = fnComm.convertUnits(resultItem.memory_mb, "MB");
+						var totalDisk = fnComm.convertUnits(resultItem.local_gb, "GB");
+
+						// class = running, warning, critical, fail
+						var html = `<dl class="running">
+								<dt>${resultItem.hypervisor_hostname}<span>${resultItem.host_ip}</span></dt>
+								<dd>
+									<ul>
+										<li class="cpu">VCPU : <span>${cpuUsage}%</span></li>
+										<li class="memo">Memory (MB) : <span>${memoryUsage}%</span><br>Total : <span>${totalMem.convertedSize.toFixed(2)} ${totalMem.convertedUnit}</span></li>
+										<li class="disk">Disk(GB) : <span>${diskUsage}%</span><br>Total : <span>${totalDisk.convertedSize.toFixed(2)} ${totalDisk.convertedUnit}</span><br>Status : <span>Healthy</span></li>
+									</ul>
+								</dd>
+							</dl>`;
+						fnComm.appendHtml(target, html, 'div');
+
+						if (resultItem.status == 'enabled') {
+							enableCnt++;
+						} else {
+							disableCnt++;
+						}
+					});
+
+					document.getElementById("hypervisorEnableCnt").innerText = enableCnt;
+					document.getElementById("hypervisorDisableCnt").innerText = disableCnt;
+
+					main.isLoadedHypervisor = true;
+					if (main.isLoadedHypervisor && main.isLoadedProject) {
+						// 로딩 딜레이 추가
+						setTimeout(function () {
+							main.loader.style.display = "none";
+						}, 1500);
+					}
+				},
+
+
+				iaasCount(data){
+					// CpuUsage: "1.20"
+					// DiskUsage: "15.90"
+					// MemoryUsage: "4.35"
+					// PodUsage: "0.03"
+
+					var memoryUsed = fnComm.convertUnits(data.memoryUsed, "MB");
+					var memoryTotal = fnComm.convertUnits(data.memory, "MB");
+					var diskUsed = fnComm.convertUnits(data.diskUsed, "GB");
+					var diskTotal = fnComm.convertUnits(data.disk, "GB");
+
+					var vcpuPercent = Math.round(data.vcpuUsed / data.vcpu * 100);
+					var memoryPercent = Math.round(data.memoryUsed / data.memory * 100);
+					var diskPercent = Math.round(data.diskUsed / data.disk * 100);
+
+					document.getElementById("vcpuUsed").innerText = data.vcpuUsed;
+					document.getElementById("vcpuTotal").innerText = data.vcpu;
+					document.getElementById("memoryUsed").innerText = memoryUsed.convertedSize.toFixed(2);
+					document.getElementById("memoryTotal").innerText = memoryTotal.convertedSize.toFixed(2);
+					document.getElementById("diskUsed").innerText = diskUsed.convertedSize.toFixed(2);
+					document.getElementById("diskTotal").innerText = diskTotal.convertedSize.toFixed(2);
+					document.getElementById("memoryUsedUnit").innerText = memoryUsed.convertedUnit;
+					document.getElementById("memoryTotalUnit").innerText = memoryTotal.convertedUnit;
+					document.getElementById("diskUsedUnit").innerText = diskUsed.convertedUnit;
+					document.getElementById("diskTotalUnit").innerText = diskTotal.convertedUnit;
+
+					var chart1 = c3.generate({
+						bindto: '#iaasVcpuChart',
+						data: {
+							columns: [
+								['VCPU', vcpuPercent]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+
+					var chart2 = c3.generate({
+						bindto: '#iaasMemoryChart',
+						data: {
+							columns: [
+								['MEMORY', memoryPercent]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+
+					var chart3 = c3.generate({
+						bindto: '#iaasDiskChart',
+						data: {
+							columns: [
+								['DISK', diskPercent]
+							],
+							type: 'gauge',
+						},
+						gauge: {
+							label: {
+								format: function(value, ratio) {
+									return value + ' %';
+								},
+								show: false,
+							},
+							units: ' %',
+							width: 3,
+						},
+						color: {
+							pattern: ['#55c554', '#fba602', '#F97600', '#e91a61'],
+							threshold: {
+								unit: 'value',
+								max: 200,
+								values: [30, 60, 90, 100]
+							}
+						},
+						size: {
+							height: 140,
+						},
+						tooltip: {
+							format: {
+								value: function(value, ratio, id, index){
+									return value+'%';
+								}
+							}
+						},
+						legend: {
+							show: false
+						}
+					});
+				},
+
+				iaasInstanceSummary(resultList) {
+					console.log(resultList);
+					var instanceCnt = resultList.length;
+					var runningCnt = 0;
+					var noStateCnt = 0;
+					var pauseCnt = 0;
+					var shutdownCnt = 0;
+					var crashedCnt = 0;
+					var suspendedCnt = 0;
+					resultList.forEach((item, idx) => {
+						var powerState = item["OS-EXT-STS:power_state"];
+						switch (powerState) {
+							case 0 :
+								noStateCnt++;
+								break;
+							case 1 :
+								runningCnt++;
+								break;
+							case 3 :
+								pauseCnt++;
+								break;
+							case 4 :
+								shutdownCnt++;
+								break;
+							case 6 :
+								crashedCnt++;
+								break;
+							case 7 :
+								suspendedCnt++;
+								break;
+						}
+					});
+
+					document.getElementById("instanceCnt").innerText = instanceCnt;
+					document.getElementById("runningCnt").innerText = runningCnt;
+					document.getElementById("nostateCnt").innerText = noStateCnt;
+					document.getElementById("pauseCnt").innerText = pauseCnt;
+					document.getElementById("crashedCnt").innerText = crashedCnt;
+					document.getElementById("shutdownCnt").innerText = shutdownCnt;
+					document.getElementById("suspendedCnt").innerText = suspendedCnt;
+				},
+			}
+
+			main.init();
+		};
+	</script>
+</html>

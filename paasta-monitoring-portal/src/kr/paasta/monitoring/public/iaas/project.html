@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8">
+	<title>PaaS-TA Monitoring</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css">
+</head>
+<body cz-shortcut-listen="true">
+
+	<!-- Wrap -->
+	<div id="wrap">
+		
+		<!-- Header -->
+		<header>
+			<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring"></a></h1>
+
+			<ul class="global">
+				<li class="IaaS" style="display: inline-block;"><a href="#" class="top-menu-active">IaaS</a></li>
+				<li class="PaaS" style="display: inline-block;"><a href="../paas/index.html">PaaS</a></li>
+				<li class="SaaS" style="display: inline-block;"><a href="../saas/index.html">SaaS</a></li>
+				<li class="CaaS" style="display: inline-block;"><a href="../caas/index.html">CaaS</a></li>
+			</ul>
+			
+			<!-- Navigation -->
+			<nav>
+				<ul>
+					<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home"></em></a></li>
+					<li><a href="hypervisor.html">H<span>ypervisor</span></a></li>
+					<li><a href="project.html" class="on">P<span>roject</span></a></li>
+					<li>
+						<a href="alarm_policy.html">A<span>larm</span></a>
+						<ul>
+							<li><a href="alarm_policy.html">Policy</a></li>
+							<li><a href="alarm_status.html">Status</a></li>
+							<li><a href="alarm_statis.html">Statistics</a></li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<!-- // Navigation -->
+			
+		</header>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div id="container">
+			<div class="contentsLeft">
+				<!-- Overview -->
+				<h3>Project</h3>
+				<div id="projectList" class="projectList">
+					<!--
+					<div class="true">
+						<div>
+							<strong>admin</strong>
+						</div>
+						<div>
+							<dl>
+								<dt>VCPU</dt>
+								<dd>999</dd>
+							</dl>
+							<dl>
+								<dt>Menory(GB)</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Instande</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Floating IP</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Security Group</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Volumes</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Volumes Strorege</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+					</div>
+					<div class="false">
+						<div>
+							<strong>admin</strong>
+						</div>
+						<div>
+							<dl>
+								<dt>VCPU</dt>
+								<dd>999</dd>
+							</dl>
+							<dl>
+								<dt>Menory(GB)</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Instande</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Floating IP</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Security Group</dt>
+								<dd>999/999</dd>
+							</dl>
+							<dl>
+								<dt>Volumes</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+						<div>
+							<dl>
+								<dt>Volumes Strorege</dt>
+								<dd>999/999</dd>
+							</dl>
+						</div>
+					</div>
+					-->
+
+				</div>
+			</div>
+
+			<!-- Contents -->
+			<section id="contents">
+				<nav>
+					<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar"></a>
+					<ul>
+						<li>
+							<a href="javascript:void(0);" class="alarmView">
+								<img src="../resources/img/btn_header_alarm.png" alt="alarm">
+								<img src="../resources/img/btn_header_alarm_on.png" alt="alarm">
+								<span>0</span>
+							</a>
+						</li>
+						<li class="outBtn">
+							<a href="javascript:void(0);">
+								<img src="../resources/img/btn_header_user.png" alt="user">
+								<div><strong>admin</strong><span>admin@admin.com</span></div>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user"><span>Sign Out</span></a>
+						</li>
+					</ul>
+				</nav>
+				<div class="timePop">
+					<h4>Time Range</h4>
+					<div class="timer">
+						<div>
+							<input type="radio" name="timeRange" id="tr01" value="15">
+							<label for="tr01">최근 15분</label>
+							<input type="radio" name="timeRange" id="tr02" value="30">
+							<label for="tr02">최근 30분</label>
+							<input type="radio" name="timeRange" id="tr03" value="60">
+							<label for="tr03">최근 1시간</label>
+							<input type="radio" name="timeRange" id="tr04" value="180">
+							<label for="tr04">최근 3시간</label>
+							<input type="radio" name="timeRange" id="tr05" value="360">
+							<label for="tr05">최근 6시간</label>
+							<input type="radio" name="timeRange" id="tr06" value="720">
+							<label for="tr06">최근 12시간</label>
+							<input type="radio" name="timeRange" id="tr07" value="1440">
+							<label for="tr07">최근 1일</label>
+							<input type="radio" name="timeRange" id="tr08" value="10080">
+							<label for="tr08">최근 이번주</label>
+							<input type="radio" name="timeRange" id="tr09" value="40320">
+							<label for="tr09">최근 이번달</label>
+						</div>
+						<div style="display:none;">
+							<input type="radio" name="timeRange" id="tr10">
+							<label for="tr10">수동설정</label>
+							<input type="text" id="from" name="from">
+							<input type="text" id="to" name="to">
+						</div>
+					</div>
+					<h4>Refreshing Time</h4>
+					<div class="refresh">
+						<div class="select_wrap">
+							<select id="timeSelect">
+								<option value="0">OFF</option>
+								<option value="1">1m</option>
+								<option value="5">5m</option>
+								<option value="15">15m</option>
+								<option value="30">30m</option>
+								<option value="60">1h</option>
+								<option value="120">2h</option>
+								<option value="1440">1d</option>
+							</select>
+							<label for="timeSelect">OFF</label>
+						</div>
+					</div>
+					<div class="btnWrap center">
+						<button class="save">Save Changes</button>
+					</div>
+					<a href="javascript:void(0);" class="close">close</a>
+				</div>
+
+				<article>
+					<h4>Instance List <span id="project_name_title"></span></h4>
+					<div id="instanceSummary" class="summaryList">
+						<!--
+						<div class="normal">
+							<div>
+								<strong>deployment</strong>
+								<em>10.5.0.123</em>
+								<em>2021-08-27 T10:44:22</em>
+							</div>
+							<div>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>0.17 %</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>6.83 %</dd>
+								</dl>
+								<dl>
+									<dt>Zone</dt>
+									<dd>nova</dd>
+								</dl>
+								<dl>
+									<dt>Flavor</dt>
+									<dd>m1.small</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>999</dd>
+								</dl>
+								<dl>
+									<dt>DISK</dt>
+									<dd>999GB</dd>
+								</dl>
+								<dl>
+									<dt>RAM</dt>
+									<dd>99GB</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-name="daemonset">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>
+						-->
+					</div>
+					<!--<h4>Workloads Status</h4>-->
+				</article>
+			</section>
+			<!-- // Contents -->
+		</div>
+		<!-- // Container -->
+		
+		<div id="chartWrap">
+			<div class="chart on">
+				<h4><span class="chartTitle"></span></h4>
+				<ul class="chart">
+					<li>
+						<h5>CPU Usage (%)</h5>
+						<div id="cpuUsageChart"></div>
+					</li>
+					<li>
+						<h5>CPU Load Average</h5>
+						<div id="cpuLoadChart"></div>
+					</li>
+					<li>
+						<h5>Memory Usage (%)</h5>
+						<div id="memoryUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk Usage (%)</h5>
+						<div id="diskUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk IO</h5>
+						<div id="diskIoChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Bytes</h5>
+						<div id="networkByteChart"></div>
+					</li>
+					<!--
+					<li>
+						<h5>Network IO Packtes</h5>
+						<div id="networkPacktesChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Drop</h5>
+						<div id="networkDropChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Error</h5>
+						<div id="networkErrorChart"></div>
+					</li>
+					-->
+				</ul>
+
+				<!-- // Log Layer -->
+				<div class="logWrap">
+					<div class="log on">
+						<h4>LOG</h4>
+						<div id="logChart" class="logChart"></div>
+						<pre id="logText"></pre>
+						<a href="javascript:void(0);" class="logClosed"></a>
+					</div>
+				</div>
+				<!-- // Log Layer -->
+			</div>
+			<a href="javascript:void(0);" class="chartClosed"></a>
+		</div>
+
+	</div>
+
+	<!-- loadWrap : start -->
+	<div id="loadWrap" >
+		<div class="loader"></div>
+	</div>
+	<!-- loadWrap : end -->
+
+	<!-- // Wrap -->
+
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	<script type="text/javascript">
+
+		// 차트 닫기 버튼을 누르면 C3 Chart 오브젝트들을 destroy 시킨다.
+		document.querySelector('.chartClosed').addEventListener('click', (e) => {
+			document.getElementById('chartWrap').classList.toggle('on', false);
+
+			chartObjectArr.forEach((chartObj, idx) => {
+				chartObj.unload()
+				chartObj.flush();
+				chartObj.destroy();
+				chartObjectArr.splice(idx, 1);
+			});
+		}, false);
+
+		const project = {
+			id : '',
+			data : [],
+			loader : document.getElementById("loadWrap"),
+			init() {
+				// Alarm Count
+				//fnComm.alarmCount('iaas');
+
+				project.loader.style.display = "flex";
+
+				// TODO Openstack 프로젝트 목록 조회
+				fnComm.loadData('GET', fnComm.url + 'iaas/project/list', project.getProjectList)
+
+				// TODO Openstack 프로젝트 및 인스턴스 usage 목록 조회
+				//fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', project.getInstanceUsageList)
+
+			},
+
+
+			// 2021.11.03 - 프로젝트 목록 콜백함수
+			getProjectList(projectList) {
+
+				var target = document.getElementById('projectList');
+				fnComm.removeHtml(target);
+				fnComm.loadData('GET', fnComm.url + 'iaas/instance/usage/list', function(usageResult){
+					//console.log(projectList);
+					//console.log(usageResult);
+
+					usageResult.forEach((usage, idx) => {
+						// 프로젝트 정보 merge
+						projectList.forEach((project, idx) => {
+							if (project.id == usage.tenant_id) {
+								usage.enabled = project.enabled;
+								usage.project_name = project.name;
+								usage.floating_ips = project.floatingIps;
+								usage.security_groups = project.secGroups;
+							}
+						});
+						var vcpus = 0;
+						var memoryMb = 0;
+						var diskGb = 0;
+						usage.server_usages.forEach((server, idx) => {
+							vcpus += server.vcpus;
+							memoryMb += server.memory_mb;
+							diskGb += server.local_gb;
+						});
+
+						usage.vcpus = vcpus;
+						usage.memory_mb = memoryMb;
+						usage.local_gb = diskGb;
+
+						var mem = fnComm.convertUnits(usage.memory_mb, "MB");
+						var disk = fnComm.convertUnits(usage.local_gb, "GB");
+
+						var html = `<div class="${usage.enabled} projectItem" onclick="onClickProjectItem('${usage.tenant_id}', this)">
+							<div>
+								<strong class="project_name">${usage.project_name}</strong>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>${usage.vcpus}</dd>
+								</dl>
+								<dl>
+									<dt>Memory</dt>
+									<dd>${mem.convertedSize} ${mem.convertedUnit}</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>Volumes</dt>
+									<dd>${disk.convertedSize.toFixed(2)} ${disk.convertedUnit}</dd>
+								</dl>
+								<dl>
+									<dt>Instance</dt>
+									<dd>${usage.server_usages.length}</dd>
+								</dl>
+
+							</div>
+							<div>
+								<dl>
+									<dt>Floating IP</dt>
+									<dd>${usage.floating_ips}</dd>
+								</dl>
+								<dl>
+									<dt>Security Group</dt>
+									<dd>${usage.security_groups}</dd>
+								</dl>
+							</div>
+						</div>`
+
+						fnComm.appendHtml(target, html, 'div');
+
+					});
+					project.data = usageResult;
+
+					// project.html 페이지가 처음 열릴 때 오픈스택 프로젝트 목록 중 첫번째 프로젝트의 인스턴스 목록을 보여주도록 함.
+					var firstElem = document.getElementById("projectList").firstElementChild;
+					var firstElemId = projectList[0].id;
+					firstElem.addEventListener("onload", onClickProjectItem(firstElemId, firstElem));
+
+					//project.loader.style.display = "none";
+				});
+			},
+
+			getInstanceList(data) {
+				console.log(data);
+				var target = document.getElementById('instanceSummary');
+				fnComm.removeHtml(target);
+
+				data.forEach((value, idx)=>{
+					var state = value.status == "ACTIVE" ? "up" : "down";
+
+					var addressMap = value.addresses;
+					var ipAddr = addressMap[Object.keys(addressMap)[0]][0].addr;
+					//console.log(ipAddr);
+					var elapsedTimeStr = fnComm.calElapsedTime(value['OS-SRV-USG:launched_at'], 9);
+
+					var html = `<div class="${state}">
+							<div>
+								<strong><a href="javascript:void(0);">${value.name}</a></strong>
+							</div>
+							<div>
+								<dl class="color1" title="CPU">
+									<dt>C</dt>
+									<dd>${value.flavor.vcpus} core</dd>
+								</dl>
+								<dl class="color2" title="Memory">
+									<dt>M</dt>
+									<dd>${value.flavor.ram} MB</dd>
+								</dl>
+								<dl class="color3" title="Disk">
+									<dt>D</dt>
+									<dd>${value.flavor.disk} GB</dd>
+								</dl>
+								<dl class="color4" title="IP">
+									<dt>IP</dt>
+									<dd>${ipAddr}</dd>
+								</dl>
+								<dl class="color5" title="IP">
+									<dt>Flavor</dt>
+									<dd>${value.flavor.original_name}</dd>
+								</dl>
+								<dl class="color6" title="IP">
+									<dt>Region</dt>
+									<dd>${value['OS-EXT-AZ:availability_zone']}</dd>
+								</dl>
+								<dl class="color7" title="IP">
+									<dt>Age</dt>
+									<dd>${elapsedTimeStr}</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-id="${value.id}"  data-name="${value.name}">
+								<a href="javascript:void(0);" class="chart" onclick="project.chartView(this)"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+							</div>
+						</div>`
+
+					fnComm.appendHtml(target, html, 'div');
+				});
+
+				project.loader.style.display = "none";
+			},
+
+			chartView(target) {
+				var instanceId = target.parentNode.getAttribute('data-id');
+				var instanceName = target.parentNode.getAttribute('data-name');
+				document.querySelector('.chartTitle').innerHTML = instanceName;
+
+				var hypervisorName = "";
+
+				setTimeout(() => {
+					// TODO CPU Usage 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/cpu/usage?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#cpuUsageChart');
+
+					// CPU Load 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/cpu/load/average?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#cpuLoadChart');
+
+					// Memory Usage 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/memory/usage?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#memoryUsageChart');
+
+					// Disk Usage 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/disk/usage?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#diskUsageChart');
+
+					// Disk IO 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/disk/io/rate?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#diskIoChart');
+
+					// Network IO Bytes 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/network/io/bytes?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#networkByteChart');
+
+					// Network IO Packets 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/packets${fnComm.setTimer()}`, fnComm.detailChart, '#networkPacktesChart');
+
+					// Network IO Drop 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/drops${fnComm.setTimer()}`, fnComm.detailChart, '#networkDropChart');
+
+					// Network IO Error 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/errors${fnComm.setTimer()}`, fnComm.detailChart, '#networkErrorChart');
+				},500);
+				document.getElementById('chartWrap').classList.toggle('on', true);
+				document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
+			},
+		}
+
+		function errorToCallChart(message) {
+			if (document.getElementById("alertPop") == null)
+				fnComm.alertPopup('ERROR', message);
+		}
+
+		var chartObjectArr =[];   // C3 Chart 오브젝트 관리를 위한 배열
+		function renderChart(data, target) {
+			let cnt = 0;
+			let yPos = 9;
+			let detailTime = [];
+			let detailData = [];
+			let chartColor;
+
+			data.forEach((item, idx) => {
+				if(idx === 0){
+					detailTime.push('time');
+				};
+
+				detailData[idx] = [item.label];
+
+				item.data.forEach(data => {
+					if(idx === 0){
+						var timeStamp = new Date((data.Clock)*1000);
+
+						detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2));
+					};
+
+					detailData[idx].push(Number(Math.ceil(data.Value)));
+
+					if(yPos < Number(data.Value))
+						yPos = Math.ceil(data.Value);
+				});
+
+				cnt = idx;
+			});
+
+			yPos = Math.ceil((yPos / 10)) * 10;
+
+			var dataType = [];
+			dataType.push(detailTime);
+			for (var i = 0; i <= cnt; i++) {
+				dataType.push(detailData[i]);
+			};
+
+			switch (target){
+				case '#cpuUsageChart':
+				case '#cpuLoadChart':
+					chartColor = ['#ff015a', '#fc6604', '#fcce34', '#cc86cc'];
+					break;
+				case '#memoryUsageChart':
+					chartColor = ['#9cce34'];
+					break;
+				case '#diskUsageChart':
+				case '#diskIoChart':
+					chartColor = ['#3d003d', '#c701c7', '#cc86cc', '#fccefc'];
+					break;
+				case '#networkByteChart':
+				case '#networkPacktesChart':
+				case '#networkDropChart':
+				case '#networkErrorChart':
+					chartColor = ['#649afc', '#b7c3d8'];
+					break;
+				case '#nodeChart':
+					chartColor = ['#649afc', '#ff015a', '#9cce34', '#c701c7'];
+					break;
+				case '#logChart':
+					chartColor = ['#ff015a', '#9cce34', '#649afc'];
+					break;
+			};
+
+			console.log(dataType);
+
+			var chart = c3.generate({
+				bindto: target,
+				data: {
+					x: 'time',
+					xFormat: '%H:%M',
+					columns: dataType,
+					labels: false,
+					type: 'spline',
+				},
+				color: {
+					pattern: chartColor
+				},
+				axis: {
+					x: {
+						type: 'timeseries',
+						localtime: false,
+						tick: {
+							count: 2,
+						}
+					},
+					y: {
+						max: yPos,
+						min: 0,
+						tick: {
+							count: 5,
+						}
+					}
+				},
+				point: {
+					show: false
+				}
+			});
+			chartObjectArr.push(chart);
+		}
+
+		// 프로젝트 항목 클릭 이벤트
+		function onClickProjectItem(id, target) {
+			var projectName = '(' + target.querySelector('.project_name').innerText + ')';
+			document.getElementById("project_name_title").innerText = projectName;
+
+			// 사용자가 프로젝트 클릭했을 때에도 로딩 UI를 제어하기 위해..
+			if (project.loader.style.display == "none") {
+				project.loader.style.display = "flex";
+			}
+			// TODO VM 인스턴스 리스트 조회
+			fnComm.requestAjax('GET', fnComm.url + 'iaas/server/list?tenant_id='+id, project.getInstanceList);
+			Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
+			target.classList.add("on");
+		}
+
+		window.onload = () => {
+			project.init();
+		};
+	</script>
+
+</body></html>

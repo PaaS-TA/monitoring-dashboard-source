@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8">
+	<title>PaaS-TA Monitoring</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css">
+</head>
+<body cz-shortcut-listen="true">
+
+	<!-- Wrap -->
+	<div id="wrap">
+		
+		<!-- Header -->
+		<header>
+			<h1><a href="index.html" title="Monitoring"><img src="../resources/img/h1_logo.png" alt="Monitoring"></a></h1>
+
+			<ul class="global">
+				<li class="IaaS" style="display: inline-block;"><a href="#" class="top-menu-active">IaaS</a></li>
+				<li class="PaaS" style="display: inline-block;"><a href="../paas/index.html">PaaS</a></li>
+				<li class="SaaS" style="display: inline-block;"><a href="../saas/index.html">SaaS</a></li>
+				<li class="CaaS" style="display: inline-block;"><a href="../caas/index.html">CaaS</a></li>
+			</ul>
+			
+			<!-- Navigation -->
+			<nav>
+				<ul>
+					<li><a href="index.html"><em><img src="../resources/img/nav_home.png" alt="home"></em></a></li>
+					<li><a href="hypervisor.html" class="on">H<span>ypervisor</span></a></li>
+					<li><a href="project.html">P<span>roject</span></a></li>
+					<li>
+						<a href="alarm_policy.html">A<span>larm</span></a>
+						<ul>
+							<li><a href="alarm_policy.html">Policy</a></li>
+							<li><a href="alarm_status.html">Status</a></li>
+							<li><a href="alarm_statis.html">Statistics</a></li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<!-- // Navigation -->
+			
+		</header>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div id="container">
+			<!-- Contents -->
+			<section id="contents">
+				<nav>
+					<a href="javascript:void(0);" class="timeSetting"><img src="../resources/img/btn_header_cal.png" alt="calendar"></a>
+					<ul>
+						<li>
+							<a href="javascript:void(0);" class="alarmView on">
+								<img src="../resources/img/btn_header_alarm.png" alt="alarm">
+								<img src="../resources/img/btn_header_alarm_on.png" alt="alarm">
+								<span>16</span>
+							</a>
+						</li>
+						<li class="outBtn">
+							<a href="javascript:void(0);">
+								<img src="../resources/img/btn_header_user.png" alt="user">
+								<div><strong>admin</strong><span>admin@admin.com</span></div>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0);" class="logout"><img src="../resources/img/btn_header_out.png" alt="user"><span>Sign Out</span></a>
+						</li>
+					</ul>
+				</nav>
+				<div class="timePop">
+					<h4>Time Range</h4>
+					<div class="timer">
+						<div>
+							<input type="radio" name="timeRange" id="tr01" value="15">
+							<label for="tr01">최근 15분</label>
+							<input type="radio" name="timeRange" id="tr02" value="30">
+							<label for="tr02">최근 30분</label>
+							<input type="radio" name="timeRange" id="tr03" value="60">
+							<label for="tr03">최근 1시간</label>
+							<input type="radio" name="timeRange" id="tr04" value="180">
+							<label for="tr04">최근 3시간</label>
+							<input type="radio" name="timeRange" id="tr05" value="360">
+							<label for="tr05">최근 6시간</label>
+							<input type="radio" name="timeRange" id="tr06" value="720">
+							<label for="tr06">최근 12시간</label>
+							<input type="radio" name="timeRange" id="tr07" value="1440">
+							<label for="tr07">최근 1일</label>
+							<input type="radio" name="timeRange" id="tr08" value="10080">
+							<label for="tr08">최근 이번주</label>
+							<input type="radio" name="timeRange" id="tr09" value="40320">
+							<label for="tr09">최근 이번달</label>
+						</div>
+						<div style="display:none;">
+							<input type="radio" name="timeRange" id="tr10">
+							<label for="tr10">수동설정</label>
+							<input type="text" id="from" name="from">
+							<input type="text" id="to" name="to">
+						</div>
+					</div>
+					<h4>Refreshing Time</h4>
+					<div class="refresh">
+						<div class="select_wrap">
+							<select id="timeSelect">
+								<option value="0">OFF</option>
+								<option value="1">1m</option>
+								<option value="5">5m</option>
+								<option value="15">15m</option>
+								<option value="30">30m</option>
+								<option value="60">1h</option>
+								<option value="120">2h</option>
+								<option value="1440">1d</option>
+							</select>
+							<label for="timeSelect">OFF</label>
+						</div>
+					</div>
+					<div class="btnWrap center">
+						<button class="save">Save Changes</button>
+					</div>
+					<a href="javascript:void(0);" class="close">close</a>
+				</div>
+
+				<article class="table style01">
+					<h4>Hypervisor</h4>
+
+					<div id="hypervisorList" class="summaryList">
+						<!--
+						<div class="down">
+							<div>
+								<strong>Con05</strong>
+								<em>10.5.0.123</em>
+							</div>
+							<div>
+								<dl>
+									<dt>CPU Used</dt>
+									<dd>13.00 %</dd>
+								</dl>
+								<dl>
+									<dt>Total Memory</dt>
+									<dd>1,993 MB</dd>
+								</dl>
+								<dl>
+									<dt>Memory Used</dt>
+									<dd>68.37 %</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>Total Disk</dt>
+									<dd>2,818 MB</dd>
+								</dl>
+								<dl>
+									<dt>Disk Status</dt>
+									<dd>healthy</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn">
+								<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+								<a href="javascript:void(0);" class="log"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>
+							</div>
+						</div>
+						-->
+					</div>
+				</article>
+			</section>
+			<!-- // Contents -->
+
+		</div>
+		<!-- // Container -->
+
+		<div id="chartWrap">
+			<div class="chart on">
+				<h4><span class="chartTitle"></span></h4>
+				<ul class="chart">
+					<li>
+						<h5>CPU Usage (%)</h5>
+						<div id="cpuUsageChart"></div>
+					</li>
+					<li>
+						<h5>CPU Load Average</h5>
+						<div id="cpuLoadChart"></div>
+					</li>
+					<li>
+						<h5>Memory Usage (%)</h5>
+						<div id="memoryUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk Usage (%)</h5>
+						<div id="diskUsageChart"></div>
+					</li>
+					<li>
+						<h5>Disk IO</h5>
+						<div id="diskIoChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Bytes</h5>
+						<div id="networkByteChart"></div>
+					</li>
+					<!--
+					<li>
+						<h5>Network IO Packtes</h5>
+						<div id="networkPacktesChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Drop</h5>
+						<div id="networkDropChart"></div>
+					</li>
+					<li>
+						<h5>Network IO Error</h5>
+						<div id="networkErrorChart"></div>
+					</li>
+					-->
+				</ul>
+
+				<!-- // Log Layer -->
+				<div class="logWrap">
+					<div class="log on">
+						<h4>LOG</h4>
+						<div id="logChart" class="logChart"></div>
+						<pre id="logText"></pre>
+						<a href="javascript:void(0);" class="logClosed"></a>
+					</div>
+				</div>
+				<!-- // Log Layer -->
+			</div>
+			<a href="javascript:void(0);" class="chartClosed"></a>
+		</div>
+
+		<div id="logWrap">
+
+		</div>
+
+		<!-- loadWrap : start -->
+		<div id="loadWrap" >
+			<div class="loader"></div>
+		</div>
+		<!-- loadWrap : end -->
+
+	</div>
+	<!-- // Wrap -->
+
+	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+	<script type="text/javascript">
+
+		// 차트 닫기 버튼을 누르면 C3 Chart 오브젝트들을 destroy 시킨다.
+		document.querySelector('.chartClosed').addEventListener('click', (e) => {
+			document.getElementById('chartWrap').classList.toggle('on', false);
+
+			chartObjectArr.forEach((chartObj, idx) => {
+				chartObj.unload()
+				chartObj.flush();
+				chartObj.destroy();
+				chartObjectArr.splice(idx, 1);
+			});
+		}, false);
+
+		function errorToCallChart(message) {
+			if (document.getElementById("alertPop") == null)
+				fnComm.alertPopup('ERROR', message);
+		}
+
+		var chartObjectArr =[];   // C3 Chart 오브젝트 관리를 위한 배열
+		function renderChart(data, target) {
+			let cnt = 0;
+			let yPos = 9;
+			let detailTime = [];
+			let detailData = [];
+			let chartColor;
+
+			data.forEach((item, idx) => {
+				if(idx === 0){
+					detailTime.push('time');
+				};
+
+				detailData[idx] = [item.label];
+
+				item.data.forEach(data => {
+					if(idx === 0){
+						var timeStamp = new Date((data.Clock)*1000);
+
+						detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2));
+					};
+
+					detailData[idx].push(Number(Math.ceil(data.Value)));
+
+					if(yPos < Number(data.Value))
+						yPos = Math.ceil(data.Value);
+				});
+
+				cnt = idx;
+			});
+
+			yPos = Math.ceil((yPos / 10)) * 10;
+
+			var dataType = [];
+			dataType.push(detailTime);
+			for (var i = 0; i <= cnt; i++) {
+				dataType.push(detailData[i]);
+			};
+
+			switch (target){
+				case '#cpuUsageChart':
+				case '#cpuLoadChart':
+					chartColor = ['#ff015a', '#fc6604', '#fcce34', '#cc86cc'];
+					break;
+				case '#memoryUsageChart':
+					chartColor = ['#9cce34'];
+					break;
+				case '#diskUsageChart':
+				case '#diskIoChart':
+					chartColor = ['#3d003d', '#c701c7', '#cc86cc', '#fccefc'];
+					break;
+				case '#networkByteChart':
+				case '#networkPacktesChart':
+				case '#networkDropChart':
+				case '#networkErrorChart':
+					chartColor = ['#649afc', '#b7c3d8'];
+					break;
+				case '#nodeChart':
+					chartColor = ['#649afc', '#ff015a', '#9cce34', '#c701c7'];
+					break;
+				case '#logChart':
+					chartColor = ['#ff015a', '#9cce34', '#649afc'];
+					break;
+			};
+
+			console.log(dataType);
+
+			var chart = c3.generate({
+				bindto: target,
+				data: {
+					x: 'time',
+					xFormat: '%H:%M',
+					columns: dataType,
+					labels: false,
+					type: 'spline',
+				},
+				color: {
+					pattern: chartColor
+				},
+				axis: {
+					x: {
+						type: 'timeseries',
+						localtime: false,
+						tick: {
+							count: 2,
+						}
+					},
+					y: {
+						max: yPos,
+						min: 0,
+						tick: {
+							/*
+							format : function(data) {
+
+								console.log("chart Origin", data);
+								var convertResult = fnComm.convertUnits(data, 'MB');
+								console.log("chart", convertResult);
+								var result = convertResult.convertedSize + '' + convertResult.convertedUnit;
+								return result;
+							},
+							*/
+							count: 5,
+						}
+					}
+				},
+				point: {
+					show: false
+				}
+			});
+			chartObjectArr.push(chart);
+		}
+
+		const hypervisor = {
+			id : '',
+			logId : '',
+			logCnt : 1,
+			logPage : 1,
+			logSum : 1,
+
+			loader : document.getElementById("loadWrap"),
+
+			init() {
+				document.getElementById("loadWrap").style.display = "flex";
+
+				// Alarm Count
+				fnComm.alarmCount('paas');
+
+				// 오늘 날짜
+				/*
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1;
+                var yyyy = today.getFullYear();
+
+                if(dd < 10) dd='0'+dd;
+                if(mm < 10) mm='0'+mm;
+
+                // LOG 검색 Default set
+                document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+                var hh = today.getHours();
+                var hs = today.getHours()-1;
+                var nn = today.getMinutes();
+                var ss = today.getSeconds();
+
+                if(hh < 10) hh='0'+hh;
+                if(hs < 10) hs='0'+hs;
+                if(nn < 10) nn='0'+nn;
+                if(ss < 10) ss='0'+ss;
+
+                document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+                document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+                */
+				// paas 컨디션 차트
+				//fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
+
+				// TODO 하이퍼바이저 목록 출력
+				fnComm.loadData('GET', fnComm.url + 'iaas/hypervisor/list', hypervisor.getHypervisorList);
+			},
+
+			getHypervisorList(resultList) {
+				var target = document.getElementById("hypervisorList");
+				fnComm.removeHtml(target);
+
+				// 하이퍼바이저 리스트를 가져와서 호스트명 속성 기준 오름차순 정렬 먼저 실행함.
+				resultList.sort(function (a, b) {
+					if (a.hypervisor_hostname > b.hypervisor_hostname) {
+						return 1;
+					} else if (a.hypervisor_hostname < b.hypervisor_hostname) {
+						return -1;
+					};
+					return 0;
+				});
+
+				resultList.forEach((resultItem, idx)=>{
+					var state = resultItem.state == "active" ? "up" : "down";
+
+					var cpuUsage = (resultItem.vcpus_used/resultItem.vcpus * 100).toFixed(1);
+					var memoryUsage = (resultItem.memory_mb_used/resultItem.memory_mb * 100).toFixed(1);
+
+					var usedMem = fnComm.convertUnits(resultItem.memory_mb_used, "MB");
+					var totalMem = fnComm.convertUnits(resultItem.memory_mb, "MB");
+					var usedDisk = fnComm.convertUnits(resultItem.local_gb_used, "GB");
+					var totalDisk = fnComm.convertUnits(resultItem.local_gb, "GB");
+
+					var html = `<div class="${resultItem.state}">
+							<div>
+								<strong>${resultItem.hypervisor_hostname}</strong>
+								<em>${resultItem.host_ip}</em>
+							</div>
+							<div>
+								<dl>
+									<dt>VCPU</dt>
+									<dd>${resultItem.vcpus_used}/${resultItem.vcpus}</dd>
+								</dl>
+								<dl>
+									<dt>Memory</dt>
+									<dd>${usedMem.convertedSize.toFixed(2)} ${usedMem.convertedUnit} / ${totalMem.convertedSize.toFixed(2)} ${totalMem.convertedUnit}</dd>
+								</dl>
+								<dl>
+									<dt>Disk</dt>
+									<dd>${usedDisk.convertedSize.toFixed(2)} ${usedDisk.convertedUnit} / ${totalDisk.convertedSize.toFixed(2)} ${totalDisk.convertedUnit}</dd>
+								</dl>
+							</div>
+							<div>
+								<dl>
+									<dt>Instances</dt>
+									<dd>${resultItem.running_vms}</dd>
+								</dl>
+								<dl>
+									<dt>CPU Usage</dt>
+									<dd>${cpuUsage}%</dd>
+								</dl>
+								<dl>
+									<dt>Memory Usage</dt>
+									<dd>${memoryUsage}%</dd>
+								</dl>
+							</div>
+							<div class="summaryBtn" data-id="${resultItem.hypervisor_hostname}"  data-name="${resultItem.hypervisor_hostname}">
+								<a href="javascript:void(0);" class="chart" onclick="hypervisor.chartView(this)"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+								<a href="javascript:void(0);" class="log" style="display: none;"><img src="../resources/img/btn_log.png" alt="Log"><span>Log</span></a>
+							</div>
+						</div>`
+
+					fnComm.appendHtml(target, html, 'div');
+				});
+
+				//Array.from(document.getElementsByClassName("projectItem")).forEach(elem => elem.classList.remove("on"));
+				document.getElementById("loadWrap").style.display = "none";
+			},
+
+			chartView(target) {
+				var hypervisorName = target.parentNode.getAttribute('data-id');
+				document.querySelector('.chartTitle').innerHTML = hypervisorName;
+
+				var instanceId = "";
+
+				setTimeout(() => {
+					// TODO CPU Usage 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/cpu/usage?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#cpuUsageChart');
+
+					// CPU Load 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/cpu/load/average?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#cpuLoadChart');
+
+					// Memory Usage 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/memory/usage?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#memoryUsageChart');
+
+					// Disk Usage 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/disk/usage?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#diskUsageChart');
+
+					// Disk IO 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/disk/io/rate?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#diskIoChart');
+
+					// Network IO Bytes 정보
+					fnComm.requestAjax('GET', `${fnComm.url}iaas/instance/network/io/bytes?instance_id=${instanceId}&host=${hypervisorName}`, renderChart, errorToCallChart, '#networkByteChart');
+
+
+					// Network IO Packets 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/packets${fnComm.setTimer()}`, fnComm.detailChart, '#networkPacktesChart');
+
+					// Network IO Drop 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/drops${fnComm.setTimer()}`, fnComm.detailChart, '#networkDropChart');
+
+					// Network IO Error 정보
+					//fnComm.loadData('GET', `${fnComm.url}paas/paasta/network/${elmID}/errors${fnComm.setTimer()}`, fnComm.detailChart, '#networkErrorChart');
+				},500);
+				document.getElementById('chartWrap').classList.toggle('on', true);
+				document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
+			},
+
+			paasTopProcess(data) {
+				//////////////////////////////////////////////////////////////////////
+				// paas Top Process : 리스트
+				// Data Example //////////////////////////////////////////////////////
+				// index: "1"
+				// memory: 449.203125
+				// pid: "27457"
+				// process: "java"
+				// time: "2018-11-13T05:41:02"
+				//////////////////////////////////////////////////////////////////////
+				var target = document.getElementById('paasTop');
+
+				fnComm.removeHtml(target);
+
+				data.forEach((value, idx)=>{
+					var html = `<div>
+							<strong>${value.index}</strong>
+							<div>
+								<dl class="time">
+									<dt><img src="../resources/img/icon_time.png" alt="time"></dt>
+									<dd>${value.time}</dd>
+								</dl>
+								<dl class="pid">
+									<dt><img src="../resources/img/icon_id.png" alt="pid"></dt>
+									<dd>${value.pid}</dd>
+								</dl>
+								<dl class="process">
+									<dt><img src="../resources/img/icon_process.png" alt="process"></dt>
+									<dd>${value.process}</dd>
+								</dl>
+								<dl class="memory">
+									<dt><img src="../resources/img/icon_memory.png" alt="memory"></dt>
+									<dd>${fnComm.numberComma(0, value.memory)} MB</dd>
+								</dl>
+							</div>
+						</div>`;
+
+					fnComm.appendHtml(target, html, 'div');
+				});
+			},
+			logView() {
+				document.getElementById('chartWrap').classList.toggle('on', true);
+				document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
+
+				setTimeout(() => {
+					var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m`;
+
+					// Log 리스트
+					fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.detailLog);
+				},500);
+			},
+
+			detailLog(data){
+				if(data.messages !=  null){
+					var target = document.querySelector('.preText');
+
+					fnComm.removeHtml(target);
+
+					data.messages.forEach((value)=>{
+						var html = `<li>${value.time}<br>${value.message}</li>`;
+
+						fnComm.appendHtml(target, html, 'ul');
+					});
+				} else {
+					document.querySelector('.preText').innerHTML = 'No Log'
+				}
+			},
+		}
+
+		window.onload = () => {
+			hypervisor.init();
+		};
+	</script>
+
+</body></html>

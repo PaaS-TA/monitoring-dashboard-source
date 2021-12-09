@@ -1,48 +1,35 @@
 package main
 
 import (
-	"bufio"
 	"crypto/tls"
 	"fmt"
-	"github.com/cihub/seelog"
+	"github.com/cavaliercoder/go-zabbix"
+	commonModel "kr/paasta/monitoring/common/model"
 	"net"
-	//"github.com/cloudfoundry-community/go-cfclient"
-
-	//"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/cloudfoundry-community/gogobosh"
-	"github.com/go-redis/redis"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gophercloud/gophercloud"
-	"github.com/influxdata/influxdb1-client/v2"
-	"github.com/jinzhu/gorm"
-	"github.com/monasca/golang-monascaclient/monascaclient"
-	/*"gopkg.in/olivere/elastic.v3"*/
-	"io"
-	"io/ioutil"
-	"kr/paasta/monitoring/handlers"
-	"kr/paasta/monitoring/iaas/model"
-	bm "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/utils"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/cihub/seelog"
+	"github.com/cloudfoundry-community/gogobosh"
 	elasticsearch "github.com/elastic/go-elasticsearch/v7"
+	"github.com/go-redis/redis"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/influxdata/influxdb1-client/v2"
+	"github.com/jinzhu/gorm"
+
+	"kr/paasta/monitoring/common/config"
+	"kr/paasta/monitoring/handlers"
+	"kr/paasta/monitoring/iaas_new"
+	"kr/paasta/monitoring/iaas_new/model"
+	bm "kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/utils"
 )
 
 type Config map[string]string
 
-type DBConfig struct {
-	DbType       string
-	UserName     string
-	UserPassword string
-	Host         string
-	Port         string
-	DbName       string
-}
 
 type MemberInfo struct {
 	UserId        string    `gorm:"type:varchar(50);primary_key"`
@@ -62,191 +49,221 @@ type MemberInfo struct {
 	CreatedAt     time.Time `gorm:"type:datetime;null;DEFAULT:CURRENT_TIMESTAMP"`
 }
 
+var logger seelog.LoggerInterface
+
 func main() {
 
-	//sessionCookie, _ := utils.GenerateRandomString(32)
-	//model.SessionManager = *scs.NewCookieManager(sessionCookie) //("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
-	//model.SessionManager.Lifetime(time.Minute * 30)
-
-	//model.SessionManager.Secure()
-	//============================================
-	// 기본적인 프로퍼티 설정 정보 읽어오기
-	config, err := ReadConfig(`config.ini`)
+	xmlFile, err := config.ConvertXmlToString("log_config.xml")
 	if err != nil {
-		log.Println(err)
 		os.Exit(-1)
 	}
 
-	xmlFile, err := ReadXmlConfig(`log_config.xml`)
-	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
-	}
-
-	logger, err := seelog.LoggerFromConfigAsBytes([]byte(xmlFile))
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	logger, _ = seelog.LoggerFromConfigAsBytes([]byte(xmlFile))
 	model.MonitLogger = logger
-	UseLogger(logger)
+	utils.Logger = logger
 
-	timeGap, _ := strconv.Atoi(config["gmt.time.gap"])
+	// 기본적인 프로퍼티 설정 정보 읽어오기
+	configMap, err := config.ImportConfig("config.ini")
+	if err != nil {
+		logger.Error(err)
+		os.Exit(-1)
+	}
+
+	timeGap, _ := strconv.Atoi(configMap["gmt.time.gap"])
 	model.GmtTimeGap = timeGap
 	bm.GmtTimeGap = timeGap
 
-	apiPort, _ := strconv.Atoi(config["server.port"])
+	apiPort, _ := strconv.Atoi(configMap["server.port"])
 
-	sysType := config["system.monitoring.type"]
-
-	// iaas client
-	var iaasDbAccessObj *gorm.DB
-	var iaaSInfluxServerClient client.Client
-	var iaasElasticClient *elasticsearch.Client
-	var openstackProvider model.OpenstackProvider
-	var monClient *monascaclient.Client
-	var auth gophercloud.AuthOptions
+	sysType := configMap["system.monitoring.type"]
 
 	// paas client
 	var paaSInfluxServerClient client.Client
 	var paasElasticClient *elasticsearch.Client
 	var databases bm.Databases
-	//var cfProvider cfclient.Config
 	var boshClient *gogobosh.Client
 
-	// Common MysqlDB
-	paasConfigDbCon := new(DBConfig)
-	paasConfigDbCon.DbType = config["paas.monitoring.db.type"]
-	paasConfigDbCon.DbName = config["paas.monitoring.db.dbname"]
-	paasConfigDbCon.UserName = config["paas.monitoring.db.username"]
-	paasConfigDbCon.UserPassword = config["paas.monitoring.db.password"]
-	paasConfigDbCon.Host = config["paas.monitoring.db.host"]
-	paasConfigDbCon.Port = config["paas.monitoring.db.port"]
+	// config.ini 파일에서 MySQL 접속정보를 추출
+	dbConnInfo := config.InitDBConnectionConfig(configMap)
 
-	paasConnectionString := utils.GetConnectionString(paasConfigDbCon.Host, paasConfigDbCon.Port, paasConfigDbCon.UserName, paasConfigDbCon.UserPassword, paasConfigDbCon.DbName)
-	fmt.Println("String:", paasConnectionString)
-	paasDbAccessObj, paasDbErr := gorm.Open(paasConfigDbCon.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
+	paasConnectionString := utils.GetConnectionString(dbConnInfo.Host, dbConnInfo.Port, dbConnInfo.UserName, dbConnInfo.UserPassword, dbConnInfo.DbName)
+	logger.Infof("DB Connection Info : %v\n", paasConnectionString)
+
+	paasDbAccessObj, paasDbErr := gorm.Open(dbConnInfo.DbType, paasConnectionString+"?charset=utf8&parseTime=true")
 	if paasDbErr != nil {
-		fmt.Println("err::", paasDbErr)
+		logger.Errorf("%v\n", paasDbErr)
 		return
 	}
 
+	// 2021.09.06 - 왜 있는건지??
+	// 2021.11.11 - @Deprecated
 	// memberInfo table (use common database table)
-	createTable(paasDbAccessObj)
+	//createTable(paasDbAccessObj)
 
 	// Redis Client
 	rdClient := redis.NewClient(&redis.Options{
-		Addr:     config["redis.addr"],
-		Password: config["redis.password"],
+		Addr:     configMap["redis.addr"],
+		Password: configMap["redis.password"],
 	})
+	logger.Info(rdClient)
+
 	cfConfig := bm.CFConfig{
-		Host:           config["paas.monitoring.cf.host"],
-		CaasBrokerHost: config["caas.monitoring.broker.host"],
+		Host:           configMap["paas.monitoring.cf.host"],
+		CaasBrokerHost: configMap["caas.monitoring.broker.host"],
 	}
-	//IaaS Connection Info
+
+	// TODO IaaS Connection Info
+	iaasClient := iaas_new.IaasClient{}
+
+
+	var iaasDbAccessObj *gorm.DB
+	var iaaSInfluxServerClient client.Client
+	var iaasElasticClient *elasticsearch.Client
+	var openstackProvider model.OpenstackProvider
+
+	var zabbixSession *zabbix.Session
+
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
-		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, monClient, auth, err = getIaasClients(config)
+		/*
+		iaasClient, err = iaas_new.GetIaasClients(configMap)
 		if err != nil {
-			log.Println(err)
+			logger.Error(err)
 			os.Exit(-1)
 		}
+		*/
+
+		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, zabbixSession, err = getIaasClent(configMap)
+
+
+
 	}
-	//
+
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_PAAS) {
-		fmt.Println("sysType == utils.SYS_TYPE_ALL || sysType == utils.SYS_TYPE_PAAS")
-		paaSInfluxServerClient, paasElasticClient, databases, boshClient, err = getPaasClients(config)
+		paaSInfluxServerClient, paasElasticClient, databases, boshClient, err = getPaasClients(configMap)
 		if err != nil {
-			log.Println(err)
+			logger.Error(err)
 			os.Exit(-1)
 		}
 	}
-	//12
+
 	// Route Path 정보와 처리 서비스 연결
 	var handler http.Handler
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, *monClient, auth, databases,
-			rdClient, sysType, boshClient, cfConfig)
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
+			rdClient, sysType, boshClient, cfConfig, zabbixSession)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
-			log.Fatalln(err)
+			logger.Error(err)
 		}
 	} else {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
-			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, monascaclient.Client{}, auth, databases,
-			rdClient, sysType, boshClient, cfConfig)
+			iaasDbAccessObj, paasDbAccessObj, iaasElasticClient, paasElasticClient, iaasClient.AuthOpts, databases,
+			rdClient, sysType, boshClient, cfConfig, zabbixSession)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
-			log.Fatalln(err)
+			logger.Error(err)
 		}
 	}
-
 }
 
-func UseLogger(newLogger seelog.LoggerInterface) {
-	utils.Logger = newLogger
-}
+// 2021.09.06 - 이거 왜 있는지??
+// 2021.11.11 - @Deprecated
+//func createTable(dbClient *gorm.DB) {
+//	dbClient.Debug().AutoMigrate(&MemberInfo{})
+//}
 
-func ReadXmlConfig(filename string) (string, error) {
-	xmlFile, err := ioutil.ReadFile(filename)
+
+func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Client, paasElasticClient *elasticsearch.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
+
+	// InfluxDB
+	paasUrl, _ := config["paas.metric.db.url"]
+	paasuserName, _ := config["paas.metric.db.username"]
+	paasPassword, _ := config["paas.metric.db.password"]
+
+	paaSInfluxServerClient, err = client.NewHTTPClient(client.HTTPConfig{
+		Addr:     paasUrl,
+		Username: paasuserName,
+		Password: paasPassword,
+		InsecureSkipVerify: true,
+	})
+
+	logger.Infof("paaSInfluxServerClient : %v\n", paaSInfluxServerClient)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return "", err
-	}
-	return string(xmlFile), nil
-}
-
-// Config 파일 읽어 오기
-func ReadConfig(filename string) (Config, error) {
-	// init with some bogus data
-	config := Config{
-		"server.ip":   "127.0.0.1",
-		"server.port": "8888",
+		logger.Errorf("err : %v\n", err)
 	}
 
-	if len(filename) == 0 {
-		return config, nil
+
+	elasticsearchUsername, _ := config["paas.elasticsearch.username"]
+	elasticsearchPassword, _ := config["paas.elasticsearch.password"]
+	elasticsearchUrl, _ := config["paas.elasticsearch.url"]
+	elasticsearchHttpsEnabled, _ := strconv.ParseBool(config["paas.elasticsearch.https_enabled"])
+
+	cfg := elasticsearch.Config{
+		Username: elasticsearchUsername,
+		Password: elasticsearchPassword,
+		Addresses: []string{
+			elasticsearchUrl,
+		},
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: time.Second,
+			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+			TLSClientConfig: &tls.Config{
+				MaxVersion:         tls.VersionTLS11,
+				InsecureSkipVerify: elasticsearchHttpsEnabled,
+			},
+		},
 	}
-	file, err := os.Open(filename)
+	paasElasticClient, err = elasticsearch.NewClient(cfg)
+	logger.Infof("paasElasticClient : %v\n", paasElasticClient)
 	if err != nil {
-		return nil, err
+		logger.Errorf("err : %v\n", err)
 	}
-	defer file.Close()
 
-	reader := bufio.NewReader(file)
-	for {
-		line, err := reader.ReadString('\n')
-		// check if the line has = sign
-		// and process the line. Ignore the rest.
-		if equal := strings.Index(line, "="); equal >= 0 {
-			if key := strings.TrimSpace(line[:equal]); len(key) > 0 {
-				value := ""
-				if len(line) > equal {
-					value = strings.TrimSpace(line[equal+1:])
-				}
-				// assign the config map
-				config[key] = value
-			}
-		}
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
+
+	// ElasticSearch
+	/*paasElasticUrl, _ := config["paas.elastic.url"]
+	paasElasticClient, err = elastic.NewClient(
+		elastic.SetURL(fmt.Sprintf("http://%s", paasElasticUrl)),
+		elastic.SetSniff(false),
+	)*/
+
+	// PaaS Database
+	boshDatabase, _ := config["paas.metric.db.name.bosh"]
+	paastaDatabase, _ := config["paas.metric.db.name.paasta"]
+	containerDatabase, _ := config["paas.metric.db.name.container"]
+
+	databases.BoshDatabase = boshDatabase
+	databases.PaastaDatabase = paastaDatabase
+	databases.ContainerDatabase = containerDatabase
+
+	// Cloud Foundry Client
+	//cfProvider = cfclient.Config{
+	//	ApiAddress: config["paas.cf.client.apiaddress"],
+	//	//Username:     "admin",
+	//	//Password:     "admin",
+	//	SkipSslValidation: true,
+	//}
+
+	// BOSH Client Config
+	boshConfig := &gogobosh.Config{
+		BOSHAddress:       config["bosh.client.api.address"],
+		Username:          config["bosh.client.api.username"],
+		Password:          config["bosh.client.api.password"],
+		HttpClient:        http.DefaultClient,
+		SkipSslValidation: true,
 	}
-	return config, nil
+	boshClient, err = gogobosh.NewClient(boshConfig)
+	if err != nil {
+		logger.Errorf("Failed to create connection to the bosh server. err=", err)
+	}
+	return
 }
 
-func createTable(dbClient *gorm.DB) {
 
-	dbClient.Debug().AutoMigrate(&MemberInfo{})
-}
-
-func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider model.OpenstackProvider, monClient *monascaclient.Client, auth gophercloud.AuthOptions, err error) {
-
+func getIaasClent(config map[string]string) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerClient client.Client, iaasElasticClient *elasticsearch.Client, openstackProvider model.OpenstackProvider, zabbixSession *zabbix.Session, err error) {
 	// Mysql
-	iaasConfigDbCon := new(DBConfig)
+	iaasConfigDbCon := new(commonModel.DBConfig)
 	iaasConfigDbCon.DbType = config["iaas.monitoring.db.type"]
 	iaasConfigDbCon.DbName = config["iaas.monitoring.db.dbname"]
 	iaasConfigDbCon.UserName = config["iaas.monitoring.db.username"]
@@ -255,18 +272,19 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 	iaasConfigDbCon.Port = config["iaas.monitoring.db.port"]
 
 	iaasConnectionString := utils.GetConnectionString(iaasConfigDbCon.Host, iaasConfigDbCon.Port, iaasConfigDbCon.UserName, iaasConfigDbCon.UserPassword, iaasConfigDbCon.DbName)
-	fmt.Println("String:", iaasConnectionString)
-	iaasDbAccessObj, err = gorm.Open(iaasConfigDbCon.DbType, iaasConnectionString+"?charset=utf8&parseTime=true")
+	//fmt.Println("String:", iaasConnectionString)
+	iaasDbAccessObj, _ = gorm.Open(iaasConfigDbCon.DbType, iaasConnectionString+"?charset=utf8&parseTime=true")
 
+	// 2021.09.06 - 이거 왜 있는지?
 	//Alarm 처리 내역 정보 Table 생성
-	iaasDbAccessObj.Debug().AutoMigrate(&model.AlarmActionHistory{})
+	//iaasDbAccessObj.Debug().AutoMigrate(&model.AlarmActionHistory{})
 
 	// InfluxDB
 	iaasUrl, _ := config["iaas.metric.db.url"]
 	iaasUserName, _ := config["iaas.metric.db.username"]
 	iaasPassword, _ := config["iaas.metric.db.password"]
 
-	iaaSInfluxServerClient, err = client.NewHTTPClient(client.HTTPConfig{
+	iaaSInfluxServerClient, _ = client.NewHTTPClient(client.HTTPConfig{
 		Addr:     iaasUrl,
 		Username: iaasUserName,
 		Password: iaasPassword,
@@ -294,9 +312,7 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 			},
 		},
 	}
-	iaasElasticClient, err = elasticsearch.NewClient(cfg)
-	fmt.Println("iaasElasticClient::", iaasElasticClient)
-	fmt.Println("err::", err)
+	iaasElasticClient, _ = elasticsearch.NewClient(cfg)
 
 	// ElasticSearch
 	/*iaasElasticUrl, _ := config["iaas.elastic.url"]
@@ -305,7 +321,7 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 		elastic.SetSniff(false),
 	)*/
 
-	// Openstack Info
+	// Openstack 정보
 	openstackProvider.Region, _ = config["default.region"]
 	openstackProvider.Username, _ = config["default.username"]
 	openstackProvider.Password, _ = config["default.password"]
@@ -334,102 +350,24 @@ func getIaasClients(config Config) (iaasDbAccessObj *gorm.DB, iaaSInfluxServerCl
 	model.RabbitMqPort, _ = config["rabbitmq.port"]
 	model.GMTTimeGap, _ = strconv.ParseInt(config["gmt.time.gap"], 10, 64)
 
-	monClient = monascaclient.New()
-	monClient.SetBaseURL(config["monasca.url"])
-	timeOut, _ := strconv.Atoi(config["monasca.connect.timeout"])
-	monClient.SetTimeout(timeOut)
-
-	tls, _ := strconv.ParseBool(config["monasca.secure.tls"])
-	monClient.SetInsecure(tls)
-
-	auth = gophercloud.AuthOptions{
-		DomainName:       config["default.domain"],
-		IdentityEndpoint: config["keystone.url"],
-		Username:         config["default.username"],
-		Password:         config["default.password"],
-		TenantID:         config["default.tenant_id"],
-	}
-
-	return
-}
-
-func getPaasClients(config Config) (paaSInfluxServerClient client.Client, paasElasticClient *elasticsearch.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
-
-	// InfluxDB
-	paasUrl, _ := config["paas.metric.db.url"]
-	paasuserName, _ := config["paas.metric.db.username"]
-	paasPassword, _ := config["paas.metric.db.password"]
-
-	paaSInfluxServerClient, err = client.NewHTTPClient(client.HTTPConfig{
-		Addr:     paasUrl,
-		Username: paasuserName,
-		Password: paasPassword,
-		InsecureSkipVerify: true,
-	})
-
-	fmt.Printf("paaSInfluxServerClient : %v\n", paaSInfluxServerClient)
-	fmt.Printf("err : %v\n", err)
-
-	elasticsearchUsername, _ := config["paas.elasticsearch.username"]
-	elasticsearchPassword, _ := config["paas.elasticsearch.password"]
-	elasticsearchUrl, _ := config["paas.elasticsearch.url"]
-	elasticsearchHttpsEnabled, _ := strconv.ParseBool(config["paas.elasticsearch.https_enabled"])
-
-	cfg := elasticsearch.Config{
-		Username: elasticsearchUsername,
-		Password: elasticsearchPassword,
-		Addresses: []string{
-			elasticsearchUrl,
-		},
+	zabbixHost := config["zabbix.host"]
+	zabbixAdminId := config["zabbix.admin.id"]
+	zabbixAdminPw := config["zabbix.admin.pw"]
+	client := &http.Client{
 		Transport: &http.Transport{
-			MaxIdleConnsPerHost:   10,
-			ResponseHeaderTimeout: time.Second,
-			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
 			TLSClientConfig: &tls.Config{
-				MaxVersion:         tls.VersionTLS11,
-				InsecureSkipVerify: elasticsearchHttpsEnabled,
+				InsecureSkipVerify: true,
 			},
 		},
 	}
-	paasElasticClient, err = elasticsearch.NewClient(cfg)
-	fmt.Println("paasElasticClient::", paasElasticClient)
-	fmt.Println("err::", err)
 
-	// ElasticSearch
-	/*paasElasticUrl, _ := config["paas.elastic.url"]
-	paasElasticClient, err = elastic.NewClient(
-		elastic.SetURL(fmt.Sprintf("http://%s", paasElasticUrl)),
-		elastic.SetSniff(false),
-	)*/
-
-	// PaaS Database
-	bosh_database, _ := config["paas.metric.db.name.bosh"]
-	paasta_database, _ := config["paas.metric.db.name.paasta"]
-	container_database, _ := config["paas.metric.db.name.container"]
-
-	databases.BoshDatabase = bosh_database
-	databases.PaastaDatabase = paasta_database
-	databases.ContainerDatabase = container_database
-
-	// Cloud Foundry Client
-	//cfProvider = cfclient.Config{
-	//	ApiAddress: config["paas.cf.client.apiaddress"],
-	//	//Username:     "admin",
-	//	//Password:     "admin",
-	//	SkipSslValidation: true,
-	//}
-
-	// BOSH Client Config
-	boshConfig := &gogobosh.Config{
-		BOSHAddress:       config["bosh.client.api.address"],
-		Username:          config["bosh.client.api.username"],
-		Password:          config["bosh.client.api.password"],
-		HttpClient:        http.DefaultClient,
-		SkipSslValidation: true,
-	}
-	boshClient, err = gogobosh.NewClient(boshConfig)
+	cache := zabbix.NewSessionFileCache().SetFilePath("./zabbix_session")
+	zabbixSession, err = zabbix.CreateClient(zabbixHost).
+		WithCache(cache).
+		WithHTTPClient(client).
+		WithCredentials(zabbixAdminId, zabbixAdminPw).Connect()
 	if err != nil {
-		log.Fatalln("Failed to create connection to the bosh server. err=", err)
+		utils.Logger.Error(err)
 	}
 
 	return

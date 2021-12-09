@@ -9,11 +9,11 @@ import (
 	"github.com/go-redis/redis"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/monasca/golang-monascaclient/monascaclient"
-	"github.com/rackspace/gophercloud"
-	"github.com/rackspace/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
 	"io"
 	"io/ioutil"
-	"kr/paasta/monitoring/iaas/model"
+	"kr/paasta/monitoring/iaas_new/model"
 	"log"
 	"math"
 	"net/http"
@@ -194,13 +194,11 @@ func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient
 	}
 
 	//Provider is the top-level client that all of your OpenStack services
-
 	providerClient, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, "", err
 	}
-	fmt.Println("GetOpenstackProvider providerClient.TokenID :::", providerClient.TokenID)
 
 	///////////////////////////////////////////////////////////////////////////
 	/*
@@ -257,7 +255,7 @@ func GetOpenstackProvider(r *http.Request) (provider *gophercloud.ProviderClient
 }
 
 //Get Openstack Admin Token - based on Default Domain & Admin tenant
-func GetAdminToken(openstack_provider model.OpenstackProvider) (*gophercloud.ProviderClient, error) {
+func GetOpenstackToken(openstack_provider model.OpenstackProvider) (*gophercloud.ProviderClient, error) {
 
 	// Option 1: Pass in the values yourself
 	opts := gophercloud.AuthOptions{

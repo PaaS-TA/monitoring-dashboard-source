@@ -13,3 +13,11 @@
 
 .h4-small { font-size: 13pt; margin: 0 0 0 10px; }
 .top-menu-active { font-weight: bold; }
+
+.chartWrap {display:flex; width:100%; text-align:center;}
+.chartWrap li {position:relative; flex:1;}
+.chartWrap li div {position:relative; z-index:2; height:230px;}
+.chartWrap li > p {position:absolute; z-index:1; top:0; left:0; width:100%; font-size:38px; line-height:280px; font-weight:100;}
+.chartWrap li .instance {margin-top:60px; line-height:25px; font-size:18px;}
+.chartWrap li > em {display:block; font-size:38px; line-height:40px; font-weight:100;}
+article h3 {height:60px; margin-top:70px; font-size:26px; font-weight:100; text-align:left; line-height:60px;}
