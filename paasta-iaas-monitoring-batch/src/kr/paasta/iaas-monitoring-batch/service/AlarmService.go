@@ -368,7 +368,7 @@ func createSession(configData *config.Config) *zabbix.Session {
 		WithHTTPClient(client).
 		WithCredentials(configData.ZabbixAdminId, configData.ZabbixAdminPw).Connect()
 	if err != nil {
-		log.Fatalf("%v\n", err)
+		fmt.Errorf("%v\n", err)
 	}
 
 	version, err := _session.GetVersion()
