@@ -3,36 +3,32 @@ package controller
 import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"time"
+
 	//"github.com/monasca/golang-monascaclient/monascaclient/models"
 	"encoding/json"
 	. "github.com/onsi/ginkgo"
 	"strings"
 )
 
-type AppAutoscalingPolicyBody struct {
-	AppGuid             string `json:"appGuid"`
-	InstanceMinCnt      int    `json:"instanceMinCnt"`
-	InstanceMaxCnt      int    `json:"instanceMaxCnt"`
-	CpuMinThreshold     int    `json:"cpuMinThreshold"`
-	CpuMaxThreshold     int    `json:"cpuMaxThreshold"`
-	MemoryMinThreshold  int    `json:"memoryMinThreshold"`
-	MemoryMaxThreshold  int    `json:"memoryMaxThreshold"`
-	InstanceScalingUnit int    `json:"instanceVariationUnit"`
-	MeasureTimeSec      int    `json:"measureTimeSec"`
-	AutoScalingOutYn    string `json:"autoScalingOutYn"`
-	AutoScalingInYn     string `json:"autoScalingInYn"`
-}
-
-type AppAlarmPolicyBody struct {
-	AppGuid                 string `json:"appGuid"`
-	CpuWarningThreshold     int    `json:"cpuWarningThreshold"`
-	CpuCriticalThreshold    int    `json:"cpuCriticalThreshold"`
-	MemoryWarningThreshold  int    `json:"memoryWarningThreshold"`
-	MemoryCriticalThreshold int    `json:"memoryCriticalThreshold"`
-	MeasureTimeSec          int    `json:"measureTimeSec"`
-	Email                   string `json:"email"`
-	EmailSendYn             string `json:"emailSendYn"`
-	AlarmUseYn              string `json:"alarmUseYn"`
+type AlarmPolicyRequest struct {
+	Id                uint     `json:"id"`
+	OriginType        string   `json:"originType"`
+	AlarmType         string   `json:"alarmType"`
+	WarningThreshold  int      `json:"warningThreshold"`
+	CriticalThreshold int      `json:"criticalThreshold"`
+	RepeatTime        int      `json:"repeatTime"`
+	Comment           string   `json:"comment"`
+	MeasureTime       int      `json:"measureTime"`
+	MailAddress       string   `json:"mailAddress"`
+	SnsType           string   `json:"snsType"`
+	SnsId             string   `json:"snsId"`
+	Token             string   `json:"token"`
+	Expl              string   `json:"expl"`
+	MailSendYn        string   `json:"mailSendYn"`
+	SnsSendYn         string   `json:"snsSendYn"`
+	ModiDate          time.Time `json:"modiDate"`
+	ModiUser          string   `json:"modiUser"`
 }
 
 var _ = Describe("Potal Application API", func() {
@@ -51,18 +47,8 @@ var _ = Describe("Potal Application API", func() {
 
 			It("PAAS_APP_AUTOSCALING_POLICY_UPDATE (POST)", func() {
 
-				query := AppAutoscalingPolicyBody{
-					AppGuid:             appId,
-					InstanceMinCnt:      1,
-					InstanceMaxCnt:      20,
-					CpuMinThreshold:     50,
-					CpuMaxThreshold:     80,
-					MemoryMinThreshold:  50,
-					MemoryMaxThreshold:  90,
-					InstanceScalingUnit: 30,
-					MeasureTimeSec:      500,
-					AutoScalingOutYn:    "N",
-					AutoScalingInYn:     "N",
+				query := AlarmPolicyRequest{
+
 				}
 
 				data, _ := json.Marshal(query)

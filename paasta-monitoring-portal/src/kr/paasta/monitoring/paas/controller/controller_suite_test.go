@@ -19,7 +19,7 @@ import (
 	"io"
 	"io/ioutil"
 	comModels "kr/paasta/monitoring/common/model"
-	iaasModels "kr/paasta/monitoring/iaas/model"
+	iaasModels "kr/paasta/monitoring/iaas_new/model"
 	bm "kr/paasta/monitoring/paas/model"
 	paasModels "kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/utils"

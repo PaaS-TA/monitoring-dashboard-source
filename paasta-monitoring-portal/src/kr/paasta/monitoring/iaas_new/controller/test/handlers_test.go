@@ -1,32 +1,32 @@
-package handlers
+package test
 
 import (
 	"github.com/cavaliercoder/go-zabbix"
-	"io"
-	"net/http"
-	"strings"
-	"time"
+	"github.com/elastic/go-elasticsearch/v7"
+	controller2 "kr/paasta/monitoring/iaas_new/controller"
 
+	paasContoller "kr/paasta/monitoring/paas/controller"
+	"strings"
+
+	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
-	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-redis/redis"
-	"github.com/gophercloud/gophercloud"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
+	"github.com/rackspace/gophercloud"
 	"github.com/tedsuo/rata"
-
+	"io"
 	caasContoller "kr/paasta/monitoring/caas/controller"
 	"kr/paasta/monitoring/common/controller"
-	iaasContoller "kr/paasta/monitoring/iaas_new/controller"
-	paasContoller "kr/paasta/monitoring/paas/controller"
-	pm "kr/paasta/monitoring/paas/model"
-	saasContoller "kr/paasta/monitoring/saas/controller"
-
-	"kr/paasta/monitoring/routes"
-	"kr/paasta/monitoring/utils"
 
 	"kr/paasta/monitoring/iaas_new/model"
+	pm "kr/paasta/monitoring/paas/model"
+	"kr/paasta/monitoring/routes"
+	saasContoller "kr/paasta/monitoring/saas/controller"
+	"kr/paasta/monitoring/utils"
+	"net/http"
+	"time"
 )
 
 func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
@@ -47,20 +47,17 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	var caasMetricsController *caasContoller.MetricController
 
 	// TODO 2021.11.01 - IAAS 관련 컨트롤러들을 핸들러에 등록
-	mainController := iaasContoller.NewMainController(openstackProvider, iaasInfluxClient)
-	computeController := iaasContoller.NewComputeController(openstackProvider, iaasInfluxClient)
-	manageNodeController := iaasContoller.NewManageNodeController(openstackProvider, iaasInfluxClient)
-	tenantController := iaasContoller.NewOpenstackTenantController(openstackProvider, iaasInfluxClient)
-	//notificationController := iaasContoller.NewNotificationController(monsClient, iaasInfluxClient)
-	//definitionController := iaasContoller.NewAlarmDefinitionController(monsClient, iaasInfluxClient)
-	//stautsController := iaasContoller.NewAlarmStatusController(monsClient, iaasInfluxClient, iaasTxn)
-	logController := iaasContoller.NewLogController(openstackProvider, iaasInfluxClient, iaasElasticClient)
+	mainController := controller2.NewMainController(openstackProvider, iaasInfluxClient)
+	computeController := controller2.NewComputeController(openstackProvider, iaasInfluxClient)
+	manageNodeController := controller2.NewManageNodeController(openstackProvider, iaasInfluxClient)
+	tenantController := controller2.NewOpenstackTenantController(openstackProvider, iaasInfluxClient)
+	logController := controller2.NewLogController(openstackProvider, iaasInfluxClient, iaasElasticClient)
 
-	openstackController := iaasContoller.NewOpenstackController(openstackProvider, iaasInfluxClient)
-	zabbixController := iaasContoller.NewZabbixController(zabbixSession, openstackProvider)
+	openstackController := controller2.NewOpenstackController(openstackProvider, iaasInfluxClient)
+	zabbixController := controller2.NewZabbixController(zabbixSession, openstackProvider)
 
-	iaasAlarmController := iaasContoller.GetAlarmController(paasTxn)
-	iaasAlarmPolicyController := iaasContoller.GetAlarmPolicyController(paasTxn)
+	iaasAlarmController := controller2.GetAlarmController(paasTxn)
+	iaasAlarmPolicyController := controller2.GetAlarmPolicyController(paasTxn)
 
 	var iaasActions rata.Handlers
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
@@ -71,9 +68,9 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
 
 			//Integrated with routes
-			routes.IAAS_MAIN_SUMMARY:                  route(mainController.OpenstackSummary),
-			routes.IAAS_NODE_COMPUTE_SUMMARY:          route(computeController.NodeSummary),
-			routes.IAAS_NODES:                         route(manageNodeController.GetNodeList),
+			routes.IAAS_MAIN_SUMMARY:         route(mainController.OpenstackSummary),
+			routes.IAAS_NODE_COMPUTE_SUMMARY: route(computeController.NodeSummary),
+			routes.IAAS_NODES:                route(manageNodeController.GetNodeList),
 
 			routes.IAAS_NODE_CPU_USAGE_LIST:           route(computeController.GetCpuUsageList),
 			routes.IAAS_NODE_CPU_LOAD_LIST:            route(computeController.GetCpuLoadList),
@@ -104,17 +101,17 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_LOG_SPECIFIC: route(logController.GetSpecificTimeRangeLog),
 
 			// TODO 2021.11.01 - IAAS 모니터링 신규 추가
-			routes.IAAS_GET_HYPERVISOR_LIST: route(openstackController.GetHypervisorList),
-			routes.IAAS_GET_HYPER_STATISTICS : route(openstackController.GetHypervisorStatistics),
-			routes.IAAS_GET_SERVER_LIST : route(openstackController.GetServerList),
-			routes.IAAS_GET_PROJECT_LIST : route(openstackController.GetProjectList),
+			routes.IAAS_GET_HYPERVISOR_LIST:      route(openstackController.GetHypervisorList),
+			routes.IAAS_GET_HYPER_STATISTICS :    route(openstackController.GetHypervisorStatistics),
+			routes.IAAS_GET_SERVER_LIST :         route(openstackController.GetServerList),
+			routes.IAAS_GET_PROJECT_LIST :        route(openstackController.GetProjectList),
 			routes.IAAS_GET_INSTANCE_USAGE_LIST : route(openstackController.GetProjectUsage),
 
-			routes.IAAS_GET_CPU_USAGE : route(zabbixController.GetCpuUsage),
-			routes.IAAS_GET_MEMORY_USAGE: route(zabbixController.GetMemoryUsage),
-			routes.IAAS_GET_DISK_USAGE: route(zabbixController.GetDiskUsage),
+			routes.IAAS_GET_CPU_USAGE :       route(zabbixController.GetCpuUsage),
+			routes.IAAS_GET_MEMORY_USAGE:     route(zabbixController.GetMemoryUsage),
+			routes.IAAS_GET_DISK_USAGE:       route(zabbixController.GetDiskUsage),
 			routes.IAAS_GET_CPU_LOAD_AVERAGE: route(zabbixController.GetCpuLoadAverage),
-			routes.IAAS_GET_DISK_IO_RATE: route(zabbixController.GetDiskIORate),
+			routes.IAAS_GET_DISK_IO_RATE:     route(zabbixController.GetDiskIORate),
 			routes.IAAS_GET_NETWORK_IO_BTYES: route(zabbixController.GetNetworkIOBytes),
 
 
@@ -129,7 +126,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_ALARM_SNS_CHANNEL_LIST:   route(iaasAlarmPolicyController.GetAlarmSnsChannelList),
 			routes.IAAS_ALARM_SNS_CHANNEL_CREATE: route(iaasAlarmPolicyController.CreateAlarmSnsChannel),
 			routes.IAAS_ALARM_SNS_CHANNEL_DELETE: route(iaasAlarmPolicyController.DeleteAlarmSnsChannel),
-			routes.IAAS_ALARM_SNS_CHANNEL_UPDATE: route(iaasAlarmPolicyController.UpdateAlarmSnsChannel),  // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
+			routes.IAAS_ALARM_SNS_CHANNEL_UPDATE: route(iaasAlarmPolicyController.UpdateAlarmSnsChannel), // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
 
 			routes.IAAS_ALARM_STATUS_LIST:    route(iaasAlarmController.GetAlarmList),
 			routes.IAAS_ALARM_STATUS_COUNT:   route(iaasAlarmController.GetAlarmListCount),
@@ -222,7 +219,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.PAAS_ALARM_SNS_CHANNEL_LIST:   route(alarmPolicyController.GetAlarmSnsChannelList),
 			routes.PAAS_ALARM_SNS_CHANNEL_CREATE: route(alarmPolicyController.CreateAlarmSnsChannel),
 			routes.PAAS_ALARM_SNS_CHANNEL_DELETE: route(alarmPolicyController.DeleteAlarmSnsChannel),
-			routes.PAAS_ALARM_SNS_CHANNEL_UPDATE: route(alarmPolicyController.UpdateAlarmSnsChannel),  // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
+			routes.PAAS_ALARM_SNS_CHANNEL_UPDATE: route(alarmPolicyController.UpdateAlarmSnsChannel), // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
 
 			routes.PAAS_ALARM_STATUS_LIST:    route(alarmController.GetAlarmList),
 			routes.PAAS_ALARM_STATUS_COUNT:   route(alarmController.GetAlarmListCount),
@@ -461,7 +458,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 		panic("unable to create router: " + err.Error())
 	}
 
-	utils.Logger.Info("Monit Application Started")
+	//utils.Logger.Info("Monit Application Started")
 	return utils.HttpWrap(handler, rdClient, openstackProvider, cfConfig)
 }
 

@@ -429,7 +429,7 @@ header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; backgro
 .statusList .summaryBtn a span {display:block; line-height:18px;}
 .statusList .summaryBtn a.process {background:#656872;}
 .statusList .summaryBtn a.chart {background:#ed7161;}
-.statusList .summaryBtn a.log {background:#80c2b8};
+.statusList .summaryBtn a.log {background:#80c2b8;}
 
 .ovChart {height:250px;}
 

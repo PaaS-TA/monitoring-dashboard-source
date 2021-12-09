@@ -9,7 +9,6 @@ import (
 	"kr/paasta/monitoring/paas/model"
 	"kr/paasta/monitoring/paas/util"
 	"kr/paasta/monitoring/utils"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -46,7 +45,7 @@ func (h *AlarmPolicyService) UpdateAlarmPolicyList(w http.ResponseWriter, r *htt
 
 	err := json.Unmarshal(data, &apiRequest)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return

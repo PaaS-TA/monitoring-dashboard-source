@@ -126,6 +126,7 @@ func (h *AlarmService) UpdateAlarm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
 func (h *AlarmService) CreateAlarmAction(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println("enter CreateAlarmAction!!!")
 	var apiRequest model.AlarmActionRequest
@@ -146,7 +147,9 @@ func (h *AlarmService) CreateAlarmAction(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte("{\"status\":\"Created\"}"))
 	}
 }
+*/
 
+/*
 func (h *AlarmService) UpdateAlarmAction(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmActionRequest
@@ -177,7 +180,9 @@ func (h *AlarmService) UpdateAlarmAction(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte("{\"status\":\"Created\"}"))
 	}
 }
+*/
 
+/*
 func (h *AlarmService) DeleteAlarmAction(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmActionRequest
@@ -194,6 +199,7 @@ func (h *AlarmService) DeleteAlarmAction(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte("{\"status\":\"No Content\"}"))
 	}
 }
+*/
 
 func (h *AlarmService) GetAlarmStat(w http.ResponseWriter, r *http.Request) {
 
@@ -273,6 +279,7 @@ func (h *AlarmService) GetAlarmStatGraphMatrix(w http.ResponseWriter, r *http.Re
 	util.RenderJsonResponse(result, w)
 }
 
+/*
 func (h *AlarmService) GetPaasAlarmRealTimeCount(w http.ResponseWriter, r *http.Request) {
 
 	result, err := service.GetAlarmService(h.txn).GetPaasAlarmRealTimeCount()
@@ -282,7 +289,9 @@ func (h *AlarmService) GetPaasAlarmRealTimeCount(w http.ResponseWriter, r *http.
 	}
 	util.RenderJsonResponse(result, w)
 }
+*/
 
+/*
 func (h *AlarmService) GetPaasAlarmRealTimeList(w http.ResponseWriter, r *http.Request) {
 
 	result, err := service.GetAlarmService(h.txn).GetPaasAlarmRealTimeList()
@@ -292,3 +301,4 @@ func (h *AlarmService) GetPaasAlarmRealTimeList(w http.ResponseWriter, r *http.R
 	}
 	util.RenderJsonResponse(result, w)
 }
+*/

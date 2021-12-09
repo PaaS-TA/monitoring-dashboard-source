@@ -268,7 +268,7 @@
 				"snsSendYn" : "${sendYn}"
 			},`;
 
-			fnComm.saveData('PUT', `${fnComm.url}paas/alarm/sns/channel`, params.replace(/(\s*)/g,''));
+			fnComm.saveData('PUT', `${fnComm.url}iaas/alarm/sns/channel`, params.replace(/(\s*)/g,''));
 		}
 
 		window.onload = () => {
@@ -408,7 +408,7 @@
 
 					console.log(policyData.replace(/(\s*)/g,''));
 
-					fnComm.saveData('PUT', `${fnComm.url}paas/alarm/policy`, policyData.replace(/(\s*)/g,''));
+					fnComm.saveData('PUT', `${fnComm.url}iaas/alarm/policy`, policyData.replace(/(\s*)/g,''));
 				},
 
 				// 2021.05.18 - Alarm SNS Channel 정보 출력하기
