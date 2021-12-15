@@ -375,7 +375,7 @@
 					for(var i=0; i<target.length; i++){
 
 						// 2021.05.18 - 예외처리 추가
-						if (cTarget[i].value <= wTarget[i].value) {
+						if (parseInt(cTarget[i].value) <= parseInt(wTarget[i].value)) {
 							fnComm.alertPopup('Notice', 'Critical 임계값을 Warning 임계값보다 높게 설정해주세요.', null);
 							return;
 						}
