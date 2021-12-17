@@ -372,16 +372,16 @@
 					// running: "0"
 					// total: "0"
 					// warning: "0"
-					document.querySelector('.conCnt').innerHTML = data.total;
+					document.querySelector('.conCnt').innerHTML = data.Total;
 
 					var chart = c3.generate({
 						bindto: '#conChart',
 						data: {
 							columns: [
-								['Running', data.running],
-								['Warning', data.warning],
-								['Critical', data.critical],
-								['Failed', data.failed],
+								['Running', data.Running],
+								['Warning', data.Warning],
+								['Critical', data.Critical],
+								['Failed', data.Failed],
 							],
 							type : 'donut'
 						},
