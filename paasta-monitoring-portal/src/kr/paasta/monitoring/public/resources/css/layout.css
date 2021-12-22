@@ -3,6 +3,7 @@
 @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
 *, :before, :after {margin:0; padding:0; border:0; font-style:normal; vertical-align:top; box-sizing:border-box; -moz-box-sizing:border-box; -webkit-box-sizing:border-box; outline:none;}
+header h1 img {margin-top:10px;}
 
 html {-webkit-font-smoothing:antialiased;}
 table {width:100%; border-collapse:collapse; border-spacing:0;}
