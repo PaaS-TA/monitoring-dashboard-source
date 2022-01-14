@@ -17,10 +17,10 @@
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/logo_56x56.png" alt="Monitoring" ></a></h1>
 
 				<ul class="global">
-					<li class="IaaS"><a href="../iaas/index.html" >IaaS</a></li>
-					<li class="PaaS"><a href="#" class="top-menu-active">PaaS</a></li>
+					<li class="PaaS"><a href="#" class="top-menu-active">AP</a></li>
+					<li class="CaaS"><a href="../caas/index.html">CP</a></li>
 					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
-					<li class="CaaS"><a href="../caas/index.html">CaaS</a></li>
+					<li class="IaaS"><a href="../iaas/index.html">IaaS</a></li>
 				</ul>
 				
 				<!-- Navigation -->
@@ -49,7 +49,7 @@
 			<div id="container">
 				<div class="contentsLeft">
 					<!-- Overview -->
-					<h3>PaaS</h3>
+					<h3>PaaS-TA</h3>
 					<div class="chartView" id="paasChart"></div>
 					<h4>Top Process<span id="paasTopTitle"></span></h4>
 					<div id="paasTop" class="topList">
@@ -133,7 +133,7 @@
 					</div>
 
 					<article class="table style01">
-						<h4>PaaS Summary</h4>
+						<h4>PaaS-TA List</h4>
 						<div id="paasSummary" class="summaryList"></div>
 						<div class="paging" style="display:none;">
 							<a href="javascript:void(0);">&lt;</a>
@@ -277,13 +277,13 @@
 						
 						// paas 컨디션 차트
 						fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
-						// paas Summary 리스트
+						// PaaS-TA List 리스트
 						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.paasSummaryList);
 					},
 					
 					paasSummaryList(data) {
 						//////////////////////////////////////////////////////////////////////
-						// paas Summary : 리스트
+						// PaaS-TA List : 리스트
 						// Data Example //////////////////////////////////////////////////////
 						// address: "10.20.0.6"
 						// core: "8"
