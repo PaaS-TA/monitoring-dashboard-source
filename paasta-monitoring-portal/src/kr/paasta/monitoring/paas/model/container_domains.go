@@ -105,11 +105,11 @@ type (
 	}
 
 	OverviewCntRes struct {
-		Running  string `json:"running"`
-		Failed   string `json:"failed"`
-		Critical string `json:"critical"`
-		Warning  string `json:"warning"`
-		Total    string `json:"total"`
+		Running  string `json:"Running"`
+		Failed   string `json:"Failed"`
+		Critical string `json:"Critical"`
+		Warning  string `json:"Warning"`
+		Total    string `json:"Total"`
 	}
 
 	ContainerReq struct {

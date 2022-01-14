@@ -13,12 +13,12 @@
 			
 			<!-- Header -->
 			<header>
-				<h1><img src="resources/img/h1_logo.png" alt="Monitoring" ></h1>
+				<h1><img src="resources/img/logo_56x56.png" alt="Monitoring" ></h1>
 				<ul class="global">
-					<li class="IaaS"><a href="iaas/index.html">IaaS</a></li>
-					<li class="PaaS"><a href="paas/index.html">PaaS</a></li>
+					<li class="PaaS"><a href="paas/index.html">AP</a></li>
+					<li class="CaaS"><a href="caas/index.html">CP</a></li>
 					<li class="SaaS"><a href="saas/index.html">SaaS</a></li>
-					<li class="CaaS"><a href="caas/index.html">CaaS</a></li>
+					<li class="IaaS"><a href="iaas/index.html">IaaS</a></li>
 				</ul>
 				<nav>
 					<a href="javascript:void(0);" class="timeSetting"><img src="resources/img/btn_header_cal.png" alt="calendar" ></a>
@@ -110,7 +110,7 @@
 							<h3>PaaS-Monitoring Summary</h3>
 							<ul class="chartWrap">
 								<li>
-									<h4>Bosh</h4>
+									<h4>BOSH</h4>
 									<p class="boshCnt">0</p>
 									<div id="boshChart"></div>
 								</li>
@@ -372,16 +372,16 @@
 					// running: "0"
 					// total: "0"
 					// warning: "0"
-					document.querySelector('.conCnt').innerHTML = data.total;
+					document.querySelector('.conCnt').innerHTML = data.Total;
 
 					var chart = c3.generate({
 						bindto: '#conChart',
 						data: {
 							columns: [
-								['Running', data.running],
-								['Warning', data.warning],
-								['Critical', data.critical],
-								['Failed', data.failed],
+								['Running', data.Running],
+								['Warning', data.Warning],
+								['Critical', data.Critical],
+								['Failed', data.Failed],
 							],
 							type : 'donut'
 						},

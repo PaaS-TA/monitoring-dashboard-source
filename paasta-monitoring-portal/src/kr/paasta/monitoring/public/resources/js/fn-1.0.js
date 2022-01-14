@@ -498,11 +498,11 @@ const fnComm = {
     		bindto: '#contChart',
 			data: {
 				columns: [
-					['Running', 0, data.running, 0, 0, 0, 0, 0],
-					['Warning', 0, 0, data.warning, 0, 0, 0, 0],
-					['Critical', 0, 0, 0, data.critical, 0, 0, 0],
-					['Failed', 0, 0, 0, 0, data.failed, 0, 0],
-					['Total', 0, 0, 0, 0, 0, data.total, 0]
+					['Running', 0, data.Running, 0, 0, 0, 0, 0],
+					['Warning', 0, 0, data.Warning, 0, 0, 0, 0],
+					['Critical', 0, 0, 0, data.Critical, 0, 0, 0],
+					['Failed', 0, 0, 0, 0, data.Failed, 0, 0],
+					['Total', 0, 0, 0, 0, 0, data.Total, 0]
 				],
 				labels: true,
 				type: 'spline'

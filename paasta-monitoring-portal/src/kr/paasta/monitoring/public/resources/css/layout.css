@@ -79,6 +79,7 @@ body {font-family:"Noto Sans KR", "맑은 고딕", sans-serif; font-weight:300; 
 header {position:absolute; top:0; left:0; z-index:100; width:90px; height:100%; border-right:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1); transition:.3s;}
 header:hover {width:150px;}
 header h1 {overflow:hidden; margin-bottom:100px; text-align:center;}
+header h1 img {margin-top:10px;}
 
 header .global {position:absolute; top:0; left:200px; width:600px;}
 header .global li {display:none; width:120px; text-align:center;}
