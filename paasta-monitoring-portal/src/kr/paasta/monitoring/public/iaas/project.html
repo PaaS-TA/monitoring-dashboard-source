@@ -462,15 +462,16 @@
 				var target = document.getElementById('instanceSummary');
 				fnComm.removeHtml(target);
 
-				data.forEach((value, idx)=>{
-					var state = value.status == "ACTIVE" ? "up" : "down";
+				if (data != null) {
+					data.forEach((value, idx)=>{
+						var state = value.status == "ACTIVE" ? "up" : "down";
 
-					var addressMap = value.addresses;
-					var ipAddr = addressMap[Object.keys(addressMap)[0]][0].addr;
-					//console.log(ipAddr);
-					var elapsedTimeStr = fnComm.calElapsedTime(value['OS-SRV-USG:launched_at'], 9);
+						var addressMap = value.addresses;
+						var ipAddr = addressMap[Object.keys(addressMap)[0]][0].addr;
+						//console.log(ipAddr);
+						var elapsedTimeStr = fnComm.calElapsedTime(value['OS-SRV-USG:launched_at'], 9);
 
-					var html = `<div class="${state}">
+						var html = `<div class="${state}">
 							<div>
 								<strong><a href="javascript:void(0);">${value.name}</a></strong>
 							</div>
@@ -509,8 +510,9 @@
 							</div>
 						</div>`
 
-					fnComm.appendHtml(target, html, 'div');
-				});
+						fnComm.appendHtml(target, html, 'div');
+					});
+				}
 
 				project.loader.style.display = "none";
 			},
