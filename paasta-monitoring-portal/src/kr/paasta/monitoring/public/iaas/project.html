@@ -450,7 +450,7 @@
 
 					// project.html 페이지가 처음 열릴 때 오픈스택 프로젝트 목록 중 첫번째 프로젝트의 인스턴스 목록을 보여주도록 함.
 					var firstElem = document.getElementById("projectList").firstElementChild;
-					var firstElemId = projectList[0].id;
+					var firstElemId = usageResult[0].tenant_id;
 					firstElem.addEventListener("onload", onClickProjectItem(firstElemId, firstElem));
 
 					//project.loader.style.display = "none";
