@@ -63,7 +63,7 @@
 </table>
 <i>🚩 You are here.</i>
 
-PaaS-TA monitoring-dashboard-source v5.5.0
+PaaS-TA monitoring-dashboard-source
 =======================
 
 1. [개요](#1)
