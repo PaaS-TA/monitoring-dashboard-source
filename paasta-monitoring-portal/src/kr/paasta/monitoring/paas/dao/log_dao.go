@@ -58,13 +58,13 @@ func setInitRequest(initRequest model.LogMessage) (request model.LogMessage){
 	if initRequest.Index == "" {
 		// Default Target vm's recent log - recent 30 minutes.
 		now := time.Now().Local()
-		//current := now.Unix() - int64(iaasmodel.GMTTimeGap)*60*60 //9 hour difference Between Local PC and GMT(Greenwich Mean Time).
-		current := now.Unix()
+		current := now.Unix() - 9 * 60 * 60 //9 hour difference Between Local PC and GMT(Greenwich Mean Time).
+		//current := now.Unix()
 		/*
 			조회 주기정보를 전달받아 로그를 조회한다.(period - '분'단위)
 		*/
 		//Current Time Stamp
-		before := now.Unix() - initRequest.Period*60 //화면에서 설정한 조회주기(분) (ex: 30 * 60 seconds)
+		before := now.Unix() - initRequest.Period * 60 - 9 * 60 * 60  //화면에서 설정한 조회주기(분) (ex: 30 * 60 seconds)
 		//before = before - int64(iaasmodel.GMTTimeGap)*60*60 //9시간	=> if time zone is equal to Logsearch Instance, it must be removed.
 		//9 hour difference Between Local PC and Virginia.
 		initRequest.StartTime = time.Unix(before, 0).Format(time.RFC3339)[0:19]
@@ -72,6 +72,8 @@ func setInitRequest(initRequest model.LogMessage) (request model.LogMessage){
 		initRequest.Index = fmt.Sprintf("logstash-%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
 		initRequest.TargetDate = fmt.Sprintf("%s", fmt.Sprintf("%d.%s.%s", time.Unix(current, 0).Year(), attachZero(int(time.Unix(current, 0).Month())), attachZero(time.Unix(current, 0).Day())))
 	}
+	fmt.Println(initRequest.StartTime)
+	fmt.Println(initRequest.EndTime)
 
 	fmt.Println(initRequest)
 	return initRequest
