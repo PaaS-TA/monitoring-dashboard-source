@@ -225,7 +225,7 @@
 						<a href="javascript:void(0);" class="move prev">&gt;</a>
 					</div>
 				</div>
-				<a href="javascript:void(0);" class="chartClosed"></a>
+				<a href="javascript:void(0);" id="btnCloseLog" class="chartClosed"></a>
 			</div>
 			<div id="logWrap">
 
@@ -390,6 +390,9 @@
 						// Chart Close Event
 						document.querySelector('.chartClosed').addEventListener('click', (e) => {
 							document.getElementById('chartWrap').classList.toggle('on', false);
+							if(e.target.id == "btnCloseLog") {
+								fnComm.removeHtml(document.querySelector('.preText'));
+							}
 						}, false);
 						
 						// LOG Reset Event
@@ -423,10 +426,11 @@
 						
 						// LOG Search Event
 						document.querySelector('.logSearch').addEventListener('click', (e) => {
-							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-						
+							//var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+
 							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.detailLog);
 						}, false);
 					},
 	
@@ -510,21 +514,23 @@
 						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
 
 						setTimeout(() => {
-							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m`;
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=10s`;
 						
 							// Log 리스트
 							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.detailLog);
-						},500);
+						},1500);
 					},
 
 					detailLog(data){
-						if(data.messages !=  null){
+						var resultList = data.Results[0];
+						if(resultList.Series != null){
 							var target = document.querySelector('.preText');
 	
 							fnComm.removeHtml(target);
 							
-							data.messages.forEach((value)=>{
-								var html = `<li>${value.time}<br>${value.message}</li>`;
+							data.Results[0].Series[0].values.forEach((value)=>{
+								console.log(value);
+								var html = `<li>${value[0]}<br>${value[5]}</li>`;
 
 								fnComm.appendHtml(target, html, 'ul');
 							});

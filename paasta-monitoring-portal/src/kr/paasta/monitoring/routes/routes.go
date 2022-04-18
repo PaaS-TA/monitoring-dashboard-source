@@ -540,9 +540,9 @@ var IaasRoutes = rata.Routes{
 	{Path: "/v2/iaas/alarm/status/:id", Method: "PUT", Name: IAAS_ALARM_STATUS_UPDATE},
 	{Path: "/v2/iaas/alarm/status/:resolveStatus", Method: "GET", Name: IAAS_ALARM_STATUS_RESOLVE},
 
-	//{Path: "/v2/iaas/alarm/action", Method: "POST", Name: IAAS_ALARM_ACTION_CREATE},
-	//{Path: "/v2/iaas/alarm/action/:actionId", Method: "PATCH", Name: IAAS_ALARM_ACTION_UPDATE},
-	//{Path: "/v2/iaas/alarm/action/:actionId", Method: "DELETE", Name: IAAS_ALARM_ACTION_DELETE},
+	{Path: "/v2/iaas/alarm/action", Method: "POST", Name: IAAS_ALARM_ACTION_CREATE},
+	{Path: "/v2/iaas/alarm/action/:actionId", Method: "PATCH", Name: IAAS_ALARM_ACTION_UPDATE},
+	{Path: "/v2/iaas/alarm/action/:actionId", Method: "DELETE", Name: IAAS_ALARM_ACTION_DELETE},
 
 	{Path: "/v2/iaas/alarm/statistics", Method: "GET", Name: IAAS_ALARM_STATISTICS},
 	{Path: "/v2/iaas/alarm/statistics/graph/total", Method: "GET", Name: IAAS_ALARM_STATISTICS_GRAPH_TOTAL},

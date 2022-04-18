@@ -136,9 +136,9 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_ALARM_STATUS_RESOLVE: route(iaasAlarmController.GetAlarmResolveStatus),
 			routes.IAAS_ALARM_STATUS_DETAIL:  route(iaasAlarmController.GetAlarmDetail),
 			routes.IAAS_ALARM_STATUS_UPDATE:  route(iaasAlarmController.UpdateAlarm),
-			//routes.IAAS_ALARM_ACTION_CREATE:  route(iaasAlarmController.CreateAlarmAction),
-			//routes.IAAS_ALARM_ACTION_UPDATE:  route(iaasAlarmController.UpdateAlarmAction),
-			//routes.IAAS_ALARM_ACTION_DELETE:  route(iaasAlarmController.DeleteAlarmAction),
+			routes.IAAS_ALARM_ACTION_CREATE:  route(iaasAlarmController.CreateAlarmAction),
+			routes.IAAS_ALARM_ACTION_UPDATE:  route(iaasAlarmController.UpdateAlarmAction),
+			routes.IAAS_ALARM_ACTION_DELETE:  route(iaasAlarmController.DeleteAlarmAction),
 
 			routes.IAAS_ALARM_STATISTICS:               route(iaasAlarmController.GetAlarmStat),
 			routes.IAAS_ALARM_STATISTICS_GRAPH_TOTAL:   route(iaasAlarmController.GetAlarmStatGraphTotal),
@@ -193,8 +193,10 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	var metricsController *paasContoller.InfluxServerClient
 	var boshStatusController *paasContoller.BoshStatusService
 	var paasController *paasContoller.PaasController
-	var paasLogController *paasContoller.PaasLogController
+	var paasLogController *paasContoller.PaasLogController    // deprecated..
 	var appController *paasContoller.AppController
+
+	var logsearchController *paasContoller.LogsearchController
 
 
 	var paasActions rata.Handlers
@@ -205,8 +207,9 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 		metricsController = paasContoller.GetMetricsController(paasInfluxClient, databases)
 		boshStatusController = paasContoller.GetBoshStatusController(paasTxn, paasInfluxClient, databases)
 		paasController = paasContoller.GetPaasController(paasTxn, paasInfluxClient, databases, boshClient)
-		paasLogController = paasContoller.NewLogController(paasInfluxClient, paasElasticClient)
+		paasLogController = paasContoller.NewLogController(paasInfluxClient, paasElasticClient)    // deprecated..
 		appController = paasContoller.GetAppController(paasTxn)
+		logsearchController = paasContoller.GetLogsearchController(paasInfluxClient, databases)   // 2022.03.04 - 로깅 고도화
 
 		paasActions = rata.Handlers{
 			routes.MEMBER_JOIN_CHECK_DUPLICATION_PAAS_ID: route(memberController.MemberJoinCheckDuplicationPaasId),
@@ -310,11 +313,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.PAAS_CONTAINER_NETWORK_DROP_LIST:  route(containerController.GetPaasContainerNetworkDrops),
 			routes.PAAS_CONTAINER_NETWORK_ERROR_LIST: route(containerController.GetPaasContainerNetworkErrors),
 
-			routes.PAAS_LOG_RECENT:   route(paasLogController.GetDefaultRecentLog),
-			routes.PAAS_LOG_SPECIFIC: route(paasLogController.GetSpecificTimeRangeLog),
-
 			// potal - paas api
-
 			routes.PAAS_APP_CPU_USAGES:     route(metricsController.GetAppCpuUsage),
 			routes.PAAS_APP_MEMORY_USAGES:  route(metricsController.GetAppMemoryUsage),
 			routes.PAAS_APP_NETWORK_USAGES: route(metricsController.GetAppNetworkIoKByte),
@@ -326,6 +325,12 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.PAAS_APP_ALARM_LIST:                route(appController.GetPaasAppAlarmList),
 			routes.PAAS_APP_POLICY_DELETE:             route(appController.DeletePaasAppPolicy),
 			routes.PAAS_PAAS_ALL_OVERVIEW:             route(paasController.GetPaasAllOverview),
+
+			// 2022.03.04 - 로깅 시스템 교체 건 관련 작업
+			routes.PAAS_LOG_RECENT: route(logsearchController.GetLogData),   // url : v2/paas/log/recent
+
+			//routes.PAAS_LOG_RECENT:   route(paasLogController.GetDefaultRecentLog),   // deprecated..
+			routes.PAAS_LOG_SPECIFIC: route(paasLogController.GetSpecificTimeRangeLog), // deprecated..
 		}
 	}
 

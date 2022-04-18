@@ -48,7 +48,7 @@ var hostList []zabbix.Host
 func AlarmServiceBuilder(configData *config.Config) *AlarmService {
 	dbConnStr := util.GetConnectionString(configData.DbHost, configData.DbPort, configData.DbUser, configData.DbPasswd, configData.DbName)
 
-	//log.Printf("dbConnStr : %v\n", dbConnStr+"?charset=utf8&parseTime=true")
+	log.Printf("dbConnStr : %v\n", dbConnStr+"?charset=utf8&parseTime=true")
 
 	dbConn, err := gorm.Open(configData.DbType, dbConnStr+"?charset=utf8&parseTime=true")
 	if err != nil {
@@ -368,7 +368,7 @@ func createSession(configData *config.Config) *zabbix.Session {
 		WithHTTPClient(client).
 		WithCredentials(configData.ZabbixAdminId, configData.ZabbixAdminPw).Connect()
 	if err != nil {
-		fmt.Errorf("%v\n", err)
+		fmt.Printf("%v\n", err)
 	}
 
 	version, err := _session.GetVersion()

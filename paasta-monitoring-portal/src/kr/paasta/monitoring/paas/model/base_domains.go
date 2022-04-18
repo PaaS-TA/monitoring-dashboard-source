@@ -83,6 +83,18 @@ type (
 		Messages     []LogInfo `json:"messages"`
 	}
 
+	NewLogMessage struct {
+		Id           string    `json:"id"`
+		LogType      string    `json:"logType"`
+		Keyword      string    `json:"keyword"`
+		TargetDate   string    `json:"targetDate"`
+		Period       string     `json:"period"`
+		StartTime    string    `json:"startTime"`
+		EndTime      string    `json:"endTime"`
+		Messages     []LogInfo `json:"messages"`
+	}
+
+
 	LogInfo struct {
 		Time    string `json:"time"`
 		Message string `json:"message"`
