@@ -5,7 +5,8 @@ Environment
 2. GOROOT : Go 1.17.8 
 3. GOPATH : Use GOPATH that’s defined in system environment” 체크
 4. GO Modules : “Enable Go modules integration”을 체크
-5. go get -u
+5. ~\paasta-monitoring-api\src\kr\paasta\monitoring-api\에서 
+    go get -u 실행
 
 Run / Debug Configuration
 
