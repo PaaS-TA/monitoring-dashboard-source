@@ -183,10 +183,10 @@ func CreateAuth(td models.TokenDetails, user_id string, RedisInfo *redis.Client)
 func (h *TokenService) CreateToken(apiRequest models.UserInfo, c echo.Context) (models.TokenDetails, error) {
 	// 아이디 및 비밀번호 확인 시 JWT 토큰 발급 및 Redis 저장
 
-	// Token 모델을 선언한다.
+	// 1. Token 모델을 선언한다.
 	td := models.TokenDetails{}
 
-	// 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다.
+	// 2. 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다.
 	results, err := dao.GetUserDao(h.DbInfo).GetUser(apiRequest, c)
 	if err != nil {
 		return td, err
@@ -199,58 +199,18 @@ func (h *TokenService) CreateToken(apiRequest models.UserInfo, c echo.Context) (
 		return td, fmt.Errorf("The Password is incorrect")
 	}
 
-	// Access Token 만료 시간 (현재시간 + 15분)
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
-	td.AccessUuid = uuid.NewV4().String()
-	// Refresh Token 만료 시간 (현재시간 + 7일)
-	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.RefreshUuid = uuid.NewV4().String()
+	// 3. Token 생성
+	td, err = CreateToken(td, results[0].Username)
 
-	// Access Token을 생성한다.
-	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd")
-	atClaims := jwt.MapClaims{}
-	atClaims["authorized"] = true
-	atClaims["access_uuid"] = td.AccessUuid
-	atClaims["user_id"] = apiRequest.Username
-	atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
-	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
-
-	// Refresh Token을 생성한다.
-	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf") //this should be in an env file
-	rtClaims := jwt.MapClaims{}
-	rtClaims["refresh_uuid"] = td.RefreshUuid
-	rtClaims["user_id"] = apiRequest.Username
-	rtClaims["exp"] = td.RtExpires
-	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
-	if err != nil {
-		return td, err
-	}
-
-	// at는 AccessToken의 접근 유효 시간
-	// rt는 RefreshToken의 만료 시간
-	redis_at := time.Unix(td.AtExpires, 0) //converting Unix to UTC
-	redis_rt := time.Unix(td.RtExpires, 0)
-	now := time.Now()
-
-	// Todo Redis 생성시 value 처리
-	// JWT을 Redis에 저장한다.
-	errAccess := h.RedisInfo.Set(td.AccessUuid, apiRequest.Username, redis_at.Sub(now)).Err()
-	if errAccess != nil {
-		return td, errAccess
-	}
-	errRefresh := h.RedisInfo.Set(td.RefreshUuid, apiRequest.Username, redis_rt.Sub(now)).Err()
-	if errRefresh != nil {
-		return td, errRefresh
-	}
+	// 4. Token 저장 (Redis)
+	td, err = CreateAuth(td, results[0].Username, h.RedisInfo)
 	return td, nil
 }
 
 func (h *TokenService) RefreshToken(apiRequest models.TokenDetails, c echo.Context) (models.TokenDetails, error) {
 	// RefreshToken 확인 시 기존 JWT 토큰 정보 삭제 및 생성 후 Redis 저장
 
-	// Token 모델을 선언한다.
+	// 1. Token 모델을 선언한다.
 	td := models.TokenDetails{}
 
 	// 2. 토큰 검증 (signing method 검증, 서명 검증)
@@ -280,13 +240,13 @@ func (h *TokenService) RefreshToken(apiRequest models.TokenDetails, c echo.Conte
 		return td, err
 	}
 
-	// 6. Redis 토큰 생성
+	// 6. Token 생성
 	td, err = CreateToken(td, metadata["user_id"].(string))
 	if err != nil {
 		return td, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	// 7. Token 데이터 저장
+	// 7. Token 저장 (Redis)
 	td, err = CreateAuth(td, metadata["user_id"].(string), h.RedisInfo)
 	if err != nil {
 		return td, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
