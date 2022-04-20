@@ -101,3 +101,6 @@ paasta-monitoring-portal/src/golang.org/x/
 paasta-monitoring-portal/src/gopkg.in/olivere/
 paasta-monitoring-portal/src/gopkg.in/yaml.v2/
 
+paasta-monitoring-portal/src/kr/paasta/monitoring/zabbix_session
+paasta-iaas-monitoring-batch/src/kr/paasta/iaas-monitoring-batch/zabbix_session
+paasta-iaas-monitoring-batch/src/kr/paasta/iaas-monitoring-batch/.pid
