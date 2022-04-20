@@ -427,7 +427,19 @@
 						// LOG Search Event
 						document.querySelector('.logSearch').addEventListener('click', (e) => {
 							//var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
+
+							var startDateTime = new Date(document.getElementById('date').value + " " + document.getElementById('sTime').value);
+							var endDateTime = new Date(document.getElementById('date').value + " " + document.getElementById('eTime').value);
+							if (startDateTime > endDateTime) {
+								alert("검색할 시작시간이 종료시간보다 큽니다.");
+								return;
+							}
+
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000
+								&startTime=${document.getElementById('sTime').value}
+								&endTime=${document.getElementById('eTime').value}
+								&targetDate=${document.getElementById('date').value}
+								&keyword=${document.getElementById('message').value}`;
 
 							// Log 리스트
 							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.detailLog);

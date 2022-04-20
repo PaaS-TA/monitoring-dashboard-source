@@ -40,7 +40,10 @@ func (dao LogsearchDao) GetLogData(param model.NewLogMessage) (response client.R
 	if param.Id != "" {
 		sqlStr += " and \"extradata\" =~ /" + param.Id + "*/"
 	}
-	sqlStr += " ORDER BY \"time\" DESC;"
+	if param.Keyword != "" {
+		sqlStr += " and \"message\" =~ /" + param.Keyword + "/"
+	}
+	sqlStr += " ORDER BY \"time\" DESC limit 100;"
 
 	fmt.Println(sqlStr)
 	influxQuery := client.Query{
