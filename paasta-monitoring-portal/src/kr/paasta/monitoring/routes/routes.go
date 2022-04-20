@@ -107,7 +107,7 @@ const (
 	PAAS_CONTAINER_NETWORK_DROP_LIST  = "PAAS_CONTAINER_NETWORK_DROP_LIST"
 	PAAS_CONTAINER_NETWORK_ERROR_LIST = "PAAS_CONTAINER_NETWORK_ERROR_LIST"
 
-	PAAS_LOG_RECENT   = "PAAS_LOG_RECENT"
+	PAAS_LOG_SEARCH   = "PAAS_LOG_SEARCH"
 	PAAS_LOG_SPECIFIC = "PAAS_LOG_SPECIFIC"
 
 	// potal - paas api
@@ -404,7 +404,7 @@ var PaasRoutes = rata.Routes{
 	{Path: "/v2/paas/container/network/:id/drops", Method: "GET", Name: PAAS_CONTAINER_NETWORK_DROP_LIST},
 	{Path: "/v2/paas/container/network/:id/errors", Method: "GET", Name: PAAS_CONTAINER_NETWORK_ERROR_LIST},
 
-	{Path: "/v2/paas/log/recent", Method: "GET", Name: PAAS_LOG_RECENT},
+	{Path: "/v2/paas/log", Method: "GET", Name: PAAS_LOG_SEARCH},
 	{Path: "/v2/paas/log/specific", Method: "GET", Name: PAAS_LOG_SPECIFIC},
 
 	// potal - paas api

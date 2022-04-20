@@ -327,7 +327,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.PAAS_PAAS_ALL_OVERVIEW:             route(paasController.GetPaasAllOverview),
 
 			// 2022.03.04 - 로깅 시스템 교체 건 관련 작업
-			routes.PAAS_LOG_RECENT: route(logsearchController.GetLogData),   // url : v2/paas/log/recent
+			routes.PAAS_LOG_SEARCH: route(logsearchController.GetLogData),   // url : v2/paas/log/recent
 
 			//routes.PAAS_LOG_RECENT:   route(paasLogController.GetDefaultRecentLog),   // deprecated..
 			routes.PAAS_LOG_SPECIFIC: route(paasLogController.GetSpecificTimeRangeLog), // deprecated..

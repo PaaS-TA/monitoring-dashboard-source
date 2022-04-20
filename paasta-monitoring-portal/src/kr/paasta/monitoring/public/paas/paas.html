@@ -416,7 +416,7 @@
 								&keyword=${document.getElementById('message').value}`;
 
 							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.renderDetailLog);
+							fnComm.loadData('GET', `${fnComm.url}paas/log${logParameter}`, paas.renderDetailLog);
 						}, false);
 					},
 	
@@ -505,7 +505,7 @@
 							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=10s`;
 						
 							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.renderDetailLog);
+							fnComm.loadData('GET', `${fnComm.url}paas/log${logParameter}`, paas.renderDetailLog);
 						},1500);
 					},
 
