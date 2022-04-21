@@ -214,6 +214,9 @@
 							<label>Message</label>
 							<input type="text" id="message" style="width:800px;">
 						</div>
+						<div>
+							<span style="color:#ff0000; font-weight: bold;">로그타임과 실제시간과는 9시간의 시차가 존재하오니, 참고하시기 바랍니다.</span>
+						</div>
 						<button class="logSearch" id="btnSearchLog">SEARCH</button>
 					</fieldset>
 					<ul class="preText">
@@ -405,6 +408,7 @@
 							var endDateTime = new Date(document.getElementById('date').value + " " + document.getElementById('eTime').value);
 							if (startDateTime > endDateTime) {
 								alert("검색할 시작시간이 종료시간보다 큽니다.");
+								paas.loader.style.display = "none";
 								return;
 							}
 
@@ -557,7 +561,7 @@
 							document.querySelector('.preText').innerHTML = 'No Log'
 							paas.loader.style.display = "none";
 						}
-					},
+					}
 				}
 	
 				paas.init();
