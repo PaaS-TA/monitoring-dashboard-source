@@ -492,39 +492,6 @@ var IaasRoutes = rata.Routes{
 	{Path: "/v2/iaas/main/summary", Method: "GET", Name: IAAS_MAIN_SUMMARY},
 	{Path: "/v2/iaas/node/manage/summary", Method: "GET", Name: IAAS_NODE_MANAGE_SUMMARY},
 	{Path: "/v2/iaas/node/compute/summary", Method: "GET", Name: IAAS_NODE_COMPUTE_SUMMARY},
-	{Path: "/v2/iaas/node/rabbitmq/summary", Method: "GET", Name: IAAS_NODE_RABBITMQ_SUMMARY_OVERVIEW},
-	//{Path: "/v2/iaas/node/:hostname/rabbitmq/summary",  	Method: "GET", Name: IAAS_NODE_RABBITMQ_SUMMARY             },
-
-	{Path: "/v2/iaas/nodes", Method: "GET", Name: IAAS_NODES},
-
-	{Path: "/v2/iaas/node/topprocess/:hostname/cpu", Method: "GET", Name: IAAS_NODE_TOPPROCESS_CPU},
-	{Path: "/v2/iaas/node/topprocess/:hostname/memory", Method: "GET", Name: IAAS_NODE_TOPPROCESS_MEMORY},
-
-	{Path: "/v2/iaas/node/cpu/:hostname/usages", Method: "GET", Name: IAAS_NODE_CPU_USAGE_LIST},
-	{Path: "/v2/iaas/node/cpu/:hostname/loads", Method: "GET", Name: IAAS_NODE_CPU_LOAD_LIST},
-	{Path: "/v2/iaas/node/memory/:hostname/swaps", Method: "GET", Name: IAAS_NODE_MEMORY_SWAP_LIST},
-	{Path: "/v2/iaas/node/memory/:hostname/usages", Method: "GET", Name: IAAS_NODE_MEMORY_USAGE_LIST},
-	{Path: "/v2/iaas/node/disk/:hostname/usages", Method: "GET", Name: IAAS_NODE_DISK_USAGE_LIST},
-	{Path: "/v2/iaas/node/disk/:hostname/reads", Method: "GET", Name: IAAS_NODE_DISK_READ_LIST},
-	{Path: "/v2/iaas/node/disk/:hostname/writes", Method: "GET", Name: IAAS_NODE_DISK_WRITE_LIST},
-	{Path: "/v2/iaas/node/network/:hostname/kbytes", Method: "GET", Name: IAAS_NODE_NETWORK_KBYTE_LIST},
-	{Path: "/v2/iaas/node/network/:hostname/errors", Method: "GET", Name: IAAS_NODE_NETWORK_ERROR_LIST},
-	{Path: "/v2/iaas/node/network/:hostname/droppackets", Method: "GET", Name: IAAS_NODE_NETWORK_DROP_PACKET_LIST},
-
-	{Path: "/v2/iaas/tenant/summary", Method: "GET", Name: IAAS_TENANT_SUMMARY},
-	{Path: "/v2/iaas/tenant/:instanceId/instances", Method: "GET", Name: IAAS_TENANT_INSTANCE_LIST},
-	{Path: "/v2/iaas/tenant/cpu/:instanceId/usages", Method: "GET", Name: IAAS_TENANT_CPU_USAGE_LIST},
-	{Path: "/v2/iaas/tenant/memory/:instanceId/usages", Method: "GET", Name: IAAS_TENANT_MEMORY_USAGE_LIST},
-	{Path: "/v2/iaas/tenant/disk/:instanceId/reads", Method: "GET", Name: IAAS_TENANT_DISK_READ_LIST},
-	{Path: "/v2/iaas/tenant/disk/:instanceId/writes", Method: "GET", Name: IAAS_TENANT_DISK_WRITE_LIST},
-	{Path: "/v2/iaas/tenant/network/:instanceId/ios", Method: "GET", Name: IAAS_TENANT_NETWORK_IO_LIST},
-	{Path: "/v2/iaas/tenant/network/:instanceId/packets", Method: "GET", Name: IAAS_TENANT_NETWORK_PACKET_LIST},
-	{Path: "/v2/iaas/log/recent", Method: "GET", Name: IAAS_LOG_RECENT},
-	{Path: "/v2/iaas/log/specific", Method: "GET", Name: IAAS_LOG_SPECIFIC},
-
-
-	//{Path: "/v2/iaas/alarm/realtime/count", Method: "GET", Name: IAAS_ALARM_REALTIME_COUNT},
-	//{Path: "/v2/iaas/alarm/realtime/list", Method: "GET", Name: IAAS_ALARM_REALTIME_LIST},
 
 	{Path: "/v2/iaas/alarm/policies", Method: "GET", Name: IAAS_ALARM_POLICY_LIST},
 	{Path: "/v2/iaas/alarm/policy", Method: "PUT", Name: IAAS_ALARM_POLICY_UPDATE},

@@ -86,7 +86,7 @@ func (n *LoginService) Login(req commonModel.UserInfo, reqCsrfToken string, cfCo
 				//return req, provider, err
 			} else {
 				result.IaasToken = provider.TokenID
-				//fmt.Println("iaas token ::: ", result.IaasToken )
+				fmt.Println("iaas token ::: ", result.IaasToken )
 			}
 
 			utils.Logger.Debugf("req.Token(CSRF_TOKEN) : %v\n", req.Token)

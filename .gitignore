@@ -104,3 +104,4 @@ paasta-monitoring-portal/src/gopkg.in/yaml.v2/
 paasta-monitoring-portal/src/kr/paasta/monitoring/zabbix_session
 paasta-iaas-monitoring-batch/src/kr/paasta/iaas-monitoring-batch/zabbix_session
 paasta-iaas-monitoring-batch/src/kr/paasta/iaas-monitoring-batch/.pid
+paasta-monitoring-portal/src/kr/paasta/monitoring/config.ini

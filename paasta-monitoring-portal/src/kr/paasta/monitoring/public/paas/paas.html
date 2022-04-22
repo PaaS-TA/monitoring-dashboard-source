@@ -281,10 +281,10 @@
 						// paas 컨디션 차트
 						fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
 						// PaaS-TA List 리스트
-						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.paasSummaryList);
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.getPaasVMList);
 					},
 					
-					paasSummaryList(data) {
+					getPaasVMList(data) {
 						//////////////////////////////////////////////////////////////////////
 						// PaaS-TA List : 리스트
 						// Data Example //////////////////////////////////////////////////////
@@ -305,9 +305,9 @@
 						// totalMemory: 16046.84765625
 						//////////////////////////////////////////////////////////////////////
 						var target = document.getElementById('paasSummary');
-						
 						fnComm.removeHtml(target);
-	
+
+						var firstVMId;
 						data.data.forEach((value, idx)=>{
 							var html = `<div class="${value.state}">
 								<div>
@@ -352,13 +352,13 @@
 							article.setAttribute('data-id', value.id);
 
 							if(idx === 0){
-								paas.id = value.id;
+								firstVMId = value.id;
 								document.getElementById('paasTopTitle').innerHTML = value.name;
 							};
 						});
 						
 						// Set paas Top Process 
-						fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/'+paas.id+'/memory?id=' + paas.id, paas.paasTopProcess );
+						fnComm.loadData('GET', fnComm.url+'paas/paasta/topprocess/'+firstVMId+'/memory', paas.paasTopProcess );
 						
 						// Button Event (Process, Chart, Log)
 						var elm = document.querySelectorAll('.summaryBtn');
@@ -368,7 +368,7 @@
 								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
 								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 
-								fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/' + elmID + '/memory?id=' + paas.id, paas.paasTopProcess );
+								fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/' + elmID + '/memory', paas.paasTopProcess );
 								document.getElementById('paasTopTitle').innerHTML = elmName;
 							}, false);
 
@@ -547,20 +547,25 @@
 					renderDetailLog(data){
 						var target = document.querySelector('.preText');
 						fnComm.removeHtml(target);
+						if (typeof data.Results != "undefined") {
+							var resultList = data.Results[0];
+							if (resultList.Series != null) {
+								data.Results[0].Series[0].values.forEach((value)=>{
+									console.log(value);
+									var html = `<li>${value[0]}<br>${value[5]}</li>`;
 
-						var resultList = data.Results[0];
-						if (resultList.Series != null) {
-							data.Results[0].Series[0].values.forEach((value)=>{
-								console.log(value);
-								var html = `<li>${value[0]}<br>${value[5]}</li>`;
-
-								fnComm.appendHtml(target, html, 'ul');
-							});
-							paas.loader.style.display = "none";
+									fnComm.appendHtml(target, html, 'ul');
+								});
+								paas.loader.style.display = "none";
+							} else {
+								document.querySelector('.preText').innerHTML = 'No Log'
+								paas.loader.style.display = "none";
+							}
 						} else {
 							document.querySelector('.preText').innerHTML = 'No Log'
 							paas.loader.style.display = "none";
 						}
+
 					}
 				}
 	

@@ -52,6 +52,7 @@ func (dao LogsearchDao) GetLogData(param model.NewLogMessage) (response client.R
 	}
 	result, err := dao.influxClient.Query(influxQuery)
 	if err != nil {
+		fmt.Println(err.Error())
 		errLogMsg = err.Error()
 	}
 
