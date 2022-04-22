@@ -47,14 +47,6 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	var caasMetricsController *caasContoller.MetricController
 
 	// TODO 2021.11.01 - IAAS 관련 컨트롤러들을 핸들러에 등록
-	mainController := iaasContoller.NewMainController(openstackProvider, iaasInfluxClient)
-	computeController := iaasContoller.NewComputeController(openstackProvider, iaasInfluxClient)
-	manageNodeController := iaasContoller.NewManageNodeController(openstackProvider, iaasInfluxClient)
-	//notificationController := iaasContoller.NewNotificationController(monsClient, iaasInfluxClient)
-	//definitionController := iaasContoller.NewAlarmDefinitionController(monsClient, iaasInfluxClient)
-	//stautsController := iaasContoller.NewAlarmStatusController(monsClient, iaasInfluxClient, iaasTxn)
-	logController := iaasContoller.NewLogController(openstackProvider, iaasInfluxClient, iaasElasticClient)
-
 	openstackController := iaasContoller.NewOpenstackController(openstackProvider, iaasInfluxClient)
 	zabbixController := iaasContoller.NewZabbixController(zabbixSession, openstackProvider)
 
@@ -63,20 +55,9 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 
 	var iaasActions rata.Handlers
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
-		//iaasActions = iaasHttp.InitHandler(paasTxn, openstackProvider, iaasInfluxClient, iaasElasticClient)
-
 		iaasActions = rata.Handlers {
 			routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
 			routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
-
-			//Integrated with routes
-			routes.IAAS_MAIN_SUMMARY:                  route(mainController.OpenstackSummary),
-			routes.IAAS_NODE_COMPUTE_SUMMARY:          route(computeController.NodeSummary),
-
-			routes.IAAS_NODE_MANAGE_SUMMARY:            route(manageNodeController.ManageNodeSummary),
-
-			routes.IAAS_LOG_RECENT:   route(logController.GetDefaultRecentLog),
-			routes.IAAS_LOG_SPECIFIC: route(logController.GetSpecificTimeRangeLog),
 
 			// TODO 2021.11.01 - IAAS 모니터링 신규 추가
 			routes.IAAS_GET_HYPERVISOR_LIST: route(openstackController.GetHypervisorList),
