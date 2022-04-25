@@ -53,7 +53,7 @@ func (a *TokenController) RefreshToken(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid json provided")
 	}
 
-	// Authentication의 CreateToken 발급을 호출한다.
+	// Authentication의 RefreshToken 발급을 호출한다.
 	tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).RefreshToken(apiRequest, c)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())

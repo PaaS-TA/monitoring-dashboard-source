@@ -11,8 +11,6 @@ func Int64ToString(inputNum int64) string {
 }
 
 func GetConnectionString(host, port, user, pass, dbname string) string {
-
 	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s",
 		user, pass, "tcp", host, port, dbname, "")
-
 }

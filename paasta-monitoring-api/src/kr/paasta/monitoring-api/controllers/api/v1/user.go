@@ -28,14 +28,14 @@ func (a *UserController) GetUsers(c echo.Context) (err error) {
 		return nil
 	}
 
-	// Authentication의 CreateToken을 호출한다.
+	// User의 GetUsers를 호출한다.
 	users, err := v1service.GetUserService(a.DbInfo).GetUsers(apiRequest, c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, err.Error())
 		return nil
 	}
 
-	// 토근을 발급한다.
+	// 사용자 정보를 전달한다.
 	c.JSON(http.StatusOK, users)
 	return nil
 }
