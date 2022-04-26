@@ -10,7 +10,7 @@ func Int64ToString(inputNum int64) string {
 	return strconv.FormatInt(inputNum, 10)
 }
 
-func GetConnectionString(host, port, user, pass, dbname string) string {
-	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s",
-		user, pass, "tcp", host, port, dbname, "")
+func GetDBConnectionString(dbtype, user, password, protocol, host, port, dbname, charset, parseTime string) (string, string) {
+	return dbtype, fmt.Sprintf("%s:%s@%s([%s]:%s)/%s?charset=%s&parseTime=%s",
+		user, password, protocol, host, port, dbname, charset, parseTime)
 }

@@ -11,8 +11,13 @@ type ResponseData struct {
 	Meta interface{} `json:"meta"`
 }
 
-//Message returns map data
-func Message(status int, message string) map[string]interface{} {
+// Internal Server Error Format
+func InternalErrMessage(err error) {
+	panic(err)
+}
+
+// Request & Response Error Format
+func ExternalErrMessage(status int, message string) map[string]interface{} {
 	return map[string]interface{}{"status": status, "message": message}
 }
 

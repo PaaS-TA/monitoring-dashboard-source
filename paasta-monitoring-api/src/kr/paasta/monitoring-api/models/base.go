@@ -27,11 +27,11 @@ func init() {
 		fmt.Print(e)
 	}
 
-	username := os.Getenv("db_user")
-	password := os.Getenv("db_pass")
-	dbName := os.Getenv("db_name")
-	dbHost := os.Getenv("db_host")
-	dbPort := os.Getenv("db_port")
+	username := os.Getenv("paas_db_username")
+	password := os.Getenv("paas_db_password")
+	dbName := os.Getenv("paas_db_name")
+	dbHost := os.Getenv("paas_db_host")
+	dbPort := os.Getenv("paas_db_port")
 
 	msql := mysql.Config{}
 	log.Println(msql)

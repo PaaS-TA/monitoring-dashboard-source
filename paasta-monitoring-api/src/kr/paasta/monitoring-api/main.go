@@ -3,7 +3,6 @@ package main
 import (
 	Connections "GoEchoProject/connections"
 	Routers "GoEchoProject/routers"
-	"fmt"
 	"os"
 )
 
@@ -11,30 +10,24 @@ import (
 func main() {
 
 	// connection 설정 (DB & API etc..)
-	c, err := Connections.SetupConnection()
-	if err != nil {
-		fmt.Println(err)
-	}
+	c := Connections.SetupConnection()
 
 	// Router 설정
 	r := Routers.SetupRouter(c)
 
-	port := os.Getenv("port")
+	webPort := os.Getenv("web_port")
 
 	// For run on requested port
 	if len(os.Args) > 1 {
 		reqPort := os.Args[1]
 		if reqPort != "" {
-			port = reqPort
+			webPort = reqPort
 		}
 	}
 
-	if port == "" {
-		port = "8080" //localhost
-	}
-	type Job interface {
-		Run()
+	if webPort == "" {
+		webPort = "8080" //localhost
 	}
 
-	r.Logger.Fatal(r.Start(":" + port))
+	r.Logger.Fatal(r.Start(":" + webPort))
 }
