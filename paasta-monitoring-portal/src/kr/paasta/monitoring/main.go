@@ -232,11 +232,12 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	boshDatabase, _ := config["paas.metric.db.name.bosh"]
 	paastaDatabase, _ := config["paas.metric.db.name.paasta"]
 	containerDatabase, _ := config["paas.metric.db.name.container"]
+	loggingMeasurement, _ := config["paas.metric.db.name.logging"]
 
 	databases.BoshDatabase = boshDatabase
 	databases.PaastaDatabase = paastaDatabase
 	databases.ContainerDatabase = containerDatabase
-
+	databases.LoggingDatabase = loggingMeasurement
 	// Cloud Foundry Client
 	//cfProvider = cfclient.Config{
 	//	ApiAddress: config["paas.cf.client.apiaddress"],
