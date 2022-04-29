@@ -126,7 +126,7 @@ func (h *AlarmService) UpdateAlarm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
+
 func (h *AlarmService) CreateAlarmAction(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println("enter CreateAlarmAction!!!")
 	var apiRequest model.AlarmActionRequest
@@ -147,9 +147,9 @@ func (h *AlarmService) CreateAlarmAction(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte("{\"status\":\"Created\"}"))
 	}
 }
-*/
 
-/*
+
+
 func (h *AlarmService) UpdateAlarmAction(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmActionRequest
@@ -180,9 +180,8 @@ func (h *AlarmService) UpdateAlarmAction(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte("{\"status\":\"Created\"}"))
 	}
 }
-*/
 
-/*
+
 func (h *AlarmService) DeleteAlarmAction(w http.ResponseWriter, r *http.Request) {
 
 	var apiRequest model.AlarmActionRequest
@@ -199,7 +198,7 @@ func (h *AlarmService) DeleteAlarmAction(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte("{\"status\":\"No Content\"}"))
 	}
 }
-*/
+
 
 func (h *AlarmService) GetAlarmStat(w http.ResponseWriter, r *http.Request) {
 

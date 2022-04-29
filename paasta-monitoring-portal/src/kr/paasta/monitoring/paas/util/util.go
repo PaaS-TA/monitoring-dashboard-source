@@ -41,7 +41,7 @@ func RenderJsonResponse(data interface{}, w http.ResponseWriter) {
 	}
 
 	js, err := json.Marshal(data)
-	fmt.Println(data)
+	//fmt.Println(data)
 	if err != nil {
 		log.Fatalln("Error writing JSON:", err)
 	}

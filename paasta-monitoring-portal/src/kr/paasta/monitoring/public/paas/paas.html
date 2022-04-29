@@ -214,7 +214,10 @@
 							<label>Message</label>
 							<input type="text" id="message" style="width:800px;">
 						</div>
-						<button class="logSearch">SEARCH</button>
+						<div>
+							<span style="color:#ff0000; font-weight: bold;">로그타임과 실제시간과는 9시간의 시차가 존재하오니, 참고하시기 바랍니다.</span>
+						</div>
+						<button class="logSearch" id="btnSearchLog">SEARCH</button>
 					</fieldset>
 					<ul class="preText">
 					</ul>
@@ -225,7 +228,7 @@
 						<a href="javascript:void(0);" class="move prev">&gt;</a>
 					</div>
 				</div>
-				<a href="javascript:void(0);" class="chartClosed"></a>
+				<a href="javascript:void(0);" id="btnCloseLog" class="chartClosed"></a>
 			</div>
 			<div id="logWrap">
 
@@ -245,7 +248,7 @@
 					logCnt : 1,
 					logPage : 1,
 					logSum : 1,
-
+					loader : document.getElementById("loadWrap"),
 					init() {
 						// Alarm Count
 						fnComm.alarmCount('paas');
@@ -278,10 +281,10 @@
 						// paas 컨디션 차트
 						fnComm.loadData('GET', fnComm.url + 'paas/paasta/overview', fnComm.paasConditionChart);
 						// PaaS-TA List 리스트
-						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.paasSummaryList);
+						fnComm.loadData('GET', fnComm.url + 'paas/paasta/summary', paas.getPaasVMList);
 					},
 					
-					paasSummaryList(data) {
+					getPaasVMList(data) {
 						//////////////////////////////////////////////////////////////////////
 						// PaaS-TA List : 리스트
 						// Data Example //////////////////////////////////////////////////////
@@ -302,9 +305,9 @@
 						// totalMemory: 16046.84765625
 						//////////////////////////////////////////////////////////////////////
 						var target = document.getElementById('paasSummary');
-						
 						fnComm.removeHtml(target);
-	
+
+						var firstVMId;
 						data.data.forEach((value, idx)=>{
 							var html = `<div class="${value.state}">
 								<div>
@@ -349,13 +352,13 @@
 							article.setAttribute('data-id', value.id);
 
 							if(idx === 0){
-								paas.id = value.id;
+								firstVMId = value.id;
 								document.getElementById('paasTopTitle').innerHTML = value.name;
 							};
 						});
 						
 						// Set paas Top Process 
-						fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/'+paas.id+'/memory?id=' + paas.id, paas.paasTopProcess );
+						fnComm.loadData('GET', fnComm.url+'paas/paasta/topprocess/'+firstVMId+'/memory', paas.paasTopProcess );
 						
 						// Button Event (Process, Chart, Log)
 						var elm = document.querySelectorAll('.summaryBtn');
@@ -365,7 +368,7 @@
 								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
 								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 
-								fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/' + elmID + '/memory?id=' + paas.id, paas.paasTopProcess );
+								fnComm.loadData('GET', fnComm.url + 'paas/paasta/topprocess/' + elmID + '/memory', paas.paasTopProcess );
 								document.getElementById('paasTopTitle').innerHTML = elmName;
 							}, false);
 
@@ -374,7 +377,7 @@
 								var elmID = e.target.parentNode.parentNode.getAttribute('data-id');
 								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 								document.querySelector('.chartTitle').innerHTML = elmName;
-								paas.chartView(elmID);
+								paas.openChartViewer(elmID);
 							}, false);
 
 							// Log Event
@@ -382,51 +385,41 @@
 								paas.logId = e.target.parentNode.parentNode.getAttribute('data-id');
 								var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 								document.querySelector('.chartTitle').innerHTML = elmName;
-
-								paas.logView();
+								paas.openLogViewer();
 							}, false);
-						};
+						}
 						
 						// Chart Close Event
 						document.querySelector('.chartClosed').addEventListener('click', (e) => {
-							document.getElementById('chartWrap').classList.toggle('on', false);
+							paas.resetLogViewerComponent();
+							paas.closeLogViewer();
 						}, false);
 						
 						// LOG Reset Event
 						document.querySelector('.reset').addEventListener('click', (e) => {
-							// 오늘 날짜
-							var today = new Date();
-							var dd = today.getDate();
-							var mm = today.getMonth()+1;
-							var yyyy = today.getFullYear();
-
-							if(dd < 10) dd='0'+dd;
-							if(mm < 10) mm='0'+mm;
-
-							// LOG 검색 Default set
-							document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
-
-							var hh = today.getHours();
-							var hs = today.getHours()-1;
-							var nn = today.getMinutes();
-							var ss = today.getSeconds();
-
-							if(hh < 10) hh='0'+hh;
-							if(hs < 10) hs='0'+hs;
-							if(nn < 10) nn='0'+nn;
-							if(ss < 10) ss='0'+ss;
-
-							document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
-							document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
-							document.getElementById('message').value = '';
+							paas.resetLogViewerComponent();
 						}, false);
 						
 						// LOG Search Event
-						document.querySelector('.logSearch').addEventListener('click', (e) => {
-							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000&period=5m&startTime=${document.getElementById('sTime').value}&endTime=${document.getElementById('eTime').value}&targetDate=${document.getElementById('date').value}`;
-						
+						document.getElementById('btnSearchLog').addEventListener('click', (e) => {
+							paas.loader.style.display = "flex";
+
+							var startDateTime = new Date(document.getElementById('date').value + " " + document.getElementById('sTime').value);
+							var endDateTime = new Date(document.getElementById('date').value + " " + document.getElementById('eTime').value);
+							if (startDateTime > endDateTime) {
+								alert("검색할 시작시간이 종료시간보다 큽니다.");
+								paas.loader.style.display = "none";
+								return;
+							}
+
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=1000
+								&startTime=${document.getElementById('sTime').value}
+								&endTime=${document.getElementById('eTime').value}
+								&targetDate=${document.getElementById('date').value}
+								&keyword=${document.getElementById('message').value}`;
+
 							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/specific${logParameter}`, paas.detailLog);
+							fnComm.loadData('GET', `${fnComm.url}paas/log${logParameter}`, paas.renderDetailLog);
 						}, false);
 					},
 	
@@ -471,7 +464,7 @@
 						});
 					},
 
-					chartView(elmID) {
+					openChartViewer(elmID) {
 						document.getElementById('chartWrap').classList.toggle('on', true);
 						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', true);
 
@@ -505,37 +498,84 @@
 						},500);
 					},
 
-					logView() {
+					openLogViewer() {
 						document.getElementById('chartWrap').classList.toggle('on', true);
 						document.getElementById('chartWrap').querySelector('.chart').classList.toggle('on', false);
+						fnComm.removeHtml(document.querySelector('.preText'));
 
+						paas.loader.style.display = "flex";
 						setTimeout(() => {
-							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=5m`;
+							var logParameter = `?id=${paas.logId}&logType=cf&pageIndex=1&pageItems=100&period=10s`;
 						
 							// Log 리스트
-							fnComm.loadData('GET', `${fnComm.url}paas/log/recent${logParameter}`, paas.detailLog);
-						},500);
+							fnComm.loadData('GET', `${fnComm.url}paas/log${logParameter}`, paas.renderDetailLog);
+						},1500);
 					},
 
-					detailLog(data){
-						if(data.messages !=  null){
-							var target = document.querySelector('.preText');
-	
-							fnComm.removeHtml(target);
-							
-							data.messages.forEach((value)=>{
-								var html = `<li>${value.time}<br>${value.message}</li>`;
+					closeLogViewer() {
+						document.getElementById('chartWrap').classList.toggle('on', false);
+					},
 
-								fnComm.appendHtml(target, html, 'ul');
-							});
+					resetLogViewerComponent() {
+						// 오늘 날짜
+						var today = new Date();
+						var dd = today.getDate();
+						var mm = today.getMonth()+1;
+						var yyyy = today.getFullYear();
+
+						if(dd < 10) dd='0'+dd;
+						if(mm < 10) mm='0'+mm;
+
+						// LOG 검색 Default set
+						document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+						var hh = today.getHours();
+						var hs = today.getHours()-1;
+						var nn = today.getMinutes();
+						var ss = today.getSeconds();
+
+						if(hh < 10) hh='0'+hh;
+						if(hs < 10) hs='0'+hs;
+						if(nn < 10) nn='0'+nn;
+						if(ss < 10) ss='0'+ss;
+
+						document.getElementById('sTime').value = `${hs}:${nn}:${ss}`;
+						document.getElementById('eTime').value = `${hh}:${nn}:${ss}`;
+						document.getElementById('message').value = '';
+					},
+
+					renderDetailLog(data){
+						var target = document.querySelector('.preText');
+						fnComm.removeHtml(target);
+						if (typeof data.Results != "undefined") {
+							var resultList = data.Results[0];
+							if (resultList.Series != null) {
+								data.Results[0].Series[0].values.forEach((value)=>{
+									console.log(value);
+									var html = `<li>${value[0]}<br>${value[5]}</li>`;
+
+									fnComm.appendHtml(target, html, 'ul');
+								});
+								paas.loader.style.display = "none";
+							} else {
+								document.querySelector('.preText').innerHTML = 'No Log'
+								paas.loader.style.display = "none";
+							}
 						} else {
 							document.querySelector('.preText').innerHTML = 'No Log'
-						};
-					},
+							paas.loader.style.display = "none";
+						}
+
+					}
 				}
 	
 				paas.init();
 			};
 		</script>
+
+		<div id="loadWrap">
+			<div class="loader"></div>
+		</div>
+
 	</body>
 </html>
