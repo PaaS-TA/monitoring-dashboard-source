@@ -3,6 +3,7 @@ package v1
 import (
     "GoEchoProject/apiHelpers"
     "GoEchoProject/connections"
+    "GoEchoProject/helpers"
     "GoEchoProject/models"
     v1service "GoEchoProject/services/api/v1"
     "github.com/go-redis/redis/v7"
@@ -24,15 +25,15 @@ func GetTokenController(conn connections.Connections) *TokenController {
 }
 
 func (a *TokenController) CreateToken(c echo.Context) (err error) {
-
-    /* Request Body Data를 매핑한다. */
-    var apiRequest models.UserInfo // -> &추가
-    if err = c.Bind(&apiRequest); err != nil {
-        return echo.NewHTTPError(http.StatusBadRequest, "Invalid json provided")
+    var userRequest models.UserInfo                         // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
+    err = helpers.BindRequestAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
+    if err != nil {
+        apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+        return err
     }
 
     // Authentication의 CreateToken 발급을 호출한다.
-    tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateToken(apiRequest, c)
+    tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateToken(userRequest, c)
     if err != nil {
         apiHelpers.Respond(c, http.StatusBadRequest, "Cannot create token", err.Error())
         return err
@@ -44,15 +45,15 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 }
 
 func (a *TokenController) RefreshToken(c echo.Context) (err error) {
-
-    /* Request Body Data를 매핑한다.  */
-    var apiRequest models.TokenDetails // -> &추가
-    if err = c.Bind(&apiRequest); err != nil {
-        return echo.NewHTTPError(http.StatusBadRequest, "Invalid json provided")
+    var userRequest models.TokenDetails                     // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
+    err = helpers.BindRequestAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
+    if err != nil {
+        apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+        return err
     }
 
     // Authentication의 RefreshToken 발급을 호출한다.
-    tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).RefreshToken(apiRequest, c)
+    tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).RefreshToken(userRequest, c)
     if err != nil {
         apiHelpers.Respond(c, http.StatusBadRequest, "Cannot refresh token", err.Error())
         return err
