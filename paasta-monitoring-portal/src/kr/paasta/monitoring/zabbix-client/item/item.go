@@ -25,8 +25,8 @@ func GetItemList(session *zabbix.Session, params map[string]interface{}) ([]zabb
 	var itemParams zabbix.ItemGetParams
 
 	// 2021.10.25 - Host의 IP 정보도 가져올 수 있도록 추가함
-	//itemParams.SelectInterfaces = zabbix.SelectFields{"ip"}
-	itemParams.OutputFields = zabbix.SelectFields{"ip"}
+	itemParams.SelectInterfaces = zabbix.SelectFields{"ip"}
+	//itemParams.OutputFields = zabbix.SelectFields{"ip"}
 
 	filterMap := make(map[string]interface{}, 0)
 	searchMap := make(map[string]interface{}, 0)
