@@ -1,7 +1,5 @@
 package util
 
-
-
 import (
 	"time"
 	"net"

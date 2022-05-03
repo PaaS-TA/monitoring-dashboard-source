@@ -7,11 +7,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jinzhu/gorm"
-	md "kr/paasta/monitoring-batch/model"
+	md "monitoring-batch/model"
 	"net/http"
 	"os"
 	//"github.com/cloudfoundry-community/go-cfclient"
-	"kr/paasta/monitoring-batch/util"
+	"monitoring-batch/util"
 	"sync"
 	//"github.com/cloudfoundry-community/go-cfclient"
 )

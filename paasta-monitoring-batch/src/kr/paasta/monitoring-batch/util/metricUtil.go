@@ -3,7 +3,7 @@ package util
 import (
 	"encoding/json"
 	client "github.com/influxdata/influxdb/client/v2"
-	cb "kr/paasta/monitoring-batch/model/base"
+	cb "monitoring-batch/model/base"
 	"reflect"
 	"strconv"
 	"time"

@@ -1,16 +1,16 @@
 package service
 
 import (
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
+	"monitoring-batch/dao"
+	"monitoring-batch/model"
+	"monitoring-batch/model/base"
+	"monitoring-batch/util"
 	"fmt"
 	"reflect"
 	"time"
 	"strconv"
 	"sync"
-	sender "kr/paasta/monitoring-batch/alarm"
+	sender "monitoring-batch/alarm"
 )
 
 type PortalAppAlarmStruct struct {
