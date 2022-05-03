@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	commonModel "kr/paasta/monitoring/common/model"
+	commonModel "monitoring-portal/common/model"
 	"os"
 	"strings"
 )

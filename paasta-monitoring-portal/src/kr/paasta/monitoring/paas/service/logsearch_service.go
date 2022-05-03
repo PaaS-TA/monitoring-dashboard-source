@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/paas/dao"
-	"kr/paasta/monitoring/paas/model"
+	"monitoring-portal/paas/dao"
+	"monitoring-portal/paas/model"
 	"time"
 )
 

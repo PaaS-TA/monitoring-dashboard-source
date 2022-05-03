@@ -3,8 +3,8 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/cavaliercoder/go-zabbix"
-	commonModel "kr/paasta/monitoring/common/model"
+	commonModel "monitoring-portal/common/model"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"net"
 	"net/http"
 	"os"
@@ -20,12 +20,12 @@ import (
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 
-	"kr/paasta/monitoring/common/config"
-	"kr/paasta/monitoring/handlers"
-	"kr/paasta/monitoring/iaas_new"
-	"kr/paasta/monitoring/iaas_new/model"
-	bm "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/common/config"
+	"monitoring-portal/handlers"
+	"monitoring-portal/iaas_new"
+	"monitoring-portal/iaas_new/model"
+	bm "monitoring-portal/paas/model"
+	"monitoring-portal/utils"
 )
 
 type Config map[string]string
@@ -115,7 +115,6 @@ func main() {
 	// TODO IaaS Connection Info
 	iaasClient := iaas_new.IaasClient{}
 
-
 	var iaasDbAccessObj *gorm.DB
 	var iaaSInfluxServerClient client.Client
 	var iaasElasticClient *elasticsearch.Client
@@ -133,8 +132,6 @@ func main() {
 		*/
 
 		iaasDbAccessObj, iaaSInfluxServerClient, iaasElasticClient, openstackProvider, zabbixSession, err = getIaasClent(configMap)
-
-
 
 	}
 

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
-	"kr/paasta/monitoring/caas/model"
-	"kr/paasta/monitoring/caas/service"
-	"kr/paasta/monitoring/caas/util"
+	"monitoring-portal/caas/model"
+	"monitoring-portal/caas/service"
+	"monitoring-portal/caas/util"
 	"net/http"
 	"strconv"
 )

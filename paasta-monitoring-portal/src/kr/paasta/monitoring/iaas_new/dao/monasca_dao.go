@@ -2,8 +2,8 @@ package dao
 
 import (
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/iaas_new/model"
-	pm "kr/paasta/monitoring/paas/model"
+	"monitoring-portal/iaas_new/model"
+	pm "monitoring-portal/paas/model"
 )
 
 type MonascaDao struct {

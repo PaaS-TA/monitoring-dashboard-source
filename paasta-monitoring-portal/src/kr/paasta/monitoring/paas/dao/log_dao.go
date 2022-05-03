@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	/*"gopkg.in/olivere/elastic.v3"*/
-	iaasmodel "kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/paas/model"
 	"math"
+	/*"gopkg.in/olivere/elastic.v3"*/
+	iaasmodel "monitoring-portal/iaas_new/model"
+	"monitoring-portal/paas/model"
 	"strings"
 	"time"
 

@@ -5,8 +5,8 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/utils"
 )
 
 type Keystone struct {

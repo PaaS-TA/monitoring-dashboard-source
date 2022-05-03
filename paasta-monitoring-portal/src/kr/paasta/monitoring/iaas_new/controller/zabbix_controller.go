@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"github.com/cavaliercoder/go-zabbix"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/iaas_new/service"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/iaas_new/service"
+	"monitoring-portal/utils"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"net/http"
 )
 

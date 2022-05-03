@@ -10,11 +10,11 @@ import (
 	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
-	cm "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/common/service"
-	"kr/paasta/monitoring/iaas_new/model"
-	pm "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/utils"
+	cm "monitoring-portal/common/model"
+	"monitoring-portal/common/service"
+	"monitoring-portal/iaas_new/model"
+	pm "monitoring-portal/paas/model"
+	"monitoring-portal/utils"
 	"net/http"
 )
 

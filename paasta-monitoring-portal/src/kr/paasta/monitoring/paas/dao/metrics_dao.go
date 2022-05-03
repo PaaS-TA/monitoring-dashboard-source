@@ -3,8 +3,8 @@ package dao
 import (
 	"fmt"
 	"github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/util"
 )
 
 type serverDtvMetricStruct struct {

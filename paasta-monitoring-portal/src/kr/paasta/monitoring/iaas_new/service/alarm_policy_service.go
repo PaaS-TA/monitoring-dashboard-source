@@ -3,9 +3,9 @@ package service
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/iaas_new/dao"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/dao"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/utils"
 )
 
 type AlarmPolicyService struct {

@@ -2,9 +2,9 @@ package controller
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/iaas_new/service"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/iaas_new/service"
+	"monitoring-portal/utils"
 	"net/http"
 )
 

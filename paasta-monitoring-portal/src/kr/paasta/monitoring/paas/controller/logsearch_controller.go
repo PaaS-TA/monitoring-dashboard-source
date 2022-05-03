@@ -2,10 +2,10 @@ package controller
 
 import (
 	"github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/service"
-	"kr/paasta/monitoring/paas/util"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/service"
+	"monitoring-portal/paas/util"
+	"monitoring-portal/utils"
 	"net/http"
 )
 
