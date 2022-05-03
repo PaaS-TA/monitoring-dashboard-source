@@ -1,7 +1,7 @@
 package v1
 
 import (
-	models "GoEchoProject/models"
+	models "GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"

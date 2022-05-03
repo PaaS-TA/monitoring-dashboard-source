@@ -1,7 +1,7 @@
 package v1service
 
 import (
-	"GoEchoProject/models"
+	"GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
@@ -20,7 +20,7 @@ func GetUserService(txn *gorm.DB) *UserService {
 	}
 }
 
-func (h *UserService) GetUsers(apiRequest models.UserInfo, c echo.Context) ([]models.UserInfo, error) {
+func (h *UserService) GetUsers(apiRequest v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
 	users, err := dao.GetUserDao(h.txn).GetUsers(apiRequest, c)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -29,7 +29,7 @@ func (h *UserService) GetUsers(apiRequest models.UserInfo, c echo.Context) ([]mo
 	return users, nil
 }
 
-func (h *UserService) GetUser(apiRequest models.UserInfo, c echo.Context) ([]models.UserInfo, error) {
+func (h *UserService) GetUser(apiRequest v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
 	users, err := dao.GetUserDao(h.txn).GetUser(apiRequest, c)
 	if err != nil {
 		fmt.Println(err.Error())
