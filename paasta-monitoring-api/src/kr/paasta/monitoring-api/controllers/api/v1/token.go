@@ -35,7 +35,7 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 	// Authentication의 CreateToken 발급을 호출한다.
 	tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateToken(userRequest, c)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusBadRequest, "Cannot create token", err.Error())
+		apiHelpers.Respond(c, http.StatusInternalServerError, "Cannot create token", err.Error())
 		return err
 	}
 

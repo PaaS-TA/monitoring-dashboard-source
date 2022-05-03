@@ -1,7 +1,6 @@
 package connections
 
 import (
-	"GoEchoProject/apiHelpers"
 	"GoEchoProject/helpers"
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
@@ -38,20 +37,20 @@ func RedisConnection(env map[string]string) *redis.Client {
 	if len(dsn) == 0 {
 		dsn = "localhost:6379"
 	}
-	client := redis.NewClient(&redis.Options{
+	redisClient := redis.NewClient(&redis.Options{
 		Addr: dsn, //redis port
 	})
-	_, err := client.Ping().Result()
+	_, err := redisClient.Ping().Result()
 	if err != nil {
-		apiHelpers.InternalErrMessage(err)
+		panic(err)
 	}
-	return client
+	return redisClient
 }
 
 func PaaSConnection(env map[string]string) *gorm.DB {
 
 	// DB 설정
-	paasConnectionObj, paasConnectionErr := gorm.Open(
+	paasDBClient, paasDBErr := gorm.Open(
 		helpers.GetDBConnectionString(
 			env["paas_db_type"],
 			env["paas_db_username"],
@@ -64,11 +63,11 @@ func PaaSConnection(env map[string]string) *gorm.DB {
 			env["paas_db_parseTime"]),
 	)
 
-	if paasConnectionErr != nil {
-		apiHelpers.InternalErrMessage(paasConnectionErr)
+	if paasDBErr != nil {
+		panic(paasDBErr)
 	}
 
-	return paasConnectionObj
+	return paasDBClient
 }
 
 func SaaSConnection(env map[string]string) error {
