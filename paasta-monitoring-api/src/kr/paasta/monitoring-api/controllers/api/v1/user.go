@@ -3,6 +3,7 @@ package v1
 import (
 	"GoEchoProject/apiHelpers"
 	"GoEchoProject/connections"
+	"GoEchoProject/helpers"
 	"GoEchoProject/models/api/v1"
 	v1service "GoEchoProject/services/api/v1"
 	"github.com/jinzhu/gorm"
@@ -21,19 +22,18 @@ func GetUserController(conn connections.Connections) *UserController {
 }
 
 func (a *UserController) GetUsers(c echo.Context) (err error) {
-	/* Request Body Data Mapping */
-	var apiRequest v1.UserInfo // -> &추가
-	//apiRequest := new(models.UserInfo) // &제거
-	if err = c.Bind(&apiRequest); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
-		return nil
+	var apiRequest v1.UserInfo
+	err = helpers.BindRequestAndCheckValid(c, &apiRequest)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", nil)
+		return err
 	}
 
 	// User의 GetUsers를 호출한다.
 	users, err := v1service.GetUserService(a.DbInfo).GetUsers(apiRequest, c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, err.Error())
-		return nil
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
 	}
 
 	// 사용자 정보를 전달한다.
