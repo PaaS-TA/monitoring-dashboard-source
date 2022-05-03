@@ -205,7 +205,9 @@ const fnComm = {
 	/////////////////////////////////////////////////////////////////////////////////////
 	loadData(method, url, callbackFunction, list){
 		if(sessionStorage.getItem('token') == null){
-			document.location.href = '../login.html';
+			console.log("token expired..");
+			document.location.href = '../public/login.html';
+			return;
 		}
 		var request = new XMLHttpRequest();
 		request.open(method, url);
