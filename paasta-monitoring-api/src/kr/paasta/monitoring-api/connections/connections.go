@@ -3,6 +3,7 @@ package connections
 import (
 	"GoEchoProject/helpers"
 	"github.com/go-redis/redis/v7"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"os"
 	"strings"

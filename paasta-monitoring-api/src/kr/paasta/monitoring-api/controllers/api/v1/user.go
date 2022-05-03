@@ -3,7 +3,6 @@ package v1
 import (
 	"GoEchoProject/apiHelpers"
 	"GoEchoProject/connections"
-	"GoEchoProject/helpers"
 	"GoEchoProject/models/api/v1"
 	v1service "GoEchoProject/services/api/v1"
 	"github.com/jinzhu/gorm"
@@ -23,8 +22,7 @@ func GetUserController(conn connections.Connections) *UserController {
 
 func (a *UserController) GetUsers(c echo.Context) (err error) {
 	var apiRequest v1.UserInfo
-	err = helpers.BindRequestAndCheckValid(c, &apiRequest)
-	if err != nil {
+	if err = c.Bind(&apiRequest); err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", nil)
 		return err
 	}

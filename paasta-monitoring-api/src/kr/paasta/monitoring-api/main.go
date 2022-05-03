@@ -3,11 +3,19 @@ package main
 import (
 	Connections "GoEchoProject/connections"
 	Routers "GoEchoProject/routers"
+	"github.com/joho/godotenv"
+	"log"
 	"os"
 )
 
 //Execution starts from main function
 func main() {
+
+	// .env 파일 로드
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	// connection 설정 (DB & API etc..)
 	c := Connections.SetupConnection()
