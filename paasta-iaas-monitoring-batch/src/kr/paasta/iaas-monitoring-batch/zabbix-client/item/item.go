@@ -2,8 +2,8 @@ package item
 
 import (
 	"fmt"
-	"monitoring-portal/utils"
-	"monitoring-portal/zabbix-client/lib/go-zabbix"
+	"iaas-monitoring-batch/zabbix-client/lib/go-zabbix"
+	"log"
 )
 
 var isDebug bool
@@ -26,7 +26,7 @@ func GetItemList(session *zabbix.Session, params map[string]interface{}) ([]zabb
 
 	// 2021.10.25 - Host의 IP 정보도 가져올 수 있도록 추가함
 	itemParams.SelectInterfaces = zabbix.SelectFields{"ip"}
-
+	
 	filterMap := make(map[string]interface{}, 0)
 	searchMap := make(map[string]interface{}, 0)
 
@@ -55,7 +55,7 @@ func GetItemList(session *zabbix.Session, params map[string]interface{}) ([]zabb
 
 	result, err := session.GetItems(itemParams)
 	if err != nil {
-		utils.Logger.Errorf("%v\n", err)
+		log.Fatalf("%v\n", err)
 		return nil, err
 	}
 	//utils.PrintJson(result)

@@ -1,7 +1,7 @@
 package util
 
 import (
-	cb "kr/paasta/iaas-monitoring-batch/model/base"
+	cb "iaas-monitoring-batch/model/base"
 )
 
 const (

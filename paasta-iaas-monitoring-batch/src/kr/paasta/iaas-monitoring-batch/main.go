@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"kr/paasta/iaas-monitoring-batch/config"
 	"log"
 	"os"
 	"os/signal"
@@ -10,10 +9,10 @@ import (
 	"strconv"
 	"syscall"
 	"time"
-
 	"github.com/tedsuo/ifrit"
-	"github.com/tedsuo/ifrit/grouper"
 	"github.com/tedsuo/ifrit/sigmon"
+	"github.com/tedsuo/ifrit/grouper"
+	"iaas-monitoring-batch/config"
 )
 
 func main() {
