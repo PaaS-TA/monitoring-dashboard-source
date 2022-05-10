@@ -8,8 +8,8 @@ import (
 
 	//"net/smtp"
 	"gopkg.in/gomail.v2"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
+	"caas-monitoring-batch/model"
+	"caas-monitoring-batch/util"
 	"os"
 )
 

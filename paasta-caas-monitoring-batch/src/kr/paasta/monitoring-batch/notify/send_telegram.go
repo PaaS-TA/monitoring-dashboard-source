@@ -3,7 +3,7 @@ package notify
 import (
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"kr/paasta/monitoring-batch/util"
+	"caas-monitoring-batch/util"
 	"log"
 	"os"
 )

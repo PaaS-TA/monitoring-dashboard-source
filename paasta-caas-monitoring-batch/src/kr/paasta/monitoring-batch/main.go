@@ -1,10 +1,10 @@
 package main
 
 import (
+	"caas-monitoring-batch/caas"
+	"caas-monitoring-batch/dao"
+	"caas-monitoring-batch/util"
 	_ "github.com/go-sql-driver/mysql"
-	"kr/paasta/monitoring-batch/caas"
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
 	"sync"

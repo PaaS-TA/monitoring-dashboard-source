@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"flag"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"monitoring-portal/paas/dao"
@@ -30,6 +31,7 @@ func GetBoshStatusService(txn *gorm.DB, influxClient client.Client, databases mo
 }
 
 func (n BoshStatusService) GetBoshStatusOverview(request model.BoshSummaryReq) (model.BoshOverviewCntRes, model.ErrMessage) {
+	flag.String()
 	boshSummary, err := GetBoshStatusService(n.txn, n.influxClient, n.databases).getBoshStatus(request)
 	if err != nil {
 		//log.Println(err)
