@@ -6,11 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"caas-monitoring-batch/config"
+	"caas-monitoring-batch/model"
 	//"net/smtp"
 	"gopkg.in/gomail.v2"
-	"caas-monitoring-batch/model"
-	"caas-monitoring-batch/util"
-	"os"
 )
 
 var sender string
@@ -19,21 +18,8 @@ var dialer *gomail.Dialer
 
 //var message *gomail.Message
 func init() {
-	config, err := util.ReadConfig("config.ini")
-	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
-	}
-
-	smtpHost := config["mail.smtp.host"]
-	smtpPort, _ := strconv.Atoi(config["mail.smtp.port"])
-	username := config["mail.sender"]
-	password := config["mail.sender.password"]
-	sender = config["mail.sender"]
-	resourceUrl = config["mail.resource.url"]
-
-	dialer = gomail.NewDialer(smtpHost, smtpPort, username, password)
-
+	config := config.GetConfiguration()
+	dialer = gomail.NewDialer(config.SmtpHost, config.SmtpPort, config.Sender, config.SenderPw)
 }
 
 func SendMail(serviceType string, receivers []string, mailContent model.MailContent) {
