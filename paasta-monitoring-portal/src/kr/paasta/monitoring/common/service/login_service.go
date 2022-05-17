@@ -2,21 +2,21 @@ package services
 
 import (
 	"fmt"
-	"strings"
 	"time"
+	"strings"
 
 	//"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/jinzhu/gorm"
 	"github.com/go-redis/redis"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
-	"github.com/jinzhu/gorm"
 
-	"kr/paasta/monitoring/common/dao"
-	commonModel "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/iaas_new/integration"
-	"kr/paasta/monitoring/iaas_new/model"
-	paasModel "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/utils"
+	"monitoring-portal/common/dao"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/iaas_new/integration"
+	paasModel "monitoring-portal/paas/model"
+	commonModel "monitoring-portal/common/model"
 )
 
 type LoginService struct {
@@ -86,7 +86,7 @@ func (n *LoginService) Login(req commonModel.UserInfo, reqCsrfToken string, cfCo
 				//return req, provider, err
 			} else {
 				result.IaasToken = provider.TokenID
-				//fmt.Println("iaas token ::: ", result.IaasToken )
+				fmt.Println("iaas token ::: ", result.IaasToken )
 			}
 
 			utils.Logger.Debugf("req.Token(CSRF_TOKEN) : %v\n", req.Token)

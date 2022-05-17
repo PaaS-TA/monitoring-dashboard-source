@@ -61,5 +61,6 @@ type (
 		BoshDatabase      string
 		PaastaDatabase    string
 		ContainerDatabase string
+		LoggingDatabase string
 	}
 )

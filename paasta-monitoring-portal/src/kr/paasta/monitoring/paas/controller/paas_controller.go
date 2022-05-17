@@ -4,9 +4,9 @@ import (
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/service"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/service"
+	"monitoring-portal/paas/util"
 	"net/http"
 	"strconv"
 )
@@ -88,17 +88,7 @@ func (p *PaasController) GetPaasSummary(w http.ResponseWriter, r *http.Request) 
 }
 
 func (p *PaasController) GetPaasTopProcessMemory(w http.ResponseWriter, r *http.Request) {
-
 	var apiRequest model.PaasRequest
-
-	apiRequest.Origin = r.FormValue(":origin")
-	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
-	apiRequest.ServiceName = r.URL.Query().Get("serviceName")
-	apiRequest.Index = r.URL.Query().Get("index")
-	apiRequest.Addr = r.URL.Query().Get("addr")
-	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
-	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 	apiRequest.Id = r.FormValue(":id")
 
 	result, err := service.GetPaasService(p.txn, p.influxClient, p.databases, p.boshClient).GetPaasTopProcessMemory(apiRequest)
@@ -110,21 +100,16 @@ func (p *PaasController) GetPaasTopProcessMemory(w http.ResponseWriter, r *http.
 }
 
 func (p *PaasController) GetPaasCpuUsage(w http.ResponseWriter, r *http.Request) {
-
 	var result interface{}
 	var apiRequest model.PaasRequest
 
-	//fmt.Println("request=", r)
-
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
-	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")
-	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")
+	apiRequest.TimeRangeFrom = r.URL.Query().Get("timeRangeFrom")  // may be deprecated..
+	apiRequest.TimeRangeTo = r.URL.Query().Get("timeRangeTo")  // may be deprecated..
 	apiRequest.GroupBy = r.URL.Query().Get("groupBy")
 	apiRequest.Args = []model.MetricArg{{model.METRIC_NAME_CPU_CORE_PREFIX, model.ALARM_TYPE_CPU}}
 	apiRequest.IsLikeQuery = true
-
-	//fmt.Println("apiRequest=", apiRequest)
 
 	result, err := service.GetPaasService(p.txn, p.influxClient, p.databases, p.boshClient).GetPaasMetricStats(apiRequest)
 	if err != nil {
@@ -134,11 +119,8 @@ func (p *PaasController) GetPaasCpuUsage(w http.ResponseWriter, r *http.Request)
 }
 
 func (p *PaasController) GetPaasCpuLoad(w http.ResponseWriter, r *http.Request) {
-
 	var result interface{}
 	var apiRequest model.PaasRequest
-
-	//fmt.Println("request=", r)
 
 	apiRequest.Id = r.FormValue(":id")
 	apiRequest.DefaultTimeRange = r.URL.Query().Get("defaultTimeRange")
@@ -150,8 +132,6 @@ func (p *PaasController) GetPaasCpuLoad(w http.ResponseWriter, r *http.Request) 
 		{model.METRIC_NAME_CPU_LOAD_AVG_05_MIN, "5m"},
 		{model.METRIC_NAME_CPU_LOAD_AVG_15_MIN, "15m"}}
 
-	//fmt.Println("apiRequest=", apiRequest)
-
 	result, err := service.GetPaasService(p.txn, p.influxClient, p.databases, p.boshClient).GetPaasMetricStats(apiRequest)
 	if err != nil {
 		util.RenderJsonResponse(err, w)
@@ -161,7 +141,6 @@ func (p *PaasController) GetPaasCpuLoad(w http.ResponseWriter, r *http.Request) 
 }
 
 func (p *PaasController) GetPaasMemoryUsage(w http.ResponseWriter, r *http.Request) {
-
 	var result interface{}
 	var apiRequest model.PaasRequest
 	apiRequest.Id = r.FormValue(":id")

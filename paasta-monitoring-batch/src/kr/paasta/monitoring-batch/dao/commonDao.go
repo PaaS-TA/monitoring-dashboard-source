@@ -2,12 +2,13 @@ package dao
 
 import (
 	"fmt"
-	client "github.com/influxdata/influxdb/client/v2"
-	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/model"
-	cb "kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
 	"time"
+	"github.com/jinzhu/gorm"
+	client "github.com/influxdata/influxdb/client/v2"
+
+	"monitoring-batch/util"
+	"monitoring-batch/model"
+	cb "monitoring-batch/model/base"
 )
 
 type commonStruct struct {

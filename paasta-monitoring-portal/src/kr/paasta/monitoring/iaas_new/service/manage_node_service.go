@@ -1,12 +1,12 @@
 package service
 
 import (
-	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/gophercloud/gophercloud"
-	"kr/paasta/monitoring/iaas_new/dao"
-	"kr/paasta/monitoring/iaas_new/integration"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/utils"
+	client "github.com/influxdata/influxdb1-client/v2"
+	"monitoring-portal/iaas_new/dao"
+	"monitoring-portal/iaas_new/integration"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/utils"
 	"reflect"
 	"sort"
 	"strings"

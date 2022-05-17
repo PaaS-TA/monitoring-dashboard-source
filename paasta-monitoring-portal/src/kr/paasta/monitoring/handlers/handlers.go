@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/cavaliercoder/go-zabbix"
 	"io"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"net/http"
 	"strings"
 	"time"
@@ -16,17 +16,17 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/tedsuo/rata"
 
-	caasContoller "kr/paasta/monitoring/caas/controller"
-	"kr/paasta/monitoring/common/controller"
-	iaasContoller "kr/paasta/monitoring/iaas_new/controller"
-	paasContoller "kr/paasta/monitoring/paas/controller"
-	pm "kr/paasta/monitoring/paas/model"
-	saasContoller "kr/paasta/monitoring/saas/controller"
+	caasContoller "monitoring-portal/caas/controller"
+	"monitoring-portal/common/controller"
+	iaasContoller "monitoring-portal/iaas_new/controller"
+	paasContoller "monitoring-portal/paas/controller"
+	pm "monitoring-portal/paas/model"
+	saasContoller "monitoring-portal/saas/controller"
 
-	"kr/paasta/monitoring/routes"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/routes"
+	"monitoring-portal/utils"
 
-	"kr/paasta/monitoring/iaas_new/model"
+	"monitoring-portal/iaas_new/model"
 )
 
 func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
@@ -47,15 +47,6 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	var caasMetricsController *caasContoller.MetricController
 
 	// TODO 2021.11.01 - IAAS 관련 컨트롤러들을 핸들러에 등록
-	mainController := iaasContoller.NewMainController(openstackProvider, iaasInfluxClient)
-	computeController := iaasContoller.NewComputeController(openstackProvider, iaasInfluxClient)
-	manageNodeController := iaasContoller.NewManageNodeController(openstackProvider, iaasInfluxClient)
-	tenantController := iaasContoller.NewOpenstackTenantController(openstackProvider, iaasInfluxClient)
-	//notificationController := iaasContoller.NewNotificationController(monsClient, iaasInfluxClient)
-	//definitionController := iaasContoller.NewAlarmDefinitionController(monsClient, iaasInfluxClient)
-	//stautsController := iaasContoller.NewAlarmStatusController(monsClient, iaasInfluxClient, iaasTxn)
-	logController := iaasContoller.NewLogController(openstackProvider, iaasInfluxClient, iaasElasticClient)
-
 	openstackController := iaasContoller.NewOpenstackController(openstackProvider, iaasInfluxClient)
 	zabbixController := iaasContoller.NewZabbixController(zabbixSession, openstackProvider)
 
@@ -64,44 +55,9 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 
 	var iaasActions rata.Handlers
 	if strings.Contains(sysType, utils.SYS_TYPE_IAAS) || sysType == utils.SYS_TYPE_ALL {
-		//iaasActions = iaasHttp.InitHandler(paasTxn, openstackProvider, iaasInfluxClient, iaasElasticClient)
-
 		iaasActions = rata.Handlers {
 			routes.MEMBER_JOIN_CHECK_DUPLICATION_IAAS_ID: route(memberController.MemberJoinCheckDuplicationIaasId),
 			routes.MEMBER_JOIN_CHECK_IAAS:                route(memberController.MemberCheckIaaS),
-
-			//Integrated with routes
-			routes.IAAS_MAIN_SUMMARY:                  route(mainController.OpenstackSummary),
-			routes.IAAS_NODE_COMPUTE_SUMMARY:          route(computeController.NodeSummary),
-			routes.IAAS_NODES:                         route(manageNodeController.GetNodeList),
-
-			routes.IAAS_NODE_CPU_USAGE_LIST:           route(computeController.GetCpuUsageList),
-			routes.IAAS_NODE_CPU_LOAD_LIST:            route(computeController.GetCpuLoadList),
-			routes.IAAS_NODE_MEMORY_SWAP_LIST:         route(computeController.GetMemorySwapList),
-			routes.IAAS_NODE_MEMORY_USAGE_LIST:        route(computeController.GetMemoryUsageList),
-			routes.IAAS_NODE_DISK_USAGE_LIST:          route(computeController.GetDiskUsageList),
-			routes.IAAS_NODE_DISK_READ_LIST:           route(computeController.GetDiskIoReadList),
-			routes.IAAS_NODE_DISK_WRITE_LIST:          route(computeController.GetDiskIoWriteList),
-			routes.IAAS_NODE_NETWORK_KBYTE_LIST:       route(computeController.GetNetworkInOutKByteList),
-			routes.IAAS_NODE_NETWORK_ERROR_LIST:       route(computeController.GetNetworkInOutErrorList),
-			routes.IAAS_NODE_NETWORK_DROP_PACKET_LIST: route(computeController.GetNetworkDroppedPacketList),
-
-			routes.IAAS_NODE_MANAGE_SUMMARY:            route(manageNodeController.ManageNodeSummary),
-			routes.IAAS_NODE_RABBITMQ_SUMMARY_OVERVIEW: route(manageNodeController.ManageRabbitMqSummary),
-			routes.IAAS_NODE_TOPPROCESS_CPU:            route(manageNodeController.GetTopProcessByCpu),
-			routes.IAAS_NODE_TOPPROCESS_MEMORY:         route(manageNodeController.GetTopProcessByMemory),
-
-			routes.IAAS_TENANT_SUMMARY:             route(tenantController.TenantSummary),
-			routes.IAAS_TENANT_INSTANCE_LIST:       route(tenantController.GetTenantInstanceList),
-			routes.IAAS_TENANT_CPU_USAGE_LIST:      route(tenantController.GetInstanceCpuUsageList),
-			routes.IAAS_TENANT_MEMORY_USAGE_LIST:   route(tenantController.GetInstanceMemoryUsageList),
-			routes.IAAS_TENANT_DISK_READ_LIST:      route(tenantController.GetInstanceDiskReadList),
-			routes.IAAS_TENANT_DISK_WRITE_LIST:     route(tenantController.GetInstanceDiskWriteList),
-			routes.IAAS_TENANT_NETWORK_IO_LIST:     route(tenantController.GetInstanceNetworkIoList),
-			routes.IAAS_TENANT_NETWORK_PACKET_LIST: route(tenantController.GetInstanceNetworkPacketsList),
-
-			routes.IAAS_LOG_RECENT:   route(logController.GetDefaultRecentLog),
-			routes.IAAS_LOG_SPECIFIC: route(logController.GetSpecificTimeRangeLog),
 
 			// TODO 2021.11.01 - IAAS 모니터링 신규 추가
 			routes.IAAS_GET_HYPERVISOR_LIST: route(openstackController.GetHypervisorList),
@@ -117,12 +73,6 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_GET_DISK_IO_RATE: route(zabbixController.GetDiskIORate),
 			routes.IAAS_GET_NETWORK_IO_BTYES: route(zabbixController.GetNetworkIOBytes),
 
-
-			//routes..IAAS_ALARM_NOTIFICATION_LIST:   route(notificationController.GetAlarmNotificationList),
-			//routes..IAAS_ALARM_NOTIFICATION_CREATE: route(notificationController.CreateAlarmNotification),
-			//routes..IAAS_ALARM_NOTIFICATION_UPDATE: route(notificationController.UpdateAlarmNotification),
-			//routes..IAAS_ALARM_NOTIFICATION_DELETE: route(notificationController.DeleteAlarmNotification),
-
 			routes.IAAS_ALARM_POLICY_LIST:   route(iaasAlarmPolicyController.GetAlarmPolicyList),
 			routes.IAAS_ALARM_POLICY_UPDATE: route(iaasAlarmPolicyController.UpdateAlarmPolicyList),
 
@@ -136,52 +86,15 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.IAAS_ALARM_STATUS_RESOLVE: route(iaasAlarmController.GetAlarmResolveStatus),
 			routes.IAAS_ALARM_STATUS_DETAIL:  route(iaasAlarmController.GetAlarmDetail),
 			routes.IAAS_ALARM_STATUS_UPDATE:  route(iaasAlarmController.UpdateAlarm),
-			//routes.IAAS_ALARM_ACTION_CREATE:  route(iaasAlarmController.CreateAlarmAction),
-			//routes.IAAS_ALARM_ACTION_UPDATE:  route(iaasAlarmController.UpdateAlarmAction),
-			//routes.IAAS_ALARM_ACTION_DELETE:  route(iaasAlarmController.DeleteAlarmAction),
+			routes.IAAS_ALARM_ACTION_CREATE:  route(iaasAlarmController.CreateAlarmAction),
+			routes.IAAS_ALARM_ACTION_UPDATE:  route(iaasAlarmController.UpdateAlarmAction),
+			routes.IAAS_ALARM_ACTION_DELETE:  route(iaasAlarmController.DeleteAlarmAction),
 
 			routes.IAAS_ALARM_STATISTICS:               route(iaasAlarmController.GetAlarmStat),
 			routes.IAAS_ALARM_STATISTICS_GRAPH_TOTAL:   route(iaasAlarmController.GetAlarmStatGraphTotal),
 			routes.IAAS_ALARM_STATISTICS_GRAPH_SERVICE: route(iaasAlarmController.GetAlarmStatGraphService),
 			routes.IAAS_ALARM_STATISTICS_GRAPH_MATRIX:  route(iaasAlarmController.GetAlarmStatGraphMatrix),
 
-			//routes.IAAS_ALARM_STATUS_LIST:  route(stautsController.GetAlarmStatusList),
-			//routes.IAAS_ALARM_STATUS:       route(stautsController.GetAlarmStatus),
-			//routes.IAAS_ALARM_HISTORY_LIST: route(stautsController.GetAlarmHistoryList),
-			//routes.iaas.IAAS_ALARM_STATUS_COUNT: route(stautsController.GetAlarmStatusCount),
-
-			//routes.IAAS_ALARM_ACTION_LIST:   route(stautsController.GetAlarmHistoryActionList),
-			//routes.IAAS_ALARM_ACTION_CREATE: route(stautsController.CreateAlarmHistoryAction),
-			//routes.IAAS_ALARM_ACTION_UPDATE: route(stautsController.UpdateAlarmHistoryAction),
-			//routes.IAAS_ALARM_ACTION_DELETE: route(stautsController.DeleteAlarmHistoryAction),
-
-			//routes.IAAS_ALARM_REALTIME_COUNT: route(stautsController.GetIaasAlarmRealTimeCount),
-			//routes.IAAS_ALARM_REALTIME_LIST:  route(stautsController.GetIaasAlarmRealTimeList),
-
-			//routes.IAAS_ALARM_REALTIME_COUNT: route(alarmController.GetPaasAlarmRealTimeCount),
-			//routes.IAAS_ALARM_REALTIME_LIST:  route(alarmController.GetPaasAlarmRealTimeList),
-
-			//routes.IAAS_ALARM_POLICY_LIST:   route(alarmPolicyController.GetAlarmPolicyList),
-			//routes.IAAS_ALARM_POLICY_UPDATE: route(alarmPolicyController.UpdateAlarmPolicyList),
-
-			//routes.IAAS_ALARM_SNS_CHANNEL_LIST:   route(alarmPolicyController.GetAlarmSnsChannelList),
-			//routes.IAAS_ALARM_SNS_CHANNEL_CREATE: route(alarmPolicyController.CreateAlarmSnsChannel),
-			//routes.IAAS_ALARM_SNS_CHANNEL_DELETE: route(alarmPolicyController.DeleteAlarmSnsChannel),
-			//routes.IAAS_ALARM_SNS_CHANNEL_UPDATE: route(alarmPolicyController.UpdateAlarmSnsChannel),  // 2021.05.18 - PaaS 채널 SNS 정보 수정 기능 추가
-
-			//routes.IAAS_ALARM_STATUS_LIST:    route(alarmController.GetAlarmList),
-			//routes.IAAS_ALARM_STATUS_COUNT:   route(alarmController.GetAlarmListCount),
-			//routes.IAAS_ALARM_STATUS_RESOLVE: route(alarmController.GetAlarmResolveStatus),
-			//routes.IAAS_ALARM_STATUS_DETAIL:  route(alarmController.GetAlarmDetail),
-			//routes.IAAS_ALARM_STATUS_UPDATE:  route(alarmController.UpdateAlarm),
-			//routes.IAAS_ALARM_ACTION_CREATE:  route(alarmController.CreateAlarmAction),
-			//routes.IAAS_ALARM_ACTION_UPDATE:  route(alarmController.UpdateAlarmAction),
-			//routes.IAAS_ALARM_ACTION_DELETE:  route(alarmController.DeleteAlarmAction),
-
-			//routes.IAAS_ALARM_STATISTICS:               route(alarmController.GetAlarmStat),
-			//routes.IAAS_ALARM_STATISTICS_GRAPH_TOTAL:   route(alarmController.GetAlarmStatGraphTotal),
-			//routes.IAAS_ALARM_STATISTICS_GRAPH_SERVICE: route(alarmController.GetAlarmStatGraphService),
-			//routes.IAAS_ALARM_STATISTICS_GRAPH_MATRIX:  route(alarmController.GetAlarmStatGraphMatrix),
 		}
 
 
@@ -193,8 +106,10 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	var metricsController *paasContoller.InfluxServerClient
 	var boshStatusController *paasContoller.BoshStatusService
 	var paasController *paasContoller.PaasController
-	var paasLogController *paasContoller.PaasLogController
+	var paasLogController *paasContoller.PaasLogController    // deprecated..
 	var appController *paasContoller.AppController
+
+	var logsearchController *paasContoller.LogsearchController
 
 
 	var paasActions rata.Handlers
@@ -205,8 +120,9 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 		metricsController = paasContoller.GetMetricsController(paasInfluxClient, databases)
 		boshStatusController = paasContoller.GetBoshStatusController(paasTxn, paasInfluxClient, databases)
 		paasController = paasContoller.GetPaasController(paasTxn, paasInfluxClient, databases, boshClient)
-		paasLogController = paasContoller.NewLogController(paasInfluxClient, paasElasticClient)
+		paasLogController = paasContoller.NewLogController(paasInfluxClient, paasElasticClient)    // deprecated..
 		appController = paasContoller.GetAppController(paasTxn)
+		logsearchController = paasContoller.GetLogsearchController(paasInfluxClient, databases)   // 2022.03.04 - 로깅 고도화
 
 		paasActions = rata.Handlers{
 			routes.MEMBER_JOIN_CHECK_DUPLICATION_PAAS_ID: route(memberController.MemberJoinCheckDuplicationPaasId),
@@ -310,11 +226,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.PAAS_CONTAINER_NETWORK_DROP_LIST:  route(containerController.GetPaasContainerNetworkDrops),
 			routes.PAAS_CONTAINER_NETWORK_ERROR_LIST: route(containerController.GetPaasContainerNetworkErrors),
 
-			routes.PAAS_LOG_RECENT:   route(paasLogController.GetDefaultRecentLog),
-			routes.PAAS_LOG_SPECIFIC: route(paasLogController.GetSpecificTimeRangeLog),
-
 			// potal - paas api
-
 			routes.PAAS_APP_CPU_USAGES:     route(metricsController.GetAppCpuUsage),
 			routes.PAAS_APP_MEMORY_USAGES:  route(metricsController.GetAppMemoryUsage),
 			routes.PAAS_APP_NETWORK_USAGES: route(metricsController.GetAppNetworkIoKByte),
@@ -326,6 +238,12 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 			routes.PAAS_APP_ALARM_LIST:                route(appController.GetPaasAppAlarmList),
 			routes.PAAS_APP_POLICY_DELETE:             route(appController.DeletePaasAppPolicy),
 			routes.PAAS_PAAS_ALL_OVERVIEW:             route(paasController.GetPaasAllOverview),
+
+			// 2022.03.04 - 로깅 시스템 교체 건 관련 작업
+			routes.PAAS_LOG_SEARCH: route(logsearchController.GetLogData),   // url : v2/paas/log/recent
+
+			//routes.PAAS_LOG_RECENT:   route(paasLogController.GetDefaultRecentLog),   // deprecated..
+			routes.PAAS_LOG_SPECIFIC: route(paasLogController.GetSpecificTimeRangeLog), // deprecated..
 		}
 	}
 

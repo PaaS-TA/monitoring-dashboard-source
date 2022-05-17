@@ -1,25 +1,25 @@
 package main
 
 import (
+	"caas-monitoring-batch/caas"
+	config2 "caas-monitoring-batch/config"
+	"caas-monitoring-batch/dao"
 	_ "github.com/go-sql-driver/mysql"
-	"kr/paasta/monitoring-batch/caas"
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/util"
+	"github.com/jinzhu/gorm"
 	"log"
-	"os"
 	"sync"
 )
 
 func main() {
-	// 기본적인 프로퍼티 설정 정보 읽어오기
-	config, err := util.ReadConfig(`config.ini`)
+	config := config2.GetConfiguration()
+
+	connectionStr := config2.GetDBConnectionStr()
+	dbConn, err := gorm.Open("mysql", connectionStr)
 	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
+		log.Fatalln("err::", err)
 	}
 
-	dbAccessObj := dao.GetdbAccessObj()
-	dao.CreateTable(dbAccessObj)
+	dao.CreateTable(dbConn)
 
 	// CaaS 스케쥴 실행
 	var waitGroup sync.WaitGroup
@@ -29,7 +29,7 @@ func main() {
 	//	return x.ServiceType == "CaaS"
 	//}).([]model.BatchAlarmInfo)
 
-	caas.Startschedule(dbAccessObj, config["caas.monitoring.api.url"])
+	caas.Startschedule(dbConn, config.CaasApiUrl)
 
 	waitGroup.Wait()
 }

@@ -5,10 +5,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/thoas/go-funk"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
+	"saas-monitoring-batch/model"
+	"saas-monitoring-batch/util"
 	"strconv"
 )
 

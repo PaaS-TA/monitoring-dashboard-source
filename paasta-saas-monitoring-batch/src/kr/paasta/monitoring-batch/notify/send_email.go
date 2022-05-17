@@ -3,10 +3,10 @@ package notify
 import (
 	"fmt"
 	"gopkg.in/gomail.v2"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
+	"saas-monitoring-batch/model"
+	"saas-monitoring-batch/util"
 	"strconv"
 	"strings"
 )

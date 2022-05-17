@@ -6,8 +6,8 @@ import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"io"
-	"kr/paasta/monitoring/paas/model"
 	"log"
+	"monitoring-portal/paas/model"
 	"net/http"
 	"os"
 	"reflect"
@@ -41,7 +41,7 @@ func RenderJsonResponse(data interface{}, w http.ResponseWriter) {
 	}
 
 	js, err := json.Marshal(data)
-	fmt.Println(data)
+	//fmt.Println(data)
 	if err != nil {
 		log.Fatalln("Error writing JSON:", err)
 	}

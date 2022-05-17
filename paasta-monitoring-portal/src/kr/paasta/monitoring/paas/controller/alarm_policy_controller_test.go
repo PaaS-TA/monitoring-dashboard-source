@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"kr/paasta/monitoring/paas/model"
+	"monitoring-portal/paas/model"
 	"net/http"
-	//"github.com/monasca/golang-monascaclient/monascaclient/models"
 	. "github.com/onsi/ginkgo"
 	"strings"
 )

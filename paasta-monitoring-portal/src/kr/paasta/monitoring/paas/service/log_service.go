@@ -2,9 +2,9 @@ package service
 
 import (
 	/*"gopkg.in/olivere/elastic.v3"*/
-	iaasmodel "kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/paas/dao"
-	"kr/paasta/monitoring/paas/model"
+	iaasmodel "monitoring-portal/iaas_new/model"
+	"monitoring-portal/paas/dao"
+	"monitoring-portal/paas/model"
 
 	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )

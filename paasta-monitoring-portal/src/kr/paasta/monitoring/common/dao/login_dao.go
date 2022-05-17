@@ -2,8 +2,8 @@ package dao
 
 import (
 	"github.com/jinzhu/gorm"
-	cm "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/utils"
+	cm "monitoring-portal/common/model"
+	"monitoring-portal/utils"
 	//"strconv"
 )
 

@@ -2,16 +2,16 @@ package service
 
 import (
 	"fmt"
-	"github.com/cavaliercoder/go-zabbix"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/utils"
+	"monitoring-portal/zabbix-client/common"
+	"monitoring-portal/zabbix-client/history"
+	"monitoring-portal/zabbix-client/host"
+	"monitoring-portal/zabbix-client/item"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"net/http"
 	"strconv"
-	"zabbix-client/common"
-	"zabbix-client/history"
-	"zabbix-client/host"
-	"zabbix-client/item"
 )
 
 type ZabbixService struct {

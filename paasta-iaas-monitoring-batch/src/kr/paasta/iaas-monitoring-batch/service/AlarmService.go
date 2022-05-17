@@ -5,8 +5,8 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
-	"kr/paasta/iaas-monitoring-batch/config"
-	"kr/paasta/iaas-monitoring-batch/model/base"
+	"iaas-monitoring-batch/config"
+	"iaas-monitoring-batch/model/base"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -16,18 +16,18 @@ import (
 	"sync"
 	"time"
 
-	"zabbix-client/common"
-	"zabbix-client/host"
-	"zabbix-client/hostgroup"
-	"zabbix-client/item"
+	"iaas-monitoring-batch/zabbix-client/common"
+	"iaas-monitoring-batch/zabbix-client/host"
+	"iaas-monitoring-batch/zabbix-client/hostgroup"
+	"iaas-monitoring-batch/zabbix-client/item"
 
-	"github.com/cavaliercoder/go-zabbix"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	"iaas-monitoring-batch/zabbix-client/lib/go-zabbix"
 
-	"kr/paasta/iaas-monitoring-batch/dao"
-	"kr/paasta/iaas-monitoring-batch/model"
-	"kr/paasta/iaas-monitoring-batch/util"
+	"iaas-monitoring-batch/dao"
+	"iaas-monitoring-batch/model"
+	"iaas-monitoring-batch/util"
 )
 
 type AlarmService struct {
@@ -48,7 +48,7 @@ var hostList []zabbix.Host
 func AlarmServiceBuilder(configData *config.Config) *AlarmService {
 	dbConnStr := util.GetConnectionString(configData.DbHost, configData.DbPort, configData.DbUser, configData.DbPasswd, configData.DbName)
 
-	//log.Printf("dbConnStr : %v\n", dbConnStr+"?charset=utf8&parseTime=true")
+	log.Printf("dbConnStr : %v\n", dbConnStr+"?charset=utf8&parseTime=true")
 
 	dbConn, err := gorm.Open(configData.DbType, dbConnStr+"?charset=utf8&parseTime=true")
 	if err != nil {
@@ -368,7 +368,7 @@ func createSession(configData *config.Config) *zabbix.Session {
 		WithHTTPClient(client).
 		WithCredentials(configData.ZabbixAdminId, configData.ZabbixAdminPw).Connect()
 	if err != nil {
-		fmt.Errorf("%v\n", err)
+		fmt.Printf("%v\n", err)
 	}
 
 	version, err := _session.GetVersion()

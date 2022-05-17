@@ -1,13 +1,14 @@
 package dao
 
 import (
-	"github.com/cloudfoundry-community/gogobosh"
-	"sync"
-	mod "kr/paasta/monitoring-batch/model"
-	cb "kr/paasta/monitoring-batch/model/base"
-	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/util"
 	"fmt"
+	"sync"
+	"github.com/jinzhu/gorm"
+	"github.com/cloudfoundry-community/gogobosh"
+
+	"monitoring-batch/util"
+	mod "monitoring-batch/model"
+	cb "monitoring-batch/model/base"
 )
 
 type boshStruct struct {

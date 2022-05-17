@@ -3,7 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"kr/paasta/monitoring/caas/model"
+	"monitoring-portal/caas/model"
 	"strings"
 
 	//"github.com/monasca/golang-monascaclient/monascaclient/models"

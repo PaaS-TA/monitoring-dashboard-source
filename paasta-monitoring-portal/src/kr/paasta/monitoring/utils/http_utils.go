@@ -8,8 +8,8 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 
-	"kr/paasta/monitoring/iaas_new/model"
-	pm "kr/paasta/monitoring/paas/model"
+	"monitoring-portal/iaas_new/model"
+	pm "monitoring-portal/paas/model"
 )
 
 func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider model.OpenstackProvider, cfConfig pm.CFConfig) http.HandlerFunc {

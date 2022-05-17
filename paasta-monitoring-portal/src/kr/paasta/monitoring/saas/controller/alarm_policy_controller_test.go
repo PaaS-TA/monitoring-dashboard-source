@@ -3,10 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"kr/paasta/monitoring/saas/model"
+	"monitoring-portal/saas/model"
 	"strings"
 
-	//"github.com/monasca/golang-monascaclient/monascaclient/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	"net/http"

@@ -1,13 +1,13 @@
 package service
 
 import (
-	"kr/paasta/monitoring-batch/dao"
+	"monitoring-batch/dao"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"strings"
-	"kr/paasta/monitoring-batch/util"
-	"kr/paasta/monitoring-batch/model"
-	cb "kr/paasta/monitoring-batch/model/base"
+	"monitoring-batch/util"
+	"monitoring-batch/model"
+	cb "monitoring-batch/model/base"
 	"strconv"
 	"time"
 	"net/http"

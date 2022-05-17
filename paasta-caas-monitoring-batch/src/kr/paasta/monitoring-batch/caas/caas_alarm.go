@@ -2,16 +2,7 @@ package caas
 
 import (
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/jinzhu/gorm"
-	"github.com/mileusna/crontab"
-	"github.com/thoas/go-funk"
-	"github.com/tidwall/gjson"
 	"io/ioutil"
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/notify"
-	"kr/paasta/monitoring-batch/util"
 	"log"
 	"net/http"
 	"reflect"
@@ -19,6 +10,17 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/jinzhu/gorm"
+	"github.com/mileusna/crontab"
+	"github.com/thoas/go-funk"
+	"github.com/tidwall/gjson"
+
+	"caas-monitoring-batch/dao"
+	"caas-monitoring-batch/model"
+	"caas-monitoring-batch/notify"
+	"caas-monitoring-batch/util"
 )
 
 var equalCheckAlarmInfos []model.BatchAlarmInfo

@@ -216,7 +216,7 @@
 					}, false);
 
 					// LOGIN Type
-					var type = sessionStorage.getItem('sysType').split(',');
+					var type = sessionStorage.getItem('sysType')!= null ? sessionStorage.getItem('sysType').split(',') : '';
 
 					for(var i=0 ; i<type.length ; i++){
 

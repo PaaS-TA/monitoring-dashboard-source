@@ -3,21 +3,8 @@ package notify
 import (
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"kr/paasta/monitoring-batch/util"
-	"log"
-	"os"
 )
 
-var config map[string]string
-
-func init() {
-	var err error
-	config, err = util.ReadConfig("config.ini")
-	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
-	}
-}
 
 func SendChatBot(receivers []int64, message string, token string) {
 	fmt.Println("token : " + token)
