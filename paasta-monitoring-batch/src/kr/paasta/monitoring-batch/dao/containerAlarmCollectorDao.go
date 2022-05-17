@@ -2,13 +2,15 @@ package dao
 
 import (
 	"fmt"
-	client "github.com/influxdata/influxdb/client/v2"
-	"github.com/jinzhu/gorm"
-	mod "kr/paasta/monitoring-batch/model"
-	cb "kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
-	"strconv"
 	"time"
+	"strconv"
+
+	"github.com/jinzhu/gorm"
+	client "github.com/influxdata/influxdb/client/v2"
+
+	"monitoring-batch/util"
+	mod "monitoring-batch/model"
+	cb "monitoring-batch/model/base"
 )
 
 type containerAlarmStruct struct {

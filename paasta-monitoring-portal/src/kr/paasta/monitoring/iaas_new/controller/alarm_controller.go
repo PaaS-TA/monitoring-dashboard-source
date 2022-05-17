@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/iaas_new/service"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/iaas_new/service"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/util"
 	"net/http"
 	"strconv"
 )

@@ -2,8 +2,7 @@ package service
 
 import (
 	"github.com/jinzhu/gorm"
-	"kr/paasta/iaas-monitoring-batch/model"
-	//"time"
+	"iaas-monitoring-batch/model"
 )
 
 func CreateTable(dbClient *gorm.DB) {

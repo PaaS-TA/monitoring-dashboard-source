@@ -2,10 +2,10 @@ package handler
 
 import (
 	"os"
-	"github.com/tedsuo/ifrit"
-	"kr/paasta/monitoring-batch/service"
 	"time"
 	"sync"
+	"github.com/tedsuo/ifrit"
+	"monitoring-batch/service"
 )
 
 type backend_server struct {

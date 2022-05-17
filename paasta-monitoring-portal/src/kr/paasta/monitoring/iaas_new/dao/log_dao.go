@@ -8,9 +8,8 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	/*"gopkg.in/olivere/elastic.v3"*/
-	"kr/paasta/monitoring/iaas_new/model"
 	"math"
+	"monitoring-portal/iaas_new/model"
 	"strings"
 	"time"
 

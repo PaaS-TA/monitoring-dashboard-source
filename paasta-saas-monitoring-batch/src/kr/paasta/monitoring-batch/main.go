@@ -1,11 +1,11 @@
 package main
 
 import (
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/saas"
-	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
+	"saas-monitoring-batch/dao"
+	"saas-monitoring-batch/saas"
+	"saas-monitoring-batch/util"
 	"sync"
 )
 
