@@ -1,0 +1,189 @@
+definitions:
+  apiHelpers.BasicResponseForm:
+    properties:
+      message:
+        type: string
+      responseInfo: {}
+      responseTime:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  v1.CreateToken:
+    properties:
+      password:
+        example: password
+        type: string
+      username:
+        example: username
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  v1.RefreshToken:
+    properties:
+      accessToken:
+        example: accessToken
+        type: string
+      refreshToken:
+        example: refreshToken
+        type: string
+    required:
+    - accessToken
+    - refreshToken
+    type: object
+  v1.TokenDetails:
+    properties:
+      accessToken:
+        type: string
+      accessUuid:
+        type: string
+      atExpires:
+        type: integer
+      refreshToken:
+        type: string
+      refreshUuid:
+        type: string
+      rtExpires:
+        type: integer
+    required:
+    - accessToken
+    - refreshToken
+    type: object
+  v1.UserInfo:
+    properties:
+      authC1:
+        type: string
+      authC2:
+        type: string
+      authI1:
+        type: string
+      authI2:
+        type: string
+      authP1:
+        type: string
+      authP2:
+        type: string
+      caasToken:
+        type: string
+      caasUserId:
+        type: string
+      caasUserPw:
+        type: string
+      caasUserUseYn:
+        type: string
+      iaasToken:
+        type: string
+      iaasUserId:
+        type: string
+      iaasUserPw:
+        type: string
+      iaasUserUseYn:
+        type: string
+      paasAdminYn:
+        type: string
+      paasToken:
+        type: string
+      paasUserId:
+        type: string
+      paasUserPw:
+        type: string
+      paasUserUseYn:
+        type: string
+      password:
+        type: string
+      sysType:
+        type: string
+      token:
+        type: string
+      userAuth:
+        type: string
+      userEmail:
+        type: string
+      userId:
+        type: string
+      userNm:
+        type: string
+      userPw:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+host: localhost:3895
+info:
+  contact: {}
+  title: Monitoring Dashboard API
+  version: 5.8.0
+paths:
+  /api/test/users:
+    get:
+      consumes:
+      - application/json
+      description: '[테스트] 전체 유저 정보를 가져온다.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.UserInfo'
+              type: object
+      summary: '[테스트] 전체 유저 정보 가져오기'
+  /api/v1/token:
+    post:
+      consumes:
+      - application/json
+      description: '[테스트] 토큰 정보를 생성한다.'
+      parameters:
+      - description: Insert UserInfo
+        in: body
+        name: UserInfo
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.TokenDetails'
+              type: object
+      summary: '[테스트] 토큰 생성하기'
+    put:
+      consumes:
+      - application/json
+      description: '[테스트] 토큰 정보를 리프레시한다.'
+      parameters:
+      - description: Insert TokenInfo
+        in: body
+        name: TokenDetails
+        required: true
+        schema:
+          $ref: '#/definitions/v1.RefreshToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.TokenDetails'
+              type: object
+      summary: '[테스트] 토큰 리프레시하기'
+swagger: "2.0"

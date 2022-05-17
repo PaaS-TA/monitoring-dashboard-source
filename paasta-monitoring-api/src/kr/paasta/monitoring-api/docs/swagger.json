@@ -1,0 +1,298 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Monitoring Dashboard API",
+        "contact": {},
+        "version": "5.8.0"
+    },
+    "host": "localhost:3895",
+    "paths": {
+        "/api/test/users": {
+            "get": {
+                "description": "[테스트] 전체 유저 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "[테스트] 전체 유저 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.UserInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/token": {
+            "put": {
+                "description": "[테스트] 토큰 정보를 리프레시한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "[테스트] 토큰 리프레시하기",
+                "parameters": [
+                    {
+                        "description": "Insert TokenInfo",
+                        "name": "TokenDetails",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.RefreshToken"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.TokenDetails"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "[테스트] 토큰 정보를 생성한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "[테스트] 토큰 생성하기",
+                "parameters": [
+                    {
+                        "description": "Insert UserInfo",
+                        "name": "UserInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateToken"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.TokenDetails"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "apiHelpers.BasicResponseForm": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "responseInfo": {},
+                "responseTime": {
+                    "type": "string"
+                },
+                "statusCode": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.CreateToken": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "username"
+                }
+            }
+        },
+        "v1.RefreshToken": {
+            "type": "object",
+            "required": [
+                "accessToken",
+                "refreshToken"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                    "example": "accessToken"
+                },
+                "refreshToken": {
+                    "type": "string",
+                    "example": "refreshToken"
+                }
+            }
+        },
+        "v1.TokenDetails": {
+            "type": "object",
+            "required": [
+                "accessToken",
+                "refreshToken"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "accessUuid": {
+                    "type": "string"
+                },
+                "atExpires": {
+                    "type": "integer"
+                },
+                "refreshToken": {
+                    "type": "string"
+                },
+                "refreshUuid": {
+                    "type": "string"
+                },
+                "rtExpires": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.UserInfo": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "authC1": {
+                    "type": "string"
+                },
+                "authC2": {
+                    "type": "string"
+                },
+                "authI1": {
+                    "type": "string"
+                },
+                "authI2": {
+                    "type": "string"
+                },
+                "authP1": {
+                    "type": "string"
+                },
+                "authP2": {
+                    "type": "string"
+                },
+                "caasToken": {
+                    "type": "string"
+                },
+                "caasUserId": {
+                    "type": "string"
+                },
+                "caasUserPw": {
+                    "type": "string"
+                },
+                "caasUserUseYn": {
+                    "type": "string"
+                },
+                "iaasToken": {
+                    "type": "string"
+                },
+                "iaasUserId": {
+                    "type": "string"
+                },
+                "iaasUserPw": {
+                    "type": "string"
+                },
+                "iaasUserUseYn": {
+                    "type": "string"
+                },
+                "paasAdminYn": {
+                    "type": "string"
+                },
+                "paasToken": {
+                    "type": "string"
+                },
+                "paasUserId": {
+                    "type": "string"
+                },
+                "paasUserPw": {
+                    "type": "string"
+                },
+                "paasUserUseYn": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "sysType": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "userAuth": {
+                    "type": "string"
+                },
+                "userEmail": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userNm": {
+                    "type": "string"
+                },
+                "userPw": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
