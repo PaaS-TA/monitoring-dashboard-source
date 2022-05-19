@@ -40,9 +40,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e.POST("/api/v1/token", apiToken.CreateToken) // 토큰 생성
 	e.PUT("/api/v1/token", apiToken.RefreshToken) // 토큰 리프레시
 
-	// GetUsers 테스트용 경로
-	e.GET("api/test/users", apiUser.GetUsers) // 유저 조회
-
 	//// 그외에 다른 정보는 발급된 토큰을 기반으로 유효한 토큰을 가진 사용자만 접근하도록 middleware 설정
 	//// 추가 설명 : middlewares.CheckToken 설정 (입력된 JWT 토큰 검증 및 검증된 요청자 API 접근 허용)
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))

@@ -3,7 +3,6 @@ package v1
 import (
 	"GoEchoProject/apiHelpers"
 	"GoEchoProject/connections"
-	"GoEchoProject/helpers"
 	"GoEchoProject/models/api/v1"
 	v1service "GoEchoProject/services/api/v1"
 	"github.com/jinzhu/gorm"
@@ -28,14 +27,14 @@ func GetUserController(conn connections.Connections) *UserController {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=UserInfo}
-//  @Router       /api/test/users [get]
+//  @Router       /api/v1/users [get]
 func (a *UserController) GetUsers(c echo.Context) (err error) {
 	var apiRequest v1.UserInfo
-	err = helpers.BindRequestAndCheckValid(c, &apiRequest)
-	if err != nil {
-		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", nil)
-		return err
-	}
+	//err = helpers.BindRequestAndCheckValid(c, &apiRequest)
+	//if err != nil {
+	//	apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", nil)
+	//	return err
+	//}
 
 	// User의 GetUsers를 호출한다.
 	users, err := v1service.GetUserService(a.DbInfo).GetUsers(apiRequest, c)

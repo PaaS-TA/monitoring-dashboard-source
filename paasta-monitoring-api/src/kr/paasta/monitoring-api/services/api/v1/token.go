@@ -185,7 +185,6 @@ func (h *TokenService) CreateToken(apiRequest v1.CreateToken, c echo.Context) (v
 
 	// 1. Token 모델을 선언한다.
 	td := v1.TokenDetails{}
-
 	userInfo := v1.UserInfo{
 		Username: apiRequest.Username,
 		Password: apiRequest.Password,
