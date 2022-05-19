@@ -186,8 +186,13 @@ func (h *TokenService) CreateToken(apiRequest v1.CreateToken, c echo.Context) (v
 	// 1. Token 모델을 선언한다.
 	td := v1.TokenDetails{}
 
+	userInfo := v1.UserInfo{
+		Username: apiRequest.Username,
+		Password: apiRequest.Password,
+	}
+
 	// 2. 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다.
-	results, err := dao.GetUserDao(h.DbInfo).GetUser(apiRequest, c)
+	results, err := dao.GetUserDao(h.DbInfo).GetUser(userInfo, c)
 	if err != nil {
 		return td, err
 	}
