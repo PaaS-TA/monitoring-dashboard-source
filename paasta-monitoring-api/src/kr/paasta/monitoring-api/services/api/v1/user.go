@@ -29,7 +29,7 @@ func (h *UserService) GetUsers(apiRequest v1.UserInfo, c echo.Context) ([]v1.Use
 	return users, nil
 }
 
-func (h *UserService) GetUser(apiRequest v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
+func (h *UserService) GetUser(apiRequest v1.CreateToken, c echo.Context) ([]v1.UserInfo, error) {
 	users, err := dao.GetUserDao(h.txn).GetUser(apiRequest, c)
 	if err != nil {
 		fmt.Println(err.Error())

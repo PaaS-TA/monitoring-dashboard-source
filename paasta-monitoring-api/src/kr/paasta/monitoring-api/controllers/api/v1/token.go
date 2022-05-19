@@ -30,11 +30,11 @@ func GetTokenController(conn connections.Connections) *TokenController {
 //  @Description  [테스트] 토큰 정보를 생성한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        UserInfo  body      CreateToken  true  "Insert UserInfo"
+//  @Param        UserInfo  body      CreateToken  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
 //  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [post]
 func (a *TokenController) CreateToken(c echo.Context) (err error) {
-	var userRequest v1.UserInfo                             // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
+	var userRequest v1.CreateToken                          // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
 	err = helpers.BindRequestAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
@@ -59,11 +59,11 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 //  @Description  [테스트] 토큰 정보를 리프레시한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        TokenDetails  body      RefreshToken  true  "Insert TokenInfo"
+//  @Param        TokenDetails  body      RefreshToken  true  "토큰을 리프레시하기 위한 토큰 정보를 제공한다."
 //  @Success      200           {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [put]
 func (a *TokenController) RefreshToken(c echo.Context) (err error) {
-	var userRequest v1.TokenDetails                         // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
+	var userRequest v1.RefreshToken                         // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
 	err = helpers.BindRequestAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
@@ -77,7 +77,7 @@ func (a *TokenController) RefreshToken(c echo.Context) (err error) {
 		return err
 	}
 
-	// TokenDetails로 토근 정보를 전달한다. (AccessToken, RefreshToken, AccessUuid, RefreshUuid, AtExpires, RtExpires) .
+	// TokenDetails로 토근 정보를 전달한다. (AccessToken, RefreshToken, AccessUuid, RefreshUuid, AtExpires, RtExpires)
 	apiHelpers.Respond(c, http.StatusOK, "Success to refresh token", tokenDetails)
 	return nil
 }
