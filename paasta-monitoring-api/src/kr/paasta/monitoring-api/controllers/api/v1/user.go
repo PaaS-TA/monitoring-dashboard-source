@@ -1,23 +1,24 @@
 package v1
 
 import (
-    "GoEchoProject/apiHelpers"
-    "GoEchoProject/connections"
-    "GoEchoProject/models/api/v1"
-    v1service "GoEchoProject/services/api/v1"
-    "github.com/jinzhu/gorm"
-    "github.com/labstack/echo/v4"
-    "net/http"
+	"GoEchoProject/apiHelpers"
+	"GoEchoProject/connections"
+	"GoEchoProject/helpers"
+	"GoEchoProject/models/api/v1"
+	v1service "GoEchoProject/services/api/v1"
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 type UserController struct {
-    DbInfo *gorm.DB
+	DbInfo *gorm.DB
 }
 
 func GetUserController(conn connections.Connections) *UserController {
-    return &UserController{
-        DbInfo: conn.DbInfo,
-    }
+	return &UserController{
+		DbInfo: conn.DbInfo,
+	}
 }
 
 // GetUsers
@@ -29,22 +30,21 @@ func GetUserController(conn connections.Connections) *UserController {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=UserInfo}
 //  @Router       /api/test/users [get]
 func (a *UserController) GetUsers(c echo.Context) (err error) {
-    /* Request Body Data Mapping */
-    var userRequest v1.UserInfo // -> &추가
-    //userRequest := new(models.UserInfo) // &제거
-    if err = c.Bind(&userRequest); err != nil {
-        c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
-        return nil
-    }
+	var apiRequest v1.UserInfo
+	err = helpers.BindRequestAndCheckValid(c, &apiRequest)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", nil)
+		return err
+	}
 
-    // User의 GetUsers를 호출한다.
-    users, err := v1service.GetUserService(a.DbInfo).GetUsers(userRequest, c)
-    if err != nil {
-        c.JSON(http.StatusUnauthorized, err.Error())
-        return nil
-    }
+	// User의 GetUsers를 호출한다.
+	users, err := v1service.GetUserService(a.DbInfo).GetUsers(apiRequest, c)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
 
-    // 사용자 정보를 전달한다.
-    apiHelpers.Respond(c, http.StatusOK, "Success to get all users", users)
-    return nil
+	// 사용자 정보를 전달한다.
+	apiHelpers.Respond(c, http.StatusOK, "Success to get all users", users)
+	return nil
 }
