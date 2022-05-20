@@ -20,8 +20,8 @@ func GetUserService(txn *gorm.DB) *UserService {
 	}
 }
 
-func (h *UserService) GetUsers(apiRequest v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
-	users, err := dao.GetUserDao(h.txn).GetUsers(apiRequest, c)
+func (h *UserService) GetUsers(request v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
+	users, err := dao.GetUserDao(h.txn).GetUsers(request, c)
 	if err != nil {
 		fmt.Println(err.Error())
 		return users, err
@@ -29,8 +29,8 @@ func (h *UserService) GetUsers(apiRequest v1.UserInfo, c echo.Context) ([]v1.Use
 	return users, nil
 }
 
-func (h *UserService) GetUser(apiRequest v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
-	users, err := dao.GetUserDao(h.txn).GetUser(apiRequest, c)
+func (h *UserService) GetUser(request v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
+	users, err := dao.GetUserDao(h.txn).GetUser(request, c)
 	if err != nil {
 		fmt.Println(err.Error())
 		return users, err

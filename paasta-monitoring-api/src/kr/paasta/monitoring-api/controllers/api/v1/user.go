@@ -29,21 +29,30 @@ func GetUserController(conn connections.Connections) *UserController {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=UserInfo}
 //  @Router       /api/v1/users [get]
 func (a *UserController) GetUsers(c echo.Context) (err error) {
-	var apiRequest v1.UserInfo
-	//err = helpers.BindRequestAndCheckValid(c, &apiRequest)
-	//if err != nil {
-	//	apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", nil)
-	//	return err
-	//}
-
-	// User의 GetUsers를 호출한다.
-	users, err := v1service.GetUserService(a.DbInfo).GetUsers(apiRequest, c)
-	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
-		return err
+	var users []v1.UserInfo
+	var request v1.UserInfo
+	qParams := c.QueryParams()
+	if val, ok := qParams["username"]; ok {
+		request.Username = val[0]
 	}
 
-	// 사용자 정보를 전달한다.
-	apiHelpers.Respond(c, http.StatusOK, "Success to get all users", users)
+	if request.Username != "" {
+		users, err = v1service.GetUserService(a.DbInfo).GetUser(request, c)
+		if err != nil {
+			apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+			return err
+		}
+		// 단일 사용자 정보를 전달한다.
+		apiHelpers.Respond(c, http.StatusOK, "Success to get user", users)
+	} else {
+		users, err = v1service.GetUserService(a.DbInfo).GetUsers(request, c)
+		if err != nil {
+			apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+			return err
+		}
+		// 전체 사용자 정보를 전달한다.
+		apiHelpers.Respond(c, http.StatusOK, "Success to get all users", users)
+	}
+
 	return nil
 }

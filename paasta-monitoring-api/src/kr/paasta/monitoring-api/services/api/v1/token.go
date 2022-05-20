@@ -180,14 +180,14 @@ func CreateAuth(td v1.TokenDetails, user_id string, RedisInfo *redis.Client) (v1
 }
 
 // Refresh 토큰 정리 후 적용
-func (h *TokenService) CreateToken(apiRequest v1.CreateToken, c echo.Context) (v1.TokenDetails, error) {
+func (h *TokenService) CreateToken(request v1.CreateToken, c echo.Context) (v1.TokenDetails, error) {
 	// 아이디 및 비밀번호 확인 시 JWT 토큰 발급 및 Redis 저장
 
 	// 1. Token 모델을 선언한다.
 	td := v1.TokenDetails{}
 	userInfo := v1.UserInfo{
-		Username: apiRequest.Username,
-		Password: apiRequest.Password,
+		Username: request.Username,
+		Password: request.Password,
 	}
 
 	// 2. 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다.
@@ -199,7 +199,7 @@ func (h *TokenService) CreateToken(apiRequest v1.CreateToken, c echo.Context) (v
 		return td, fmt.Errorf("reason: cannot found username")
 	}
 	// 계정에 대한 비밀번호를 확인한다.
-	if results[0].Password != apiRequest.Password {
+	if results[0].Password != request.Password {
 		return td, fmt.Errorf("reason: password is incorrect")
 	}
 
@@ -211,14 +211,14 @@ func (h *TokenService) CreateToken(apiRequest v1.CreateToken, c echo.Context) (v
 	return td, nil
 }
 
-func (h *TokenService) RefreshToken(apiRequest v1.RefreshToken, c echo.Context) (v1.TokenDetails, error) {
+func (h *TokenService) RefreshToken(request v1.RefreshToken, c echo.Context) (v1.TokenDetails, error) {
 	// RefreshToken 확인 시 기존 JWT 토큰 정보 삭제 및 생성 후 Redis 저장
 
 	// 1. Token 모델을 선언한다.
 	td := v1.TokenDetails{}
 
 	// 2. 토큰 검증 (signing method 검증, 서명 검증)
-	token, err := VerifyToken(apiRequest.RefreshToken, "REFRESH_SECRET", c)
+	token, err := VerifyToken(request.RefreshToken, "REFRESH_SECRET", c)
 	if err != nil {
 		return td, echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}

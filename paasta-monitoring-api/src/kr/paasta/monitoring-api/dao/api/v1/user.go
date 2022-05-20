@@ -17,7 +17,7 @@ func GetUserDao(txn *gorm.DB) *UserDao {
 	}
 }
 
-func (u *UserDao) GetUsers(apiRequest models.UserInfo, c echo.Context) (tz []models.UserInfo, err error) {
+func (u *UserDao) GetUsers(request models.UserInfo, c echo.Context) (tz []models.UserInfo, err error) {
 	// 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다. (test code)
 	var t []models.UserInfo
 	users := u.txn.Debug().Table("user_infos").
@@ -34,12 +34,12 @@ func (u *UserDao) GetUsers(apiRequest models.UserInfo, c echo.Context) (tz []mod
 	return t, err
 }
 
-func (u *UserDao) GetUser(apiRequest models.UserInfo, c echo.Context) (tz []models.UserInfo, err error) {
+func (u *UserDao) GetUser(request models.UserInfo, c echo.Context) (tz []models.UserInfo, err error) {
 	// 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다. (test code)
 	var t []models.UserInfo
 	users := u.txn.Debug().Table("user_infos").
 		Select(" * ").
-		Where("username = ? ", apiRequest.Username).
+		Where("username = ? ", request.Username).
 		Find(&t)
 	//fmt.Println(users)
 
