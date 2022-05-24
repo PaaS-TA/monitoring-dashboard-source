@@ -3,6 +3,7 @@ package routers
 import (
 	"GoEchoProject/connections"
 	apiControllerV1 "GoEchoProject/controllers/api/v1"
+	AP "GoEchoProject/controllers/api/v1/ap"
 	"GoEchoProject/middlewares"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -35,6 +36,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
+	APAlarm := AP.GetApAlarmController(conn)
+
 	// Router 설정
 	//// Token은 항상 접근 가능하도록
 	e.POST("/api/v1/token", apiToken.CreateToken) // 토큰 생성
@@ -45,6 +48,11 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	//// Swagger에서는 CheckToken 프로세스에 의해 아래 function을 실행할 수 없음 (POSTMAN 이용)
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))
 	v1.GET("/users", apiUser.GetUsers)
+
+	// AP
+	e.GET("/api/v1/ap/alarm/status", APAlarm.GetAlarmStatus)
+	e.GET("/api/v1/ap/alarm/policy", APAlarm.GetAlarmPolicy)
+	e.PUT("/api/v1/ap/alarm/policy", APAlarm.UpdateAlarmPolicy)
 
 	return e
 }
