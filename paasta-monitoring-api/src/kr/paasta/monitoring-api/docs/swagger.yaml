@@ -8,6 +8,151 @@ definitions:
         type: string
       statusCode:
         type: integer
+      statusText:
+        type: string
+    type: object
+  v1.AlarmPolicies:
+    properties:
+      alarmType:
+        type: string
+      comment:
+        type: string
+      criticalThreshold:
+        type: integer
+      id:
+        type: integer
+      measureTime:
+        type: integer
+      modiDate:
+        type: string
+      modiUser:
+        type: string
+      originType:
+        type: string
+      regDate:
+        type: string
+      regUser:
+        type: string
+      repeatTime:
+        type: integer
+      warningThreshold:
+        type: integer
+    type: object
+  v1.AlarmPolicyRequest:
+    properties:
+      alarmType:
+        type: string
+      criticalThreshold:
+        type: integer
+      mailAddress:
+        type: string
+      mailSendYn:
+        type: string
+      measureTime:
+        type: integer
+      originType:
+        type: string
+      repeatTime:
+        type: integer
+      warningThreshold:
+        type: integer
+    required:
+    - originType
+    type: object
+  v1.Alarms:
+    properties:
+      alarmCnt:
+        type: integer
+      alarmMessage:
+        type: string
+      alarmSendDate:
+        type: string
+      alarmTitle:
+        type: string
+      alarmType:
+        type: string
+      appIndex:
+        type: integer
+      appName:
+        type: string
+      appYN:
+        type: string
+      completeDate:
+        type: string
+      completeUser:
+        type: string
+      containerName:
+        type: string
+      id:
+        type: integer
+      ip:
+        type: string
+      level:
+        type: string
+      modiDate:
+        type: string
+      modiUser:
+        type: string
+      originId:
+        type: integer
+      originType:
+        type: string
+      regDate:
+        type: string
+      regUser:
+        type: string
+      resolveStatus:
+        type: string
+    type: object
+  v1.Bosh:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  v1.BoshChart:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  v1.BoshLog:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  v1.BoshProcess:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  v1.BoshSummary:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
     type: object
   v1.CreateToken:
     properties:
@@ -23,14 +168,10 @@ definitions:
     type: object
   v1.RefreshToken:
     properties:
-      accessToken:
-        example: accessToken
-        type: string
       refreshToken:
         example: refreshToken
         type: string
     required:
-    - accessToken
     - refreshToken
     type: object
   v1.TokenDetails:
@@ -47,9 +188,6 @@ definitions:
         type: string
       rtExpires:
         type: integer
-    required:
-    - accessToken
-    - refreshToken
     type: object
   v1.UserInfo:
     properties:
@@ -113,17 +251,17 @@ definitions:
     - password
     - username
     type: object
-host: localhost:3895
+host: localhost:8395
 info:
   contact: {}
   title: Monitoring Dashboard API
   version: 5.8.0
 paths:
-  /api/test/users:
+  /api/v1/ap/alarm/policy:
     get:
       consumes:
       - application/json
-      description: '[테스트] 전체 유저 정보를 가져온다.'
+      description: '[테스트] 전체 알람 정책을 가져온다.'
       produces:
       - application/json
       responses:
@@ -134,16 +272,168 @@ paths:
             - $ref: '#/definitions/apiHelpers.BasicResponseForm'
             - properties:
                 responseInfo:
-                  $ref: '#/definitions/v1.UserInfo'
+                  $ref: '#/definitions/v1.AlarmPolicies'
               type: object
-      summary: '[테스트] 전체 유저 정보 가져오기'
+      summary: '[테스트] 전체 알람 정책 가져오기'
+    put:
+      consumes:
+      - application/json
+      description: '[테스트] 전체 알람 정책을 업데이트 한다.'
+      parameters:
+      - description: 알람 정책을 변경하기 위한 정보를 주입한다.
+        in: body
+        name: AlarmPolicyRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmPolicyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: '[테스트] 전체 알람 정책 업데이트하기'
+  /api/v1/ap/alarm/status:
+    get:
+      consumes:
+      - application/json
+      description: '[테스트] 전체 알람 현황을 가져온다.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Alarms'
+              type: object
+      summary: '[테스트] 전체 알람 현황 가져오기'
+  /api/v1/bosh:
+    get:
+      consumes:
+      - application/json
+      description: Bosh의 목록을 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Bosh'
+              type: object
+      summary: Bosh의 목록을 가져온다.
+      tags:
+      - AP
+  /api/v1/bosh/Chart:
+    get:
+      consumes:
+      - application/json
+      description: Bosh의 차트 정보를 가져온다.
+      parameters:
+      - description: Bosh의 차트 정보 조회시 Bosh ID를 주입한다.
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshChart'
+              type: object
+      summary: Bosh의 차트 정보를 가져온다.
+      tags:
+      - AP
+  /api/v1/bosh/log:
+    get:
+      consumes:
+      - application/json
+      description: Bosh의 로그 정보를 가져온다.
+      parameters:
+      - description: Bosh의 로그 정보 조회시 Bosh ID를 주입한다.
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshLog'
+              type: object
+      summary: Bosh의 로그 정보를 가져온다.
+      tags:
+      - AP
+  /api/v1/bosh/overview:
+    get:
+      consumes:
+      - application/json
+      description: Bosh의 상태 별 개수를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshSummary'
+              type: object
+      summary: Bosh의 상태 별 개수를 가져온다.
+      tags:
+      - AP
+  /api/v1/bosh/process:
+    get:
+      consumes:
+      - application/json
+      description: Bosh의 프로세스 목록을 가져온다.
+      parameters:
+      - description: Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshProcess'
+              type: object
+      summary: Bosh의 프로세스 목록을 가져온다.
+      tags:
+      - AP
   /api/v1/token:
     post:
       consumes:
       - application/json
       description: '[테스트] 토큰 정보를 생성한다.'
       parameters:
-      - description: Insert UserInfo
+      - description: 토큰을 생성하기 위해 필요한 유저 정보를 제공한다.
         in: body
         name: UserInfo
         required: true
@@ -167,7 +457,7 @@ paths:
       - application/json
       description: '[테스트] 토큰 정보를 리프레시한다.'
       parameters:
-      - description: Insert TokenInfo
+      - description: 토큰을 리프레시하기 위한 토큰 정보를 제공한다.
         in: body
         name: TokenDetails
         required: true
@@ -186,4 +476,36 @@ paths:
                   $ref: '#/definitions/v1.TokenDetails'
               type: object
       summary: '[테스트] 토큰 리프레시하기'
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: '[테스트] 전체 또는 단일 유저 정보를 가져온다.'
+      parameters:
+      - description: 단일 사용자 정보 조회시 유저명을 주입한다.
+        in: query
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.UserInfo'
+              type: object
+      summary: '[테스트] 전체 또는 단일 유저 정보 가져오기'
 swagger: "2.0"
+tags:
+- description: Application Platform API (Cloud Foundry)
+  name: AP
+- description: Container Platform API (Kubernetes)
+  name: CP
+- description: APM (Pinpoint)
+  name: SaaS
+- description: Openstack(Zabbix)
+  name: IaaS

@@ -16,16 +16,16 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/test/users": {
+        "/api/v1/ap/alarm/policy": {
             "get": {
-                "description": "[테스트] 전체 유저 정보를 가져온다.",
+                "description": "[테스트] 전체 알람 정책을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 전체 유저 정보 가져오기",
+                "summary": "[테스트] 전체 알람 정책 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -38,7 +38,267 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/v1.UserInfo"
+                                            "$ref": "#/definitions/v1.AlarmPolicies"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "[테스트] 전체 알람 정책을 업데이트 한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "[테스트] 전체 알람 정책 업데이트하기",
+                "parameters": [
+                    {
+                        "description": "알람 정책을 변경하기 위한 정보를 주입한다.",
+                        "name": "AlarmPolicyRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/alarm/status": {
+            "get": {
+                "description": "[테스트] 전체 알람 현황을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "[테스트] 전체 알람 현황 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Alarms"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bosh": {
+            "get": {
+                "description": "Bosh의 목록을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh의 목록을 가져온다.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Bosh"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bosh/Chart": {
+            "get": {
+                "description": "Bosh의 차트 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh의 차트 정보를 가져온다.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bosh의 차트 정보 조회시 Bosh ID를 주입한다.",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshChart"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bosh/log": {
+            "get": {
+                "description": "Bosh의 로그 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh의 로그 정보를 가져온다.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bosh의 로그 정보 조회시 Bosh ID를 주입한다.",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshLog"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bosh/overview": {
+            "get": {
+                "description": "Bosh의 상태 별 개수를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh의 상태 별 개수를 가져온다.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshSummary"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/bosh/process": {
+            "get": {
+                "description": "Bosh의 프로세스 목록을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh의 프로세스 목록을 가져온다.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshProcess"
                                         }
                                     }
                                 }
@@ -60,7 +320,7 @@ const docTemplate = `{
                 "summary": "[테스트] 토큰 리프레시하기",
                 "parameters": [
                     {
-                        "description": "Insert TokenInfo",
+                        "description": "토큰을 리프레시하기 위한 토큰 정보를 제공한다.",
                         "name": "TokenDetails",
                         "in": "body",
                         "required": true,
@@ -101,7 +361,7 @@ const docTemplate = `{
                 "summary": "[테스트] 토큰 생성하기",
                 "parameters": [
                     {
-                        "description": "Insert UserInfo",
+                        "description": "토큰을 생성하기 위해 필요한 유저 정보를 제공한다.",
                         "name": "UserInfo",
                         "in": "body",
                         "required": true,
@@ -131,6 +391,46 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/users": {
+            "get": {
+                "description": "[테스트] 전체 또는 단일 유저 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "[테스트] 전체 또는 단일 유저 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "단일 사용자 정보 조회시 유저명을 주입한다.",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.UserInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -146,6 +446,225 @@ const docTemplate = `{
                 },
                 "statusCode": {
                     "type": "integer"
+                },
+                "statusText": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.AlarmPolicies": {
+            "type": "object",
+            "properties": {
+                "alarmType": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "criticalThreshold": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "measureTime": {
+                    "type": "integer"
+                },
+                "modiDate": {
+                    "type": "string"
+                },
+                "modiUser": {
+                    "type": "string"
+                },
+                "originType": {
+                    "type": "string"
+                },
+                "regDate": {
+                    "type": "string"
+                },
+                "regUser": {
+                    "type": "string"
+                },
+                "repeatTime": {
+                    "type": "integer"
+                },
+                "warningThreshold": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.AlarmPolicyRequest": {
+            "type": "object",
+            "required": [
+                "originType"
+            ],
+            "properties": {
+                "alarmType": {
+                    "type": "string"
+                },
+                "criticalThreshold": {
+                    "type": "integer"
+                },
+                "mailAddress": {
+                    "type": "string"
+                },
+                "mailSendYn": {
+                    "type": "string"
+                },
+                "measureTime": {
+                    "type": "integer"
+                },
+                "originType": {
+                    "type": "string"
+                },
+                "repeatTime": {
+                    "type": "integer"
+                },
+                "warningThreshold": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.Alarms": {
+            "type": "object",
+            "properties": {
+                "alarmCnt": {
+                    "type": "integer"
+                },
+                "alarmMessage": {
+                    "type": "string"
+                },
+                "alarmSendDate": {
+                    "type": "string"
+                },
+                "alarmTitle": {
+                    "type": "string"
+                },
+                "alarmType": {
+                    "type": "string"
+                },
+                "appIndex": {
+                    "type": "integer"
+                },
+                "appName": {
+                    "type": "string"
+                },
+                "appYN": {
+                    "type": "string"
+                },
+                "completeDate": {
+                    "type": "string"
+                },
+                "completeUser": {
+                    "type": "string"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "level": {
+                    "type": "string"
+                },
+                "modiDate": {
+                    "type": "string"
+                },
+                "modiUser": {
+                    "type": "string"
+                },
+                "originId": {
+                    "type": "integer"
+                },
+                "originType": {
+                    "type": "string"
+                },
+                "regDate": {
+                    "type": "string"
+                },
+                "regUser": {
+                    "type": "string"
+                },
+                "resolveStatus": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.Bosh": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.BoshChart": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.BoshLog": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.BoshProcess": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.BoshSummary": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -169,14 +688,9 @@ const docTemplate = `{
         "v1.RefreshToken": {
             "type": "object",
             "required": [
-                "accessToken",
                 "refreshToken"
             ],
             "properties": {
-                "accessToken": {
-                    "type": "string",
-                    "example": "accessToken"
-                },
                 "refreshToken": {
                     "type": "string",
                     "example": "refreshToken"
@@ -185,10 +699,6 @@ const docTemplate = `{
         },
         "v1.TokenDetails": {
             "type": "object",
-            "required": [
-                "accessToken",
-                "refreshToken"
-            ],
             "properties": {
                 "accessToken": {
                     "type": "string"
@@ -303,13 +813,31 @@ const docTemplate = `{
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "Application Platform API (Cloud Foundry)",
+            "name": "AP"
+        },
+        {
+            "description": "Container Platform API (Kubernetes)",
+            "name": "CP"
+        },
+        {
+            "description": "APM (Pinpoint)",
+            "name": "SaaS"
+        },
+        {
+            "description": "Openstack(Zabbix)",
+            "name": "IaaS"
+        }
+    ]
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "5.8.0",
-	Host:             "localhost:3895",
+	Host:             "localhost:8395",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Monitoring Dashboard API",

@@ -13,6 +13,14 @@ import (
 // @title    Monitoring Dashboard API
 // @version  5.8.0
 // @host     localhost:8395
+// @tag.name AP
+// @tag.description Application Platform API (Cloud Foundry)
+// @tag.name CP
+// @tag.description Container Platform API (Kubernetes)
+// @tag.name SaaS
+// @tag.description APM (Pinpoint)
+// @tag.name IaaS
+// @tag.description Openstack(Zabbix)
 func main() {
 
 	// .env 파일 로드
