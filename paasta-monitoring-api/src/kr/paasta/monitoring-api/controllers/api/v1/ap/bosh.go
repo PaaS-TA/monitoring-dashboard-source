@@ -25,7 +25,7 @@ func GetBoshController(conn connections.Connections) *BoshController {
 //  @Description  Bosh의 상태 별 개수를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
 //  @Router       /api/v1/bosh/overview [get]
 func (a *BoshController) GetBoshOverview(c echo.Context) (err error) {
 	var BoshSummary []v1.BoshSummary
@@ -40,7 +40,7 @@ func (a *BoshController) GetBoshOverview(c echo.Context) (err error) {
 //  @tags         AP
 //  @Accept       json
 //  @Produce      json
-//  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Bosh}
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Bosh}
 //  @Router       /api/v1/bosh [get]
 func (a *BoshController) GetBoshList(c echo.Context) (err error) {
 	return nil
@@ -53,8 +53,8 @@ func (a *BoshController) GetBoshList(c echo.Context) (err error) {
 //  @Description  Bosh의 프로세스 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        id  query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
-//  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
+//  @Param        id   query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
 //  @Router       /api/v1/bosh/process [get]
 func (a *BoshController) GetBoshProcessList(c echo.Context) (err error) {
 	return nil
@@ -67,8 +67,8 @@ func (a *BoshController) GetBoshProcessList(c echo.Context) (err error) {
 //  @Description  Bosh의 차트 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        id  query     string  false  "Bosh의 차트 정보 조회시 Bosh ID를 주입한다."
-//  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
+//  @Param        id   query     string  false  "Bosh의 차트 정보 조회시 Bosh ID를 주입한다."
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
 //  @Router       /api/v1/bosh/Chart [get]
 func (a *BoshController) GetBoshChart(c echo.Context) (err error) {
 	return nil
@@ -81,8 +81,8 @@ func (a *BoshController) GetBoshChart(c echo.Context) (err error) {
 //  @Description  Bosh의 로그 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        id  query     string  false  "Bosh의 로그 정보 조회시 Bosh ID를 주입한다."
-//  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshLog}
+//  @Param        id   query     string  false  "Bosh의 로그 정보 조회시 Bosh ID를 주입한다."
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshLog}
 //  @Router       /api/v1/bosh/log [get]
 func (a *BoshController) GetBoshLog(c echo.Context) (err error) {
 	return nil

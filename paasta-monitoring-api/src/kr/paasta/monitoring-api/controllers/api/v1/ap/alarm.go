@@ -69,7 +69,7 @@ func (ap *ApAlarmController) GetAlarmPolicy(c echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Param        AlarmPolicyRequest  body      v1.AlarmPolicyRequest  true  "알람 정책을 변경하기 위한 정보를 주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Success      200                {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/policy [put]
 func (ap *ApAlarmController) UpdateAlarmPolicy(c echo.Context) error {
 	var request []models.AlarmPolicyRequest
@@ -85,7 +85,7 @@ func (ap *ApAlarmController) UpdateAlarmPolicy(c echo.Context) error {
 		return err
 	}
 
-	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarms target.", results)
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarms policy.", results)
 	return nil
 }
 
@@ -97,7 +97,7 @@ func (ap *ApAlarmController) UpdateAlarmPolicy(c echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Param        AlarmTargetRequest  body      v1.AlarmPolicyRequest  true  "알람 타겟을 변경하기 위한 정보를 주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Success      200                {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/target [put]
 func (ap *ApAlarmController) UpdateAlarmTarget(c echo.Context) error {
 	var request []models.AlarmTargetRequest
