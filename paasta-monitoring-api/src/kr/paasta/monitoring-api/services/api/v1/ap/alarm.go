@@ -6,51 +6,50 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type ApService struct {
+type ApAlarmService struct {
 	DbInfo *gorm.DB
 }
 
-func GetApService(DbInfo *gorm.DB) *ApService {
-	return &ApService{
+func GetApAlarmService(DbInfo *gorm.DB) *ApAlarmService {
+	return &ApAlarmService{
 		DbInfo: DbInfo,
 	}
 }
 
-func (ap *ApService) GetAlarmStatus() ([]models.Alarms, error) {
-	results, err := AP.GetApDao(ap.DbInfo).GetAlarmStatus()
+func (ap *ApAlarmService) GetAlarmStatus() ([]models.Alarms, error) {
+	results, err := AP.GetApAlarmDao(ap.DbInfo).GetAlarmStatus()
 	if err != nil {
 		return results, err
 	}
 	return results, nil
 }
 
-func (ap *ApService) GetAlarmPolicy() ([]models.AlarmPolicies, error) {
-	results, err := AP.GetApDao(ap.DbInfo).GetAlarmPolicy()
+func (ap *ApAlarmService) GetAlarmPolicy() ([]models.AlarmPolicies, error) {
+	results, err := AP.GetApAlarmDao(ap.DbInfo).GetAlarmPolicy()
 	if err != nil {
 		return results, err
 	}
 	return results, nil
 }
 
-func (ap *ApService) UpdateAlarmPolicy(request []models.AlarmPolicyRequest) (string, error) {
+func (ap *ApAlarmService) UpdateAlarmPolicy(request []models.AlarmPolicyRequest) (string, error) {
 	for _, request := range request {
-		err := AP.GetApDao(ap.DbInfo).UpdateAlarmPolicy(request)
-		if request.MailAddress != "" {
-			ap.UpdateAlarmTarget(request)
-		}
+		err := AP.GetApAlarmDao(ap.DbInfo).UpdateAlarmPolicy(request)
 		if err != nil {
 			return "FAILED UPDATE POLICY!", err
 		}
 	}
 
-	return "SUCCEEDED!", nil
+	return "SUCCEEDED UPDATE POLICY!", nil
 }
 
-func (ap *ApService) UpdateAlarmTarget(request models.AlarmPolicyRequest) (string, error) {
-	err := AP.GetApDao(ap.DbInfo).UpdateAlarmTarget(request)
-	if err != nil {
-		return "FAILED UPDATE TARGET!", err
+func (ap *ApAlarmService) UpdateAlarmTarget(request []models.AlarmTargetRequest) (string, error) {
+	for _, request := range request {
+		err := AP.GetApAlarmDao(ap.DbInfo).UpdateAlarmTarget(request)
+		if err != nil {
+			return "FAILED UPDATE TARGET!", err
+		}
 	}
 
-	return "SUCCEEDED!", nil
+	return "SUCCEEDED UPDATE TARGET!", nil
 }

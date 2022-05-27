@@ -26,8 +26,8 @@ func GetTokenController(conn connections.Connections) *TokenController {
 
 // CreateToken
 //  * Annotations for Swagger *
-//  @Summary      [테스트] 토큰 생성하기
-//  @Description  [테스트] 토큰 정보를 생성한다.
+//  @Summary      토큰 생성하기
+//  @Description  토큰 정보를 생성한다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        UserInfo  body      CreateToken  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
@@ -55,8 +55,8 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 
 // RefreshToken
 //  * Annotations for Swagger *
-//  @Summary      [테스트] 토큰 리프레시하기
-//  @Description  [테스트] 토큰 정보를 리프레시한다.
+//  @Summary      토큰 리프레시하기
+//  @Description  토큰 정보를 리프레시한다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        TokenDetails  body      RefreshToken  true  "토큰을 리프레시하기 위한 토큰 정보를 제공한다."

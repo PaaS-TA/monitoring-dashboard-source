@@ -7,17 +7,17 @@ import (
 	"time"
 )
 
-type ApDao struct {
+type ApAlarmDao struct {
 	DbInfo *gorm.DB
 }
 
-func GetApDao(DbInfo *gorm.DB) *ApDao {
-	return &ApDao{
+func GetApAlarmDao(DbInfo *gorm.DB) *ApAlarmDao {
+	return &ApAlarmDao{
 		DbInfo: DbInfo,
 	}
 }
 
-func (ap *ApDao) GetAlarmStatus() ([]models.Alarms, error) {
+func (ap *ApAlarmDao) GetAlarmStatus() ([]models.Alarms, error) {
 	var response []models.Alarms
 	results := ap.DbInfo.Debug().Table("alarms").
 		Select(" * ").
@@ -31,7 +31,7 @@ func (ap *ApDao) GetAlarmStatus() ([]models.Alarms, error) {
 	return response, nil
 }
 
-func (ap *ApDao) GetAlarmPolicy() ([]models.AlarmPolicies, error) {
+func (ap *ApAlarmDao) GetAlarmPolicy() ([]models.AlarmPolicies, error) {
 	var response []models.AlarmPolicies
 	results := ap.DbInfo.Debug().Table("alarm_policies").
 		Select(" * ").
@@ -45,7 +45,7 @@ func (ap *ApDao) GetAlarmPolicy() ([]models.AlarmPolicies, error) {
 	return response, nil
 }
 
-func (ap *ApDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
+func (ap *ApAlarmDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
 	results := ap.DbInfo.Debug().Table("alarm_policies").
 		Model(request).
 		Where("origin_type = ? and alarm_type = ?", request.OriginType, request.AlarmType).
@@ -65,19 +65,20 @@ func (ap *ApDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
 	return nil
 }
 
-func (ap *ApDao) UpdateAlarmTarget(request models.AlarmPolicyRequest) error {
-	results := ap.DbInfo.Debug().Table("alarm_targets").
-		Model(request).
-		Where("origin_type = ? ", request.OriginType).
-		Updates(map[string]interface{}{
-			"mail_address": request.MailAddress,
-			"mail_send_yn": request.MailSendYn,
-			"modi_date":    time.Now().UTC().Add(time.Hour * 9),
-			"modi_user":    "admin"})
-
-	if results.Error != nil {
-		fmt.Println(results.Error)
-		return results.Error
+func (ap *ApAlarmDao) UpdateAlarmTarget(request models.AlarmTargetRequest) error {
+	if request.MailAddress != "" {
+		results := ap.DbInfo.Debug().Table("alarm_targets").
+			Model(request).
+			Where("origin_type = ?", request.OriginType).
+			Updates(map[string]interface{}{
+				"mail_address": request.MailAddress,
+				"mail_send_yn": request.MailSendYn,
+				"modi_date":    time.Now().UTC().Add(time.Hour * 9),
+				"modi_user":    "admin"})
+		if results.Error != nil {
+			fmt.Println(results.Error)
+			return results.Error
+		}
 	}
 
 	return nil

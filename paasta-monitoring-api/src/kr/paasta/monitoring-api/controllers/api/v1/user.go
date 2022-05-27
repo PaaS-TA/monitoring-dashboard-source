@@ -22,8 +22,8 @@ func GetUserController(conn connections.Connections) *UserController {
 
 // GetUsers
 //  * Annotations for Swagger *
-//  @Summary      [테스트] 전체 또는 단일 유저 정보 가져오기
-//  @Description  [테스트] 전체 또는 단일 유저 정보를 가져온다.
+//  @Summary      전체 또는 단일 유저 정보 가져오기
+//  @Description  전체 또는 단일 유저 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        username  query     string  false  "단일 사용자 정보 조회시 유저명을 주입한다."
