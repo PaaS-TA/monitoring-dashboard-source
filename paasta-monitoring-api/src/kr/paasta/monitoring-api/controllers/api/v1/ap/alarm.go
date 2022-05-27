@@ -145,11 +145,11 @@ func (ap *ApAlarmController) RegisterSnsAccount(c echo.Context) error {
 	return nil
 }
 
-// GetSnsAlarmList
+// GetSnsAccount
 //  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      알람 받을 SNS 계정 등록하기
-//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Summary      알람 받는 SNS 계정 가져오기
+//  @Description  알람 받는 SNS 계정 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmSns}
@@ -168,8 +168,8 @@ func (ap *ApAlarmController) GetSnsAccount(c echo.Context) error {
 // DeleteSnsAccount
 //  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      알람 받을 SNS 계정 등록하기
-//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Summary      알람 받는 SNS 계정 삭제하기
+//  @Description  알람 받는 SNS 계정을 삭제한다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "삭제할 SNS 계정을 정보(ChannelId)를  주입한다."
@@ -196,8 +196,8 @@ func (ap *ApAlarmController) DeleteSnsAccount(c echo.Context) error {
 // UpdateSnsAccount
 //  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      알람 받을 SNS 계정 등록하기
-//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Summary      알람 받을 SNS 계정 수정하기
+//  @Description  알람 받을 SNS 계정 정보를 수정한다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "수정할 SNS 계정 정보를 주입한다."
