@@ -20,16 +20,15 @@ func GetDBConnectionString(dbtype, user, password, protocol, host, port, dbname,
 // BindRequestAndCheckValid :: 클라이언트의 Requset Body를
 // userRequest로 받은 구조체에 바인딩한 결과와 구조체 값의 유효성을 검사한 결과를 반환한다.
 func BindRequestAndCheckValid(c echo.Context, request interface{}) error {
-	bindErr := c.Bind(&request) // 유효한 Request Body가 아니라면 error 반환 (ex: JSON 문법 에러)
+	bindErr := c.Bind(&request)
 	if bindErr != nil {
 		return bindErr
 	}
 
 	validator := validator.New()
-	validErr := validator.Struct(request) // models 패키지에 정의된 태그에 따라 유효성 검사, 문제시 error 반환
+	validErr := validator.Var(request, "dive")
 	if validErr != nil {
 		return validErr
-
 	}
 
 	return nil
