@@ -116,3 +116,107 @@ func (ap *ApAlarmController) UpdateAlarmTarget(c echo.Context) error {
 	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarms target.", results)
 	return nil
 }
+
+// RegisterSnsAccount
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 받을 SNS 계정 등록하기
+//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "알람 받을 SNS 계정 정보를 주입한다."
+//  @Success      200                {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) RegisterSnsAccount(c echo.Context) error {
+	var request models.SnsAccountRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).RegisterSnsAccount(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to register sns account.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to register sns account.", results)
+	return nil
+}
+
+// GetSnsAlarmList
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 받을 SNS 계정 등록하기
+//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmSns}
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) GetSnsAccount(c echo.Context) error {
+	results, err := AP.GetApAlarmService(ap.DbInfo).GetSnsAccount()
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get sns alarm list.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get sns alarm list.", results)
+	return nil
+}
+
+// DeleteSnsAccount
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 받을 SNS 계정 등록하기
+//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "삭제할 SNS 계정을 정보(ChannelId)를  주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) DeleteSnsAccount(c echo.Context) error {
+	var request models.SnsAccountRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).DeleteSnsAccount(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to delete sns account.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to delete sns account.", results)
+	return nil
+}
+
+// UpdateSnsAccount
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 받을 SNS 계정 등록하기
+//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "수정할 SNS 계정 정보를 주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) UpdateSnsAccount(c echo.Context) error {
+	var request models.SnsAccountRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).UpdateSnsAccount(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to update sns account.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update sns account.", results)
+	return nil
+}

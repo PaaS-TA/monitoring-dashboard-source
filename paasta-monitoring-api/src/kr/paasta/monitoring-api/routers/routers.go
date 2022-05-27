@@ -54,6 +54,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e.GET("/api/v1/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
 	e.PUT("/api/v1/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
 	e.PUT("/api/v1/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
+	e.POST("/api/v1/ap/alarm/sns", ApAlarm.RegisterSnsAccount)
+	e.GET("/api/v1/ap/alarm/sns", ApAlarm.GetSnsAccount)
+	e.DELETE("/api/v1/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
+	e.PUT("/api/v1/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
 
 	return e
 }

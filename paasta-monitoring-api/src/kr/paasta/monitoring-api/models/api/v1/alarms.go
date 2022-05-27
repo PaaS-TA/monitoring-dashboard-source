@@ -2,7 +2,7 @@ package v1
 
 // Struct's each field name is field name of tables in PaastaMonitoring Database.
 // The name of struct is tables' name.
-// For response container.
+// For response container part.
 type (
 	Alarms struct {
 		Id            int    `json:"id"`
@@ -42,9 +42,23 @@ type (
 		ModiDate          string `json:"modiDate"`
 		ModiUser          string `json:"modiUser"`
 	}
+
+	AlarmSns struct {
+		ChannelId  int    `json:"channelId"`
+		OriginType string `json:"originType"`
+		SnsType    string `json:"snsType"`
+		SnsId      string `json:"snsId"`
+		Token      string `json:"token"`
+		Expl       string `json:"expl"`
+		SnsSendYN  string `json:"snsSendYN"`
+		RegDate    string `json:"regDate"`
+		RegUser    string `json:"regUser"`
+		ModiDate   string `json:"modiDate"`
+		ModiUser   string `json:"modiUser"`
+	}
 )
 
-// For request container.
+// For request container part.
 type (
 	AlarmPolicyRequest struct {
 		OriginType        string `json:"originType" validate:"required"`
@@ -58,6 +72,15 @@ type (
 	AlarmTargetRequest struct {
 		OriginType  string `json:"originType" validate:"required"`
 		MailAddress string `json:"mailAddress" validate:"email"`
-		MailSendYn  string `json:"mailSendYn"`
+		MailSendYN  string `json:"mailSendYN"`
+	}
+
+	SnsAccountRequest struct {
+		OriginType string `json:"originType"`
+		SnsType    string `json:"snsType"`
+		SnsId      string `json:"snsId"`
+		Token      string `json:"token"`
+		Expl       string `json:"expl"`
+		SnsSendYN  string `json:"snsSendYN"`
 	}
 )
