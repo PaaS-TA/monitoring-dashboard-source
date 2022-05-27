@@ -53,7 +53,11 @@ type (
 		CriticalThreshold int    `json:"criticalThreshold"`
 		RepeatTime        int    `json:"repeatTime"`
 		MeasureTime       int    `json:"measureTime"`
-		MailAddress       string `json:"mailAddress" validate:"email"`
-		MailSendYn        string `json:"mailSendYn"`
+	}
+
+	AlarmTargetRequest struct {
+		OriginType  string `json:"originType" validate:"required"`
+		MailAddress string `json:"mailAddress" validate:"email"`
+		MailSendYn  string `json:"mailSendYn"`
 	}
 )

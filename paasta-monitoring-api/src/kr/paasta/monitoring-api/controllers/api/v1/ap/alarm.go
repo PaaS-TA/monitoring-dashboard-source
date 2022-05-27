@@ -85,6 +85,34 @@ func (ap *ApAlarmController) UpdateAlarmPolicy(c echo.Context) error {
 		return err
 	}
 
-	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarms policy.", results)
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarms target.", results)
+	return nil
+}
+
+// UpdateAlarmTarget
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      전체 알람 타겟 업데이트하기
+//  @Description  전체 알람 타겟을 업데이트 한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        AlarmTargetRequest  body      v1.AlarmPolicyRequest  true  "알람 타겟을 변경하기 위한 정보를 주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/target [put]
+func (ap *ApAlarmController) UpdateAlarmTarget(c echo.Context) error {
+	var request []models.AlarmTargetRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).UpdateAlarmTarget(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to update alarm target.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarms target.", results)
 	return nil
 }

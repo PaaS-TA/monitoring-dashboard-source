@@ -36,7 +36,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
-	APAlarm := AP.GetApAlarmController(conn)
+	ApAlarm := AP.GetApAlarmController(conn)
 
 	// Router 설정
 	//// Token은 항상 접근 가능하도록
@@ -50,9 +50,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/users", apiUser.GetUsers)
 
 	// AP
-	e.GET("/api/v1/ap/alarm/status", APAlarm.GetAlarmStatus)
-	e.GET("/api/v1/ap/alarm/policy", APAlarm.GetAlarmPolicy)
-	e.PUT("/api/v1/ap/alarm/policy", APAlarm.UpdateAlarmPolicy)
+	e.GET("/api/v1/ap/alarm/status", ApAlarm.GetAlarmStatus)
+	e.GET("/api/v1/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
+	e.PUT("/api/v1/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
+	e.PUT("/api/v1/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
 
 	return e
 }
