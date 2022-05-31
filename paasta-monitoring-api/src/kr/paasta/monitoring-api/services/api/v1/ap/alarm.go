@@ -83,3 +83,35 @@ func (ap *ApAlarmService) UpdateSnsAccount(request models.SnsAccountRequest) (st
 	}
 	return "SUCCEEDED UPDATE SNS ACCOUNT!", nil
 }
+
+func (ap *ApAlarmService) CreateAlarmAction(request models.AlarmActionRequest) (string, error) {
+	err := AP.GetApAlarmDao(ap.DbInfo).CreateAlarmAction(request)
+	if err != nil {
+		return "FAILED CREATE ALARM ACTION!", err
+	}
+	return "SUCCEEDED CREATE ALARM ACTION!", nil
+}
+
+func (ap *ApAlarmService) GetAlarmAction() ([]models.AlarmActions, error) {
+	results, err := AP.GetApAlarmDao(ap.DbInfo).GetAlarmAction()
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
+func (ap *ApAlarmService) UpdateAlarmAction(request models.AlarmActionRequest) (string, error) {
+	err := AP.GetApAlarmDao(ap.DbInfo).UpdateAlarmAction(request)
+	if err != nil {
+		return "FAILED UPDATE ALARM ACTION!", err
+	}
+	return "SUCCEEDED UPDATE ALARM ACTION!", nil
+}
+
+func (ap *ApAlarmService) DeleteAlarmAction(request models.AlarmActionRequest) (string, error) {
+	err := AP.GetApAlarmDao(ap.DbInfo).DeleteAlarmAction(request)
+	if err != nil {
+		return "FAILED DELETE ALARM ACTION!", err
+	}
+	return "SUCCEEDED DELETE ALARM ACTION!", nil
+}

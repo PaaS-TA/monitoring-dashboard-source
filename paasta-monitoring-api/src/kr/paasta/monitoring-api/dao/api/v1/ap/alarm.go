@@ -139,3 +139,58 @@ func (ap *ApAlarmDao) UpdateSnsAccount(request models.SnsAccountRequest) error {
 
 	return nil
 }
+
+func (ap *ApAlarmDao) CreateAlarmAction(request models.AlarmActionRequest) error {
+	results := ap.DbInfo.Debug().Table("alarm_actions").Create(&request)
+
+	if results.Error != nil {
+		fmt.Println(results.Error)
+		return results.Error
+	}
+
+	return nil
+}
+
+func (ap *ApAlarmDao) GetAlarmAction() ([]models.AlarmActions, error) {
+	var response []models.AlarmActions
+	results := ap.DbInfo.Debug().Table("alarm_actions").
+		Select("*").
+		Find(&response)
+
+	if results.Error != nil {
+		fmt.Println(results.Error)
+		return response, results.Error
+	}
+
+	return response, nil
+}
+
+func (ap *ApAlarmDao) UpdateAlarmAction(request models.AlarmActionRequest) error {
+	results := ap.DbInfo.Debug().Table("alarm_actions").
+		Where("id = ?", request.Id).
+		Updates(map[string]interface{}{
+			"alarm_id":          request.AlarmId,
+			"alarm_action_desc": request.AlarmActionDesc,
+			"modi_date":         time.Now().UTC().Add(time.Hour * 9),
+			"modi_user":         "admin"})
+
+	if results.Error != nil {
+		fmt.Println(results.Error)
+		return results.Error
+	}
+
+	return nil
+}
+
+func (ap *ApAlarmDao) DeleteAlarmAction(request models.AlarmActionRequest) error {
+	results := ap.DbInfo.Debug().Table("alarm_actions").
+		Where("id = ?", request.Id).
+		Delete(&request)
+
+	if results.Error != nil {
+		fmt.Println(results.Error)
+		return results.Error
+	}
+
+	return nil
+}

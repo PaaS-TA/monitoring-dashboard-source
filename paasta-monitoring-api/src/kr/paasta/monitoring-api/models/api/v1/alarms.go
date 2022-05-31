@@ -56,6 +56,16 @@ type (
 		ModiDate   string `json:"modiDate"`
 		ModiUser   string `json:"modiUser"`
 	}
+
+	AlarmActions struct {
+		Id              int    `json:"id"`
+		AlarmId         int    `json:"alarmId"`
+		AlarmActionDesc string `json:"alarmActionDesc"`
+		RegDate         string `json:"regDate"`
+		RegUser         string `json:"regUser"`
+		ModiDate        string `json:"modiDate"`
+		ModiUser        string `json:"modiUser"`
+	}
 )
 
 // For request container part.
@@ -82,5 +92,11 @@ type (
 		Token      string `json:"token"`
 		Expl       string `json:"expl"`
 		SnsSendYN  string `json:"snsSendYN"`
+	}
+
+	AlarmActionRequest struct {
+		Id              int    `json:"id"`
+		AlarmId         int    `json:"alarmId"`
+		AlarmActionDesc string `json:"alarmActionDesc"`
 	}
 )

@@ -49,6 +49,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))
 	v1.GET("/users", apiUser.GetUsers)
 
+	// AP - Alarm
 	e.GET("/api/v1/ap/alarm/status", ApAlarm.GetAlarmStatus)
 	e.GET("/api/v1/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
 	e.PUT("/api/v1/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
@@ -57,6 +58,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e.GET("/api/v1/ap/alarm/sns", ApAlarm.GetSnsAccount)
 	e.DELETE("/api/v1/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
 	e.PUT("/api/v1/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
+	e.POST("/api/v1/ap/alarm/action", ApAlarm.CreateAlarmAction)
+	e.GET("/api/v1/ap/alarm/action", ApAlarm.GetAlarmAction)
+	e.PATCH("/api/v1/ap/alarm/action", ApAlarm.UpdateAlarmAction)
+	e.DELETE("/api/v1/ap/alarm/action", ApAlarm.DeleteAlarmAction)
 
 	return e
 }

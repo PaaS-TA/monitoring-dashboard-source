@@ -220,3 +220,107 @@ func (ap *ApAlarmController) UpdateSnsAccount(c echo.Context) error {
 	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update sns account.", results)
 	return nil
 }
+
+// CreateAlarmAction
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람에 대한 조치 내용 작성하기
+//  @Description  알람에 대한 조치 내용을 작성한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "새로 작성할 알람 정보를 주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) CreateAlarmAction(c echo.Context) error {
+	var request models.AlarmActionRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).CreateAlarmAction(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to create alarm actions.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to create alarm actions.", results)
+	return nil
+}
+
+// GetAlarmAction
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람에 대한 조치 내용 가져오기
+//  @Description  알람에 대한 조치 내용을 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) GetAlarmAction(c echo.Context) error {
+	results, err := AP.GetApAlarmService(ap.DbInfo).GetAlarmAction()
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm action.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get alarm action.", results)
+	return nil
+}
+
+// UpdateAlarmAction
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람에 대한 조치 내용 수정하기
+//  @Description  알람에 대한 조치 내용을 수정한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "수정할 알람 정보를 주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) UpdateAlarmAction(c echo.Context) error {
+	var request models.AlarmActionRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).UpdateAlarmAction(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to update alarm action.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to update alarm action.", results)
+	return nil
+}
+
+// DeleteAlarmAction
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람에 대한 조치 내용 삭제하기
+//  @Description  알람에 대한 조치 내용을 삭제한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "삭제할 알람 정보(Id)를  주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (ap *ApAlarmController) DeleteAlarmAction(c echo.Context) error {
+	var request models.AlarmActionRequest
+	err := helpers.BindRequestAndCheckValid(c, &request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := AP.GetApAlarmService(ap.DbInfo).DeleteAlarmAction(request)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to delete alarm action.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to delete alarm action.", results)
+	return nil
+}
