@@ -1,14 +1,14 @@
 package routers
 
 import (
-	"GoEchoProject/connections"
-	apiControllerV1 "GoEchoProject/controllers/api/v1"
-	AP "GoEchoProject/controllers/api/v1/ap"
-	"GoEchoProject/middlewares"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"net/http"
+	"paasta-monitoring-api/connections"
+	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
+	AP "paasta-monitoring-api/controllers/api/v1/ap"
+	"paasta-monitoring-api/middlewares"
 )
 
 //SetupRouter function will perform all route operations
@@ -49,7 +49,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))
 	v1.GET("/users", apiUser.GetUsers)
 
-	// AP
 	e.GET("/api/v1/ap/alarm/status", ApAlarm.GetAlarmStatus)
 	e.GET("/api/v1/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
 	e.PUT("/api/v1/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)

@@ -1,14 +1,14 @@
 package ap
 
 import (
-	"GoEchoProject/apiHelpers"
-	"GoEchoProject/connections"
-	"GoEchoProject/helpers"
-	models "GoEchoProject/models/api/v1"
-	AP "GoEchoProject/services/api/v1/ap"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"paasta-monitoring-api/apiHelpers"
+	"paasta-monitoring-api/connections"
+	"paasta-monitoring-api/helpers"
+	models "paasta-monitoring-api/models/api/v1"
+	AP "paasta-monitoring-api/services/api/v1/ap"
 )
 
 type ApAlarmController struct {

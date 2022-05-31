@@ -1,12 +1,12 @@
 package main
 
 import (
-	Connections "GoEchoProject/connections"
-	_ "GoEchoProject/docs"
-	Routers "GoEchoProject/routers"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	Connections "paasta-monitoring-api/connections"
+	_ "paasta-monitoring-api/docs"
+	Routers "paasta-monitoring-api/routers"
 )
 
 //Execution starts from main function

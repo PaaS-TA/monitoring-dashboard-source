@@ -1,11 +1,11 @@
 package ap
 
 import (
-	"GoEchoProject/connections"
-	v1 "GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"paasta-monitoring-api/connections"
+	v1 "paasta-monitoring-api/models/api/v1"
 )
 
 type BoshController struct {

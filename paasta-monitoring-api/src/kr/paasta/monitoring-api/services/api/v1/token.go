@@ -1,8 +1,6 @@
 package v1service
 
 import (
-	dao "GoEchoProject/dao/api/v1"
-	"GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"github.com/golang-jwt/jwt"
@@ -11,6 +9,8 @@ import (
 	"github.com/twinj/uuid"
 	"net/http"
 	"os"
+	dao "paasta-monitoring-api/dao/api/v1"
+	"paasta-monitoring-api/models/api/v1"
 	"strings"
 	"time"
 )

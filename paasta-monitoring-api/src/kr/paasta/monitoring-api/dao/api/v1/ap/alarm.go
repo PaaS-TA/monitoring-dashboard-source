@@ -1,9 +1,9 @@
 package ap
 
 import (
-	models "GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	models "paasta-monitoring-api/models/api/v1"
 	"time"
 )
 

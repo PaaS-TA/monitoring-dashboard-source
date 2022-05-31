@@ -1,10 +1,10 @@
 package v1
 
 import (
-	models "GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	models "paasta-monitoring-api/models/api/v1"
 )
 
 type UserDao struct {

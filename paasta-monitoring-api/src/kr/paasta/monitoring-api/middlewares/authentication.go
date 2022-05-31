@@ -1,11 +1,11 @@
 package middlewares
 
 import (
-	"GoEchoProject/connections"
-	v1service "GoEchoProject/services/api/v1"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"paasta-monitoring-api/connections"
+	v1service "paasta-monitoring-api/services/api/v1"
 )
 
 func CheckToken(conn connections.Connections) echo.MiddlewareFunc {

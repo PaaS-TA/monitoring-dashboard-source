@@ -1,12 +1,12 @@
 package v1service
 
 import (
-	"GoEchoProject/models/api/v1"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"paasta-monitoring-api/models/api/v1"
 
-	dao "GoEchoProject/dao/api/v1"
+	dao "paasta-monitoring-api/dao/api/v1"
 )
 
 //Gorm Object Struct

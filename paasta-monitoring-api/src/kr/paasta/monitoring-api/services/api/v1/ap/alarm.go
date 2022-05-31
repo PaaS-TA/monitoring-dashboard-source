@@ -1,9 +1,9 @@
 package ap
 
 import (
-	AP "GoEchoProject/dao/api/v1/ap"
-	models "GoEchoProject/models/api/v1"
 	"github.com/jinzhu/gorm"
+	AP "paasta-monitoring-api/dao/api/v1/ap"
+	models "paasta-monitoring-api/models/api/v1"
 )
 
 type ApAlarmService struct {

@@ -1,15 +1,15 @@
 package v1
 
 import (
-	"GoEchoProject/apiHelpers"
-	"GoEchoProject/connections"
-	"GoEchoProject/helpers"
-	"GoEchoProject/models/api/v1"
-	v1service "GoEchoProject/services/api/v1"
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"paasta-monitoring-api/apiHelpers"
+	"paasta-monitoring-api/connections"
+	"paasta-monitoring-api/helpers"
+	"paasta-monitoring-api/models/api/v1"
+	v1service "paasta-monitoring-api/services/api/v1"
 )
 
 type TokenController struct {
