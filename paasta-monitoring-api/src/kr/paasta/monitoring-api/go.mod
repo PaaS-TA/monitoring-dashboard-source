@@ -1,4 +1,4 @@
-module GoEchoProject
+module paasta-monitoring-api
 
 go 1.17
 
@@ -7,10 +7,12 @@ require (
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/gophercloud/gophercloud v0.25.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/swaggo/echo-swagger v1.3.2
+	github.com/swaggo/swag v1.8.1
 	github.com/twinj/uuid v1.0.0
 )
 
@@ -31,7 +33,6 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
-	github.com/swaggo/swag v1.8.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
