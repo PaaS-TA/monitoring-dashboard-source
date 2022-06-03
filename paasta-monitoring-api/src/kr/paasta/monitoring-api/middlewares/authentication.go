@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"os"
 	"paasta-monitoring-api/connections"
 	v1service "paasta-monitoring-api/services/api/v1"
 )
@@ -11,6 +12,11 @@ import (
 func CheckToken(conn connections.Connections) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+
+			mode := os.Getenv("mode")
+			if mode == "development" {
+				return nil
+			}
 
 			// 1. 토큰 추출
 			bearToken, err := v1service.ExtractToken(c)
