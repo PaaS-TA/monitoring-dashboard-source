@@ -2,6 +2,7 @@ package ap
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
 	AP "paasta-monitoring-api/dao/api/v1/ap"
 	models "paasta-monitoring-api/models/api/v1"
 )
@@ -114,4 +115,28 @@ func (ap *ApAlarmService) DeleteAlarmAction(request models.AlarmActionRequest) (
 		return "FAILED DELETE ALARM ACTION!", err
 	}
 	return "SUCCEEDED DELETE ALARM ACTION!", nil
+}
+
+func (ap *ApAlarmService) GetAlarmStatisticsTotal(c echo.Context) ([]map[string]interface{}, error) {
+	results, err := AP.GetApAlarmDao(ap.DbInfo).GetAlarmStatisticsTotal(c)
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
+func (ap *ApAlarmService) GetAlarmStatisticsService(c echo.Context) ([]map[string]interface{}, error) {
+	results, err := AP.GetApAlarmDao(ap.DbInfo).GetAlarmStatisticsService(c)
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
+func (ap *ApAlarmService) GetAlarmStatisticsResource(c echo.Context) ([]map[string]interface{}, error) {
+	results, err := AP.GetApAlarmDao(ap.DbInfo).GetAlarmStatisticsResource(c)
+	if err != nil {
+		return results, err
+	}
+	return results, nil
 }

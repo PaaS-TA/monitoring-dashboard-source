@@ -324,3 +324,63 @@ func (ap *ApAlarmController) DeleteAlarmAction(c echo.Context) error {
 	apiHelpers.Respond(c, http.StatusOK, "Succeeded to delete alarm action.", results)
 	return nil
 }
+
+// GetAlarmStatisticsTotal
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 통계 그래프를 그리기 위한 데이터 가져오기
+//  @Description  알람 통계 그래프를 그리기 위한 데이터를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/statistics/total [get]
+func (ap *ApAlarmController) GetAlarmStatisticsTotal(c echo.Context) error {
+	results, err := AP.GetApAlarmService(ap.DbInfo).GetAlarmStatisticsTotal(c)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm statistics.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get alarm statistics.", results)
+	return nil
+}
+
+// GetAlarmStatisticsService
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 통계 그래프(서비스별)를 그리기 위한 데이터 가져오기
+//  @Description  알람 통계 그래프(서비스별)를 그리기 위한 데이터를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/statistics/service [get]
+func (ap *ApAlarmController) GetAlarmStatisticsService(c echo.Context) error {
+	results, err := AP.GetApAlarmService(ap.DbInfo).GetAlarmStatisticsService(c)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm statistics.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get alarm statistics.", results)
+	return nil
+}
+
+// GetAlarmStatisticsResource
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기
+//  @Description  알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/statistics/resource [get]
+func (ap *ApAlarmController) GetAlarmStatisticsResource(c echo.Context) error {
+	results, err := AP.GetApAlarmService(ap.DbInfo).GetAlarmStatisticsResource(c)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm statistics.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get alarm statistics.", results)
+	return nil
+}

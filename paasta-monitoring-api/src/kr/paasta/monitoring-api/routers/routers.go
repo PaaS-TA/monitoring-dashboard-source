@@ -50,18 +50,21 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/users", apiUser.GetUsers)
 
 	// AP - Alarm
-	v1.GET("/api/v1/ap/alarm/status", ApAlarm.GetAlarmStatus)
-	v1.GET("/api/v1/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
-	v1.PUT("/api/v1/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
-	v1.PUT("/api/v1/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
-	v1.POST("/api/v1/ap/alarm/sns", ApAlarm.RegisterSnsAccount)
-	v1.GET("/api/v1/ap/alarm/sns", ApAlarm.GetSnsAccount)
-	v1.DELETE("/api/v1/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
-	v1.PUT("/api/v1/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
-	v1.POST("/api/v1/ap/alarm/action", ApAlarm.CreateAlarmAction)
-	v1.GET("/api/v1/ap/alarm/action", ApAlarm.GetAlarmAction)
-	v1.PATCH("/api/v1/ap/alarm/action", ApAlarm.UpdateAlarmAction)
-	v1.DELETE("/api/v1/ap/alarm/action", ApAlarm.DeleteAlarmAction)
+	v1.GET("/ap/alarm/status", ApAlarm.GetAlarmStatus)
+	v1.GET("/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
+	v1.PUT("/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
+	v1.PUT("/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
+	v1.POST("/ap/alarm/sns", ApAlarm.RegisterSnsAccount)
+	v1.GET("/ap/alarm/sns", ApAlarm.GetSnsAccount)
+	v1.DELETE("/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
+	v1.PUT("/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
+	v1.POST("/ap/alarm/action", ApAlarm.CreateAlarmAction)
+	v1.GET("/ap/alarm/action", ApAlarm.GetAlarmAction)
+	v1.PATCH("/ap/alarm/action", ApAlarm.UpdateAlarmAction)
+	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
+	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
+	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
+	e.GET("/api/v1/ap/alarm/statistics/resource", ApAlarm.GetAlarmStatisticsResource)
 
 	return e
 }
