@@ -153,7 +153,7 @@ func (ap *ApAlarmController) RegisterSnsAccount(c echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmSns}
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Router       /api/v1/ap/alarm/sns [get]
 func (ap *ApAlarmController) GetSnsAccount(c echo.Context) error {
 	results, err := AP.GetApAlarmService(ap.DbInfo).GetSnsAccount()
 	if err != nil {
@@ -173,8 +173,8 @@ func (ap *ApAlarmController) GetSnsAccount(c echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "삭제할 SNS 계정을 정보(ChannelId)를  주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Success      200  {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [delete]
 func (ap *ApAlarmController) DeleteSnsAccount(c echo.Context) error {
 	var request models.SnsAccountRequest
 	err := helpers.BindRequestAndCheckValid(c, &request)
@@ -201,8 +201,8 @@ func (ap *ApAlarmController) DeleteSnsAccount(c echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "수정할 SNS 계정 정보를 주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Success      200  {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [put]
 func (ap *ApAlarmController) UpdateSnsAccount(c echo.Context) error {
 	var request models.SnsAccountRequest
 	err := helpers.BindRequestAndCheckValid(c, &request)
@@ -229,8 +229,8 @@ func (ap *ApAlarmController) UpdateSnsAccount(c echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "새로 작성할 알람 정보를 주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Success      200  {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/action [post]
 func (ap *ApAlarmController) CreateAlarmAction(c echo.Context) error {
 	var request models.AlarmActionRequest
 	err := helpers.BindRequestAndCheckValid(c, &request)
@@ -256,8 +256,8 @@ func (ap *ApAlarmController) CreateAlarmAction(c echo.Context) error {
 //  @Description  알람에 대한 조치 내용을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Success      200  {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/action [get]
 func (ap *ApAlarmController) GetAlarmAction(c echo.Context) error {
 	results, err := AP.GetApAlarmService(ap.DbInfo).GetAlarmAction()
 	if err != nil {
@@ -278,7 +278,7 @@ func (ap *ApAlarmController) GetAlarmAction(c echo.Context) error {
 //  @Produce      json
 //  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "수정할 알람 정보를 주입한다."
 //  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Router       /api/v1/ap/alarm/action [patch]
 func (ap *ApAlarmController) UpdateAlarmAction(c echo.Context) error {
 	var request models.AlarmActionRequest
 	err := helpers.BindRequestAndCheckValid(c, &request)
@@ -306,7 +306,7 @@ func (ap *ApAlarmController) UpdateAlarmAction(c echo.Context) error {
 //  @Produce      json
 //  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "삭제할 알람 정보(Id)를  주입한다."
 //  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Router       /api/v1/ap/alarm/action [delete]
 func (ap *ApAlarmController) DeleteAlarmAction(c echo.Context) error {
 	var request models.AlarmActionRequest
 	err := helpers.BindRequestAndCheckValid(c, &request)
