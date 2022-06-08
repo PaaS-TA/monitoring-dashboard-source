@@ -1,39 +1,33 @@
 package ap
 
 import (
-	"fmt"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"net/http"
+	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"
-	v1 "paasta-monitoring-api/models/api/v1"
+	models "paasta-monitoring-api/models/api/v1"
+	AP "paasta-monitoring-api/services/api/v1/ap"
 )
 
 type BoshController struct {
-	DbInfo *gorm.DB
+	DbInfo         *gorm.DB
+	InfluxDBClient client.Client
+	BoshInfoList   []models.Bosh
+	Env            map[string]interface{}
 }
 
 func GetBoshController(conn connections.Connections) *BoshController {
 	return &BoshController{
-		DbInfo: conn.DbInfo,
+		DbInfo:         conn.DbInfo,
+		InfluxDBClient: conn.InfluxDBClient,
+		BoshInfoList:   conn.BoshInfoList,
+		Env:            conn.Env,
 	}
 }
 
-// GetBoshOverview
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      Bosh의 상태 별 개수를 가져온다.
-//  @Description  Bosh의 상태 별 개수를 가져온다.
-//  @Accept       json
-//  @Produce      json
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
-//  @Router       /api/v1/bosh/overview [get]
-func (a *BoshController) GetBoshOverview(c echo.Context) (err error) {
-	var BoshSummary []v1.BoshSummary
-	fmt.Println(BoshSummary)
-	return nil
-}
-
-// GetBoshList
+// GetBoshInfoList
 //  * Annotations for Swagger *
 //  @Summary      Bosh의 목록을 가져온다.
 //  @Description  Bosh의 목록을 가져온다.
@@ -42,21 +36,78 @@ func (a *BoshController) GetBoshOverview(c echo.Context) (err error) {
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Bosh}
 //  @Router       /api/v1/bosh [get]
-func (a *BoshController) GetBoshList(c echo.Context) (err error) {
+func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshInfoList()
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
+	// 전체 사용자 정보를 전달한다.
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Info List", results)
 	return nil
 }
 
-// GetBoshProcessList
+// GetBoshOverview
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Bosh Overview 정보를 가져온다.
+//  @Description  Bosh Overview 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshOverview}
+//  @Router       /api/v1/ap/bosh/overview [get]
+func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
+	// Bosh Summary 정보 조회
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshOverview()
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
+	// 전체 사용자 정보를 전달한다.
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Overview", results)
+	return nil
+}
+
+// GetBoshSummary
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Bosh Summary 정보를 가져온다.
+//  @Description  Bosh Summary 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
+//  @Router       /api/v1/ap/bosh/summary [get]
+func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
+	// Bosh Summary 정보 조회
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary()
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
+	// 전체 사용자 정보를 전달한다.
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Summary", results)
+	return nil
+}
+
+// GetBoshProcessByMemory
 //  * Annotations for Swagger *
 //  @tags         AP
 //  @Summary      Bosh의 프로세스 목록을 가져온다.
 //  @Description  Bosh의 프로세스 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        id   query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
+//  @Param        uuid   query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
-//  @Router       /api/v1/bosh/process [get]
-func (a *BoshController) GetBoshProcessList(c echo.Context) (err error) {
+//  @Router       /api/v1/ap/bosh/process [get]
+func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
+	// Bosh Process 정보 조회
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshProcessByMemory()
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
+	// 전체 사용자 정보를 전달한다.
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Process By Memory", results)
 	return nil
 }
 
@@ -70,7 +121,7 @@ func (a *BoshController) GetBoshProcessList(c echo.Context) (err error) {
 //  @Param        id   query     string  false  "Bosh의 차트 정보 조회시 Bosh ID를 주입한다."
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
 //  @Router       /api/v1/bosh/Chart [get]
-func (a *BoshController) GetBoshChart(c echo.Context) (err error) {
+func (b *BoshController) GetBoshChart(c echo.Context) (err error) {
 	return nil
 }
 
@@ -84,6 +135,6 @@ func (a *BoshController) GetBoshChart(c echo.Context) (err error) {
 //  @Param        id   query     string  false  "Bosh의 로그 정보 조회시 Bosh ID를 주입한다."
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshLog}
 //  @Router       /api/v1/bosh/log [get]
-func (a *BoshController) GetBoshLog(c echo.Context) (err error) {
+func (b *BoshController) GetBoshLog(c echo.Context) (err error) {
 	return nil
 }
