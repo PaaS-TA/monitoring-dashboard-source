@@ -41,6 +41,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// Router 설정
 	//// Token은 항상 접근 가능하도록
 	e.POST("/api/v1/token", apiToken.CreateToken) // 토큰 생성
+	e.POST("/api/v1/token2", apiToken.CreateAccessToken)  // member_infos 기반 토큰 생성
 	e.PUT("/api/v1/token", apiToken.RefreshToken) // 토큰 리프레시
 
 	//// 그외에 다른 정보는 발급된 토큰을 기반으로 유효한 토큰을 가진 사용자만 접근하도록 middleware 설정
@@ -50,18 +51,22 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/users", apiUser.GetUsers)
 
 	// AP - Alarm
-	v1.GET("/api/v1/ap/alarm/status", ApAlarm.GetAlarmStatus)
-	v1.GET("/api/v1/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
-	v1.PUT("/api/v1/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
-	v1.PUT("/api/v1/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
-	v1.POST("/api/v1/ap/alarm/sns", ApAlarm.RegisterSnsAccount)
-	v1.GET("/api/v1/ap/alarm/sns", ApAlarm.GetSnsAccount)
-	v1.DELETE("/api/v1/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
-	v1.PUT("/api/v1/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
-	v1.POST("/api/v1/ap/alarm/action", ApAlarm.CreateAlarmAction)
-	v1.GET("/api/v1/ap/alarm/action", ApAlarm.GetAlarmAction)
-	v1.PATCH("/api/v1/ap/alarm/action", ApAlarm.UpdateAlarmAction)
-	v1.DELETE("/api/v1/ap/alarm/action", ApAlarm.DeleteAlarmAction)
+	v1.GET("/ap/alarm/status", ApAlarm.GetAlarmStatus)
+	v1.GET("/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
+	v1.PUT("/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
+	v1.PUT("/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
+	v1.POST("/ap/alarm/sns", ApAlarm.RegisterSnsAccount)
+	v1.GET("/ap/alarm/sns", ApAlarm.GetSnsAccount)
+	v1.DELETE("/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
+	v1.PUT("/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
+	v1.POST("/ap/alarm/action", ApAlarm.CreateAlarmAction)
+	v1.GET("/ap/alarm/action", ApAlarm.GetAlarmAction)
+	v1.PATCH("/ap/alarm/action", ApAlarm.UpdateAlarmAction)
+	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
+
+	// IaaS
+	//IaaSModule := IAAS.GetOpenstackController()
+	//v1.Get("/iaas/hyper/statistics", IaaSModule.GetHypervisorStatistics)
 
 	return e
 }

@@ -51,3 +51,20 @@ func (u *UserDao) GetUser(request models.UserInfo, c echo.Context) (tz []models.
 
 	return t, err
 }
+
+
+func (u *UserDao) GetMemberInfo(param models.MemberInfos, c echo.Context) (tz []models.MemberInfos, err error) {
+	// 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다. (test code)
+	var t []models.MemberInfos
+	users := u.txn.Debug().Model(&models.MemberInfos{}).Where(param).Find(&t)
+	//fmt.Println(users)
+
+	if users.Error != nil {
+		fmt.Println(users.Error)
+		return t, users.Error
+	}
+	//c.Logger().Info(users)
+
+	return t, err
+}
+

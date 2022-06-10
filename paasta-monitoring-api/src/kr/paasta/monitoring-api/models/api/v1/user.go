@@ -1,5 +1,7 @@
 package v1
 
+import "time"
+
 type (
 	UserInfo struct {
 		Username      string `json:"username" validate:"required"`
@@ -32,8 +34,8 @@ type (
 		CaasUserUseYn string `json:"caasUserUseYn"`
 	}
 
-	MemberInfo struct {
-		UserId        string `json:"userId"`
+	MemberInfos struct {
+		UserId        string `gorm:"primaryKey" json:"userId"`
 		UserPw        string `json:"userPw"`
 		UserEmail     string `json:"userEmail"`
 		UserNm        string `json:"userNm"`
@@ -46,6 +48,8 @@ type (
 		IaasUserUseYn string `json:"iaasUserUseYn"`
 		PaasUserUseYn string `json:"paasUserUseYn"`
 		CaasUserUseYn string `json:"caasUserUseYn"`
+		CreatedAt     time.Time
+		UpdatedAt     time.Time
 	}
 )
 

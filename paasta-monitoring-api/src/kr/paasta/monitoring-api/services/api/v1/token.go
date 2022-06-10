@@ -1,6 +1,8 @@
 package v1service
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"github.com/golang-jwt/jwt"
@@ -211,6 +213,36 @@ func (h *TokenService) CreateToken(request v1.CreateToken, c echo.Context) (v1.T
 	return td, nil
 }
 
+
+func (h *TokenService) CreateAccessToken(request v1.TokenParam, c echo.Context) (v1.TokenDetails, error) {
+	// 아이디 및 비밀번호 확인 시 JWT 토큰 발급 및 Redis 저장
+
+	// 1. Token 모델을 선언한다.
+	td := v1.TokenDetails{}
+	passwdHash := getSha256(request.Passwd)
+	memberInfos := v1.MemberInfos{
+		UserId : request.UserId,
+		UserPw : passwdHash,
+	}
+
+	// 2. 전달 받은 계정 정보로 데이터베이스에 계정이 존재하는지 확인한다.
+	results, err := dao.GetUserDao(h.DbInfo).GetMemberInfo(memberInfos, c)
+	if err != nil {
+		return td, err
+	}
+	if len(results) == 0 {
+		return td, fmt.Errorf("reason: cannot found username")
+	}
+
+	// 3. Token 생성
+	td, err = CreateToken(td, results[0].UserId)
+
+	// 4. Token 저장 (Redis)
+	td, err = CreateAuth(td, results[0].UserId, h.RedisInfo)
+	return td, nil
+}
+
+
 func (h *TokenService) RefreshToken(request v1.RefreshToken, c echo.Context) (v1.TokenDetails, error) {
 	// RefreshToken 확인 시 기존 JWT 토큰 정보 삭제 및 생성 후 Redis 저장
 
@@ -257,4 +289,16 @@ func (h *TokenService) RefreshToken(request v1.RefreshToken, c echo.Context) (v1
 	}
 
 	return td, nil
+}
+
+
+
+func getSha256(reqMsg string) string {
+	data := []byte(reqMsg)
+	hash1 := sha256.New()
+	hash1.Write(data)
+	md := hash1.Sum(nil)
+	mdStr := hex.EncodeToString(md)
+
+	return mdStr
 }

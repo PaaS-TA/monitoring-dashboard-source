@@ -53,6 +53,27 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 	return nil
 }
 
+
+func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
+	var params v1.TokenParam
+	err := helpers.BindRequestAndCheckValid(ctx, &params)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	tokenMap, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateAccessToken(params, ctx)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, "Cannot create token", err.Error())
+		return err
+	}
+
+	// TokenDetails로 토근 정보를 전달한다. (AccessToken, RefreshToken, AccessUuid, RefreshUuid, AtExpires, RtExpires)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to create token", tokenMap)
+	return nil
+}
+
+
 // RefreshToken
 //  * Annotations for Swagger *
 //  @Summary      토큰 리프레시하기

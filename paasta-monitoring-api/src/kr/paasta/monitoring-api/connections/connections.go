@@ -3,6 +3,8 @@ package connections
 import (
 	"github.com/go-redis/redis/v7"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/jinzhu/gorm"
 	"os"
 	"paasta-monitoring-api/helpers"
@@ -12,9 +14,10 @@ import (
 type Connections struct {
 	DbInfo    *gorm.DB
 	RedisInfo *redis.Client
+	OpenstackProvider *gophercloud.ProviderClient
 }
 
-func SetEnv(env map[string]string) {
+func setEnv(env map[string]string) {
 
 	// Redis 설정
 	env["redis_url"] = os.Getenv("redis_url")
@@ -29,9 +32,10 @@ func SetEnv(env map[string]string) {
 	env["paas_db_name"] = os.Getenv("paas_db_name")
 	env["paas_db_charset"] = os.Getenv("paas_db_charset")
 	env["paas_db_parseTime"] = os.Getenv("paas_db_parseTime")
+
 }
 
-func RedisConnection(env map[string]string) *redis.Client {
+func redisConnection(env map[string]string) *redis.Client {
 
 	// Redis 설정
 	dsn := env["redis_url"]
@@ -48,7 +52,7 @@ func RedisConnection(env map[string]string) *redis.Client {
 	return redisClient
 }
 
-func PaaSConnection(env map[string]string) *gorm.DB {
+func paasConnection(env map[string]string) *gorm.DB {
 
 	// DB 설정
 	paasDBClient, paasDBErr := gorm.Open(
@@ -71,28 +75,48 @@ func PaaSConnection(env map[string]string) *gorm.DB {
 	return paasDBClient
 }
 
-func SaaSConnection(env map[string]string) error {
+func saasConnection(env map[string]string) error {
 	return nil
 }
 
-func CaaSConnection(env map[string]string) error {
+func caasConnection(env map[string]string) error {
 	return nil
 }
 
-func IaaSConnection(env map[string]string) error {
+func iaasConnection(env map[string]string) error {
 	return nil
+}
+
+func openstackConnection(connections Connections) *gophercloud.ProviderClient {
+	opts := gophercloud.AuthOptions{
+		IdentityEndpoint : os.Getenv("openstack.identity_endpoint"),
+		Username   : os.Getenv("openstack.username"),
+		Password   : os.Getenv("openstack.password"),
+		TenantID   :   	   os.Getenv("openstack.tenant_id"),
+		TenantName : 	   os.Getenv("openstack.tenant_name"),
+		DomainName : 	   os.Getenv("openstack.domain"),
+		//TokenID :	 	   iaasTokenData["iaasToken"],
+		//AllowReauth : 	   false,
+	}
+
+	providerClient, _ := openstack.AuthenticatedClient(opts)
+
+	//openstackToken := providerClient.TokenID
+
+	//새로 로그인 되었으므로 변경된 토큰으로 변경하여 저장
+	//connections.RedisInfo.HSet(reqToken, "iaasToken", providerClient.TokenID)
+	return providerClient
 }
 
 func SetupConnection() Connections {
-
 	conn := Connections{}
 
 	// 환경 변수 설정
 	env := make(map[string]string)
-	SetEnv(env)
+	setEnv(env)
 
 	// 내부 서비스 환경 설정
-	conn.RedisInfo = RedisConnection(env)
+	conn.RedisInfo = redisConnection(env)
 
 	services := os.Getenv("services")
 	servicesArr := strings.Split(services, ",")
@@ -101,13 +125,14 @@ func SetupConnection() Connections {
 	for _, value := range servicesArr {
 		switch value {
 		case "PaaS":
-			conn.DbInfo = PaaSConnection(env)
+			conn.DbInfo = paasConnection(env)
 		case "SaaS":
-			SaaSConnection(env)
+			saasConnection(env)
 		case "CaaS":
-			CaaSConnection(env)
+			caasConnection(env)
 		case "IaaS":
-			IaaSConnection(env)
+			iaasConnection(env)
+			conn.OpenstackProvider = openstackConnection(conn)
 		}
 	}
 	return conn
