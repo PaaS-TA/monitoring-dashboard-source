@@ -15,7 +15,8 @@ func CheckToken(conn connections.Connections) echo.MiddlewareFunc {
 
 			mode := os.Getenv("mode")
 			if mode == "development" {
-				return nil
+				err := next(c)
+				return err
 			}
 
 			// 1. 토큰 추출
