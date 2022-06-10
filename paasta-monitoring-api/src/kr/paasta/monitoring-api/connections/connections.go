@@ -43,16 +43,6 @@ func SetEnv() map[string]interface{} {
 	env["paas_db_charset"] = os.Getenv("paas_db_charset")
 	env["paas_db_parseTime"] = os.Getenv("paas_db_parseTime")
 
-}
-
-func redisConnection(env map[string]string) *redis.Client {
-	env["paas_metric_db_username"] = os.Getenv("paas_metric_db_username")
-	env["paas_metric_db_password"] = os.Getenv("paas_metric_db_password")
-	env["paas_metric_db_url"] = os.Getenv("paas_metric_db_url")
-	env["paas_metric_db_name_paasta"] = os.Getenv("paas_metric_db_name_paasta")
-	env["paas_metric_db_name_bosh"] = os.Getenv("paas_metric_db_name_bosh")
-	env["paas_metric_db_name_container"] = os.Getenv("paas_metric_db_name_container")
-
 	return env
 }
 
@@ -132,15 +122,15 @@ func PaaSConnection(env map[string]interface{}) *gorm.DB {
 	return paasDBClient
 }
 
-func saasConnection(env map[string]string) error {
+func SaasConnection(env map[string]interface{}) error {
 	return nil
 }
 
-func caasConnection(env map[string]string) error {
+func CaaSConnection(env map[string]interface{}) error {
 	return nil
 }
 
-func iaasConnection(env map[string]string) error {
+func IaaSConnection(env map[string]interface{}) error {
 	return nil
 }
 
@@ -203,11 +193,11 @@ func SetupConnection() Connections {
 			Conn.DbInfo = PaaSConnection(Conn.Env)
 			Conn.InfluxDBClient = InfluxDBConnection(Conn.Env)
 		case "SaaS":
-			saaSConnection(Conn.Env)
+			SaasConnection(Conn.Env)
 		case "CaaS":
-			caaSConnection(Conn.Env)
+			CaaSConnection(Conn.Env)
 		case "IaaS":
-			iaaSConnection(Conn.Env)
+			IaaSConnection(Conn.Env)
 		}
 	}
 	return Conn
