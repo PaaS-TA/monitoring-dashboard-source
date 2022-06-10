@@ -37,6 +37,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiUser := apiControllerV1.GetUserController(conn)
 
 	ApAlarm := AP.GetApAlarmController(conn)
+	ApBosh := AP.GetBoshController(conn)
 
 	// Router 설정
 	//// Token은 항상 접근 가능하도록
@@ -67,6 +68,16 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// IaaS
 	//IaaSModule := IAAS.GetOpenstackController()
 	//v1.Get("/iaas/hyper/statistics", IaaSModule.GetHypervisorStatistics)
+	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
+	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
+	e.GET("/api/v1/ap/alarm/statistics/resource", ApAlarm.GetAlarmStatisticsResource)
+
+	e.GET("/api/v1/ap/bosh", ApBosh.GetBoshInfoList)
+	e.GET("/api/v1/ap/bosh/overview", ApBosh.GetBoshOverview)
+	e.GET("/api/v1/ap/bosh/summary", ApBosh.GetBoshSummary)
+	e.GET("/api/v1/ap/bosh/process", ApBosh.GetBoshProcessByMemory)
+	e.GET("/api/v1/ap/bosh/chart/:id", ApBosh.GetBoshChart)
+	e.GET("/api/v1/ap/bosh/Log/:id", ApBosh.GetBoshLog)
 
 	return e
 }

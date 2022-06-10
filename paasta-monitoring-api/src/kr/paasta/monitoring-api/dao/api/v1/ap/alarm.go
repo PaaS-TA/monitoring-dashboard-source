@@ -3,6 +3,7 @@ package ap
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
 	models "paasta-monitoring-api/models/api/v1"
 	"time"
 )
@@ -193,4 +194,146 @@ func (ap *ApAlarmDao) DeleteAlarmAction(request models.AlarmActionRequest) error
 	}
 
 	return nil
+}
+
+func (ap *ApAlarmDao) GetAlarmStatisticsTotal(c echo.Context) ([]map[string]interface{}, error) {
+	request := []models.AlarmStatisticsCriteriaRequest{
+		{"Warning", "warning", "", ""},
+		{"Critical", "critical", "", ""},
+	}
+
+	response, err := GetAlarmStatisticsForGraphByTime(ap, c, request)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (ap *ApAlarmDao) GetAlarmStatisticsService(c echo.Context) ([]map[string]interface{}, error) {
+	request := []models.AlarmStatisticsCriteriaRequest{
+		{"bos-Warning", "warning", "bos", ""},
+		{"bos-Critical", "critical", "bos", ""},
+		{"pas-Warning", "warning", "pas", ""},
+		{"pas-Critical", "critical", "pas", ""},
+		{"con-Warning", "warning", "con", ""},
+		{"con-Critical", "critical", "con", ""},
+	}
+
+	response, err := GetAlarmStatisticsForGraphByTime(ap, c, request)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (ap *ApAlarmDao) GetAlarmStatisticsResource(c echo.Context) ([]map[string]interface{}, error) {
+	request := []models.AlarmStatisticsCriteriaRequest{
+		{"cpu-Warning", "warning", "", "cpu"},
+		{"cpu-Critical", "critical", "", "cpu"},
+		{"memory-Warning", "warning", "", "memory"},
+		{"memory-Critical", "critical", "", "memory"},
+		{"disk-Warning", "warning", "", "disk"},
+		{"disk-Critical", "critical", "", "disk"},
+	}
+
+	response, err := GetAlarmStatisticsForGraphByTime(ap, c, request)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func GetAlarmStatisticsForGraphByTime(ap *ApAlarmDao, c echo.Context, request []models.AlarmStatisticsCriteriaRequest) ([]map[string]interface{}, error) {
+	var period string
+	var timeCriterion string
+	var dateFormat string
+
+	switch c.QueryParam("period") {
+	case "d":
+		period = "DAY"
+		timeCriterion = "HOUR"
+		dateFormat = "%Y-%m-%d %H:00"
+	case "w":
+		period = "WEEK"
+		timeCriterion = "DAY"
+		dateFormat = "%Y-%m-%d"
+	case "m":
+		period = "MONTH"
+		timeCriterion = "DAY"
+		dateFormat = "%Y-%m-%d"
+	case "y":
+		period = "YEAR"
+		timeCriterion = "MONTH"
+		dateFormat = "%Y-%m-01"
+	}
+
+	var countByTimeline []models.CountByTimeline
+	var response []map[string]interface{}
+
+	for _, v := range request {
+		whereRight := `level = '` + v.AlarmLevel + `'`
+		if v.Service != "" {
+			whereRight += ` AND origin_type = '` + v.Service + `'`
+		}
+		if v.Resource != "" {
+			whereRight += ` AND alarm_type = '` + v.Resource + `'`
+		}
+
+		SQLLeft := `
+(
+  WITH RECURSIVE AggregateTable AS (
+    SELECT
+      DATE_FORMAT(NOW(), '` + dateFormat + `') AS TimelineA
+    UNION ALL
+    SELECT
+      DATE_FORMAT(DATE_SUB(AggregateTable.TimelineA, INTERVAL 1 ` + timeCriterion + `), '` + dateFormat + `') AS TimelineB
+    FROM
+      AggregateTable
+  )
+  SELECT
+    DATE_FORMAT(AggregateTable.TimelineA, '` + dateFormat + `') AS Timeline
+  FROM
+    AggregateTable
+  WHERE
+    AggregateTable.TimelineA > DATE_SUB(NOW(), INTERVAL 1 ` + period + `)
+  ORDER BY Timeline ASC
+) L`
+
+		SQLRight := `
+LEFT JOIN
+(
+  SELECT
+    DATE_FORMAT(reg_date, '` + dateFormat + `') AS Timeline,
+    COUNT(*) AS Count
+  FROM
+    alarms
+  WHERE
+    DATE_FORMAT(reg_date, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 ` + period + `)
+  AND
+    DATE_FORMAT(reg_date, '%Y-%m-%d') <= NOW()
+  AND
+    ` + whereRight + `
+  GROUP BY Timeline
+  ORDER BY Timeline ASC
+) R
+ON L.Timeline = R.Timeline`
+
+		results := ap.DbInfo.Debug().Table(SQLLeft).Joins(SQLRight).
+			Select("UNIX_TIMESTAMP(L.Timeline) AS timeline, IFNULL(R.Count, 0) AS count").
+			Order("timeline ASC").
+			Find(&countByTimeline)
+
+		if results.Error != nil {
+			fmt.Println(results.Error)
+			return response, results.Error
+		}
+
+		tmp := map[string]interface{}{"level": v.Alias, "statistics": countByTimeline}
+		response = append(response, tmp)
+	}
+
+	return response, nil
 }

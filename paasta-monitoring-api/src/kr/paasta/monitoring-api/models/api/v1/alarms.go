@@ -68,6 +68,15 @@ type (
 	}
 )
 
+// 사용자정의형 응답을 위한 구조체 정의 영역.
+// JOIN 등으로 생성된 가상 또는 임시 테이블의 결과와 매치시킴.
+type (
+	CountByTimeline struct {
+		Timeline int `json:"timeline"`
+		Count    int `json:"count"`
+	}
+)
+
 // For request container part.
 type (
 	AlarmPolicyRequest struct {
@@ -98,5 +107,12 @@ type (
 		Id              int    `json:"id"`
 		AlarmId         int    `json:"alarmId"`
 		AlarmActionDesc string `json:"alarmActionDesc"`
+	}
+
+	AlarmStatisticsCriteriaRequest struct {
+		Alias      string `json:"alias"`
+		AlarmLevel string `json:"alarmLevel"`
+		Service    string `json:"service"`
+		Resource   string `json:"resource"`
 	}
 )

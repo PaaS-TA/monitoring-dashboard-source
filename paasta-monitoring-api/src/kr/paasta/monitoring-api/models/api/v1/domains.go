@@ -1,0 +1,42 @@
+package v1
+
+const (
+	TOP_PROCESS_CNT          = 5
+	MB                       = 1048576
+	KB                       = 1024
+	STATE_RUNNING            = "running"
+	STATE_FAILED             = "failed"
+	STATE_CRITICAL           = "critical"
+	STATE_WARNING            = "warning"
+	ORIGIN_TYPE_PAAS         = "pas"
+	DISK_STATE_NORMAL        = "healthy"
+	METRIC_NAME_TOTAL_MEMORY = "memoryStats.TotalMemory"
+	//METRIC_NAME_MEMORY_USAGE				= "memoryStats.UsedPercent"
+	METRIC_NAME_FREE_MEMORY              = "memoryStats.FreeMemory"
+	METRIC_NAME_TOTAL_DISK_ROOT          = "diskStats./.Total"
+	METRIC_NAME_TOTAL_DISK_VCAP          = "diskStats./var/vcap/data.Total"
+	METRIC_NAME_CPU_CORE_PREFIX          = "cpuStats.core."
+	METRIC_NAME_CPU_LOAD_AVG_01_MIN      = "cpuStats.LoadAvg1Stats"
+	METRIC_NAME_CPU_LOAD_AVG_05_MIN      = "cpuStats.LoadAvg5Stats"
+	METRIC_NAME_CPU_LOAD_AVG_15_MIN      = "cpuStats.LoadAvg15Stats"
+	METRIC_NAME_DISK_ROOT_USAGE          = "diskStats./.Usage"
+	METRIC_NAME_DISK_VCAP_USAGE          = "diskStats./var/vcap/data.Usage"
+	METRIC_NAME_DISK_IO_ROOT_READ_BYTES  = "diskIOStats.\\/\\..*.readBytes"
+	METRIC_NAME_DISK_IO_ROOT_WRITE_BYTES = "diskIOStats.\\/\\..*.writeBytes"
+	METRIC_NAME_DISK_IO_VCAP_READ_BYTES  = "diskIOStats.\\/var\\/vcap\\/data\\..*.readBytes"
+	METRIC_NAME_DISK_IO_VCAP_WRITE_BYTES = "diskIOStats.\\/var\\/vcap\\/data\\..*.writeBytes"
+	METRIC_NETWORK_IO_BYTES_SENT         = "networkIOStats.eth0.bytesSent"
+	METRIC_NETWORK_IO_BYTES_RECV         = "networkIOStats.eth0.bytesRecv"
+	METRIC_NETWORK_IO_PACKET_SENT        = "networkIOStats.eth0.packetSent"
+	METRIC_NETWORK_IO_PACKET_RECV        = "networkIOStats.eth0.packetRecv"
+	METRIC_NETWORK_IO_DROP_IN            = "networkIOStats.eth0.dropIn"
+	METRIC_NETWORK_IO_DROP_OUT           = "networkIOStats.eth0.dropOut"
+	METRIC_NETWORK_IO_ERR_IN             = "networkIOStats.eth0.errIn"
+	METRIC_NETWORK_IO_ERR_OUT            = "networkIOStats.eth0.errOut"
+	BOSH_DEPLOYMENT_NAME_CF              = "cf"
+	BOSH_NAME                            = "bosh"
+	USAGE_NAME_CPU                       = "CPU"
+	USAGE_NAME_MEMORY                    = "Memory"
+	USAGE_NAME_DISK_ROOT                 = "Disk(/)"
+	USAGE_NAME_DISK_VCAP                 = "Disk(Data)"
+)
