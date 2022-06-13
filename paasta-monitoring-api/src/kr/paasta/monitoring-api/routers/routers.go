@@ -1,15 +1,16 @@
 package routers
 
 import (
+	"net/http"
+	"paasta-monitoring-api/connections"
+	"paasta-monitoring-api/middlewares"
+	AP "paasta-monitoring-api/controllers/api/v1/ap"
+	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
+	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"net/http"
-	"paasta-monitoring-api/connections"
-	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
-	AP "paasta-monitoring-api/controllers/api/v1/ap"
-	IAAS "paasta-monitoring-api/controllers/api/v1/iaas"
-	"paasta-monitoring-api/middlewares"
 )
 
 //SetupRouter function will perform all route operations
@@ -67,8 +68,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
 
 	// IaaS
-	IaaSModule := IAAS.GetOpenstackController(conn.OpenstackProvider)
-	v1.GET("/iaas/hyper/statistics", IaaSModule.GetHypervisorStatistics)
+	iaasModule := iaas.GetOpenstackController(conn.OpenstackProvider)
+	v1.GET("/iaas/hyper/statistics", iaasModule.GetHypervisorStatistics)
+	v1.GET("/iaas/hypervisor/list", iaasModule.GetHypervisorList)
+	v1.GET("/iaas/project/list", iaasModule.GetProjectList)
 
 	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
 	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
