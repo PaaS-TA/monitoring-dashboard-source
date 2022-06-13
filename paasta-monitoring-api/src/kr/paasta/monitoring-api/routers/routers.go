@@ -1,12 +1,15 @@
 package routers
 
 import (
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"net/http"
 	"paasta-monitoring-api/connections"
-	"paasta-monitoring-api/middlewares"
+	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
 	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
-	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
+	"paasta-monitoring-api/middlewares"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -14,11 +17,12 @@ import (
 )
 
 //SetupRouter function will perform all route operations
-func SetupRouter(conn connections.Connections) *echo.Echo {
+func SetupRouter(conn connections.Connections, logger *zap.Logger) *echo.Echo {
 	e := echo.New()
 
 	// Logger 설정 (HTTP requests)
-	e.Use(middleware.Logger())
+	//e.Use(middleware.Logger())
+	e.Use(ApiLogger(logger))
 	// Recover 설정 (recovers panics, prints stack trace)
 	e.Use(middleware.Recover())
 
@@ -68,7 +72,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
 
 	// IaaS
-	iaasModule := iaas.GetOpenstackController(conn.OpenstackProvider)
+	iaasModule := iaas.GetOpenstackController(conn.OpenstackProvider, logger)
 	v1.GET("/iaas/hyper/statistics", iaasModule.GetHypervisorStatistics)
 	v1.GET("/iaas/hypervisor/list", iaasModule.GetHypervisorList)
 	v1.GET("/iaas/project/list", iaasModule.GetProjectList)
@@ -87,4 +91,48 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e.GET("/api/v1/ap/bosh/Log/:id", ApBosh.GetBoshLog)
 
 	return e
+}
+
+
+func ApiLogger(logger *zap.Logger) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+
+			now := time.Now()
+			err := next(ctx)
+			if err != nil {
+				ctx.Error(err)
+			}
+
+			requestId := ctx.Request().Header.Get(echo.HeaderXRequestID)
+			if requestId == "" {
+				ctx.Response().Header().Get(echo.HeaderXRequestID)
+			}
+			fields := []zapcore.Field{
+				zap.Int("status", ctx.Response().Status),
+				zap.String("latency", time.Since(now).String()),
+				zap.String("id", requestId),
+				zap.String("method", ctx.Request().Method),
+				zap.String("uri", ctx.Request().RequestURI),
+				zap.String("host", ctx.Request().Host),
+				zap.String("remote_ip", ctx.RealIP()),
+			}
+
+			n := ctx.Response().Status
+			switch {
+			case n >= 500:
+				logger.Error("Server error", fields...)
+			case n >= 400:
+				logger.Warn("Client error", fields...)
+			case n >= 300:
+				logger.Info("Redirection", fields...)
+			default:
+				logger.Info("Success", fields...)
+			}
+
+			return nil
+
+		}
+
+	}
 }
