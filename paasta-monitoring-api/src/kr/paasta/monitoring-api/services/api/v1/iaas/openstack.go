@@ -2,6 +2,7 @@ package iaas
 
 import (
 	"fmt"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/usage"
 	utils "paasta-monitoring-api/helpers"
 
 	"github.com/gophercloud/gophercloud"
@@ -155,4 +156,41 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 	return list, err
 }
 
+func (service *OpenstackService) RetrieveTenantUsage() ([]usage.TenantUsage, error) {
+	computeClient, _ := utils.GetComputeClient(service.Provider, "")
 
+	allTenantsOpts := usage.AllTenantsOpts{
+		Detailed: true,
+	}
+
+	usagePages, err := usage.AllTenants(computeClient, allTenantsOpts).AllPages()
+	usageList, _ := usage.ExtractAllTenants(usagePages)
+
+	// IP 정보는 별도로 조회해야 하지만.. 속도가 너무 느려짐..
+	/*
+		for _, item := range(usageList) {
+			for _, server := range(item.ServerUsages) {
+				id := server.InstanceID
+
+
+				result, _ := servers.Get(computeClient, id).Extract()
+				addressList := result.Addresses
+				for _, address := range addressList {
+					tee := address.([]interface{})
+					tee2 := tee[0].(map[string]interface{})
+					ipAddress := tee2["addr"]
+					server.Name += " ("
+					server.Name += ipAddress.(string)
+					server.Name += ")"
+
+					fmt.Println(server.Name)
+				}
+
+			}
+		}
+	*/
+
+	//service.GetServerDetail("08769233-2599-4ba5-ae54-e8aa92bd11b9")
+
+	return usageList, err
+}
