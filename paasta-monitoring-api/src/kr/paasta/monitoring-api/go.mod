@@ -16,6 +16,7 @@ require (
 	github.com/swaggo/echo-swagger v1.3.3
 	github.com/swaggo/swag v1.8.2
 	github.com/twinj/uuid v1.0.0
+	go.uber.org/zap v1.21.0
 )
 
 require (
@@ -42,6 +43,8 @@ require (
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
 	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb // indirect

@@ -1,6 +1,9 @@
 package routers
 
 import (
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"net/http"
@@ -10,18 +13,15 @@ import (
 	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
 	"paasta-monitoring-api/middlewares"
 	"time"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 //SetupRouter function will perform all route operations
-func SetupRouter(conn connections.Connections, logger *zap.Logger) *echo.Echo {
+func SetupRouter(conn connections.Connections) *echo.Echo {
 	e := echo.New()
 
 	// Logger 설정 (HTTP requests)
-	//e.Use(middleware.Logger())
-	e.Use(ApiLogger(logger))
+	e.Use(middleware.Logger())
+
 	// Recover 설정 (recovers panics, prints stack trace)
 	e.Use(middleware.Recover())
 
@@ -71,7 +71,7 @@ func SetupRouter(conn connections.Connections, logger *zap.Logger) *echo.Echo {
 	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
 
 	// IaaS
-	iaasModule := iaas.GetOpenstackController(conn.OpenstackProvider, logger)
+	iaasModule := iaas.GetOpenstackController(conn.OpenstackProvider)
 	v1.GET("/iaas/hyper/statistics", iaasModule.GetHypervisorStatistics)
 	v1.GET("/iaas/hypervisor/list", iaasModule.GetHypervisorList)
 	v1.GET("/iaas/project/list", iaasModule.GetProjectList)

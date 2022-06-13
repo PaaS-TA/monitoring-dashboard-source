@@ -9,6 +9,8 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
+	"go.uber.org/zap"
+	"log"
 	"net/http"
 	"os"
 	"paasta-monitoring-api/helpers"
@@ -24,6 +26,7 @@ type Connections struct {
 	BoshInfoList      []models.Bosh
 	Env               map[string]interface{}
 	OpenstackProvider *gophercloud.ProviderClient
+	Logger *zap.Logger
 }
 
 /*
@@ -186,6 +189,7 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 	return influxDBClient
 }
 
+
 func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: env["openstack_identity_endpoint"].(string),
@@ -197,9 +201,9 @@ func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient
 	}
 	providerClient, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err.Error())
 	}
-	fmt.Println("Openstack TokenID : " + providerClient.TokenID)
+	log.Println("Openstack TokenID : " + providerClient.TokenID)
 	//openstackToken := providerClient.TokenID
 
 	// TODO Openstack 토큰 적재 방식 수립 필요
@@ -210,10 +214,9 @@ func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient
 
 func SetupConnection() Connections {
 
-	Conn := Connections{}
-
-	// 환경 변수 설정
-	Conn.Env = SetEnv()
+	Conn := Connections{
+		Env: SetEnv(),
+	}
 
 	// 내부 서비스 환경 설정
 	Conn.RedisInfo = RedisConnection(Conn.Env)
