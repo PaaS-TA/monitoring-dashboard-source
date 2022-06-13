@@ -3,10 +3,10 @@ package routers
 import (
 	"net/http"
 	"paasta-monitoring-api/connections"
-	"paasta-monitoring-api/middlewares"
+	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
 	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
-	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
+	"paasta-monitoring-api/middlewares"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -43,9 +43,9 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	// Router 설정
 	//// Token은 항상 접근 가능하도록
-	e.POST("/api/v1/token", apiToken.CreateToken) // 토큰 생성
-	e.POST("/api/v1/token2", apiToken.CreateAccessToken)  // member_infos 기반 토큰 생성
-	e.PUT("/api/v1/token", apiToken.RefreshToken) // 토큰 리프레시
+	e.POST("/api/v1/token", apiToken.CreateToken)        // 토큰 생성
+	e.POST("/api/v1/token2", apiToken.CreateAccessToken) // member_infos 기반 토큰 생성
+	e.PUT("/api/v1/token", apiToken.RefreshToken)        // 토큰 리프레시
 
 	//// 그외에 다른 정보는 발급된 토큰을 기반으로 유효한 토큰을 가진 사용자만 접근하도록 middleware 설정
 	//// 추가 설명 : middlewares.CheckToken 설정 (입력된 JWT 토큰 검증 및 검증된 요청자 API 접근 허용)
@@ -74,7 +74,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/iaas/project/list", iaasModule.GetProjectList)
 	v1.GET("/iaas/instance/usage/list", iaasModule.GetProjectUsage)
 
-
 	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
 	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
 	e.GET("/api/v1/ap/alarm/statistics/resource", ApAlarm.GetAlarmStatisticsResource)
@@ -83,8 +82,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e.GET("/api/v1/ap/bosh/overview", ApBosh.GetBoshOverview)
 	e.GET("/api/v1/ap/bosh/summary", ApBosh.GetBoshSummary)
 	e.GET("/api/v1/ap/bosh/process", ApBosh.GetBoshProcessByMemory)
-	e.GET("/api/v1/ap/bosh/chart/:id", ApBosh.GetBoshChart)
-	e.GET("/api/v1/ap/bosh/Log/:id", ApBosh.GetBoshLog)
+	e.GET("/api/v1/ap/bosh/chart/:uuid", ApBosh.GetBoshChart)
+	e.GET("/api/v1/ap/bosh/log/:uuid", ApBosh.GetBoshLog)
 
 	return e
 }

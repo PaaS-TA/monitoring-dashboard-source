@@ -19,6 +19,7 @@ const (
 	MTR_DISK_USAGE          = "diskStats./.Usage"
 	MTR_DISK_DATA_TOTAL     = "diskStats./var/vcap/data.Total"
 	MTR_DISK_DATA_USED      = "diskStats./var/vcap/data.Used"
+	MTR_DISK_DATA_USAGE     = "diskStats./var/vcap/data.Usage"
 	MTR_DISK_USAGE_STR      = "diskStats.%s.Usage"
 	MTR_DISK_IO_READ_STR    = "diskIOStats.%s.readBytes"
 	MTR_DISK_IO_WRITE_STR   = "diskIOStats.%s.writeBytes"
@@ -82,12 +83,25 @@ type (
 	}
 
 	BoshChart struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
+		UUID             string `json:"uuid"`
+		MetricName       string `json:"metricname"`
+		SqlQuery         string `json:"sqlquery"`
+		DefaultTimeRange string `json:"defaulttimerange"`
+		TimeRangeFrom    string `json:"timerangefrom"`
+		TimeRangeTo      string `json:"timerangeto"`
+		GroupBy          string `json:"groupby"`
+		IsConvertKb      bool   `json:"isconvertkb"`
+		MetricData       map[string]interface{}
 	}
 
 	BoshLog struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
+		UUID       string `json:"uuid"`
+		LogType    string `json:"logType"`
+		Keyword    string `json:"keyword"`
+		TargetDate string `json:"targetDate"`
+		Period     string `json:"period"`
+		StartTime  string `json:"startTime"`
+		EndTime    string `json:"endTime"`
+		Messages   interface{}
 	}
 )
