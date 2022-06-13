@@ -8,6 +8,7 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
+	IAAS "paasta-monitoring-api/controllers/api/v1/iaas"
 	"paasta-monitoring-api/middlewares"
 )
 
@@ -66,8 +67,9 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
 
 	// IaaS
-	//IaaSModule := IAAS.GetOpenstackController()
-	//v1.Get("/iaas/hyper/statistics", IaaSModule.GetHypervisorStatistics)
+	IaaSModule := IAAS.GetOpenstackController(conn.OpenstackProvider)
+	v1.GET("/iaas/hyper/statistics", IaaSModule.GetHypervisorStatistics)
+
 	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
 	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
 	e.GET("/api/v1/ap/alarm/statistics/resource", ApAlarm.GetAlarmStatisticsResource)

@@ -23,14 +23,41 @@ type Connections struct {
 	InfluxDBClient client.Client
 	BoshInfoList   []models.Bosh
 	Env            map[string]interface{}
+	OpenstackProvider *gophercloud.ProviderClient
+}
+
+/*
+	Read for environment variables including variables of system and program
+ */
+func getEnv(envData []string, getKeyVal func(item string) (key, value string)) map[string]interface{} {
+	envMap := make(map[string]interface{})
+	for _, item := range envData {
+		key, value := getKeyVal(item)
+		envMap[key] = value
+	}
+	return envMap
 }
 
 func SetEnv() map[string]interface{} {
+	envMap := getEnv(os.Environ(), func(item string) (key, value string) {
+		keyValueSplit := strings.Split(item, "=")
+		key = keyValueSplit[0]
+		value = keyValueSplit[1]
+		return
+	})
 
+	for key,value := range envMap {
+		if strings.Contains(key, "openstack") {
+			fmt.Println(key + " : " + value.(string))
+		}
+	}
+
+	/*
 	env := make(map[string]interface{})
 
 	// Redis 설정
 	env["redis_url"] = os.Getenv("redis_url")
+	env["redis_db"], _ = strconv.Atoi(os.Getenv("redis_db"))
 
 	// PaaS DataBase 설정
 	env["paas_db_type"] = os.Getenv("paas_db_type")
@@ -42,8 +69,8 @@ func SetEnv() map[string]interface{} {
 	env["paas_db_name"] = os.Getenv("paas_db_name")
 	env["paas_db_charset"] = os.Getenv("paas_db_charset")
 	env["paas_db_parseTime"] = os.Getenv("paas_db_parseTime")
-
-	return env
+	*/
+	return envMap
 }
 
 func GetBoshInfoList(env map[string]interface{}) []models.Bosh {
@@ -90,8 +117,11 @@ func RedisConnection(env map[string]interface{}) *redis.Client {
 	if len(dsn) == 0 {
 		dsn = "localhost:6379"
 	}
+	redisDbName, _ := strconv.Atoi(env["redis_db"].(string))
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: dsn, //redis port
+		Password: env["redis_password"].(string),
+		DB: redisDbName,
 	})
 	_, err := redisClient.Ping().Result()
 	if err != nil {
@@ -149,22 +179,22 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 }
 
 
-func openstackConnection(connections Connections) *gophercloud.ProviderClient {
+func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
-		IdentityEndpoint : os.Getenv("openstack.identity_endpoint"),
-		Username   : os.Getenv("openstack.username"),
-		Password   : os.Getenv("openstack.password"),
-		TenantID   :   	   os.Getenv("openstack.tenant_id"),
-		TenantName : 	   os.Getenv("openstack.tenant_name"),
-		DomainName : 	   os.Getenv("openstack.domain"),
-		//TokenID :	 	   iaasTokenData["iaasToken"],
-		//AllowReauth : 	   false,
+		IdentityEndpoint : env["openstack_identity_endpoint"].(string),
+		Username         : env["openstack_username"].(string),
+		Password         : env["openstack_password"].(string),
+		TenantName       : env["openstack_tenant_name"].(string),
+		DomainName       : env["openstack_domain"].(string),
 	}
-
-	providerClient, _ := openstack.AuthenticatedClient(opts)
-
+	providerClient, err := openstack.AuthenticatedClient(opts)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Openstack TokenID : " + providerClient.TokenID)
 	//openstackToken := providerClient.TokenID
 
+	// TODO Openstack 토큰 적재 방식 수립 필요
 	//새로 로그인 되었으므로 변경된 토큰으로 변경하여 저장
 	//connections.RedisInfo.HSet(reqToken, "iaasToken", providerClient.TokenID)
 	return providerClient
@@ -198,6 +228,7 @@ func SetupConnection() Connections {
 			CaaSConnection(Conn.Env)
 		case "IaaS":
 			IaaSConnection(Conn.Env)
+			Conn.OpenstackProvider = openstackConnection(Conn.Env)
 		}
 	}
 	return Conn
