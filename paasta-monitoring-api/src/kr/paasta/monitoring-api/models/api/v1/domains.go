@@ -1,6 +1,56 @@
 package v1
 
 const (
+	CSRF_TOKEN_NAME   = "X-XSRF-TOKEN"
+	TEST_TOKEN_NAME   = "TestCase"
+	TEST_TOKEN_VALUE  = "TestCase"
+	USER_SESSION_NAME = "info"
+
+	METRIC_NAME_CPU_USAGE    = "cpu"
+	METRIC_NAME_CPU_LOAD_1M  = "1m"
+	METRIC_NAME_CPU_LOAD_5M  = "5m"
+	METRIC_NAME_CPU_LOAD_15M = "15m"
+	METRIC_NAME_MEMORY_SWAP  = "swap"
+	METRIC_NAME_MEMORY_USAGE = "memory"
+
+	METRIC_NAME_NETWORK_ETH_IN  = "InEth"
+	METRIC_NAME_NETWORK_VX_IN   = "InVxlan"
+	METRIC_NAME_NETWORK_ETH_OUT = "OutEth"
+	METRIC_NAME_NETWORK_VX_OUT  = "OutVxlan"
+
+	METRIC_NAME_NETWORK_ETH_IN_ERROR  = "InEth"
+	METRIC_NAME_NETWORK_VX_IN_ERROR   = "InVxlan"
+	METRIC_NAME_NETWORK_ETH_OUT_ERROR = "OutEth"
+	METRIC_NAME_NETWORK_VX_OUT_ERROR  = "OutVxlan"
+
+	METRIC_NAME_NETWORK_ETH_IN_DROPPED_PACKET  = "InEth"
+	METRIC_NAME_NETWORK_VX_IN_DROPPED_PACKET   = "InVxlan"
+	METRIC_NAME_NETWORK_ETH_OUT_DROPPED_PACKET = "OutEth"
+	METRIC_NAME_NETWORK_VX_OUT_DROPPED_PACKET  = "OutVxlan"
+
+	METRIC_NAME_DISK_READ_KBYTE  = "read"
+	METRIC_NAME_DISK_WRITE_KBYTE = "write"
+
+	METRIC_NAME_NETWORK_IN  = "in"
+	METRIC_NAME_NETWORK_OUT = "out"
+
+	RESULT_CNT        = "totalCnt"
+	RESULT_PROJECT_ID = "tenantId"
+	RESULT_NAME       = "name"
+	RESULT_DATA       = "data"
+	RESULT_DATA_NAME  = "metric"
+
+	VM_STATUS_NO        = "noStatus"
+	VM_STATUS_RUNNING   = "running"
+	VM_STATUS_IDLE      = "idle/blocked"
+	VM_STATUS_PAUSED    = "paused"
+	VM_STATUS_SHUTDOWN  = "shutDown"
+	VM_STATUS_SHUTOFF   = "shutOff"
+	VM_STATUS_CRASHED   = "crashed"
+	VM_STATUS_POEWR_OFF = "powerOff"
+)
+
+const (
 	TOP_PROCESS_CNT          = 5
 	MB                       = 1048576
 	KB                       = 1024
@@ -40,3 +90,12 @@ const (
 	USAGE_NAME_DISK_ROOT                 = "Disk(/)"
 	USAGE_NAME_DISK_VCAP                 = "Disk(Data)"
 )
+
+type (
+	LogInfo struct {
+		Time    string `json:"time"`
+		Message string `json:"message"`
+	}
+)
+
+var GmtTimeGap int

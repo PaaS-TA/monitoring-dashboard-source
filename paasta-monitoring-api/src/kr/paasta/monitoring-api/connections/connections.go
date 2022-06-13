@@ -18,17 +18,17 @@ import (
 )
 
 type Connections struct {
-	DbInfo         *gorm.DB
-	RedisInfo      *redis.Client
-	InfluxDBClient client.Client
-	BoshInfoList   []models.Bosh
-	Env            map[string]interface{}
+	DbInfo            *gorm.DB
+	RedisInfo         *redis.Client
+	InfluxDBClient    client.Client
+	BoshInfoList      []models.Bosh
+	Env               map[string]interface{}
 	OpenstackProvider *gophercloud.ProviderClient
 }
 
 /*
 	Read for environment variables including variables of system and program
- */
+*/
 func getEnv(envData []string, getKeyVal func(item string) (key, value string)) map[string]interface{} {
 	envMap := make(map[string]interface{})
 	for _, item := range envData {
@@ -46,29 +46,37 @@ func SetEnv() map[string]interface{} {
 		return
 	})
 
-	for key,value := range envMap {
+	for key, value := range envMap {
 		if strings.Contains(key, "openstack") {
 			fmt.Println(key + " : " + value.(string))
 		}
 	}
 
 	/*
-	env := make(map[string]interface{})
+		env := make(map[string]interface{})
 
-	// Redis 설정
-	env["redis_url"] = os.Getenv("redis_url")
-	env["redis_db"], _ = strconv.Atoi(os.Getenv("redis_db"))
+		// Redis 설정
+		env["redis_url"] = os.Getenv("redis_url")
+		env["redis_db"], _ = strconv.Atoi(os.Getenv("redis_db"))
 
-	// PaaS DataBase 설정
-	env["paas_db_type"] = os.Getenv("paas_db_type")
-	env["paas_db_password"] = os.Getenv("paas_db_password")
-	env["paas_db_username"] = os.Getenv("paas_db_username")
-	env["paas_db_protocol"] = os.Getenv("paas_db_protocol")
-	env["paas_db_host"] = os.Getenv("paas_db_host")
-	env["paas_db_port"] = os.Getenv("paas_db_port")
-	env["paas_db_name"] = os.Getenv("paas_db_name")
-	env["paas_db_charset"] = os.Getenv("paas_db_charset")
-	env["paas_db_parseTime"] = os.Getenv("paas_db_parseTime")
+		// PaaS DataBase 설정
+		env["paas_db_type"] = os.Getenv("paas_db_type")
+		env["paas_db_password"] = os.Getenv("paas_db_password")
+		env["paas_db_username"] = os.Getenv("paas_db_username")
+		env["paas_db_protocol"] = os.Getenv("paas_db_protocol")
+		env["paas_db_host"] = os.Getenv("paas_db_host")
+		env["paas_db_port"] = os.Getenv("paas_db_port")
+		env["paas_db_name"] = os.Getenv("paas_db_name")
+		env["paas_db_charset"] = os.Getenv("paas_db_charset")
+		env["paas_db_parseTime"] = os.Getenv("paas_db_parseTime")
+
+		env["paas_metric_db_username"] = os.Getenv("paas_metric_db_username")
+		env["paas_metric_db_password"] = os.Getenv("paas_metric_db_password")
+		env["paas_metric_db_url"] = os.Getenv("paas_metric_db_url")
+		env["paas_metric_db_name_paasta"] = os.Getenv("paas_metric_db_name_paasta")
+		env["paas_metric_db_name_bosh"] = os.Getenv("paas_metric_db_name_bosh")
+		env["paas_metric_db_name_container"] = os.Getenv("paas_metric_db_name_container")
+		env["paas_metric_db_name_logging"] = os.Getenv("paas_metric_db_name_logging")
 	*/
 	return envMap
 }
@@ -119,9 +127,9 @@ func RedisConnection(env map[string]interface{}) *redis.Client {
 	}
 	redisDbName, _ := strconv.Atoi(env["redis_db"].(string))
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: dsn, //redis port
+		Addr:     dsn, //redis port
 		Password: env["redis_password"].(string),
-		DB: redisDbName,
+		DB:       redisDbName,
 	})
 	_, err := redisClient.Ping().Result()
 	if err != nil {
@@ -178,16 +186,14 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 	return influxDBClient
 }
 
-
 func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
-		IdentityEndpoint : env["openstack_identity_endpoint"].(string),
-		DomainName       : env["openstack_domain"].(string),
-		Username         : env["openstack_username"].(string),
-		Password         : env["openstack_password"].(string),
-		TenantID         : env["openstack_tenant_id"].(string),
-		AllowReauth      : true,
-
+		IdentityEndpoint: env["openstack_identity_endpoint"].(string),
+		DomainName:       env["openstack_domain"].(string),
+		Username:         env["openstack_username"].(string),
+		Password:         env["openstack_password"].(string),
+		TenantID:         env["openstack_tenant_id"].(string),
+		AllowReauth:      true,
 	}
 	providerClient, err := openstack.AuthenticatedClient(opts)
 	if err != nil {

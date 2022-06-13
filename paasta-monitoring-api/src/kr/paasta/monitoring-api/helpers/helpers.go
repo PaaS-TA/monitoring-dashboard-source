@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	models "paasta-monitoring-api/models/api/v1"
 	"reflect"
 	"strconv"
 	"time"
@@ -42,6 +43,59 @@ func BindRequestAndCheckValid(c echo.Context, request interface{}) error {
 func rfc3339ToUnixTimestamp(metricDataTime string) int64 {
 	t, _ := time.Parse(time.RFC3339, metricDataTime)
 	return t.Unix()
+}
+
+//조회한 결과List를 Map으로 변환한다.
+func InfluxConverterList(resp *client.Response, name string) (map[string]interface{}, error) {
+
+	if len(resp.Results) != 1 {
+		return nil, nil
+	} else {
+		//UI로 Return할 결과값
+		var returnValues []map[string]interface{}
+		var columns []string
+
+		for _, v := range resp.Results[0].Series {
+			for _, vc := range v.Columns {
+				columns = append(columns, vc)
+			}
+
+			for i := 0; i < len(v.Values); i++ {
+				row := make(map[string]interface{})
+
+				//InfluxDB에서 Value 값이 nil인 경우 해당 row는 값을 보내주지 않는다.
+				if v.Values[i][1] != nil {
+					for kv, vv := range v.Values[i] {
+						if vv != nil {
+							//Time Column Case convert to UnixTimestamp
+							if kv == 0 {
+								t := rfc3339ToUnixTimestamp(reflect.ValueOf(vv).String())
+								row[columns[kv]] = t
+							} else {
+
+								/*datamap := vv.(json.Number)
+								returnValue, _ := strconv.ParseFloat(datamap.String(),64)
+								row[columns[kv]] = 100 - returnValue*/
+								row[columns[kv]] = vv
+							}
+
+						} else {
+							row[columns[kv]] = ""
+						}
+					}
+					returnValues = append(returnValues, row)
+				}
+			}
+
+		}
+
+		result := map[string]interface{}{
+			/*models.RESULT_NAME:      name,*/
+			models.RESULT_DATA_NAME: returnValues,
+		}
+		return result, nil
+	}
+
 }
 
 //조회한 결과List를 Map으로 변환한다.
@@ -88,6 +142,123 @@ func InfluxConverterToMap(resp *client.Response) ([]map[string]interface{}, erro
 
 		return returnValues, nil
 	}
+}
+
+//조회한 결과를 Map으로 변환한다.
+func InfluxConverter4Usage(resp *client.Response, name string) (map[string]interface{}, error) {
+
+	fmt.Println(resp)
+	if len(resp.Results) != 2 {
+		return nil, nil
+	} else {
+		//UI로 Return할 결과값
+		//var returnValues      map[string]interface{}
+		//MetricDB에서 받은 결과 값
+		var resultValues []map[string]interface{}
+		var returnValuesTotal []map[string]interface{}
+
+		var columns []string
+
+		for _, v := range resp.Results[0].Series {
+			for _, vc := range v.Columns {
+				columns = append(columns, vc)
+			}
+
+			for i := 0; i < len(v.Values); i++ {
+				row := make(map[string]interface{})
+				for kv, vv := range v.Values[i] {
+					if vv != nil {
+						row[columns[kv]] = vv
+					} else {
+						row[columns[kv]] = ""
+					}
+				}
+				returnValuesTotal = append(returnValuesTotal, row)
+			}
+		}
+
+		//revel.TRACE.Printf("returnValues1 ===>%s" , returnValues1)
+		for _, v := range resp.Results[1].Series {
+			for _, vc := range v.Columns {
+				columns = append(columns, vc)
+			}
+
+			//만약 return된 두개의 결과 Data건수가 다를경우 작은 Data를 기준으로 건수계산
+			resultDataCnt := 0
+
+			if len(v.Values) != len(returnValuesTotal) {
+				if len(v.Values) > len(returnValuesTotal) {
+					resultDataCnt = len(returnValuesTotal)
+				} else if len(v.Values) < len(returnValuesTotal) {
+					resultDataCnt = len(v.Values)
+				}
+
+			} else {
+				resultDataCnt = len(returnValuesTotal)
+			}
+
+			for i := 0; i < resultDataCnt; i++ {
+				row := make(map[string]interface{})
+
+				for kv, vv := range v.Values[i] {
+
+					if kv == 0 {
+						//동일한 일시 DateTime인지 Check한다
+						//사용률이 null 이거나 "" 이면 백분률 계산에서 제외한다.
+						//시간을 10초단위로 동일 Data 체크
+						for _, totalData := range returnValuesTotal {
+							time1 := vv.(string)
+							time2 := totalData["time"].(string)
+							if vv != nil && v.Values[i][1] != nil && totalData["usage"] != "" && time1[0:18] == time2[0:18] {
+								isNegative := false
+
+								if kv == 0 {
+
+									//return된 Type이 Interface{}이므로 String으로 변환 후 Integer로 변환한다.
+									total := reflect.ValueOf(totalData["usage"]).String()
+									idle := reflect.ValueOf(v.Values[i][1]).String()
+									totalUsage, _ := strconv.ParseFloat(total, 64)
+									idleUsage, _ := strconv.ParseFloat(idle, 64)
+
+									t := rfc3339ToUnixTimestamp(reflect.ValueOf(vv).String())
+
+									//사용률 계산한다.
+									result := idleUsage / totalUsage * 100
+
+									//DiskSize인 경우 간헐적으로 비정상적인 Data가 들어온다.
+									//Ex) totalUsage > idleUsage
+									//이런 비정상적인 Data는 Skip한다.
+									if idleUsage > totalUsage {
+										isNegative = true
+									} else {
+										row[columns[0]] = t
+										row[columns[1]] = 100 - result
+									}
+
+								}
+								if isNegative == false {
+									resultValues = append(resultValues, row)
+									isNegative = false
+								} else {
+									isNegative = false
+								}
+
+							}
+						}
+
+					}
+				}
+			}
+		}
+
+		result := map[string]interface{}{
+			/*models.RESULT_NAME:      name,*/
+			models.RESULT_DATA_NAME: resultValues,
+		}
+		//returnValues = append(returnValues, result)
+		return result, nil
+	}
+
 }
 
 func TypeChecker_float64(target interface{}) interface{} {

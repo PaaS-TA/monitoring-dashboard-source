@@ -102,12 +102,169 @@ func (b *ApBoshService) GetBoshProcessByMemory() ([]models.BoshProcess, error) {
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshChart() ([]models.BoshChart, error) {
+func (b *ApBoshService) GetBoshChart(boshChart models.BoshChart) ([]models.BoshChart, error) {
 	var results []models.BoshChart
+
+	for _, boshInfo := range b.BoshInfoList {
+		boshChart.MetricName = models.MTR_CPU_CORE
+		cpuUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuUsageList(boshChart)
+		boshChart.MetricName = models.MTR_CPU_LOAD_1M
+		cpuLoad1MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuLoadList(boshChart)
+		boshChart.MetricName = models.MTR_CPU_LOAD_5M
+		cpuLoad5MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuLoadList(boshChart)
+		boshChart.MetricName = models.MTR_CPU_LOAD_15M
+		cpuLoad15MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuLoadList(boshChart)
+
+		boshChart.MetricName = models.MTR_MEM_USAGE
+		memoryUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshMemoryUsageList(boshChart)
+
+		boshChart.MetricName = models.MTR_DISK_USAGE
+		diskUsageRootResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskUsageList(boshChart)
+		boshChart.MetricName = models.MTR_DISK_DATA_USAGE
+		diskUsageVcapDataResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskUsageList(boshChart)
+
+		boshChart.MetricName = "diskIOStats.\\/\\..*.readBytes"
+		diskIoRootReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		boshChart.MetricName = "diskIOStats.\\/\\..*.writeBytes"
+		diskIoRootWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.readBytes"
+		diskIoVcapReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.writeBytes"
+		diskIoVcapWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+
+		boshChart.MetricName = "networkIOStats.eth0.bytesSent"
+		networkByteSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkByteList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.bytesRecv"
+		networkByteRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkByteList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.packetSent"
+		networkPacketSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkPacketList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.packetRecv"
+		networkPacketRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkPacketList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.dropIn"
+		networkDropInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkDropList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.dropOut"
+		networkDropOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkDropList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.errIn"
+		networkErrorInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkErrorList(boshChart)
+		boshChart.MetricName = "networkIOStats.eth0.errOut"
+		networkErrorOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkErrorList(boshChart)
+		if err != nil {
+			fmt.Println(err.Error())
+			return results, err
+		}
+		fmt.Println(boshInfo)
+
+		cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResp, models.RESP_DATA_CPU_NAME)
+		cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResp, models.RESP_DATA_LOAD_1M_NAME)
+		cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResp, models.RESP_DATA_LOAD_5M_NAME)
+		cpuLoad15M, _ := helpers.InfluxConverterList(cpuLoad15MResp, models.RESP_DATA_LOAD_5M_NAME)
+		memoryUsage, _ := helpers.InfluxConverter4Usage(memoryUsageResp, models.MTR_MEM_USAGE)
+		diskRootUsage, _ := helpers.InfluxConverterList(diskUsageRootResp, models.MTR_MEM_USAGE)
+		diskVcapDataUsage, _ := helpers.InfluxConverterList(diskUsageVcapDataResp, models.MTR_MEM_USAGE)
+
+		diskIoRootReadByte, _ := helpers.InfluxConverterList(diskIoRootReadByteList, "/-read")
+		diskIoRootWriteByte, _ := helpers.InfluxConverterList(diskIoRootWriteByteList, "/-write")
+		diskIoVcapReadByte, _ := helpers.InfluxConverterList(diskIoVcapReadByteList, "data-read")
+		diskIoVcapWriteByte, _ := helpers.InfluxConverterList(diskIoVcapWriteByteList, "data-write")
+
+		networkByteSent, _ := helpers.InfluxConverterList(networkByteSentList, "sent")
+		networkByteRecv, _ := helpers.InfluxConverterList(networkByteRecvList, "recv")
+		networkPacketSent, _ := helpers.InfluxConverterList(networkPacketSentList, "in")
+		networkPacketRecv, _ := helpers.InfluxConverterList(networkPacketRecvList, "out")
+		networkDropIn, _ := helpers.InfluxConverterList(networkDropInResp, "in")
+		networkDropOut, _ := helpers.InfluxConverterList(networkDropOutResp, "out")
+		networkErrorIn, _ := helpers.InfluxConverterList(networkErrorInResp, "in")
+		networkErrorOut, _ := helpers.InfluxConverterList(networkErrorOutResp, "out")
+
+		MetricData := map[string]interface{}{
+			"cpuUsage":            cpuUsage,
+			"cpuLoad1M":           cpuLoad1M,
+			"cpuLoad5M":           cpuLoad5M,
+			"cpuLoad15M":          cpuLoad15M,
+			"memoryUsage":         memoryUsage,
+			"diskRootUsage":       diskRootUsage,
+			"diskVcapDataUsage":   diskVcapDataUsage,
+			"diskIoRootReadByte":  diskIoRootReadByte,
+			"diskIoRootWriteByte": diskIoRootWriteByte,
+			"diskIoVcapReadByte":  diskIoVcapReadByte,
+			"diskIoVcapWriteByte": diskIoVcapWriteByte,
+			"networkByteSent":     networkByteSent,
+			"networkByteRecv":     networkByteRecv,
+			"networkPacketSent":   networkPacketSent,
+			"networkPacketRecv":   networkPacketRecv,
+			"networkDropIn":       networkDropIn,
+			"networkDropOut":      networkDropOut,
+			"networkErrorIn":      networkErrorIn,
+			"networkErrorOut":     networkErrorOut,
+		}
+
+		var resultBoshChart models.BoshChart
+		resultBoshChart.UUID = boshChart.UUID
+		resultBoshChart.DefaultTimeRange = boshChart.DefaultTimeRange
+		resultBoshChart.TimeRangeFrom = boshChart.TimeRangeFrom
+		resultBoshChart.TimeRangeTo = boshChart.TimeRangeTo
+		resultBoshChart.GroupBy = boshChart.GroupBy
+		resultBoshChart.MetricData = MetricData
+		results = append(results, resultBoshChart)
+	}
+
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshLog() ([]models.BoshLog, error) {
+func (b *ApBoshService) GetBoshLog(boshLog models.BoshLog) ([]models.BoshLog, error) {
 	var results []models.BoshLog
+
+	for _, boshInfo := range b.BoshInfoList {
+		if boshInfo.UUID == boshLog.UUID {
+			/**
+			Period 파라미터가 존재하면 Period 값으로 DB 조회
+			없으면 StartTime, EndTime 파라미터 값으로 DB조회
+			*/
+			if boshLog.Period == "" {
+				/**
+				날짜 시간 값을 DB에서 조회할 수 있는 포맷으로 변경
+				*/
+				if boshLog.StartTime == "" && boshLog.EndTime == "" {
+					boshLog.StartTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, "00:00:00")
+					boshLog.EndTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, "23:59:59")
+				} else if boshLog.StartTime != "" && boshLog.EndTime == "" {
+					boshLog.StartTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, boshLog.StartTime)
+					boshLog.EndTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, "23:59:59")
+				} else if boshLog.StartTime == "" && boshLog.EndTime != "" {
+					boshLog.StartTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, "00:00:00")
+					boshLog.EndTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, boshLog.EndTime)
+				} else {
+					boshLog.StartTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, boshLog.StartTime)
+					boshLog.EndTime = fmt.Sprintf("%sT%s", boshLog.TargetDate, boshLog.EndTime)
+				}
+				convert_start_time, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", boshLog.StartTime))
+				convert_end_time, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", boshLog.EndTime))
+				startTime := convert_start_time.Unix() - int64(models.GmtTimeGap)*60*60
+				endTime := convert_end_time.Unix() - int64(models.GmtTimeGap)*60*60
+
+				// Make RFC3339 date-time strings
+				boshLog.StartTime = time.Unix(startTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
+				boshLog.EndTime = time.Unix(endTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
+			}
+			logResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshLog(boshLog)
+			if err != nil {
+				fmt.Println(err.Error())
+				return results, err
+			}
+			messages, _ := helpers.InfluxConverterList(logResp, "")
+
+			var resultBoshLog models.BoshLog
+			resultBoshLog.UUID = boshLog.UUID
+			resultBoshLog.LogType = boshLog.LogType
+			resultBoshLog.Keyword = boshLog.Keyword
+			resultBoshLog.TargetDate = boshLog.TargetDate
+			resultBoshLog.Period = boshLog.Period
+			resultBoshLog.StartTime = boshLog.StartTime
+			resultBoshLog.EndTime = boshLog.EndTime
+			resultBoshLog.Messages = messages["metric"]
+			results = append(results, resultBoshLog)
+		}
+	}
+
 	return results, nil
 }

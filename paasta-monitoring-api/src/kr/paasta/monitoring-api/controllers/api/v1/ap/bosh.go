@@ -42,7 +42,6 @@ func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	// 전체 사용자 정보를 전달한다.
 	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Info List", results)
 	return nil
 }
@@ -57,13 +56,11 @@ func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshOverview}
 //  @Router       /api/v1/ap/bosh/overview [get]
 func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
-	// Bosh Summary 정보 조회
 	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshOverview()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	// 전체 사용자 정보를 전달한다.
 	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Overview", results)
 	return nil
 }
@@ -78,13 +75,11 @@ func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
 //  @Router       /api/v1/ap/bosh/summary [get]
 func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
-	// Bosh Summary 정보 조회
 	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	// 전체 사용자 정보를 전달한다.
 	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Summary", results)
 	return nil
 }
@@ -106,7 +101,6 @@ func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	// 전체 사용자 정보를 전달한다.
 	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Process By Memory", results)
 	return nil
 }
@@ -122,6 +116,19 @@ func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
 //  @Router       /api/v1/bosh/Chart [get]
 func (b *BoshController) GetBoshChart(c echo.Context) (err error) {
+	var boshChart models.BoshChart
+	boshChart.UUID = c.Param("uuid")
+	boshChart.DefaultTimeRange = c.QueryParam("defaultTimeRange")
+	boshChart.TimeRangeFrom = c.QueryParam("timeRangeFrom")
+	boshChart.TimeRangeTo = c.QueryParam("timeRangeTo")
+	boshChart.GroupBy = c.QueryParam("groupBy")
+
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshChart(boshChart)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Chart", results)
 	return nil
 }
 
@@ -136,5 +143,20 @@ func (b *BoshController) GetBoshChart(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshLog}
 //  @Router       /api/v1/bosh/log [get]
 func (b *BoshController) GetBoshLog(c echo.Context) (err error) {
+	/*id=168743d3-1f90-464c-70ff-13807f3c5dde&logType=bosh&pageIndex=1&pageItems=100&period=10s*/
+	var boshLog models.BoshLog
+	boshLog.UUID = c.Param("uuid")
+	boshLog.Keyword = c.QueryParam("keyword")
+	boshLog.TargetDate = c.QueryParam("targetDate")
+	boshLog.StartTime = c.QueryParam("startTime")
+	boshLog.EndTime = c.QueryParam("endTime")
+	boshLog.Period = c.QueryParam("period")
+
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshLog(boshLog)
+	if err != nil {
+		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		return err
+	}
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Log", results)
 	return nil
 }
