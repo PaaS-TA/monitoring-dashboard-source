@@ -179,7 +179,7 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 }
 
 
-func(connectionStruct *Connections ) openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
+func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint : env["openstack_identity_endpoint"].(string),
 		Username         : env["openstack_username"].(string),
