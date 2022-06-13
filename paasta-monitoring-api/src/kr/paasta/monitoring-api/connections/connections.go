@@ -160,7 +160,7 @@ func CaaSConnection(env map[string]interface{}) error {
 	return nil
 }
 
-func IaaSConnection(env map[string]interface{}) error {
+func iaasConnection(env map[string]interface{}) error {
 	return nil
 }
 
@@ -179,13 +179,14 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 }
 
 
-func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
+func(connectionStruct *Connections ) openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint : env["openstack_identity_endpoint"].(string),
 		Username         : env["openstack_username"].(string),
 		Password         : env["openstack_password"].(string),
-		TenantName       : env["openstack_tenant_name"].(string),
-		DomainName       : env["openstack_domain"].(string),
+		TenantID         : env["openstack_tenant_id"].(string),
+		AllowReauth      : true,
+
 	}
 	providerClient, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
@@ -227,7 +228,7 @@ func SetupConnection() Connections {
 		case "CaaS":
 			CaaSConnection(Conn.Env)
 		case "IaaS":
-			IaaSConnection(Conn.Env)
+			iaasConnection(Conn.Env)
 			Conn.OpenstackProvider = openstackConnection(Conn.Env)
 		}
 	}
