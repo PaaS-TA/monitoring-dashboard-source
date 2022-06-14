@@ -73,11 +73,16 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// IaaS
 	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
 	zabbixModule := iaas.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
-	v1.GET("/iaas/hyper/statistics", openstackModule.GetHypervisorStatistics)
-	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
-	v1.GET("/iaas/project/list", openstackModule.GetProjectList)
+	v1.GET("/iaas/hyper/statistics",    openstackModule.GetHypervisorStatistics)
+	v1.GET("/iaas/hypervisor/list",     openstackModule.GetHypervisorList)
+	v1.GET("/iaas/project/list",        openstackModule.GetProjectList)
 	v1.GET("/iaas/instance/usage/list", openstackModule.GetProjectUsage)
-	v1.GET("/iaas/instance/cpu/usage", zabbixModule.GetCpuUsage)
+	v1.GET("/iaas/instance/cpu/usage",        zabbixModule.GetCpuUsage)
+	v1.GET("/iaas/instance/memory/usage",     zabbixModule.GetMemoryUsage)
+	v1.GET("/iaas/instance/disk/usage",       zabbixModule.GetDiskUsage)
+	v1.GET("/iaas/instance/cpu/load/average", zabbixModule.GetCpuLoadAverage)
+	v1.GET("/iaas/instance/disk/io/rate",     zabbixModule.GetDiskIORate)
+	v1.GET("/iaas/instance/network/io/bytes", zabbixModule.GetNetworkIOBytes)
 
 
 	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
