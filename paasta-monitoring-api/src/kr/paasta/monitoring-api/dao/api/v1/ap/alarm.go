@@ -282,46 +282,33 @@ func GetAlarmStatisticsForGraphByTime(ap *ApAlarmDao, c echo.Context, request []
 			whereRight += ` AND alarm_type = '` + v.Resource + `'`
 		}
 
-		SQLLeft := `
+		sqlLeft := `
 (
-  WITH RECURSIVE AggregateTable AS (
-    SELECT
-      DATE_FORMAT(NOW(), '` + dateFormat + `') AS TimelineA
-    UNION ALL
-    SELECT
-      DATE_FORMAT(DATE_SUB(AggregateTable.TimelineA, INTERVAL 1 ` + timeCriterion + `), '` + dateFormat + `') AS TimelineB
-    FROM
-      AggregateTable
-  )
-  SELECT
-    DATE_FORMAT(AggregateTable.TimelineA, '` + dateFormat + `') AS Timeline
-  FROM
-    AggregateTable
-  WHERE
-    AggregateTable.TimelineA > DATE_SUB(NOW(), INTERVAL 1 ` + period + `)
-  ORDER BY Timeline ASC
-) L`
+WITH RECURSIVE AggregateTable
+AS
+  (
+         SELECT DATE_FORMAT(NOW(), '` + dateFormat + `') AS TimelineA
+         UNION ALL
+         SELECT DATE_FORMAT(DATE_SUB(AggregateTable.TimelineA, INTERVAL 1 ` + timeCriterion + `), '` + dateFormat + `') AS TimelineB
+         FROM   AggregateTable )
+  SELECT   DATE_FORMAT(AggregateTable.TimelineA, '` + dateFormat + `') AS Timeline
+  FROM     AggregateTable
+  WHERE    AggregateTable.TimelineA > DATE_SUB(NOW(), INTERVAL 1 ` + period + `)
+  ORDER BY Timeline ASC ) L`
 
-		SQLRight := `
+		sqlRight := `
 LEFT JOIN
 (
-  SELECT
-    DATE_FORMAT(reg_date, '` + dateFormat + `') AS Timeline,
-    COUNT(*) AS Count
-  FROM
-    alarms
-  WHERE
-    DATE_FORMAT(reg_date, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 ` + period + `)
-  AND
-    DATE_FORMAT(reg_date, '%Y-%m-%d') <= NOW()
-  AND
-    ` + whereRight + `
-  GROUP BY Timeline
-  ORDER BY Timeline ASC
-) R
-ON L.Timeline = R.Timeline`
+         SELECT   DATE_FORMAT(reg_date, '` + dateFormat + `') AS Timeline,
+                  COUNT(*)                                    AS COUNT
+         FROM     alarms
+         WHERE    DATE_FORMAT(reg_date, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 ` + period + `)
+         AND      DATE_FORMAT(reg_date, '%Y-%m-%d') <= NOW()
+         AND      ` + whereRight + `
+         GROUP BY Timeline
+         ORDER BY Timeline ASC ) R ON L.Timeline = R.Timeline`
 
-		results := ap.DbInfo.Debug().Table(SQLLeft).Joins(SQLRight).
+		results := ap.DbInfo.Debug().Table(sqlLeft).Joins(sqlRight).
 			Select("UNIX_TIMESTAMP(L.Timeline) AS timeline, IFNULL(R.Count, 0) AS count").
 			Order("timeline ASC").
 			Find(&countByTimeline)

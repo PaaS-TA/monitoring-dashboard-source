@@ -41,8 +41,9 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
-	ApAlarm := AP.GetApAlarmController(conn)
-	ApBosh := AP.GetBoshController(conn)
+	apBosh := AP.GetBoshController(conn)
+	apAlarm := AP.GetApAlarmController(conn)
+	apContainer := AP.GetApContainerController(conn)
 
 	// Router 설정
 	//// Token은 항상 접근 가능하도록
@@ -57,18 +58,32 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/users", apiUser.GetUsers)
 
 	// AP - Alarm
-	v1.GET("/ap/alarm/status", ApAlarm.GetAlarmStatus)
-	v1.GET("/ap/alarm/policy", ApAlarm.GetAlarmPolicy)
-	v1.PUT("/ap/alarm/policy", ApAlarm.UpdateAlarmPolicy)
-	v1.PUT("/ap/alarm/target", ApAlarm.UpdateAlarmTarget)
-	v1.POST("/ap/alarm/sns", ApAlarm.RegisterSnsAccount)
-	v1.GET("/ap/alarm/sns", ApAlarm.GetSnsAccount)
-	v1.DELETE("/ap/alarm/sns", ApAlarm.DeleteSnsAccount)
-	v1.PUT("/ap/alarm/sns", ApAlarm.UpdateSnsAccount)
-	v1.POST("/ap/alarm/action", ApAlarm.CreateAlarmAction)
-	v1.GET("/ap/alarm/action", ApAlarm.GetAlarmAction)
-	v1.PATCH("/ap/alarm/action", ApAlarm.UpdateAlarmAction)
-	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
+	v1.GET("/ap/alarm/status", apAlarm.GetAlarmStatus)
+	v1.GET("/ap/alarm/policy", apAlarm.GetAlarmPolicy)
+	v1.PUT("/ap/alarm/policy", apAlarm.UpdateAlarmPolicy)
+	v1.PUT("/ap/alarm/target", apAlarm.UpdateAlarmTarget)
+	v1.POST("/ap/alarm/sns", apAlarm.RegisterSnsAccount)
+	v1.GET("/ap/alarm/sns", apAlarm.GetSnsAccount)
+	v1.DELETE("/ap/alarm/sns", apAlarm.DeleteSnsAccount)
+	v1.PUT("/ap/alarm/sns", apAlarm.UpdateSnsAccount)
+	v1.POST("/ap/alarm/action", apAlarm.CreateAlarmAction)
+	v1.GET("/ap/alarm/action", apAlarm.GetAlarmAction)
+	v1.PATCH("/ap/alarm/action", apAlarm.UpdateAlarmAction)
+	v1.DELETE("/ap/alarm/action", apAlarm.DeleteAlarmAction)
+	v1.GET("/ap/alarm/statistics/total", apAlarm.GetAlarmStatisticsTotal)
+	v1.GET("/ap/alarm/statistics/service", apAlarm.GetAlarmStatisticsService)
+	v1.GET("/ap/alarm/statistics/resource", apAlarm.GetAlarmStatisticsResource)
+
+	// AP - Container
+	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
+
+	// AP - BOSH
+	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
+	v1.GET("/ap/bosh/overview", apBosh.GetBoshOverview)
+	v1.GET("/ap/bosh/summary", apBosh.GetBoshSummary)
+	v1.GET("/ap/bosh/process", apBosh.GetBoshProcessByMemory)
+	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
+	v1.GET("/ap/bosh/log/:uuid", apBosh.GetBoshLog)
 
 	// IaaS
 	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
@@ -84,21 +99,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/iaas/instance/disk/io/rate",     zabbixModule.GetDiskIORate)
 	v1.GET("/iaas/instance/network/io/bytes", zabbixModule.GetNetworkIOBytes)
 
-
-	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
-	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
-	e.GET("/api/v1/ap/alarm/statistics/resource", ApAlarm.GetAlarmStatisticsResource)
-
-	e.GET("/api/v1/ap/bosh", ApBosh.GetBoshInfoList)
-	e.GET("/api/v1/ap/bosh/overview", ApBosh.GetBoshOverview)
-	e.GET("/api/v1/ap/bosh/summary", ApBosh.GetBoshSummary)
-	e.GET("/api/v1/ap/bosh/process", ApBosh.GetBoshProcessByMemory)
-	e.GET("/api/v1/ap/bosh/chart/:uuid", ApBosh.GetBoshChart)
-	e.GET("/api/v1/ap/bosh/log/:uuid", ApBosh.GetBoshLog)
-
 	return e
 }
-
 
 func ApiLogger(logger *zap.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
