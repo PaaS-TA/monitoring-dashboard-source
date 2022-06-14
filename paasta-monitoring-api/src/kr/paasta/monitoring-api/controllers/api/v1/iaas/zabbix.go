@@ -39,12 +39,10 @@ func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 
 	if err != nil {
 		log.Println(err.Error())
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
 		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
 	}
 	return nil
-
-
 }

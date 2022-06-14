@@ -52,11 +52,14 @@ func SetEnv() map[string]interface{} {
 		return
 	})
 
+	/*
 	for key, value := range envMap {
 		if strings.Contains(key, "openstack") {
 			fmt.Println(key + " : " + value.(string))
 		}
 	}
+	*/
+
 
 	/*
 		env := make(map[string]interface{})
@@ -217,9 +220,9 @@ func (connection *Connections) initOpenstackProvider()  {
 
 
 func (connection *Connections) initZabbixSession() {
-	zabbixHost := connection.Env["zabbix.host"].(string)
-	zabbixAdminId := connection.Env["zabbix.admin.id"].(string)
-	zabbixAdminPw := connection.Env["zabbix.admin.pw"].(string)
+	zabbixHost := connection.Env["zabbix_host"].(string)
+	zabbixAdminId := connection.Env["zabbix_admin_id"].(string)
+	zabbixAdminPw := connection.Env["zabbix_admin_pw"].(string)
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -236,9 +239,10 @@ func (connection *Connections) initZabbixSession() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
+	log.Println("Zabbix Token : " + zabbixSession.Token)
 	connection.ZabbixSession = zabbixSession
 }
+
 
 func SetupConnection() Connections {
 

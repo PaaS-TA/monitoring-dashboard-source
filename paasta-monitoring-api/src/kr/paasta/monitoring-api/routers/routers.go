@@ -77,7 +77,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
 	v1.GET("/iaas/project/list", openstackModule.GetProjectList)
 	v1.GET("/iaas/instance/usage/list", openstackModule.GetProjectUsage)
-	v1.GET("/iaas/instance/cpu/usage/", zabbixModule.GetCpuUsage)
+	v1.GET("/iaas/instance/cpu/usage", zabbixModule.GetCpuUsage)
 
 
 	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
