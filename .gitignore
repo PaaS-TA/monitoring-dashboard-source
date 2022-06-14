@@ -105,3 +105,4 @@ paasta-monitoring-portal/src/kr/paasta/monitoring/config.ini
 paasta-monitoring-portal/src/kr/paasta/monitoring/zabbix_session
 paasta-iaas-monitoring-batch/src/kr/paasta/iaas-monitoring-batch/zabbix_session
 paasta-iaas-monitoring-batch/src/kr/paasta/iaas-monitoring-batch/.pid
+paasta-monitoring-api/src/kr/paasta/monitoring-api/vendor/
