@@ -24,6 +24,33 @@ func GetBoshDao(DbInfo *gorm.DB, InfluxDBClient client.Client, BoshInfoList []mo
 	}
 }
 
+func (b *BoshDao) GetBoshSummary(boshSummary models.BoshSummary) (*client.Response, models.ErrMessage) {
+	var errLogMsg string
+	var errMsg models.ErrMessage
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg = models.ErrMessage{
+				"Message": errLogMsg,
+			}
+		}
+	}()
+
+	getBoshSummarySql := boshSummary.SqlQuery
+	q := client.Query{
+		Command:  fmt.Sprintf(getBoshSummarySql, boshSummary.UUID, boshSummary.Time, boshSummary.MetricName),
+		Database: b.Env["paas_metric_db_name_bosh"].(string),
+	}
+
+	resp, err := b.InfluxDBClient.Query(q)
+	if err != nil {
+		errLogMsg = err.Error()
+		return resp, errMsg
+	}
+	fmt.Println("GetBoshProcessByMemory resp======>", resp)
+
+	return resp, nil
+}
+
 func (b *BoshDao) GetBoshProcessByMemory(uuid string) (*client.Response, error) {
 	getBoshTopprocessListSql := "select proc_name as process_name, time, proc_index, proc_pid, mem_usage from bosh_process_metrics where id = '%s' and time > now() - %s order by time desc"
 	q := client.Query{

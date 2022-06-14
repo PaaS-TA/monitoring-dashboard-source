@@ -91,6 +91,23 @@ const (
 	USAGE_NAME_DISK_VCAP                 = "Disk(Data)"
 )
 
+const (
+	DB_DATE_FORMAT       string = "2006-01-02T15:04:05+00:00"
+	ALARM_LEVEL_FAIL     string = "fail"
+	ALARM_LEVEL_CRITICAL string = "critical"
+	ALARM_LEVEL_WARNING  string = "warning"
+
+	ALARM_TYPE_CPU    string = "cpu"
+	ALARM_TYPE_MEMORY string = "memory"
+	ALARM_TYPE_DISK   string = "disk"
+
+	ORIGIN_TYPE_BOSH      string = "bos"
+	ORIGIN_TYPE_PAASTA    string = "pas"
+	ORIGIN_TYPE_CONTAINER string = "con"
+
+	RESULT_STAT_NAME = "stat"
+)
+
 type (
 	LogInfo struct {
 		Time    string `json:"time"`

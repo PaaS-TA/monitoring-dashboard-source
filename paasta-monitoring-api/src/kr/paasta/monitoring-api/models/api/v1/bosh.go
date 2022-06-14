@@ -49,17 +49,38 @@ const (
 )
 
 type (
+	BoshSummary struct {
+		Name              string `json:"name"`
+		Ip                string `json:"ip"`
+		UUID              string `json:"uuid"`
+		SqlQuery          string
+		Time              string
+		MetricName        string
+		BoshSummaryMetric BoshSummaryMetric
+	}
+
+	BoshSummaryMetric struct {
+		State           string  `json:"state"`
+		Core            string  `json:"core"`
+		CpuUsage        float64 `json:"cpuUsage"`
+		TotalMemory     float64 `json:"totalMemory"`
+		MemoryUsage     float64 `json:"memoryUsage"`
+		TotalDisk       float64 `json:"totalDisk"`
+		DataDisk        float64 `json:"dataDisk"`
+		DiskStatus      string  `json:"diskStatus"`
+		BoshState       string  `json:"-"`
+		CpuErrStat      string  `json:"cpuErrStat"`
+		MemErrStat      string  `json:"memErrStat"`
+		DiskRootErrStat string  `json:"diskRootErrStat"`
+		DiskDataErrStat string  `json:"diskDataErrStat"`
+	}
+
 	BoshOverview struct {
 		Running  string `json:"running"`
 		Failed   string `json:"failed"`
 		Critical string `json:"critical"`
 		Warning  string `json:"warning"`
 		Total    string `json:"total"`
-	}
-
-	BoshSummary struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
 	}
 
 	Bosh struct {

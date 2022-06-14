@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"math"
 	models "paasta-monitoring-api/models/api/v1"
 	"reflect"
 	"strconv"
@@ -43,6 +44,40 @@ func BindRequestAndCheckValid(c echo.Context, request interface{}) error {
 func rfc3339ToUnixTimestamp(metricDataTime string) int64 {
 	t, _ := time.Parse(time.RFC3339, metricDataTime)
 	return t.Unix()
+}
+
+func Round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func RoundFloat(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(Round(num*output)) / output
+}
+
+func RoundFloatDigit2(num float64) float64 {
+	return RoundFloat(num, 2)
+}
+
+func GetDataFloatFromInterfaceSingle(data map[string]interface{}) float64 {
+
+	var jsonValue json.Number
+
+	fmt.Printf("model.RESULT_DATA_NAME : %v\n", models.RESULT_DATA_NAME)
+	fmt.Printf("data : %v\n", data[models.RESULT_DATA_NAME])
+
+	// 임시 오류 처리
+	if data[models.RESULT_DATA_NAME] == nil {
+		return 0
+	}
+
+	datamap := data[models.RESULT_DATA_NAME].([]map[string]interface{})
+	for _, data := range datamap {
+		jsonValue = data["value"].(json.Number)
+	}
+	returnValue, _ := strconv.ParseFloat(jsonValue.String(), 64)
+
+	return returnValue
 }
 
 //조회한 결과List를 Map으로 변환한다.
@@ -141,6 +176,55 @@ func InfluxConverterToMap(resp *client.Response) ([]map[string]interface{}, erro
 		}
 
 		return returnValues, nil
+	}
+}
+
+//조회한 결과List를 Map으로 변환한다.
+func InfluxConverter(resp *client.Response) (map[string]interface{}, error) {
+
+	if len(resp.Results) != 1 {
+		return nil, nil
+	} else {
+		//UI로 Return할 결과값
+		var returnValues []map[string]interface{}
+		var columns []string
+
+		for _, v := range resp.Results[0].Series {
+			for _, vc := range v.Columns {
+				columns = append(columns, vc)
+			}
+
+			for i := 0; i < len(v.Values); i++ {
+				row := make(map[string]interface{})
+
+				//InfluxDB에서 Value 값이 nil인 경우 해당 row는 값을 보내주지 않는다.
+				if v.Values[i][1] != nil {
+					for kv, vv := range v.Values[i] {
+
+						if vv != nil {
+							//Time Column Case convert to UnixTimestamp
+							if kv == 0 {
+								t := rfc3339ToUnixTimestamp(reflect.ValueOf(vv).String())
+								row[columns[kv]] = t
+							} else {
+
+								row[columns[kv]] = vv
+							}
+
+						} else {
+							row[columns[kv]] = ""
+						}
+					}
+					returnValues = append(returnValues, row)
+				}
+			}
+
+		}
+
+		result := map[string]interface{}{
+			models.RESULT_DATA_NAME: returnValues,
+		}
+		return result, nil
 	}
 }
 
@@ -306,4 +390,35 @@ func TypeChecker_string(target interface{}) interface{} {
 		// And here I'm feeling dumb. ;)
 		return ""
 	}
+}
+
+func GetMaxAlarmLevel(alarmLevels []string) string {
+	var status string
+
+	for _, alarmLevel := range alarmLevels {
+		if alarmLevel == models.ALARM_LEVEL_CRITICAL {
+			status = alarmLevel
+		} else if alarmLevel == models.ALARM_LEVEL_WARNING {
+			if status != models.ALARM_LEVEL_CRITICAL {
+				status = alarmLevel
+			}
+		}
+	}
+
+	return status
+}
+
+func GetAlarmStatusByServiceName(originType, alarmType string, usage float64, thresholds []models.AlarmPolicies) string {
+
+	for _, threshold := range thresholds {
+		if threshold.AlarmType == alarmType && threshold.OriginType == originType {
+			if usage >= float64(threshold.CriticalThreshold) {
+				return models.ALARM_LEVEL_CRITICAL
+			} else if usage >= float64(threshold.WarningThreshold) {
+				return models.ALARM_LEVEL_WARNING
+			}
+		}
+	}
+
+	return ""
 }

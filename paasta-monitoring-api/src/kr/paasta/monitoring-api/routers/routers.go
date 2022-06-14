@@ -57,6 +57,14 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))
 	v1.GET("/users", apiUser.GetUsers)
 
+	// AP - BOSH
+	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
+	v1.GET("/ap/bosh/overview", apBosh.GetBoshOverview)
+	v1.GET("/ap/bosh/summary", apBosh.GetBoshSummary)
+	v1.GET("/ap/bosh/process", apBosh.GetBoshProcessByMemory)
+	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
+	v1.GET("/ap/bosh/log/:uuid", apBosh.GetBoshLog)
+
 	// AP - Alarm
 	v1.GET("/ap/alarm/status", apAlarm.GetAlarmStatus)
 	v1.GET("/ap/alarm/policy", apAlarm.GetAlarmPolicy)
@@ -77,26 +85,18 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// AP - Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
 
-	// AP - BOSH
-	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
-	v1.GET("/ap/bosh/overview", apBosh.GetBoshOverview)
-	v1.GET("/ap/bosh/summary", apBosh.GetBoshSummary)
-	v1.GET("/ap/bosh/process", apBosh.GetBoshProcessByMemory)
-	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
-	v1.GET("/ap/bosh/log/:uuid", apBosh.GetBoshLog)
-
 	// IaaS
 	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
 	zabbixModule := iaas.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
-	v1.GET("/iaas/hyper/statistics",    openstackModule.GetHypervisorStatistics)
-	v1.GET("/iaas/hypervisor/list",     openstackModule.GetHypervisorList)
-	v1.GET("/iaas/project/list",        openstackModule.GetProjectList)
+	v1.GET("/iaas/hyper/statistics", openstackModule.GetHypervisorStatistics)
+	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
+	v1.GET("/iaas/project/list", openstackModule.GetProjectList)
 	v1.GET("/iaas/instance/usage/list", openstackModule.GetProjectUsage)
-	v1.GET("/iaas/instance/cpu/usage",        zabbixModule.GetCpuUsage)
-	v1.GET("/iaas/instance/memory/usage",     zabbixModule.GetMemoryUsage)
-	v1.GET("/iaas/instance/disk/usage",       zabbixModule.GetDiskUsage)
+	v1.GET("/iaas/instance/cpu/usage", zabbixModule.GetCpuUsage)
+	v1.GET("/iaas/instance/memory/usage", zabbixModule.GetMemoryUsage)
+	v1.GET("/iaas/instance/disk/usage", zabbixModule.GetDiskUsage)
 	v1.GET("/iaas/instance/cpu/load/average", zabbixModule.GetCpuLoadAverage)
-	v1.GET("/iaas/instance/disk/io/rate",     zabbixModule.GetDiskIORate)
+	v1.GET("/iaas/instance/disk/io/rate", zabbixModule.GetDiskIORate)
 	v1.GET("/iaas/instance/network/io/bytes", zabbixModule.GetNetworkIOBytes)
 
 	return e
