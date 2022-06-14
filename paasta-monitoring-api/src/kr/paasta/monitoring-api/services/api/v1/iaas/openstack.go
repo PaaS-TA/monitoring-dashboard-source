@@ -1,21 +1,23 @@
 package iaas
 
 import (
-	"fmt"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/usage"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
+	"log"
 	utils "paasta-monitoring-api/helpers"
+	"strconv"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/v3/volumes"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/hypervisors"
-	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/groups"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/usage"
+	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
+	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/groups"
 )
 
 
 type OpenstackService struct {
-	Provider          *gophercloud.ProviderClient
+	Provider  *gophercloud.ProviderClient
 }
 
 func GetOpenstackService(provider *gophercloud.ProviderClient) *OpenstackService {
@@ -25,18 +27,18 @@ func GetOpenstackService(provider *gophercloud.ProviderClient) *OpenstackService
 }
 
 func (service *OpenstackService) GetHypervisorStatistics() (map[string]interface{}, error) {
-	fmt.Println(service.Provider.TokenID)
+
 	client, err := utils.GetComputeClient(service.Provider, "")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err.Error())
 	}
 
 	hypervisorStatistics, err := hypervisors.GetStatistics(client).Extract()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err.Error())
 	}
 
-	fmt.Println(hypervisorStatistics.RunningVMs)
+	log.Println("Running VMs : " + strconv.Itoa(hypervisorStatistics.RunningVMs))
 
 	result := make(map[string]interface{})
 
@@ -68,7 +70,7 @@ func (service *OpenstackService) GetHypervisorList() ([]interface{}, error) {
 
 	allPages, err := hypervisors.List(computeClient, opts).AllPages()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err.Error())
 	}
 
 	resultBody := allPages.GetBody()
@@ -90,7 +92,7 @@ func (service *OpenstackService) GetProjectList(params map[string]interface{}) (
 	resultPages, err := result.AllPages()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err.Error())
 	}
 	resultBody := resultPages.GetBody()
 	list := resultBody.(map[string][]interface{})["projects"]
@@ -193,4 +195,21 @@ func (service *OpenstackService) RetrieveTenantUsage() ([]usage.TenantUsage, err
 	//service.GetServerDetail("08769233-2599-4ba5-ae54-e8aa92bd11b9")
 
 	return usageList, err
+}
+
+
+func (service *OpenstackService) GetHostIpAddress(instanceId string) string {
+	var ipAddress string
+
+	computeClient, _ := utils.GetComputeClient(service.Provider, "")
+
+	result, _ := servers.Get(computeClient, instanceId).Extract()
+	addressList := result.Addresses
+
+	for _, address := range addressList {
+		dataArr := address.([]interface{})
+		dataMap := dataArr[0].(map[string]interface{})
+		ipAddress = dataMap["addr"].(string)
+	}
+	return ipAddress
 }

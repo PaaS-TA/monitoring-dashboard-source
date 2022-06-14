@@ -1,6 +1,8 @@
 package iaas
 
 import (
+	"log"
+
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	service "paasta-monitoring-api/services/api/v1/iaas"
@@ -25,6 +27,7 @@ func (controller *OpenstackController) GetHypervisorStatistics(ctx echo.Context)
 	results, err := service.GetOpenstackService(controller.OpenstackProvider).GetHypervisorStatistics()
 
 	if err != nil {
+		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -37,10 +40,12 @@ func (controller *OpenstackController) GetHypervisorStatistics(ctx echo.Context)
 /**
 	하이퍼바이저 목록 (상세 정보 포함) 조회
 */
-func (osService *OpenstackController) GetHypervisorList(ctx echo.Context) error {
-	results, err := service.GetOpenstackService(osService.OpenstackProvider).GetHypervisorList()
+func (controller *OpenstackController) GetHypervisorList(ctx echo.Context) error {
+	log.Println("GetHypervisorList")
+	results, err := service.GetOpenstackService(controller.OpenstackProvider).GetHypervisorList()
 
 	if err != nil {
+		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -53,11 +58,13 @@ func (osService *OpenstackController) GetHypervisorList(ctx echo.Context) error 
 /**
 	프로젝트 목록(만) 조회
 */
-func (osService *OpenstackController) GetProjectList(ctx echo.Context) error {
+func (controller *OpenstackController) GetProjectList(ctx echo.Context) error {
+	log.Println("GetProjectList")
 	serverParams := make(map[string]interface{}, 0)
-	results, err := service.GetOpenstackService(osService.OpenstackProvider).GetProjectList(serverParams)
+	results, err := service.GetOpenstackService(controller.OpenstackProvider).GetProjectList(serverParams)
 
 	if err != nil {
+		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -71,7 +78,8 @@ func (osService *OpenstackController) GetProjectList(ctx echo.Context) error {
 프로젝트(테넌트) 목록과 usage 정보를 조회
 	- 프로젝트에 속한 인스턴스 목록과 usage 조회도 가능하나 현재는 비활성화 되어 있음
 */
-func (osService *OpenstackController) GetProjectUsage(ctx echo.Context) error {
+func (controller *OpenstackController) GetProjectUsage(ctx echo.Context) error {
+	log.Println("GetProjectUsage")
 	tenantIdParam := ctx.Param("tenantId")
 
 	serverParams := make(map[string]interface{}, 0)
@@ -79,9 +87,10 @@ func (osService *OpenstackController) GetProjectUsage(ctx echo.Context) error {
 	if tenantIdParam != "" {
 		serverParams["tenantId"] = tenantIdParam
 	}
-	results, err := service.GetOpenstackService(osService.OpenstackProvider).RetrieveTenantUsage()
+	results, err := service.GetOpenstackService(controller.OpenstackProvider).RetrieveTenantUsage()
 
 	if err != nil {
+		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {

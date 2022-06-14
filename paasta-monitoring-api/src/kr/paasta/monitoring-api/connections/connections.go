@@ -1,6 +1,7 @@
 package connections
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis/v7"
@@ -14,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"paasta-monitoring-api/helpers"
+	"paasta-monitoring-api/middlewares/zabbix-client/lib/go-zabbix"
 	models "paasta-monitoring-api/models/api/v1"
 	"strconv"
 	"strings"
@@ -26,6 +28,7 @@ type Connections struct {
 	BoshInfoList      []models.Bosh
 	Env               map[string]interface{}
 	OpenstackProvider *gophercloud.ProviderClient
+	ZabbixSession     *zabbix.Session
 	Logger *zap.Logger
 }
 
@@ -190,13 +193,13 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 }
 
 
-func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient {
+func (connection *Connections) initOpenstackProvider()  {
 	opts := gophercloud.AuthOptions{
-		IdentityEndpoint: env["openstack_identity_endpoint"].(string),
-		DomainName:       env["openstack_domain"].(string),
-		Username:         env["openstack_username"].(string),
-		Password:         env["openstack_password"].(string),
-		TenantID:         env["openstack_tenant_id"].(string),
+		IdentityEndpoint: connection.Env["openstack_identity_endpoint"].(string),
+		DomainName:       connection.Env["openstack_domain"].(string),
+		Username:         connection.Env["openstack_username"].(string),
+		Password:         connection.Env["openstack_password"].(string),
+		TenantID:         connection.Env["openstack_tenant_id"].(string),
 		AllowReauth:      true,
 	}
 	providerClient, err := openstack.AuthenticatedClient(opts)
@@ -209,7 +212,32 @@ func openstackConnection(env map[string]interface{}) *gophercloud.ProviderClient
 	// TODO Openstack 토큰 적재 방식 수립 필요
 	//새로 로그인 되었으므로 변경된 토큰으로 변경하여 저장
 	//connections.RedisInfo.HSet(reqToken, "iaasToken", providerClient.TokenID)
-	return providerClient
+	connection.OpenstackProvider = providerClient
+}
+
+
+func (connection *Connections) initZabbixSession() {
+	zabbixHost := connection.Env["zabbix.host"].(string)
+	zabbixAdminId := connection.Env["zabbix.admin.id"].(string)
+	zabbixAdminPw := connection.Env["zabbix.admin.pw"].(string)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	cache := zabbix.NewSessionFileCache().SetFilePath("./zabbix_session")
+	zabbixSession, err := zabbix.CreateClient(zabbixHost).
+		WithCache(cache).
+		WithHTTPClient(client).
+		WithCredentials(zabbixAdminId, zabbixAdminPw).Connect()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	connection.ZabbixSession = zabbixSession
 }
 
 func SetupConnection() Connections {
@@ -239,7 +267,8 @@ func SetupConnection() Connections {
 			CaaSConnection(Conn.Env)
 		case "IaaS":
 			iaasConnection(Conn.Env)
-			Conn.OpenstackProvider = openstackConnection(Conn.Env)
+			Conn.initOpenstackProvider()
+			Conn.initZabbixSession()
 		}
 	}
 	return Conn

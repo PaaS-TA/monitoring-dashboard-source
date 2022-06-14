@@ -71,11 +71,14 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.DELETE("/ap/alarm/action", ApAlarm.DeleteAlarmAction)
 
 	// IaaS
-	iaasModule := iaas.GetOpenstackController(conn.OpenstackProvider)
-	v1.GET("/iaas/hyper/statistics", iaasModule.GetHypervisorStatistics)
-	v1.GET("/iaas/hypervisor/list", iaasModule.GetHypervisorList)
-	v1.GET("/iaas/project/list", iaasModule.GetProjectList)
-	v1.GET("/iaas/instance/usage/list", iaasModule.GetProjectUsage)
+	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
+	zabbixModule := iaas.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
+	v1.GET("/iaas/hyper/statistics", openstackModule.GetHypervisorStatistics)
+	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
+	v1.GET("/iaas/project/list", openstackModule.GetProjectList)
+	v1.GET("/iaas/instance/usage/list", openstackModule.GetProjectUsage)
+	v1.GET("/iaas/instance/cpu/usage/", zabbixModule.GetCpuUsage)
+
 
 	e.GET("/api/v1/ap/alarm/statistics/total", ApAlarm.GetAlarmStatisticsTotal)
 	e.GET("/api/v1/ap/alarm/statistics/service", ApAlarm.GetAlarmStatisticsService)
