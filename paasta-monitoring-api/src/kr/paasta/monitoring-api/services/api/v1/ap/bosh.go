@@ -4,6 +4,8 @@ import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
+	Common "paasta-monitoring-api/dao/api/v1"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
@@ -35,9 +37,9 @@ func (b *ApBoshService) GetBoshInfoList() ([]models.Bosh, error) {
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshOverview() (models.BoshOverview, error) {
+func (b *ApBoshService) GetBoshOverview(c echo.Context) (models.BoshOverview, error) {
 	var result models.BoshOverview
-	boshSummary, err := b.GetBoshSummary()
+	boshSummary, err := b.GetBoshSummary(c)
 	if err != nil {
 		fmt.Println(err.Error())
 		return result, err
@@ -63,13 +65,13 @@ func (b *ApBoshService) GetBoshOverview() (models.BoshOverview, error) {
 	return result, nil
 }
 
-func (b *ApBoshService) GetBoshSummary() ([]models.BoshSummary, error) {
+func (b *ApBoshService) GetBoshSummary(c echo.Context) ([]models.BoshSummary, error) {
 	var results []models.BoshSummary
 	//var errs []models.ErrMessage
 	var resultsResponse map[string]interface{}
 
 	//임계치 설정정보를 조회한다.
-	serverThresholds, err := dao.GetApAlarmDao(b.DbInfo).GetAlarmPolicy()
+	serverThresholds, err := Common.GetCommonDao(b.DbInfo).GetAlarmPolicy(c)
 	if err != nil {
 		fmt.Println(err.Error())
 		return results, err

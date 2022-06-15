@@ -56,7 +56,7 @@ func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshOverview}
 //  @Router       /api/v1/ap/bosh/overview [get]
 func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshOverview()
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshOverview(c)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -75,7 +75,7 @@ func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
 //  @Router       /api/v1/ap/bosh/summary [get]
 func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary()
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(c)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err

@@ -32,56 +32,6 @@ func (ap *ApAlarmDao) GetAlarmStatus() ([]models.Alarms, error) {
 	return response, nil
 }
 
-func (ap *ApAlarmDao) GetAlarmPolicy() ([]models.AlarmPolicies, error) {
-	var response []models.AlarmPolicies
-	results := ap.DbInfo.Debug().Table("alarm_policies").
-		Select("*").
-		Find(&response)
-
-	if results.Error != nil {
-		fmt.Println(results.Error)
-		return response, results.Error
-	}
-
-	return response, nil
-}
-
-func (ap *ApAlarmDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
-	results := ap.DbInfo.Debug().Table("alarm_policies").
-		Where("origin_type = ? and alarm_type = ?", request.OriginType, request.AlarmType).
-		Updates(map[string]interface{}{
-			"warning_threshold":  request.WarningThreshold,
-			"critical_threshold": request.CriticalThreshold,
-			"repeat_time":        request.RepeatTime,
-			"measure_time":       request.MeasureTime,
-			"modi_date":          time.Now().UTC().Add(time.Hour * 9),
-			"modi_user":          "admin"})
-
-	if results.Error != nil {
-		fmt.Println(results.Error)
-		return results.Error
-	}
-
-	return nil
-}
-
-func (ap *ApAlarmDao) UpdateAlarmTarget(request models.AlarmTargetRequest) error {
-	results := ap.DbInfo.Debug().Table("alarm_targets").
-		Where("origin_type = ?", request.OriginType).
-		Updates(map[string]interface{}{
-			"mail_address": request.MailAddress,
-			"mail_send_yn": request.MailSendYN,
-			"modi_date":    time.Now().UTC().Add(time.Hour * 9),
-			"modi_user":    "admin"})
-
-	if results.Error != nil {
-		fmt.Println(results.Error)
-		return results.Error
-	}
-
-	return nil
-}
-
 func (ap *ApAlarmDao) RegisterSnsAccount(request models.SnsAccountRequest) error {
 	results := ap.DbInfo.Debug().Table("alarm_sns").Create(&request)
 

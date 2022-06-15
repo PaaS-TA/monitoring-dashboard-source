@@ -41,6 +41,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
+	common := apiControllerV1.GetCommonController(conn)
+
 	apBosh := AP.GetBoshController(conn)
 	apAlarm := AP.GetApAlarmController(conn)
 	apContainer := AP.GetApContainerController(conn)
@@ -58,6 +60,11 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/users", apiUser.GetUsers)
 	v1.GET("/members", apiUser.GetMember)
 
+	// Common
+	v1.GET("/alarm/policy", common.GetAlarmPolicy)
+	v1.PUT("/alarm/policy", common.UpdateAlarmPolicy)
+	v1.PUT("/alarm/target", common.UpdateAlarmTarget)
+
 	// AP - BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
 	v1.GET("/ap/bosh/overview", apBosh.GetBoshOverview)
@@ -68,9 +75,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	// AP - Alarm
 	v1.GET("/ap/alarm/status", apAlarm.GetAlarmStatus)
-	v1.GET("/ap/alarm/policy", apAlarm.GetAlarmPolicy)
-	v1.PUT("/ap/alarm/policy", apAlarm.UpdateAlarmPolicy)
-	v1.PUT("/ap/alarm/target", apAlarm.UpdateAlarmTarget)
 	v1.POST("/ap/alarm/sns", apAlarm.RegisterSnsAccount)
 	v1.GET("/ap/alarm/sns", apAlarm.GetSnsAccount)
 	v1.DELETE("/ap/alarm/sns", apAlarm.DeleteSnsAccount)
