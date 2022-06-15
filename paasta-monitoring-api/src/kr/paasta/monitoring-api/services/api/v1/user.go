@@ -11,17 +11,26 @@ import (
 
 //Gorm Object Struct
 type UserService struct {
-	txn *gorm.DB
+	db *gorm.DB
 }
 
-func GetUserService(txn *gorm.DB) *UserService {
+func GetUserService(db *gorm.DB) *UserService {
 	return &UserService{
-		txn: txn,
+		db: db,
 	}
 }
 
+func (service *UserService) GetMember(params v1.MemberInfos) ([]v1.MemberInfos, error) {
+	members, err := dao.GetUserDao(service.db).GetMember(params)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return members, nil
+}
+
 func (h *UserService) GetUsers(request v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
-	users, err := dao.GetUserDao(h.txn).GetUsers(request, c)
+	users, err := dao.GetUserDao(h.db).GetUsers(request, c)
 	if err != nil {
 		fmt.Println(err.Error())
 		return users, err
@@ -30,7 +39,7 @@ func (h *UserService) GetUsers(request v1.UserInfo, c echo.Context) ([]v1.UserIn
 }
 
 func (h *UserService) GetUser(request v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
-	users, err := dao.GetUserDao(h.txn).GetUser(request, c)
+	users, err := dao.GetUserDao(h.db).GetUser(request, c)
 	if err != nil {
 		fmt.Println(err.Error())
 		return users, err

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/go-playground/validator"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -54,5 +55,29 @@ func (a *UserController) GetUsers(c echo.Context) (err error) {
 		// 전체 사용자 정보를 전달한다.
 		apiHelpers.Respond(c, http.StatusOK, "Success to get all users", users)
 	}
+	return nil
+}
+
+func (controller *UserController) GetMember(ctx echo.Context) error {
+	userId := ctx.QueryParam("userId")
+	params := v1.MemberInfos {
+		UserId : userId,
+	}
+
+	validator := validator.New()
+	err := validator.Var(params, "dive")
+
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return err
+	}
+
+	results, err := v1service.GetUserService(controller.DbInfo).GetMember(params)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm policy.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to update alarms policy.", results)
 	return nil
 }

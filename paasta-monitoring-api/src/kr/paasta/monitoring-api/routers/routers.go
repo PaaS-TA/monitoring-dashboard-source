@@ -56,6 +56,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	//// Swagger에서는 CheckToken 프로세스에 의해 아래 function을 실행할 수 없음 (POSTMAN 이용)
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))
 	v1.GET("/users", apiUser.GetUsers)
+	v1.GET("/members", apiUser.GetMember)
 
 	// AP - BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
