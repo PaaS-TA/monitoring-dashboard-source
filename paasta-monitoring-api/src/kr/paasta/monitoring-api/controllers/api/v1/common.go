@@ -53,7 +53,7 @@ func (common *CommonController) GetAlarmPolicy(c echo.Context) error {
 //  @Router       /api/v1/alarm/policy [put]
 func (common *CommonController) UpdateAlarmPolicy(c echo.Context) error {
 	var request []models.AlarmPolicyRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -81,7 +81,7 @@ func (common *CommonController) UpdateAlarmPolicy(c echo.Context) error {
 //  @Router       /api/v1/alarm/target [put]
 func (common *CommonController) UpdateAlarmTarget(c echo.Context) error {
 	var request []models.AlarmTargetRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err

@@ -53,7 +53,7 @@ func (ap *ApAlarmController) GetAlarmStatus(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/sns [post]
 func (ap *ApAlarmController) RegisterSnsAccount(c echo.Context) error {
 	var request models.SnsAccountRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -101,7 +101,7 @@ func (ap *ApAlarmController) GetSnsAccount(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/sns [delete]
 func (ap *ApAlarmController) DeleteSnsAccount(c echo.Context) error {
 	var request models.SnsAccountRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -129,7 +129,7 @@ func (ap *ApAlarmController) DeleteSnsAccount(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/sns [put]
 func (ap *ApAlarmController) UpdateSnsAccount(c echo.Context) error {
 	var request models.SnsAccountRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -157,7 +157,7 @@ func (ap *ApAlarmController) UpdateSnsAccount(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/action [post]
 func (ap *ApAlarmController) CreateAlarmAction(c echo.Context) error {
 	var request models.AlarmActionRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -205,7 +205,7 @@ func (ap *ApAlarmController) GetAlarmAction(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/action [patch]
 func (ap *ApAlarmController) UpdateAlarmAction(c echo.Context) error {
 	var request models.AlarmActionRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -233,7 +233,7 @@ func (ap *ApAlarmController) UpdateAlarmAction(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/action [delete]
 func (ap *ApAlarmController) DeleteAlarmAction(c echo.Context) error {
 	var request models.AlarmActionRequest
-	err := helpers.BindRequestAndCheckValid(c, &request)
+	err := helpers.BindJsonAndCheckValid(c, &request)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err

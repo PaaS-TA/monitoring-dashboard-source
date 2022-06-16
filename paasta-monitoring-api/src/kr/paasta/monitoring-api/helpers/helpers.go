@@ -24,21 +24,26 @@ func GetDBConnectionString(dbtype, user, password, protocol, host, port, dbname,
 		user, password, protocol, host, port, dbname, charset, parseTime)
 }
 
-// BindRequestAndCheckValid :: 클라이언트의 Requset Body를
-// userRequest로 받은 구조체에 바인딩한 결과와 구조체 값의 유효성을 검사한 결과를 반환한다.
-func BindRequestAndCheckValid(c echo.Context, request interface{}) error {
+// BindJsonAndCheckValid :: 클라이언트로부터 요청된 JSON 데이터를
+// 매개인자 request로 들어온 구조체에 바인딩하고 바인딩된 구조체 데이터의 유효성을 검사한 결과를 반환한다.
+func BindJsonAndCheckValid(c echo.Context, request interface{}) error {
 	bindErr := c.Bind(&request)
 	if bindErr != nil {
 		return bindErr
 	}
 
-	validator := validator.New()
-	validErr := validator.Var(request, "dive")
+	validErr := CheckValid(&request)
 	if validErr != nil {
 		return validErr
 	}
 
 	return nil
+}
+
+// CheckValid :: 매개인자 request로 들어온 구조체 데이터의 유효성을 검사한 결과를 반환한다.
+func CheckValid(request interface{}) error {
+	v := validator.New()
+	return v.Var(request, "dive")
 }
 
 func rfc3339ToUnixTimestamp(metricDataTime string) int64 {

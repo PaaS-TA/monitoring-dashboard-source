@@ -34,8 +34,8 @@ func GetTokenController(conn connections.Connections) *TokenController {
 //  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [post]
 func (a *TokenController) CreateToken(c echo.Context) (err error) {
-	var userRequest v1.CreateToken                          // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
-	err = helpers.BindRequestAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
+	var userRequest v1.CreateToken                       // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
+	err = helpers.BindJsonAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -53,10 +53,9 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 	return nil
 }
 
-
 func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
 	var params v1.TokenParam
-	err := helpers.BindRequestAndCheckValid(ctx, &params)
+	err := helpers.BindJsonAndCheckValid(ctx, &params)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
@@ -73,7 +72,6 @@ func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
 	return nil
 }
 
-
 // RefreshToken
 //  * Annotations for Swagger *
 //  @Summary      토큰 리프레시하기
@@ -84,8 +82,8 @@ func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
 //  @Success      200           {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [put]
 func (a *TokenController) RefreshToken(c echo.Context) (err error) {
-	var userRequest v1.RefreshToken                         // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
-	err = helpers.BindRequestAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
+	var userRequest v1.RefreshToken                      // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
+	err = helpers.BindJsonAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return err
