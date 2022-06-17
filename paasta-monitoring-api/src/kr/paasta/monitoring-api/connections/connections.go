@@ -3,6 +3,7 @@ package connections
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis/v7"
 	_ "github.com/go-sql-driver/mysql"
@@ -22,14 +23,16 @@ import (
 )
 
 type Connections struct {
-	DbInfo            *gorm.DB
-	RedisInfo         *redis.Client
-	InfluxDBClient    client.Client
-	BoshInfoList      []models.Bosh
-	Env               map[string]interface{}
-	OpenstackProvider *gophercloud.ProviderClient
-	ZabbixSession     *zabbix.Session
-	Logger *zap.Logger
+	DbInfo             *gorm.DB
+	RedisInfo          *redis.Client
+	InfluxDBClient     client.Client
+	BoshInfoList       []models.Bosh
+	Databases          models.Databases
+	Env                map[string]interface{}
+	OpenstackProvider  *gophercloud.ProviderClient
+	ZabbixSession      *zabbix.Session
+	Logger             *zap.Logger
+	CloudFoundryClient *cfclient.Client
 }
 
 /*
@@ -53,13 +56,12 @@ func SetEnv() map[string]interface{} {
 	})
 
 	/*
-	for key, value := range envMap {
-		if strings.Contains(key, "openstack") {
-			fmt.Println(key + " : " + value.(string))
+		for key, value := range envMap {
+			if strings.Contains(key, "openstack") {
+				fmt.Println(key + " : " + value.(string))
+			}
 		}
-	}
 	*/
-
 
 	/*
 		env := make(map[string]interface{})
@@ -147,7 +149,7 @@ func RedisConnection(env map[string]interface{}) *redis.Client {
 	return redisClient
 }
 
-func PaaSConnection(env map[string]interface{}) *gorm.DB {
+func PaaSConnection(env map[string]interface{}) (*gorm.DB, *cfclient.Client) {
 	// DB 설정
 	paasDBClient, paasDBErr := gorm.Open(
 		helpers.GetDBConnectionString(
@@ -166,7 +168,16 @@ func PaaSConnection(env map[string]interface{}) *gorm.DB {
 		panic(paasDBErr)
 	}
 
-	return paasDBClient
+	// Cloud Foundry Client Initialize
+	config := &cfclient.Config{
+		ApiAddress:        env["paas_cf_client_api_address"].(string),
+		Username:          env["paas_cf_client_username"].(string),
+		Password:          env["paas_cf_client_password"].(string),
+		SkipSslValidation: true,
+	}
+	cloudFoundryClient, _ := cfclient.NewClient(config)
+
+	return paasDBClient, cloudFoundryClient
 }
 
 func SaasConnection(env map[string]interface{}) error {
@@ -181,7 +192,13 @@ func iaasConnection(env map[string]interface{}) error {
 	return nil
 }
 
-func InfluxDBConnection(env map[string]interface{}) client.Client {
+func InfluxDBConnection(env map[string]interface{}) (client.Client, models.Databases) {
+
+	var databases models.Databases
+	databases.ContainerDatabase = env["paas_metric_db_name_container"].(string)
+	databases.BoshDatabase = env["paas_metric_db_name_paasta"].(string)
+	databases.PaastaDatabase = env["paas_metric_db_name_bosh"].(string)
+	databases.LoggingDatabase = env["paas_metric_db_name_logging"].(string)
 
 	influxDBClient, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr:               env["paas_metric_db_url"].(string),
@@ -192,11 +209,10 @@ func InfluxDBConnection(env map[string]interface{}) client.Client {
 	if err != nil {
 		panic(err)
 	}
-	return influxDBClient
+	return influxDBClient, databases
 }
 
-
-func (connection *Connections) initOpenstackProvider()  {
+func (connection *Connections) initOpenstackProvider() {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: connection.Env["openstack_identity_endpoint"].(string),
 		DomainName:       connection.Env["openstack_domain"].(string),
@@ -217,7 +233,6 @@ func (connection *Connections) initOpenstackProvider()  {
 	//connections.RedisInfo.HSet(reqToken, "iaasToken", providerClient.TokenID)
 	connection.OpenstackProvider = providerClient
 }
-
 
 func (connection *Connections) initZabbixSession() {
 	zabbixHost := connection.Env["zabbix_host"].(string)
@@ -243,7 +258,6 @@ func (connection *Connections) initZabbixSession() {
 	connection.ZabbixSession = zabbixSession
 }
 
-
 func SetupConnection() Connections {
 
 	Conn := Connections{
@@ -263,8 +277,8 @@ func SetupConnection() Connections {
 	for _, value := range servicesArr {
 		switch value {
 		case "PaaS":
-			Conn.DbInfo = PaaSConnection(Conn.Env)
-			Conn.InfluxDBClient = InfluxDBConnection(Conn.Env)
+			Conn.DbInfo, Conn.CloudFoundryClient = PaaSConnection(Conn.Env)
+			Conn.InfluxDBClient, Conn.Databases = InfluxDBConnection(Conn.Env)
 		case "SaaS":
 			SaasConnection(Conn.Env)
 		case "CaaS":
