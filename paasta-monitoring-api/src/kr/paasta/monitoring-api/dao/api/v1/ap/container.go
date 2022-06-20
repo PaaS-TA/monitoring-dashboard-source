@@ -52,29 +52,28 @@ func (ap *ApContainerDao) GetZoneInfo() ([]models.ZoneInfo, error) {
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetAppInfo() ([]cfclient.App, error) {
-	return ap.CloudFoundryClient.ListApps()
-	// -----------------------------------------------------------------------------------------------------------
-	/*var aaa interface{}
-	cellInfos, _ := ap.GetCellInfo()
-	query := "select application_name, application_index, container_interface, value from container_metrics " +
-		"where cell_ip = '%s' and \"name\" = 'load_average'  and container_id <> '/' and time > now() - %s"
-	var q influxDb.Query
-	for _, cellInfo := range cellInfos {
-		var resp *influxDb.Response
-		q = influxDb.Query{
-			Command:  fmt.Sprintf(query, cellInfo.Ip, "120s"),
-			Database: ap.Databases.ContainerDatabase,
-		}
+func (ap *ApContainerDao) GetAppInfo() ([]models.AppInfo, error) {
+	var response []models.AppInfo
+	apps, _ := ap.CloudFoundryClient.ListApps()
 
-		fmt.Println("GetCellContainerList Sql======>", q)
-		resp, err := ap.InfluxDbInfo.Query(q)
-		if err != nil {
-			return resp, err
+	for _, app := range apps {
+		appEnvs, _ := ap.CloudFoundryClient.GetAppEnv(app.Guid)
+		appEnv := appEnvs.ApplicationEnv["VCAP_APPLICATION"].(map[string]interface{})
+
+		tmp := models.AppInfo{
+			Name:      appEnv["application_name"].(string),
+			Uri:       appEnv["application_uris"].([]interface{})[0].(string),
+			Buildpack: app.Buildpack,
+			Instances: app.Instances,
+			Status:    app.State,
+			Memory:    app.Memory,
+			DiskQuota: app.DiskQuota,
+			CfApi:     appEnv["cf_api"].(string),
+			CreatedAt: app.CreatedAt,
+			UpdatedAt: app.UpdatedAt,
 		}
-		aaa = resp
+		response = append(response, tmp)
 	}
-	temp := aaa.(*influxDb.Response)
-	return temp, nil*/
-	// -----------------------------------------------------------------------------------------------------------
+
+	return response, nil
 }

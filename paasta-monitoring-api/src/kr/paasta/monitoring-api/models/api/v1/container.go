@@ -12,6 +12,16 @@ type (
 	}
 
 	AppInfo struct {
+		Name      string `json:"name"`
+		Uri       string `json:"uri"`
+		Buildpack string `json:"buildpack"`
+		Status    string `json:"status"`
+		Instances int    `json:"instances"`
+		Memory    int    `json:"memory"`
+		DiskQuota int    `json:"diskQuota"`
+		CfApi     string `json:"cfApi"`
+		CreatedAt string `json:"createdAt"`
+		UpdatedAt string `json:"updatedAt"`
 	}
 
 	Databases struct {

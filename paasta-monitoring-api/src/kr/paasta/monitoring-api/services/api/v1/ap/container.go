@@ -39,7 +39,7 @@ func (ap *ApContainerService) GetZoneInfo() ([]models.ZoneInfo, error) {
 	}
 	return results, nil
 }
-func (ap *ApContainerService) GetAppInfo() ([]cfclient.App, error) {
+func (ap *ApContainerService) GetAppInfo() ([]models.AppInfo, error) {
 	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbInfo, ap.Databases, ap.CloudFoundryClient).GetAppInfo()
 	if err != nil {
 		return results, err
