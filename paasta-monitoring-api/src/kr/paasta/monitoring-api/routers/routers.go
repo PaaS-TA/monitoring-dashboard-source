@@ -99,6 +99,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	// AP - Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
+	v1.GET("/ap/container/zone", apContainer.GetZoneInfo)
+	v1.GET("/ap/container/app", apContainer.GetAppInfo)
 
 	// IaaS
 	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)

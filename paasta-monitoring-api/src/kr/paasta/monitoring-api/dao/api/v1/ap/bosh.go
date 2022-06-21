@@ -10,17 +10,15 @@ import (
 
 type BoshDao struct {
 	DbInfo         *gorm.DB
-	InfluxDBClient client.Client
+	InfluxDbClient models.InfluxDbClient
 	BoshInfoList   []models.Bosh
-	Env            map[string]interface{}
 }
 
-func GetBoshDao(DbInfo *gorm.DB, InfluxDBClient client.Client, BoshInfoList []models.Bosh, Env map[string]interface{}) *BoshDao {
+func GetBoshDao(DbInfo *gorm.DB, InfluxDbClient models.InfluxDbClient, BoshInfoList []models.Bosh) *BoshDao {
 	return &BoshDao{
 		DbInfo:         DbInfo,
-		InfluxDBClient: InfluxDBClient,
+		InfluxDbClient: InfluxDbClient,
 		BoshInfoList:   BoshInfoList,
-		Env:            Env,
 	}
 }
 
@@ -38,10 +36,10 @@ func (b *BoshDao) GetBoshSummary(boshSummary models.BoshSummary) (*client.Respon
 	getBoshSummarySql := boshSummary.SqlQuery
 	q := client.Query{
 		Command:  fmt.Sprintf(getBoshSummarySql, boshSummary.UUID, boshSummary.Time, boshSummary.MetricName),
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
 
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		errLogMsg = err.Error()
 		return resp, errMsg
@@ -55,11 +53,11 @@ func (b *BoshDao) GetBoshProcessByMemory(uuid string) (*client.Response, error) 
 	getBoshTopprocessListSql := "select proc_name as process_name, time, proc_index, proc_pid, mem_usage from bosh_process_metrics where id = '%s' and time > now() - %s order by time desc"
 	q := client.Query{
 		Command:  fmt.Sprintf(getBoshTopprocessListSql, uuid, "1m"),
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
 	fmt.Println("GetBoshProcessByMemory Sql======>", q)
 
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -83,9 +81,9 @@ func (b *BoshDao) GetBoshCpuUsageList(boshChart models.BoshChart) (*client.Respo
 
 	q := client.Query{
 		Command:  cpuUsageSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -108,9 +106,9 @@ func (b *BoshDao) GetBoshCpuLoadList(boshChart models.BoshChart) (*client.Respon
 
 	q := client.Query{
 		Command:  cpuLoadSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -141,10 +139,10 @@ func (b *BoshDao) GetBoshMemoryUsageList(boshChart models.BoshChart) (*client.Re
 
 	q = client.Query{
 		Command:  Sql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
 	fmt.Println("GetBoshMemUsageList Sql======>", q)
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 
 	return resp, err
 }
@@ -163,9 +161,9 @@ func (b *BoshDao) GetBoshDiskUsageList(boshChart models.BoshChart) (*client.Resp
 
 	q := client.Query{
 		Command:  boshDiskUsageSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -190,9 +188,9 @@ func (b *BoshDao) GetBoshDiskIoList(boshChart models.BoshChart) (*client.Respons
 
 	q := client.Query{
 		Command:  boshDiskIoSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -216,9 +214,9 @@ func (b *BoshDao) GetBoshNetworkByteList(boshChart models.BoshChart) (*client.Re
 
 	q := client.Query{
 		Command:  boshNetworkByteSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -242,9 +240,9 @@ func (b *BoshDao) GetBoshNetworkPacketList(boshChart models.BoshChart) (*client.
 
 	q := client.Query{
 		Command:  boshNetworkPacketSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -268,9 +266,9 @@ func (b *BoshDao) GetBoshNetworkDropList(boshChart models.BoshChart) (*client.Re
 
 	q := client.Query{
 		Command:  boshNetworkDropSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -294,9 +292,9 @@ func (b *BoshDao) GetBoshNetworkErrorList(boshChart models.BoshChart) (*client.R
 
 	q := client.Query{
 		Command:  boshNetworkErrorSql,
-		Database: b.Env["paas_metric_db_name_bosh"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
@@ -325,9 +323,9 @@ func (b *BoshDao) GetBoshLog(boshLog models.BoshLog) (*client.Response, error) {
 
 	q := client.Query{
 		Command:  boshLogSql,
-		Database: b.Env["paas_metric_db_name_logging"].(string),
+		Database: b.InfluxDbClient.DbName.BoshDatabase,
 	}
-	resp, err := b.InfluxDBClient.Query(q)
+	resp, err := b.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
 		return resp, err
 	}
