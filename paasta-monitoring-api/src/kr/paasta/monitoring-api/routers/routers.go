@@ -10,7 +10,8 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
-	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
+	commonModule "paasta-monitoring-api/controllers/api/v1/common"
+	iaasModule "paasta-monitoring-api/controllers/api/v1/iaas"
 	"paasta-monitoring-api/middlewares"
 	"time"
 )
@@ -41,7 +42,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
-	common := apiControllerV1.GetCommonController(conn)
+	//common := apiControllerV1.GetCommonController(conn)
+	alarmPolicy := commonModule.GetAlarmPolicyController(conn)
+	alarmStatistics := commonModule.GetAlarmStatisticsController(conn)
+
 
 	apBosh := AP.GetBoshController(conn)
 	apAlarm := AP.GetApAlarmController(conn)
@@ -61,9 +65,15 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/members", apiUser.GetMember)
 
 	// Common
-	v1.GET("/alarm/policy", common.GetAlarmPolicy)
-	v1.PUT("/alarm/policy", common.UpdateAlarmPolicy)
-	v1.PUT("/alarm/target", common.UpdateAlarmTarget)
+	//v1.GET("/alarm/policy", common.GetAlarmPolicy)
+	//v1.PUT("/alarm/policy", common.UpdateAlarmPolicy)
+	//v1.PUT("/alarm/target", common.UpdateAlarmTarget)
+
+	v1.GET("/alarm/policy", alarmPolicy.GetAlarmPolicy)
+	v1.PUT("/alarm/policy", alarmPolicy.UpdateAlarmPolicy)
+	v1.PUT("/alarm/target", alarmPolicy.UpdateAlarmTarget)
+	v1.GET("/alarm/statistics/total", alarmStatistics.GetAlarmStatistics)
+	v1.GET("/alarm/statistics/resource", alarmStatistics.GetAlarmStatisticsResource)
 
 	// AP - BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
@@ -91,8 +101,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
 
 	// IaaS
-	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
-	zabbixModule := iaas.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
+	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
+	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
 	v1.GET("/iaas/hyper/statistics", openstackModule.GetHypervisorStatistics)
 	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
 	v1.GET("/iaas/project/list", openstackModule.GetProjectList)

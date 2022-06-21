@@ -115,4 +115,14 @@ type (
 		Service    string `json:"service"`
 		Resource   string `json:"resource"`
 	}
+
+	AlarmStatisticsParam struct {
+		OriginType string
+		ResourceType string
+		AliasPrefix string
+		Period string
+		TimeCriterion string
+		DateFormat string
+		ExtraParams interface{}
+	}
 )
