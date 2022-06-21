@@ -23,16 +23,15 @@ import (
 )
 
 type Connections struct {
-	DbInfo             *gorm.DB
-	RedisInfo          *redis.Client
-	InfluxDBClient     client.Client
-	BoshInfoList       []models.Bosh
-	Databases          models.Databases
-	Env                map[string]interface{}
-	OpenstackProvider  *gophercloud.ProviderClient
-	ZabbixSession      *zabbix.Session
-	Logger             *zap.Logger
-	CloudFoundryClient *cfclient.Client
+	DbInfo            *gorm.DB
+	RedisInfo         *redis.Client
+	InfluxDbClient    models.InfluxDbClient
+	BoshInfoList      []models.Bosh
+	Env               map[string]interface{}
+	OpenstackProvider *gophercloud.ProviderClient
+	ZabbixSession     *zabbix.Session
+	Logger            *zap.Logger
+	CfClient          *cfclient.Client
 }
 
 /*
@@ -192,24 +191,31 @@ func iaasConnection(env map[string]interface{}) error {
 	return nil
 }
 
-func InfluxDBConnection(env map[string]interface{}) (client.Client, models.Databases) {
-
-	var databases models.Databases
-	databases.ContainerDatabase = env["paas_metric_db_name_container"].(string)
-	databases.BoshDatabase = env["paas_metric_db_name_paasta"].(string)
-	databases.PaastaDatabase = env["paas_metric_db_name_bosh"].(string)
-	databases.LoggingDatabase = env["paas_metric_db_name_logging"].(string)
-
-	influxDBClient, err := client.NewHTTPClient(client.HTTPConfig{
+func InfluxDbConnection(env map[string]interface{}) models.InfluxDbClient {
+	httpClient, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr:               env["paas_metric_db_url"].(string),
 		Username:           env["paas_metric_db_username"].(string),
 		Password:           env["paas_metric_db_password"].(string),
 		InsecureSkipVerify: true,
 	})
+
 	if err != nil {
 		panic(err)
 	}
-	return influxDBClient, databases
+
+	DbName := models.InfluxDbName{
+		BoshDatabase:      env["paas_metric_db_name_bosh"].(string),
+		PaastaDatabase:    env["paas_metric_db_name_paasta"].(string),
+		ContainerDatabase: env["paas_metric_db_name_container"].(string),
+		LoggingDatabase:   env["paas_metric_db_name_logging"].(string),
+	}
+
+	influxDbClient := models.InfluxDbClient{
+		HttpClient: httpClient,
+		DbName:     DbName,
+	}
+
+	return influxDbClient
 }
 
 func (connection *Connections) initOpenstackProvider() {
@@ -277,8 +283,8 @@ func SetupConnection() Connections {
 	for _, value := range servicesArr {
 		switch value {
 		case "PaaS":
-			Conn.DbInfo, Conn.CloudFoundryClient = PaaSConnection(Conn.Env)
-			Conn.InfluxDBClient, Conn.Databases = InfluxDBConnection(Conn.Env)
+			Conn.DbInfo, Conn.CfClient = PaaSConnection(Conn.Env)
+			Conn.InfluxDbClient = InfluxDbConnection(Conn.Env)
 		case "SaaS":
 			SaasConnection(Conn.Env)
 		case "CaaS":

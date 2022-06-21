@@ -2,7 +2,6 @@ package ap
 
 import (
 	"github.com/cloudfoundry-community/go-cfclient"
-	influxDb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -13,18 +12,16 @@ import (
 )
 
 type ApContainerController struct {
-	DbInfo             *gorm.DB
-	InfluxDbInfo       influxDb.Client
-	Databases          models.Databases
-	CloudFoundryClient *cfclient.Client
+	DbInfo         *gorm.DB
+	InfluxDbClient models.InfluxDbClient
+	CfClient       *cfclient.Client
 }
 
 func GetApContainerController(conn connections.Connections) *ApContainerController {
 	return &ApContainerController{
-		DbInfo:             conn.DbInfo,
-		InfluxDbInfo:       conn.InfluxDBClient,
-		Databases:          conn.Databases,
-		CloudFoundryClient: conn.CloudFoundryClient,
+		DbInfo:         conn.DbInfo,
+		InfluxDbClient: conn.InfluxDbClient,
+		CfClient:       conn.CfClient,
 	}
 }
 
@@ -38,7 +35,7 @@ func GetApContainerController(conn connections.Connections) *ApContainerControll
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.CellInfo}
 //  @Router       /api/v1/ap/container/cell [get]
 func (ap *ApContainerController) GetCellInfo(c echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbInfo, ap.Databases, ap.CloudFoundryClient).GetCellInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellInfo()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get cell info.", err.Error())
 		return err
@@ -58,7 +55,7 @@ func (ap *ApContainerController) GetCellInfo(c echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.ZoneInfo}
 //  @Router       /api/v1/ap/container/zone [get]
 func (ap *ApContainerController) GetZoneInfo(c echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbInfo, ap.Databases, ap.CloudFoundryClient).GetZoneInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetZoneInfo()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get zone info.", err.Error())
 		return err
@@ -78,7 +75,7 @@ func (ap *ApContainerController) GetZoneInfo(c echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=cfclient.App}
 //  @Router       /api/v1/ap/container/zone [get]
 func (ap *ApContainerController) GetAppInfo(c echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbInfo, ap.Databases, ap.CloudFoundryClient).GetAppInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetAppInfo()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get apps info.", err.Error())
 		return err

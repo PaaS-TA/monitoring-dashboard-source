@@ -1,7 +1,6 @@
 package ap
 
 import (
-	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -13,17 +12,15 @@ import (
 
 type BoshController struct {
 	DbInfo         *gorm.DB
-	InfluxDBClient client.Client
+	InfluxDbClient models.InfluxDbClient
 	BoshInfoList   []models.Bosh
-	Env            map[string]interface{}
 }
 
 func GetBoshController(conn connections.Connections) *BoshController {
 	return &BoshController{
 		DbInfo:         conn.DbInfo,
-		InfluxDBClient: conn.InfluxDBClient,
+		InfluxDbClient: conn.InfluxDbClient,
 		BoshInfoList:   conn.BoshInfoList,
-		Env:            conn.Env,
 	}
 }
 
@@ -37,7 +34,7 @@ func GetBoshController(conn connections.Connections) *BoshController {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Bosh}
 //  @Router       /api/v1/bosh [get]
 func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshInfoList()
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshInfoList()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -56,7 +53,7 @@ func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshOverview}
 //  @Router       /api/v1/ap/bosh/overview [get]
 func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshOverview(c)
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshOverview(c)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -75,7 +72,7 @@ func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
 //  @Router       /api/v1/ap/bosh/summary [get]
 func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(c)
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(c)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -96,7 +93,7 @@ func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
 //  @Router       /api/v1/ap/bosh/process [get]
 func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
 	// Bosh Process 정보 조회
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshProcessByMemory()
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory()
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -123,7 +120,7 @@ func (b *BoshController) GetBoshChart(c echo.Context) (err error) {
 	boshChart.TimeRangeTo = c.QueryParam("timeRangeTo")
 	boshChart.GroupBy = c.QueryParam("groupBy")
 
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshChart(boshChart)
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshChart(boshChart)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -152,7 +149,7 @@ func (b *BoshController) GetBoshLog(c echo.Context) (err error) {
 	boshLog.EndTime = c.QueryParam("endTime")
 	boshLog.Period = c.QueryParam("period")
 
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshLog(boshLog)
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshLog(boshLog)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err

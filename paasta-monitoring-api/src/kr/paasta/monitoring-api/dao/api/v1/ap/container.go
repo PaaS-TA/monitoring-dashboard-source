@@ -3,24 +3,21 @@ package ap
 import (
 	"fmt"
 	"github.com/cloudfoundry-community/go-cfclient"
-	influxDb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	models "paasta-monitoring-api/models/api/v1"
 )
 
 type ApContainerDao struct {
-	DbInfo             *gorm.DB
-	InfluxDbInfo       influxDb.Client
-	Databases          models.Databases
-	CloudFoundryClient *cfclient.Client
+	DbInfo         *gorm.DB
+	InfluxDbClient models.InfluxDbClient
+	CfClient       *cfclient.Client
 }
 
-func GetApContainerDao(DbInfo *gorm.DB, InfluxDbInfo influxDb.Client, Databases models.Databases, CloudFoundryClient *cfclient.Client) *ApContainerDao {
+func GetApContainerDao(DbInfo *gorm.DB, InfluxDbClient models.InfluxDbClient, CfClient *cfclient.Client) *ApContainerDao {
 	return &ApContainerDao{
-		DbInfo:             DbInfo,
-		InfluxDbInfo:       InfluxDbInfo,
-		Databases:          Databases,
-		CloudFoundryClient: CloudFoundryClient,
+		DbInfo:         DbInfo,
+		InfluxDbClient: InfluxDbClient,
+		CfClient:       CfClient,
 	}
 }
 
@@ -38,6 +35,7 @@ func (ap *ApContainerDao) GetCellInfo() ([]models.CellInfo, error) {
 
 	return response, nil
 }
+
 func (ap *ApContainerDao) GetZoneInfo() ([]models.ZoneInfo, error) {
 	var response []models.ZoneInfo
 	results := ap.DbInfo.Debug().Table("zones").
@@ -54,10 +52,10 @@ func (ap *ApContainerDao) GetZoneInfo() ([]models.ZoneInfo, error) {
 
 func (ap *ApContainerDao) GetAppInfo() ([]models.AppInfo, error) {
 	var response []models.AppInfo
-	apps, _ := ap.CloudFoundryClient.ListApps()
+	apps, _ := ap.CfClient.ListApps()
 
 	for _, app := range apps {
-		appEnvs, _ := ap.CloudFoundryClient.GetAppEnv(app.Guid)
+		appEnvs, _ := ap.CfClient.GetAppEnv(app.Guid)
 		appEnv := appEnvs.ApplicationEnv["VCAP_APPLICATION"].(map[string]interface{})
 
 		tmp := models.AppInfo{

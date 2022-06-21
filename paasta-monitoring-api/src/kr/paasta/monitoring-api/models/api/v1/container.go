@@ -1,5 +1,7 @@
 package v1
 
+import client "github.com/influxdata/influxdb1-client/v2"
+
 type (
 	CellInfo struct {
 		Name string `json:"name"`
@@ -24,10 +26,15 @@ type (
 		UpdatedAt string `json:"updatedAt"`
 	}
 
-	Databases struct {
+	InfluxDbName struct {
 		BoshDatabase      string
 		PaastaDatabase    string
 		ContainerDatabase string
 		LoggingDatabase   string
+	}
+
+	InfluxDbClient struct {
+		HttpClient client.Client
+		DbName     InfluxDbName
 	}
 )

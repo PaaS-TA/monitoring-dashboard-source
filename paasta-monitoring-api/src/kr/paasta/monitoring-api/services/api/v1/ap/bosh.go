@@ -17,17 +17,15 @@ import (
 
 type ApBoshService struct {
 	DbInfo         *gorm.DB
-	InfluxDBClient client.Client
+	InfluxDbClient models.InfluxDbClient
 	BoshInfoList   []models.Bosh
-	Env            map[string]interface{}
 }
 
-func GetApBoshService(DbInfo *gorm.DB, InfluxDBClient client.Client, BoshInfoList []models.Bosh, Env map[string]interface{}) *ApBoshService {
+func GetApBoshService(DbInfo *gorm.DB, InfluxDbClient models.InfluxDbClient, BoshInfoList []models.Bosh) *ApBoshService {
 	return &ApBoshService{
 		DbInfo:         DbInfo,
-		InfluxDBClient: InfluxDBClient,
+		InfluxDbClient: InfluxDbClient,
 		BoshInfoList:   BoshInfoList,
-		Env:            Env,
 	}
 }
 
@@ -205,7 +203,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_CPU_CORE
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select value from bosh_metrics where id = '%s' and time > now() - %s and metricname =~ /%s/ group by metricname order by time desc limit 1;"
-				cpuCoreResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				cpuCoreResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -213,7 +211,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_CPU_CORE
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname =~ /%s/ ;"
-				cpuResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				cpuResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -221,7 +219,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_MEM_TOTAL
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				memTotalResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				memTotalResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -229,7 +227,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_MEM_FREE
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				memFreeResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				memFreeResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -237,7 +235,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_DISK_TOTAL
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskTotalResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				diskTotalResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -245,7 +243,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_DISK_USED
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskUsedResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				diskUsedResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -253,7 +251,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_DISK_DATA_TOTAL
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskDataTotalResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				diskDataTotalResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -261,7 +259,7 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 				boshSummary.MetricName = models.MTR_DISK_DATA_USED
 				boshSummary.Time = "1m"
 				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskDataUsedResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshSummary(boshSummary)
+				diskDataUsedResp, err = dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshSummary(boshSummary)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -303,7 +301,7 @@ func (b *ApBoshService) GetBoshProcessByMemory() ([]models.BoshProcess, error) {
 	var results []models.BoshProcess
 
 	for _, BoshInfo := range b.BoshInfoList {
-		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshProcessByMemory(BoshInfo.UUID)
+		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(BoshInfo.UUID)
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -362,47 +360,47 @@ func (b *ApBoshService) GetBoshChart(boshChart models.BoshChart) ([]models.BoshC
 
 	for _, boshInfo := range b.BoshInfoList {
 		boshChart.MetricName = models.MTR_CPU_CORE
-		cpuUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuUsageList(boshChart)
+		cpuUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuUsageList(boshChart)
 		boshChart.MetricName = models.MTR_CPU_LOAD_1M
-		cpuLoad1MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuLoadList(boshChart)
+		cpuLoad1MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
 		boshChart.MetricName = models.MTR_CPU_LOAD_5M
-		cpuLoad5MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuLoadList(boshChart)
+		cpuLoad5MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
 		boshChart.MetricName = models.MTR_CPU_LOAD_15M
-		cpuLoad15MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshCpuLoadList(boshChart)
+		cpuLoad15MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
 
 		boshChart.MetricName = models.MTR_MEM_USAGE
-		memoryUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshMemoryUsageList(boshChart)
+		memoryUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshMemoryUsageList(boshChart)
 
 		boshChart.MetricName = models.MTR_DISK_USAGE
-		diskUsageRootResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskUsageList(boshChart)
+		diskUsageRootResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskUsageList(boshChart)
 		boshChart.MetricName = models.MTR_DISK_DATA_USAGE
-		diskUsageVcapDataResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskUsageList(boshChart)
+		diskUsageVcapDataResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskUsageList(boshChart)
 
 		boshChart.MetricName = "diskIOStats.\\/\\..*.readBytes"
-		diskIoRootReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		diskIoRootReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
 		boshChart.MetricName = "diskIOStats.\\/\\..*.writeBytes"
-		diskIoRootWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		diskIoRootWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
 		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.readBytes"
-		diskIoVcapReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		diskIoVcapReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
 		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.writeBytes"
-		diskIoVcapWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshDiskIoList(boshChart)
+		diskIoVcapWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
 
 		boshChart.MetricName = "networkIOStats.eth0.bytesSent"
-		networkByteSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkByteList(boshChart)
+		networkByteSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkByteList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.bytesRecv"
-		networkByteRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkByteList(boshChart)
+		networkByteRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkByteList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.packetSent"
-		networkPacketSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkPacketList(boshChart)
+		networkPacketSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkPacketList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.packetRecv"
-		networkPacketRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkPacketList(boshChart)
+		networkPacketRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkPacketList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.dropIn"
-		networkDropInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkDropList(boshChart)
+		networkDropInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkDropList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.dropOut"
-		networkDropOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkDropList(boshChart)
+		networkDropOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkDropList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.errIn"
-		networkErrorInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkErrorList(boshChart)
+		networkErrorInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
 		boshChart.MetricName = "networkIOStats.eth0.errOut"
-		networkErrorOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshNetworkErrorList(boshChart)
+		networkErrorOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
 		if err != nil {
 			fmt.Println(err.Error())
 			return results, err
@@ -501,7 +499,7 @@ func (b *ApBoshService) GetBoshLog(boshLog models.BoshLog) ([]models.BoshLog, er
 				boshLog.StartTime = time.Unix(startTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
 				boshLog.EndTime = time.Unix(endTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
 			}
-			logResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDBClient, b.BoshInfoList, b.Env).GetBoshLog(boshLog)
+			logResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshLog(boshLog)
 			if err != nil {
 				fmt.Println(err.Error())
 				return results, err
