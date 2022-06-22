@@ -46,21 +46,21 @@ type (
 	}
 
 	AlarmSns struct {
-		ChannelId  int    `json:"channelId"`
-		OriginType string `json:"originType"`
-		SnsType    string `json:"snsType"`
-		SnsId      string `json:"snsId"`
-		Token      string `json:"token"`
-		Expl       string `json:"expl"`
-		SnsSendYN  string `json:"snsSendYN"`
-		RegDate    string `json:"regDate"`
-		RegUser    string `json:"regUser"`
-		ModiDate   string `json:"modiDate"`
-		ModiUser   string `json:"modiUser"`
+		ChannelId  uint       `json:"channelId"    gorm:"primaryKey;autoIncrement;not null"`
+		OriginType string     `json:"originType"   gorm:"not null"`
+		SnsType    string     `json:"snsType"      gorm:"not null"`
+		SnsId      string     `json:"snsId"        gorm:"not null"`
+		Token      string     `json:"token"`
+		Expl       string     `json:"expl"         gorm:"not null"`
+		SnsSendYN  string     `json:"snsSendYN"    gorm:"not null"`
+		RegDate    time.Time  `json:"regDate"      gorm:"<-:create"`
+		RegUser    string     `json:"regUser"      gorm:"<-:create"`
+		ModiDate   time.Time  `json:"modiDate"     gorm:"<-:update"`
+		ModiUser   string     `json:"modiUser"     gorm:"<-:update"`
 	}
 
 	AlarmActions struct {
-		Id              int        `json:"id"               gorm:"primaryKey;autoIncrement"`
+		Id              int        `json:"id"               gorm:"primaryKey;autoIncrement;not null"`
 		AlarmId         uint       `json:"alarmId"`
 		AlarmActionDesc string     `json:"alarmActionDesc"`
 		RegDate         time.Time  `json:"regDate"          gorm:"<-:create"`

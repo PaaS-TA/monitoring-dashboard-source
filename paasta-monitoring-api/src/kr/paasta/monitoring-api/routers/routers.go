@@ -44,6 +44,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	//common := apiControllerV1.GetCommonController(conn)
 	alarm := commonModule.GetAlarmController(conn)
+	alarmSns := commonModule.GetAlarmSnsController(conn)
 	alarmPolicy := commonModule.GetAlarmPolicyController(conn)
 	alarmStatistics := commonModule.GetAlarmStatisticsController(conn)
 	alarmAction := commonModule.GetAlarmActionController(conn)
@@ -72,6 +73,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	//v1.PUT("/alarm/target", common.UpdateAlarmTarget)
 
 	v1.GET("/alarm", alarm.GetAlarms)
+	v1.POST("/alarm/sns", alarmSns.CreateAlarmSns)
+	v1.GET("/alarm/sns", alarmSns.GetAlarmSns)
+	v1.PUT("/alarm/sns", alarmSns.UpdateAlarmSns)
+	v1.DELETE("/alarm/sns", alarmSns.DeleteAlarmSns)
 	v1.GET("/alarm/policy", alarmPolicy.GetAlarmPolicy)
 	v1.PUT("/alarm/policy", alarmPolicy.UpdateAlarmPolicy)
 	v1.PUT("/alarm/target", alarmPolicy.UpdateAlarmTarget)
