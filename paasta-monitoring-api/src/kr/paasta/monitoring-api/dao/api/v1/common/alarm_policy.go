@@ -42,16 +42,10 @@ func (dao *AlarmPolicyDao) GetAlarmPolicy(params models.AlarmPolicies) ([]models
 	return response, nil
 }
 
-func (dao *AlarmPolicyDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
-	results := dao.DbInfo.Debug().Table("alarm_policies").
-		Where("origin_type = ? AND alarm_type = ?", request.OriginType, request.AlarmType).
-		Updates(map[string]interface{}{
-			"warning_threshold":  request.WarningThreshold,
-			"critical_threshold": request.CriticalThreshold,
-			"repeat_time":        request.RepeatTime,
-			"measure_time":       request.MeasureTime,
-			"modi_date":          time.Now().UTC().Add(time.Hour * 9),
-			"modi_user":          "admin"})
+func (dao *AlarmPolicyDao) UpdateAlarmPolicy(param models.AlarmPolicies) error {
+	results := dao.DbInfo.Debug().Model(&param).
+		Where("origin_type = ? AND alarm_type = ?", param.OriginType, param.AlarmType).
+		Updates(param)
 
 	if results.Error != nil {
 		fmt.Println(results.Error)

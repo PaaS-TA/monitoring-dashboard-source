@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	common "paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
+	"time"
 )
 
 type AlarmPolicyService struct {
@@ -16,6 +17,7 @@ func GetAlarmPolicyService(DbInfo *gorm.DB) *AlarmPolicyService {
 		DbInfo: DbInfo,
 	}
 }
+
 
 func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.AlarmPolicies, error) {
 	params := models.AlarmPolicies {
@@ -30,15 +32,27 @@ func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.Alar
 	return results, nil
 }
 
-func (service *AlarmPolicyService) UpdateAlarmPolicy(request []models.AlarmPolicyRequest) (string, error) {
-	for _, request := range request {
-		err := common.GetAlarmPolicyDao(service.DbInfo).UpdateAlarmPolicy(request)
+
+func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []models.AlarmPolicyRequest) (string, error) {
+	for _, policyParam := range params {
+		param := models.AlarmPolicies{
+			OriginType: policyParam.OriginType,
+			AlarmType: policyParam.AlarmType,
+			WarningThreshold: policyParam.WarningThreshold,
+			CriticalThreshold: policyParam.CriticalThreshold,
+			RepeatTime: policyParam.RepeatTime,
+			MeasureTime: policyParam.MeasureTime,
+			ModiUser: ctx.Get("userId").(string),
+			ModiDate: time.Now(),
+		}
+		err := common.GetAlarmPolicyDao(service.DbInfo).UpdateAlarmPolicy(param)
 		if err != nil {
 			return "FAILED UPDATE POLICY!", err
 		}
 	}
 	return "SUCCEEDED UPDATE POLICY!", nil
 }
+
 
 func (service *AlarmPolicyService) UpdateAlarmTarget(request []models.AlarmTargetRequest) (string, error) {
 	for _, request := range request {

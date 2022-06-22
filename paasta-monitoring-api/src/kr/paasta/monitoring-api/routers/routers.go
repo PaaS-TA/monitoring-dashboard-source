@@ -42,15 +42,19 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
+	// Common > Alarm
 	alarm := commonModule.GetAlarmController(conn)
 	alarmSns := commonModule.GetAlarmSnsController(conn)
 	alarmPolicy := commonModule.GetAlarmPolicyController(conn)
 	alarmStatistics := commonModule.GetAlarmStatisticsController(conn)
 	alarmAction := commonModule.GetAlarmActionController(conn)
 
+	// IaaS
+	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
+	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
+
 	apBosh := AP.GetBoshController(conn)
 	apPaasta := AP.GetPaastaController(conn)
-	//apAlarm := AP.GetApAlarmController(conn)
 	apContainer := AP.GetApContainerController(conn)
 
 	// Router 설정
@@ -66,6 +70,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/users", apiUser.GetUsers)
 	v1.GET("/members", apiUser.GetMember)
 
+	// Common > Alarm
 	v1.GET("/alarm", alarm.GetAlarms)
 	v1.POST("/alarm/sns", alarmSns.CreateAlarmSns)
 	v1.GET("/alarm/sns", alarmSns.GetAlarmSns)
@@ -97,29 +102,12 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/paasta/chart/:uuid", apPaasta.GetPaastaChart)
 	v1.GET("/ap/paasta/log/:uuid", apPaasta.GetPaastaLog)
 
-	// AP - Alarm
-	// @Deprecated
-	//v1.GET("/ap/alarm/status", apAlarm.GetAlarmStatus)
-	//v1.POST("/ap/alarm/sns", apAlarm.RegisterSnsAccount)
-	//v1.GET("/ap/alarm/sns", apAlarm.GetSnsAccount)
-	//v1.DELETE("/ap/alarm/sns", apAlarm.DeleteSnsAccount)
-	//v1.PUT("/ap/alarm/sns", apAlarm.UpdateSnsAccount)
-	//v1.POST("/ap/alarm/action", apAlarm.CreateAlarmAction)
-	//v1.GET("/ap/alarm/action", apAlarm.GetAlarmAction)
-	//v1.PATCH("/ap/alarm/action", apAlarm.UpdateAlarmAction)
-	//v1.DELETE("/ap/alarm/action", apAlarm.DeleteAlarmAction)
-	//v1.GET("/ap/alarm/statistics/total", apAlarm.GetAlarmStatisticsTotal)
-	//v1.GET("/ap/alarm/statistics/service", apAlarm.GetAlarmStatisticsService)
-	//v1.GET("/ap/alarm/statistics/resource", apAlarm.GetAlarmStatisticsResource)
-
 	// AP - Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
 	v1.GET("/ap/container/zone", apContainer.GetZoneInfo)
 	v1.GET("/ap/container/app", apContainer.GetAppInfo)
 
 	// IaaS
-	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
-	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
 	v1.GET("/iaas/hyper/statistics", openstackModule.GetHypervisorStatistics)
 	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
 	v1.GET("/iaas/project/list", openstackModule.GetProjectList)

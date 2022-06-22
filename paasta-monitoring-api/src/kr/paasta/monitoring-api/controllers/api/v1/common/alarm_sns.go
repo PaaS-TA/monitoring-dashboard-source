@@ -61,13 +61,9 @@ func (controller *AlarmSnsController) CreateAlarmSns(c echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmSns}
 //  @Router       /api/v1/ap/alarm/sns [get]
 func (controller *AlarmSnsController) GetAlarmSns(c echo.Context) error {
-	params := models.AlarmSns{
-		OriginType: c.QueryParam("originType"),
-		SnsType: c.QueryParam("snsType"),
-		SnsSendYN: c.QueryParam("snsSendYn"),
-	}
 
-	results, err := service.GetAlarmSnsService(controller.DbInfo).GetAlarmSns(params)
+
+	results, err := service.GetAlarmSnsService(controller.DbInfo).GetAlarmSns(c)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get sns alarm list.", err.Error())
 		return err

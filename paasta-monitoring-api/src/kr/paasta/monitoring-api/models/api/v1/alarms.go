@@ -31,18 +31,18 @@ type (
 	}
 
 	AlarmPolicies struct {
-		Id                int    `json:"id"`
-		OriginType        string `json:"originType"`
-		AlarmType         string `json:"alarmType"`
-		WarningThreshold  int    `json:"warningThreshold"`
-		CriticalThreshold int    `json:"criticalThreshold"`
-		RepeatTime        int    `json:"repeatTime"`
-		MeasureTime       int    `json:"measureTime"`
-		Comment           string `json:"comment"`
-		RegDate           string `json:"regDate"`
-		RegUser           string `json:"regUser"`
-		ModiDate          string `json:"modiDate"`
-		ModiUser          string `json:"modiUser"`
+		Id                int       `json:"id"                 gorm:"primaryKey;autoIncrement;not null"`
+		OriginType        string    `json:"originType"         gorm:"not null"`
+		AlarmType         string    `json:"alarmType"          gorm:"not null"`
+		WarningThreshold  int       `json:"warningThreshold"   gorm:"not null"`
+		CriticalThreshold int       `json:"criticalThreshold"  gorm:"not null"`
+		RepeatTime        int       `json:"repeatTime"         gorm:"not null"`
+		MeasureTime       int       `json:"measureTime"        gorm:"not null"`
+		Comment           string    `json:"comment"`
+		RegDate           time.Time `json:"regDate"            gorm:"<-:create"`
+		RegUser           string    `json:"regUser"            gorm:"<-:create"`
+		ModiDate          time.Time `json:"modiDate"           gorm:"<-:update"`
+		ModiUser          string    `json:"modiUser"           gorm:"<-:update"`
 	}
 
 	AlarmSns struct {

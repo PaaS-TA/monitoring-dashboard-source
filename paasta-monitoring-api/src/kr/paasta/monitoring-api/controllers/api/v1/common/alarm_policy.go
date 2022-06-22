@@ -59,7 +59,7 @@ func (controller *AlarmPolicyController) UpdateAlarmPolicy(ctx echo.Context) err
 		return err
 	}
 
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmPolicy(request)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmPolicy(ctx, request)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm policy.", err.Error())
 		return err

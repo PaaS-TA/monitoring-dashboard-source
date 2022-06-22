@@ -60,14 +60,14 @@ func (controller *AlarmActionController) CreateAlarmAction(ctx echo.Context) err
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/action [get]
-func (ap *AlarmActionController) GetAlarmAction(c echo.Context) error {
-	results, err := service.GetAlarmActionService(ap.DbInfo).GetAlarmAction(c)
+func (ap *AlarmActionController) GetAlarmAction(ctx echo.Context) error {
+	results, err := service.GetAlarmActionService(ap.DbInfo).GetAlarmAction(ctx)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm action.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get alarm action.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get alarm action.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get alarm action.", results)
 	return nil
 }
 
