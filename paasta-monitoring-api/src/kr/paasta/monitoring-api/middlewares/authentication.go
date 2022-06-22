@@ -51,6 +51,7 @@ func CheckToken(conn connections.Connections) echo.MiddlewareFunc {
 				return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 			}
 			fmt.Println(userId + " is authorized")
+			c.Set("userId", userId)
 
 			// Continue
 			if err := next(c); err != nil {
