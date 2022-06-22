@@ -45,6 +45,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	//common := apiControllerV1.GetCommonController(conn)
 	alarmPolicy := commonModule.GetAlarmPolicyController(conn)
 	alarmStatistics := commonModule.GetAlarmStatisticsController(conn)
+	alarmAction := commonModule.GetAlarmActionController(conn)
 
 
 	apBosh := AP.GetBoshController(conn)
@@ -72,8 +73,12 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/alarm/policy", alarmPolicy.GetAlarmPolicy)
 	v1.PUT("/alarm/policy", alarmPolicy.UpdateAlarmPolicy)
 	v1.PUT("/alarm/target", alarmPolicy.UpdateAlarmTarget)
-	v1.GET("/alarm/statistics/total", alarmStatistics.GetAlarmStatistics)
-	v1.GET("/alarm/statistics/resource", alarmStatistics.GetAlarmStatisticsResource)
+	v1.GET("/alarm/stats", alarmStatistics.GetAlarmStatistics)
+	v1.GET("/alarm/stats/resource", alarmStatistics.GetAlarmStatisticsResource)
+	v1.POST("/alarm/action", alarmAction.CreateAlarmAction)
+	v1.GET("/alarm/action", alarmAction.GetAlarmAction)
+	v1.PATCH("/alarm/action", alarmAction.UpdateAlarmAction)
+	v1.DELETE("/alarm/action", alarmAction.DeleteAlarmAction)
 
 	// AP - BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
@@ -89,13 +94,13 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/alarm/sns", apAlarm.GetSnsAccount)
 	v1.DELETE("/ap/alarm/sns", apAlarm.DeleteSnsAccount)
 	v1.PUT("/ap/alarm/sns", apAlarm.UpdateSnsAccount)
-	v1.POST("/ap/alarm/action", apAlarm.CreateAlarmAction)
-	v1.GET("/ap/alarm/action", apAlarm.GetAlarmAction)
-	v1.PATCH("/ap/alarm/action", apAlarm.UpdateAlarmAction)
-	v1.DELETE("/ap/alarm/action", apAlarm.DeleteAlarmAction)
-	v1.GET("/ap/alarm/statistics/total", apAlarm.GetAlarmStatisticsTotal)
-	v1.GET("/ap/alarm/statistics/service", apAlarm.GetAlarmStatisticsService)
-	v1.GET("/ap/alarm/statistics/resource", apAlarm.GetAlarmStatisticsResource)
+	//v1.POST("/ap/alarm/action", apAlarm.CreateAlarmAction)
+	//v1.GET("/ap/alarm/action", apAlarm.GetAlarmAction)
+	//v1.PATCH("/ap/alarm/action", apAlarm.UpdateAlarmAction)
+	//v1.DELETE("/ap/alarm/action", apAlarm.DeleteAlarmAction)
+	//v1.GET("/ap/alarm/statistics/total", apAlarm.GetAlarmStatisticsTotal)
+	//v1.GET("/ap/alarm/statistics/service", apAlarm.GetAlarmStatisticsService)
+	//v1.GET("/ap/alarm/statistics/resource", apAlarm.GetAlarmStatisticsResource)
 
 	// AP - Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)

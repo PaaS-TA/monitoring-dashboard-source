@@ -1,5 +1,7 @@
 package v1
 
+import "time"
+
 // Struct's each field name is field name of tables in PaastaMonitoring Database.
 // The name of struct is tables' name.
 // For response container part.
@@ -58,13 +60,13 @@ type (
 	}
 
 	AlarmActions struct {
-		Id              int    `json:"id"`
-		AlarmId         int    `json:"alarmId"`
-		AlarmActionDesc string `json:"alarmActionDesc"`
-		RegDate         string `json:"regDate"`
-		RegUser         string `json:"regUser"`
-		ModiDate        string `json:"modiDate"`
-		ModiUser        string `json:"modiUser"`
+		Id              int        `json:"id"               gorm:"primaryKey;autoIncrement;notNull"`
+		AlarmId         int        `json:"alarmId"          gorm:"notNull"`
+		AlarmActionDesc string     `json:"alarmActionDesc"`
+		RegDate         time.Time  `json:"regDate"          gorm:"<-:create"`
+		RegUser         string     `json:"regUser"          gorm:"<-:create"`
+		ModiDate        time.Time  `json:"modiDate"         gorm:"<-:update"`
+		ModiUser        string     `json:"modiUser"         gorm:"<-:update"`
 	}
 )
 
@@ -107,6 +109,7 @@ type (
 		Id              int    `json:"id"`
 		AlarmId         int    `json:"alarmId"`
 		AlarmActionDesc string `json:"alarmActionDesc"`
+		RegUser         string
 	}
 
 	AlarmStatisticsCriteriaRequest struct {
