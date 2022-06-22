@@ -62,9 +62,9 @@ func (controller *AlarmSnsController) CreateAlarmSns(c echo.Context) error {
 //  @Router       /api/v1/ap/alarm/sns [get]
 func (controller *AlarmSnsController) GetAlarmSns(c echo.Context) error {
 	params := models.AlarmSns{
-		OriginType: c.QueryParam("origin_type"),
-		SnsType: c.QueryParam("sns_type"),
-		SnsSendYN: c.QueryParam("sns_send_yn"),
+		OriginType: c.QueryParam("originType"),
+		SnsType: c.QueryParam("snsType"),
+		SnsSendYN: c.QueryParam("snsSendYn"),
 	}
 
 	results, err := service.GetAlarmSnsService(controller.DbInfo).GetAlarmSns(params)

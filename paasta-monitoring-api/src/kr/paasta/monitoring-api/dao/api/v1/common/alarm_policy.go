@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo/v4"
 	models "paasta-monitoring-api/models/api/v1"
 	"time"
 )
@@ -18,9 +17,9 @@ func GetAlarmPolicyDao(DbInfo *gorm.DB) *AlarmPolicyDao {
 	}
 }
 
-func (common *AlarmPolicyDao) GetAlarmStatus() ([]models.Alarms, error) {
+func (dao *AlarmPolicyDao) GetAlarmStatus() ([]models.Alarms, error) {
 	var response []models.Alarms
-	results := common.DbInfo.Debug().Table("alarms").
+	results := dao.DbInfo.Debug().Table("alarms").
 		Select("*").
 		Find(&response)
 
@@ -32,17 +31,9 @@ func (common *AlarmPolicyDao) GetAlarmStatus() ([]models.Alarms, error) {
 	return response, nil
 }
 
-func (common *AlarmPolicyDao) GetAlarmPolicy(c echo.Context) ([]models.AlarmPolicies, error) {
-	var request models.AlarmPolicies
-	request.OriginType = c.QueryParam("originType")
-	request.AlarmType = c.QueryParam("alarmType")
-
+func (dao *AlarmPolicyDao) GetAlarmPolicy(params models.AlarmPolicies) ([]models.AlarmPolicies, error) {
 	var response []models.AlarmPolicies
-	results := common.DbInfo.Debug().Table("alarm_policies").
-		Select("*").
-		Where(request).
-		Find(&response)
-
+	results := dao.DbInfo.Debug().Where(params).Find(&response)
 	if results.Error != nil {
 		fmt.Println(results.Error)
 		return response, results.Error
@@ -51,8 +42,8 @@ func (common *AlarmPolicyDao) GetAlarmPolicy(c echo.Context) ([]models.AlarmPoli
 	return response, nil
 }
 
-func (common *AlarmPolicyDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
-	results := common.DbInfo.Debug().Table("alarm_policies").
+func (dao *AlarmPolicyDao) UpdateAlarmPolicy(request models.AlarmPolicyRequest) error {
+	results := dao.DbInfo.Debug().Table("alarm_policies").
 		Where("origin_type = ? AND alarm_type = ?", request.OriginType, request.AlarmType).
 		Updates(map[string]interface{}{
 			"warning_threshold":  request.WarningThreshold,
@@ -70,8 +61,8 @@ func (common *AlarmPolicyDao) UpdateAlarmPolicy(request models.AlarmPolicyReques
 	return nil
 }
 
-func (common *AlarmPolicyDao) UpdateAlarmTarget(request models.AlarmTargetRequest) error {
-	results := common.DbInfo.Debug().Table("alarm_targets").
+func (dao *AlarmPolicyDao) UpdateAlarmTarget(request models.AlarmTargetRequest) error {
+	results := dao.DbInfo.Debug().Table("alarm_targets").
 		Where("origin_type = ?", request.OriginType).
 		Updates(map[string]interface{}{
 			"mail_address": request.MailAddress,

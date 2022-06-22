@@ -3,8 +3,10 @@ package common
 import (
 	"errors"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
 	dao "paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
+	"strconv"
 	"time"
 )
 
@@ -45,8 +47,13 @@ func (ap *AlarmActionService) CreateAlarmAction(request models.AlarmActionReques
 }
 
 
-func (ap *AlarmActionService) GetAlarmAction() ([]models.AlarmActions, error) {
-	results, err := dao.GetAlarmActionDao(ap.DbInfo).GetAlarmAction()
+func (ap *AlarmActionService) GetAlarmAction(ctx echo.Context) ([]models.AlarmActions, error) {
+	alarmId, _ := strconv.Atoi(ctx.QueryParam("alarmId"))
+	params := models.AlarmActions{
+		AlarmId: alarmId,
+		AlarmActionDesc: ctx.QueryParam("alarmActionDesc"),
+	}
+	results, err := dao.GetAlarmActionDao(ap.DbInfo).GetAlarmAction(params)
 	if err != nil {
 		return results, err
 	}

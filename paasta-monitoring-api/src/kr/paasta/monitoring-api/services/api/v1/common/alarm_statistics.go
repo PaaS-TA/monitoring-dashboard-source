@@ -20,9 +20,9 @@ func GetAlarmStatisticsService(DbInfo *gorm.DB) *AlarmStatisticsService {
 
 func (service *AlarmStatisticsService) GetAlarmStatistics(ctx echo.Context) ([]map[string]interface{}, error) {
 	var params models.AlarmStatisticsParam
-	params.OriginType = ctx.QueryParam("origin_type")
-	params.ResourceType = ctx.QueryParam("resource_type")
-	params.AliasPrefix = ctx.QueryParam("alias_prefix")
+	params.OriginType = ctx.QueryParam("originType")
+	params.ResourceType = ctx.QueryParam("resourceType")
+	params.AliasPrefix = ctx.QueryParam("aliasPrefix")
 
 	switch ctx.QueryParam("period") {
 	case "d":
@@ -59,7 +59,7 @@ func (service *AlarmStatisticsService) GetAlarmStatistics(ctx echo.Context) ([]m
 
 func (service *AlarmStatisticsService) GetAlarmStatisticsResource(ctx echo.Context) ([]map[string]interface{}, error) {
 	var params models.AlarmStatisticsParam
-	params.OriginType = ctx.Param("origin_type")
+	params.OriginType = ctx.Param("originType")
 
 	switch ctx.QueryParam("period") {
 	case "d":

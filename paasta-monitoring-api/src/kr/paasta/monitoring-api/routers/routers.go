@@ -42,7 +42,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	apiToken := apiControllerV1.GetTokenController(conn)
 	apiUser := apiControllerV1.GetUserController(conn)
 
-	//common := apiControllerV1.GetCommonController(conn)
 	alarm := commonModule.GetAlarmController(conn)
 	alarmSns := commonModule.GetAlarmSnsController(conn)
 	alarmPolicy := commonModule.GetAlarmPolicyController(conn)
@@ -51,7 +50,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 
 	apBosh := AP.GetBoshController(conn)
-	apAlarm := AP.GetApAlarmController(conn)
+	//apAlarm := AP.GetApAlarmController(conn)
 	apContainer := AP.GetApContainerController(conn)
 
 	// Router 설정
@@ -66,11 +65,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1 := e.Group("/api/v1", middlewares.CheckToken(conn))
 	v1.GET("/users", apiUser.GetUsers)
 	v1.GET("/members", apiUser.GetMember)
-
-	// Common
-	//v1.GET("/alarm/policy", common.GetAlarmPolicy)
-	//v1.PUT("/alarm/policy", common.UpdateAlarmPolicy)
-	//v1.PUT("/alarm/target", common.UpdateAlarmTarget)
 
 	v1.GET("/alarm", alarm.GetAlarms)
 	v1.POST("/alarm/sns", alarmSns.CreateAlarmSns)
@@ -95,12 +89,14 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
 	v1.GET("/ap/bosh/log/:uuid", apBosh.GetBoshLog)
 
+
 	// AP - Alarm
-	v1.GET("/ap/alarm/status", apAlarm.GetAlarmStatus)
-	v1.POST("/ap/alarm/sns", apAlarm.RegisterSnsAccount)
-	v1.GET("/ap/alarm/sns", apAlarm.GetSnsAccount)
-	v1.DELETE("/ap/alarm/sns", apAlarm.DeleteSnsAccount)
-	v1.PUT("/ap/alarm/sns", apAlarm.UpdateSnsAccount)
+	// @Deprecated
+	//v1.GET("/ap/alarm/status", apAlarm.GetAlarmStatus)
+	//v1.POST("/ap/alarm/sns", apAlarm.RegisterSnsAccount)
+	//v1.GET("/ap/alarm/sns", apAlarm.GetSnsAccount)
+	//v1.DELETE("/ap/alarm/sns", apAlarm.DeleteSnsAccount)
+	//v1.PUT("/ap/alarm/sns", apAlarm.UpdateSnsAccount)
 	//v1.POST("/ap/alarm/action", apAlarm.CreateAlarmAction)
 	//v1.GET("/ap/alarm/action", apAlarm.GetAlarmAction)
 	//v1.PATCH("/ap/alarm/action", apAlarm.UpdateAlarmAction)

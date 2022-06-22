@@ -61,7 +61,7 @@ func (controller *AlarmActionController) CreateAlarmAction(ctx echo.Context) err
 //  @Success      200  {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/action [get]
 func (ap *AlarmActionController) GetAlarmAction(c echo.Context) error {
-	results, err := service.GetAlarmActionService(ap.DbInfo).GetAlarmAction()
+	results, err := service.GetAlarmActionService(ap.DbInfo).GetAlarmAction(c)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm action.", err.Error())
 		return err

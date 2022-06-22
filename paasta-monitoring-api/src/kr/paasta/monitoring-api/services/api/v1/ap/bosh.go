@@ -5,8 +5,8 @@ import (
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
-	Common "paasta-monitoring-api/dao/api/v1"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
+	Common "paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"sort"
@@ -69,7 +69,8 @@ func (b *ApBoshService) GetBoshSummary(c echo.Context) ([]models.BoshSummary, er
 	var resultsResponse map[string]interface{}
 
 	//임계치 설정정보를 조회한다.
-	serverThresholds, err := Common.GetCommonDao(b.DbInfo).GetAlarmPolicy(c)
+	var params models.AlarmPolicies
+	serverThresholds, err := Common.GetAlarmPolicyDao(b.DbInfo).GetAlarmPolicy(params)
 	if err != nil {
 		fmt.Println(err.Error())
 		return results, err

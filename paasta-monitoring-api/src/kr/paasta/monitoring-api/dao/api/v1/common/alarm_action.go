@@ -29,9 +29,9 @@ func (dao *AlarmActionDao) CreateAlarmAction(params models.AlarmActions) error {
 }
 
 
-func (dao *AlarmActionDao) GetAlarmAction() ([]models.AlarmActions, error) {
+func (dao *AlarmActionDao) GetAlarmAction(params models.AlarmActions) ([]models.AlarmActions, error) {
 	var response []models.AlarmActions
-	results := dao.DbInfo.Debug().Find(&response)
+	results := dao.DbInfo.Debug().Where(&params).Find(&response)
 
 	if results.Error != nil {
 		fmt.Println(results.Error)

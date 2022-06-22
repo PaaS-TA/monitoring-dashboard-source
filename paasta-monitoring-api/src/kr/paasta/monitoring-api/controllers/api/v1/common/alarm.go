@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"
-	models "paasta-monitoring-api/models/api/v1"
 	service "paasta-monitoring-api/services/api/v1/common"
 )
 
@@ -30,14 +29,7 @@ func GetAlarmController(conn connections.Connections) *AlarmController {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Alarms}
 //  @Router       /api/v1/ap/alarm/status [get]
 func (ap *AlarmController) GetAlarms(ctx echo.Context) error {
-	params := models.Alarms{
-		OriginType: ctx.QueryParam("origin_type"),
-		AlarmType: ctx.QueryParam("alarm_type"),
-		Level: ctx.QueryParam("level"),
-		ResolveStatus: ctx.QueryParam("resolve_status"),
-	}
-
-	results, err := service.GetAlarmService(ap.DbInfo).GetAlarms(params)
+	results, err := service.GetAlarmService(ap.DbInfo).GetAlarms(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get alarm status.", err.Error())
 		return err

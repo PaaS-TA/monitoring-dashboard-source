@@ -7,7 +7,7 @@ import "time"
 // For response container part.
 type (
 	Alarms struct {
-		Id            uint      `json:"id"            gorm:"primaryKey;autoIncrement"`
+		Id            int       `json:"id"            gorm:"primaryKey;autoIncrement"`
 		OriginType    string    `json:"originType"    gorm:"not null"`
 		OriginId      int       `json:"originId"      gorm:"not null"`
 		AlarmType     string    `json:"alarmType"     gorm:"not null"`
@@ -25,7 +25,7 @@ type (
 		RegUser       string    `json:"regUser"       gorm:"not null"`
 		ModiDate      time.Time `json:"modiDate"`
 		ModiUser      string    `json:"modiUser"`
-		AlarmSendDate time.Time `json:"alarmSendDate"`
+		AlarmSendDate time.Time `json:"-"`
 		CompleteDate  time.Time `json:"completeDate"`
 		CompleteUser  string    `json:"completeUser"`
 	}
@@ -61,7 +61,7 @@ type (
 
 	AlarmActions struct {
 		Id              int        `json:"id"               gorm:"primaryKey;autoIncrement;not null"`
-		AlarmId         uint       `json:"alarmId"`
+		AlarmId         int       `json:"alarmId"`
 		AlarmActionDesc string     `json:"alarmActionDesc"`
 		RegDate         time.Time  `json:"regDate"          gorm:"<-:create"`
 		RegUser         string     `json:"regUser"          gorm:"<-:create"`
@@ -107,7 +107,7 @@ type (
 
 	AlarmActionRequest struct {
 		Id              int    `json:"id"`
-		AlarmId         uint    `json:"alarmId"`
+		AlarmId         int    `json:"alarmId"`
 		AlarmActionDesc string `json:"alarmActionDesc"`
 		RegUser         string
 	}
