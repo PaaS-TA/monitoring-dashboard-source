@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
@@ -26,8 +27,17 @@ func (ap *AlarmActionService) CreateAlarmAction(request models.AlarmActionReques
 		RegDate: time.Now(),
 		RegUser: request.RegUser,
 	}
+	alarmParams := models.Alarms{
+		Id: request.AlarmId,
+	}
+	alarmResult, err := dao.GetAlarmDao(ap.DbInfo).GetAlarms(alarmParams)
 
-	err := dao.GetAlarmActionDao(ap.DbInfo).CreateAlarmAction(params)
+	if len(alarmResult) <= 0 {
+		err = errors.New("Not exist alarms data.")
+		return "FAILED CREATE ALARM ACTION!", err
+	}
+
+	err = dao.GetAlarmActionDao(ap.DbInfo).CreateAlarmAction(params)
 	if err != nil {
 		return "FAILED CREATE ALARM ACTION!", err
 	}
