@@ -48,8 +48,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	alarmStatistics := commonModule.GetAlarmStatisticsController(conn)
 	alarmAction := commonModule.GetAlarmActionController(conn)
 
-
 	apBosh := AP.GetBoshController(conn)
+	apPaasta := AP.GetPaastaController(conn)
 	//apAlarm := AP.GetApAlarmController(conn)
 	apContainer := AP.GetApContainerController(conn)
 
@@ -89,6 +89,13 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
 	v1.GET("/ap/bosh/log/:uuid", apBosh.GetBoshLog)
 
+	// AP - PaaS-TA
+	v1.GET("/ap/paasta", apPaasta.GetPaastaInfoList)
+	v1.GET("/ap/paasta/overview", apPaasta.GetPaastaOverview)
+	v1.GET("/ap/paasta/summary", apPaasta.GetPaastaSummary)
+	v1.GET("/ap/paasta/process", apPaasta.GetPaastaProcessByMemory)
+	v1.GET("/ap/paasta/chart/:uuid", apPaasta.GetPaastaChart)
+	v1.GET("/ap/paasta/log/:uuid", apPaasta.GetPaastaLog)
 
 	// AP - Alarm
 	// @Deprecated

@@ -26,9 +26,9 @@ func GetBoshController(conn connections.Connections) *BoshController {
 
 // GetBoshInfoList
 //  * Annotations for Swagger *
+//  @tags         AP
 //  @Summary      Bosh의 목록을 가져온다.
 //  @Description  Bosh의 목록을 가져온다.
-//  @tags         AP
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Bosh}
