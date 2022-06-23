@@ -303,33 +303,3 @@ func (b *BoshDao) GetBoshNetworkErrorList(boshChart models.BoshChart) (*client.R
 
 	return resp, err
 }
-
-func (b *BoshDao) GetBoshLog(boshLog models.BoshLog) (*client.Response, error) {
-	boshLogSql := "select * from \"logging_measurement\""
-	if boshLog.Period != "" {
-		boshLogSql += " where \"time\" <= now() + " + boshLog.Period
-	}
-	if boshLog.StartTime != "" && boshLog.EndTime != "" {
-		boshLogSql += " where \"time\" >= '" + boshLog.StartTime + "' and \"time\" <= '" + boshLog.EndTime + "'"
-	}
-	if boshLog.UUID != "" {
-		boshLogSql += " and \"extradata\" =~ /" + boshLog.UUID + "*/"
-	}
-	if boshLog.Keyword != "" {
-		boshLogSql += " and \"message\" =~ /" + boshLog.Keyword + "/"
-	}
-	boshLogSql += " ORDER BY \"time\" DESC limit 100;"
-
-	//fmt.Println("GetBoshLog Sql======>", boshLogSql)
-
-	q := client.Query{
-		Command:  boshLogSql,
-		Database: b.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := b.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	//fmt.Println("GetBoshLog resp======>", resp)
-	return resp, err
-}

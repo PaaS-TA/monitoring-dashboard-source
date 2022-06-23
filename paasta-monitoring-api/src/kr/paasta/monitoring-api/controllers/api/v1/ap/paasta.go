@@ -135,36 +135,3 @@ func (p *PaastaController) GetPaastaChart(c echo.Context) (err error) {
 	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Chart", results)
 	return nil
 }
-
-// GetPaastaLog
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      Paasta의 로그 정보를 가져온다.
-//  @Description  Paasta의 로그 정보를 가져온다.
-//  @Accept       json
-//  @Produce      json
-//  @Param        uuid   query     string  false  "PaaS-TA Core 별 로그 정보 조회시 VM UUID를 주입한다."
-//  @Param        keyword   query     string  false  "PaaS-TA Core 별 로그 정보 조회시 키워드 (keyword)를 주입한다."
-//  @Param        targetDate   query     string  false  "PaaS-TA Core 별 로그 정보 조회시 대상날짜 (targetDate)를 주입한다."
-//  @Param        startTime   query     string  false  "PaaS-TA Core 별 로그 정보 조회시 시작시간 (startTime)를 주입한다."
-//  @Param        endTime   query     string  false  "PaaS-TA Core 별 로그 정보 조회시 종료시간 (endTime)를 주입한다."
-//  @Param        period   query     string  false  "PaaS-TA Core 별 로그 정보 조회시 조회기간 (period)를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaLog}
-//  @Router       /api/v1/paasta/log [get]
-func (p *PaastaController) GetPaastaLog(c echo.Context) (err error) {
-	var paastaLog models.PaastaLog
-	paastaLog.UUID = c.Param("uuid")
-	paastaLog.Keyword = c.QueryParam("keyword")
-	paastaLog.TargetDate = c.QueryParam("targetDate")
-	paastaLog.StartTime = c.QueryParam("startTime")
-	paastaLog.EndTime = c.QueryParam("endTime")
-	paastaLog.Period = c.QueryParam("period")
-
-	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaLog(paastaLog)
-	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
-		return err
-	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Log", results)
-	return nil
-}

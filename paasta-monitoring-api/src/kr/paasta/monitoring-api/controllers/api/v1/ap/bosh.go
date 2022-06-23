@@ -128,32 +128,3 @@ func (b *BoshController) GetBoshChart(c echo.Context) (err error) {
 	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Chart", results)
 	return nil
 }
-
-// GetBoshLog
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      Bosh의 로그 정보를 가져온다.
-//  @Description  Bosh의 로그 정보를 가져온다.
-//  @Accept       json
-//  @Produce      json
-//  @Param        id   query     string  false  "Bosh의 로그 정보 조회시 Bosh ID를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshLog}
-//  @Router       /api/v1/bosh/log [get]
-func (b *BoshController) GetBoshLog(c echo.Context) (err error) {
-	/*id=168743d3-1f90-464c-70ff-13807f3c5dde&logType=bosh&pageIndex=1&pageItems=100&period=10s*/
-	var boshLog models.BoshLog
-	boshLog.UUID = c.Param("uuid")
-	boshLog.Keyword = c.QueryParam("keyword")
-	boshLog.TargetDate = c.QueryParam("targetDate")
-	boshLog.StartTime = c.QueryParam("startTime")
-	boshLog.EndTime = c.QueryParam("endTime")
-	boshLog.Period = c.QueryParam("period")
-
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshLog(boshLog)
-	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
-		return err
-	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Log", results)
-	return nil
-}

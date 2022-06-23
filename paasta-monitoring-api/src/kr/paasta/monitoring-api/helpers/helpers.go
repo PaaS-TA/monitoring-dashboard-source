@@ -427,3 +427,39 @@ func GetAlarmStatusByServiceName(originType, alarmType string, usage float64, th
 
 	return ""
 }
+
+// InfluxDB Time Set Formatter
+func InfluxTimeSetFormatter(params models.Logs) models.Logs {
+	/**
+	Period 파라미터가 존재하면 Period 값으로 DB 조회
+	없으면 StartTime, EndTime 파라미터 값으로 DB조회
+	*/
+	if params.Period == "" {
+		/**
+		날짜 시간 값을 DB에서 조회할 수 있는 포맷으로 변경
+		*/
+		if params.StartTime == "" && params.EndTime == "" {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, "00:00:00")
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, "23:59:59")
+		} else if params.StartTime != "" && params.EndTime == "" {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, params.StartTime)
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, "23:59:59")
+		} else if params.StartTime == "" && params.EndTime != "" {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, "00:00:00")
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, params.EndTime)
+		} else {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, params.StartTime)
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, params.EndTime)
+		}
+		convert_start_time, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", params.StartTime))
+		convert_end_time, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", params.EndTime))
+		startTime := convert_start_time.Unix() - int64(models.GmtTimeGap)*60*60
+		endTime := convert_end_time.Unix() - int64(models.GmtTimeGap)*60*60
+
+		// Make RFC3339 date-time strings
+		params.StartTime = time.Unix(startTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
+		params.EndTime = time.Unix(endTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
+	}
+
+	return params
+}
