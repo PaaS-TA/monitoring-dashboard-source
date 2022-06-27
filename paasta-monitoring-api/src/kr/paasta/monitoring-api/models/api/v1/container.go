@@ -3,18 +3,25 @@ package v1
 import client "github.com/influxdata/influxdb1-client/v2"
 
 type (
-	CellInfo struct {
-		Name string `json:"name"`
-		Ip   string `json:"ip"`
-		Id   uint   `json:"id"`
+	ZoneInfo struct {
+		ZoneName string     `json:"zoneName"`
+		CellCnt  uint       `json:"cellCnt"`
+		CellInfo []CellInfo `json:"cellInfo,omitempty"`
 	}
 
-	ZoneInfo struct {
-		Name string `json:"name"`
+	CellInfo struct {
+		ZoneName     string    `json:"zoneName"`
+		CellName     string    `json:"cellName"`
+		Ip           string    `json:"cellIp"`
+		Id           uint      `json:"cellId"`
+		AppCnt       uint      `json:"appCnt"`
+		ContainerCnt uint      `json:"containerCnt"`
+		AppInfo      []AppInfo `json:"appInfo,omitempty"`
 	}
 
 	AppInfo struct {
-		Name      string `json:"name"`
+		CellName  string `json:"cellName"`
+		AppName   string `json:"appName"`
 		Uri       string `json:"uri"`
 		Buildpack string `json:"buildpack"`
 		Status    string `json:"status"`
@@ -24,6 +31,24 @@ type (
 		CfApi     string `json:"cfApi"`
 		CreatedAt string `json:"createdAt"`
 		UpdatedAt string `json:"updatedAt"`
+	}
+
+	Overview struct {
+		ZoneInfo []ZoneInfo `json:"zoneInfo,omitempty"`
+	}
+
+	Status struct {
+		Running  uint `json:"running"`
+		Warning  uint `json:"warning"`
+		Critical uint `json:"critical"`
+		Failed   uint `json:"failed"`
+	}
+
+	StatusByResource struct {
+		CpuStatus    string
+		MemoryStatus string
+		DiskStatus   string
+		TotalStatus  string
 	}
 
 	InfluxDbName struct {
