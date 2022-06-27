@@ -2,8 +2,8 @@ package ap
 
 import (
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"

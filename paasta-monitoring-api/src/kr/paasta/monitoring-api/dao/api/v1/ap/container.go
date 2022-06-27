@@ -3,7 +3,7 @@ package ap
 import (
 	"fmt"
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	models "paasta-monitoring-api/models/api/v1"
 )
 

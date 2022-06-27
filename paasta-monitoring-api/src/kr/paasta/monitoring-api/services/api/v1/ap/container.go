@@ -2,7 +2,7 @@ package ap
 
 import (
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	AP "paasta-monitoring-api/dao/api/v1/ap"
 	models "paasta-monitoring-api/models/api/v1"
 )
