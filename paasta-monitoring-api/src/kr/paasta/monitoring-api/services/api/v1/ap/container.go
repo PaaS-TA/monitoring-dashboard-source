@@ -2,7 +2,7 @@ package ap
 
 import (
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	AP "paasta-monitoring-api/dao/api/v1/ap"
 	models "paasta-monitoring-api/models/api/v1"
 )
@@ -36,8 +36,33 @@ func (ap *ApContainerService) GetZoneInfo() ([]models.ZoneInfo, error) {
 	}
 	return results, nil
 }
+
 func (ap *ApContainerService) GetAppInfo() ([]models.AppInfo, error) {
 	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetAppInfo()
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
+func (ap *ApContainerService) GetContainerPageOverview() (models.Overview, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerPageOverview()
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
+func (ap *ApContainerService) GetContainerStatus() (models.Status, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerStatus()
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
+func (ap *ApContainerService) GetCellStatus() (models.Status, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellStatus()
 	if err != nil {
 		return results, err
 	}

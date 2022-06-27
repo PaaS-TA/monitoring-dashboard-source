@@ -19,6 +19,8 @@ require (
 	github.com/swaggo/swag v1.8.3
 	github.com/twinj/uuid v1.0.0
 	go.uber.org/zap v1.21.0
+	gorm.io/driver/mysql v1.3.4
+	gorm.io/gorm v1.23.6
 )
 
 require (
@@ -33,6 +35,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

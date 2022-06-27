@@ -3,8 +3,8 @@ package ap
 import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
 	Common "paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"

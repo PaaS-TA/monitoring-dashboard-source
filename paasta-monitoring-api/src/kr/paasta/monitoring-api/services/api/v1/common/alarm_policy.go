@@ -18,11 +18,10 @@ func GetAlarmPolicyService(DbInfo *gorm.DB) *AlarmPolicyService {
 	}
 }
 
-
 func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.AlarmPolicies, error) {
-	params := models.AlarmPolicies {
-		OriginType : c.QueryParam("originType"),
-		AlarmType : c.QueryParam("alarmType"),
+	params := models.AlarmPolicies{
+		OriginType: c.QueryParam("originType"),
+		AlarmType:  c.QueryParam("alarmType"),
 	}
 
 	results, err := common.GetAlarmPolicyDao(service.DbInfo).GetAlarmPolicy(params)
@@ -32,18 +31,17 @@ func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.Alar
 	return results, nil
 }
 
-
 func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []models.AlarmPolicyRequest) (string, error) {
 	for _, policyParam := range params {
 		param := models.AlarmPolicies{
-			OriginType: policyParam.OriginType,
-			AlarmType: policyParam.AlarmType,
-			WarningThreshold: policyParam.WarningThreshold,
+			OriginType:        policyParam.OriginType,
+			AlarmType:         policyParam.AlarmType,
+			WarningThreshold:  policyParam.WarningThreshold,
 			CriticalThreshold: policyParam.CriticalThreshold,
-			RepeatTime: policyParam.RepeatTime,
-			MeasureTime: policyParam.MeasureTime,
-			ModiUser: ctx.Get("userId").(string),
-			ModiDate: time.Now(),
+			RepeatTime:        policyParam.RepeatTime,
+			MeasureTime:       policyParam.MeasureTime,
+			ModiUser:          ctx.Get("userId").(string),
+			ModiDate:          time.Now(),
 		}
 		err := common.GetAlarmPolicyDao(service.DbInfo).UpdateAlarmPolicy(param)
 		if err != nil {
@@ -52,7 +50,6 @@ func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []
 	}
 	return "SUCCEEDED UPDATE POLICY!", nil
 }
-
 
 func (service *AlarmPolicyService) UpdateAlarmTarget(request []models.AlarmTargetRequest) (string, error) {
 	for _, request := range request {
