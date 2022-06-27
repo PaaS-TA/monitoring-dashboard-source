@@ -2,8 +2,8 @@ package v1
 
 import (
 	"github.com/go-redis/redis/v7"
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"

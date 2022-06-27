@@ -2,7 +2,7 @@ package v1
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	models "paasta-monitoring-api/models/api/v1"
