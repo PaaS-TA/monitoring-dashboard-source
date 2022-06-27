@@ -1,10 +1,10 @@
 package common
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	service "paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
+	"time"
 )
 
 
@@ -19,20 +19,20 @@ func GetAlarmSnsService(DbInfo *gorm.DB) *AlarmSnsService {
 }
 
 
-func (ap *AlarmSnsService) CreateAlarmSns(request models.SnsAccountRequest) (string, error) {
-	err := service.GetAlarmSnsDao(ap.DbInfo).CreateAlarmSns(request)
+func (ap *AlarmSnsService) CreateAlarmSns(params []models.AlarmSns, regUser string) (string, error) {
+	for _, param := range params {
+		param.RegUser = regUser
+		param.RegDate = time.Now()
+	}
+
+	err := service.GetAlarmSnsDao(ap.DbInfo).CreateAlarmSns(params)
 	if err != nil {
 		return "FAILED REGISTER SNS ACCOUNT!", err
 	}
 	return "SUCCEEDED REGISTER SNS ACCOUNT!", nil
 }
 
-func (ap *AlarmSnsService) GetAlarmSns(c echo.Context) ([]models.AlarmSns, error) {
-	params := models.AlarmSns{
-		OriginType: c.QueryParam("originType"),
-		SnsType: c.QueryParam("snsType"),
-		SnsSendYN: c.QueryParam("snsSendYn"),
-	}
+func (ap *AlarmSnsService) GetAlarmSns(params models.AlarmSns) ([]models.AlarmSns, error) {
 	results, err := service.GetAlarmSnsDao(ap.DbInfo).GetAlarmSns(params)
 	if err != nil {
 		return results, err
@@ -41,7 +41,7 @@ func (ap *AlarmSnsService) GetAlarmSns(c echo.Context) ([]models.AlarmSns, error
 }
 
 
-func (ap *AlarmSnsService) UpdateAlarmSns(request models.SnsAccountRequest) (string, error) {
+func (ap *AlarmSnsService) UpdateAlarmSns(request *models.AlarmSns) (string, error) {
 	err := service.GetAlarmSnsDao(ap.DbInfo).UpdateAlarmSns(request)
 	if err != nil {
 		return "FAILED UPDATE SNS ACCOUNT!", err
@@ -50,7 +50,7 @@ func (ap *AlarmSnsService) UpdateAlarmSns(request models.SnsAccountRequest) (str
 }
 
 
-func (ap *AlarmSnsService) DeleteAlarmSns(request models.SnsAccountRequest) (string, error) {
+func (ap *AlarmSnsService) DeleteAlarmSns(request models.AlarmSns) (string, error) {
 	err := service.GetAlarmSnsDao(ap.DbInfo).DeleteAlarmSns(request)
 	if err != nil {
 		return "FAILED DELETE SNS ACCOUNT!", err

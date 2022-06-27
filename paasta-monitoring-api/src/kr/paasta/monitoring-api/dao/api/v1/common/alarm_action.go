@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	models "paasta-monitoring-api/models/api/v1"
 )
 

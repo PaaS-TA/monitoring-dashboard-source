@@ -16,6 +16,7 @@ func CheckToken(conn connections.Connections) echo.MiddlewareFunc {
 
 			mode := os.Getenv("mode")
 			if mode == "development" {
+				c.Set("userId", "admin")  // For debug
 				err := next(c)
 				return err
 			}

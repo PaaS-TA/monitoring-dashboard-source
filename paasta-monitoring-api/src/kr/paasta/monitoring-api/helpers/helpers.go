@@ -9,6 +9,7 @@ import (
 	models "paasta-monitoring-api/models/api/v1"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	client "github.com/influxdata/influxdb1-client/v2"
@@ -19,8 +20,8 @@ func Int64ToString(inputNum int64) string {
 	return strconv.FormatInt(inputNum, 10)
 }
 
-func GetDBConnectionString(dbtype, user, password, protocol, host, port, dbname, charset, parseTime string) (string, string) {
-	return dbtype, fmt.Sprintf("%s:%s@%s([%s]:%s)/%s?charset=%s&parseTime=%s",
+func GetDBConnectionString(user, password, protocol, host, port, dbname, charset, parseTime string) string {
+	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s?charset=%s&parseTime=%s",
 		user, password, protocol, host, port, dbname, charset, parseTime)
 }
 
@@ -462,4 +463,18 @@ func InfluxTimeSetFormatter(params models.Logs) models.Logs {
 	}
 
 	return params
+}
+
+func FindStructFieldWithBlankValues(object interface{}) string {
+	var result []string
+	elem := reflect.ValueOf(object).Elem()
+	fieldCount := elem.NumField()
+	for i := 0; i < fieldCount; i++ {
+		value := elem.Field(i).Interface()
+		name := elem.Type().Field(i).Name
+		if value == "" {
+			result = append(result, name)
+		}
+	}
+	return strings.Join(result, ",")
 }

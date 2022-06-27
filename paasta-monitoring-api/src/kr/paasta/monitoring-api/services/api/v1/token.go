@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"github.com/golang-jwt/jwt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
 	"net/http"

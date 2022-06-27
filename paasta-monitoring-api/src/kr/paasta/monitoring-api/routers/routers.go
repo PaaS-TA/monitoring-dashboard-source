@@ -108,7 +108,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/container/app", apContainer.GetAppInfo)
 
 	// IaaS
-	v1.GET("/iaas/hyper/statistics", openstackModule.GetHypervisorStatistics)
+	v1.GET("/iaas/hypervisor/stats", openstackModule.GetHypervisorStatistics)
 	v1.GET("/iaas/hypervisor/list", openstackModule.GetHypervisorList)
 	v1.GET("/iaas/project/list", openstackModule.GetProjectList)
 	v1.GET("/iaas/instance/usage/list", openstackModule.GetProjectUsage)

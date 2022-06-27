@@ -10,7 +10,8 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+	"gorm.io/driver/mysql"
 	"go.uber.org/zap"
 	"log"
 	"net/http"
@@ -150,18 +151,17 @@ func RedisConnection(env map[string]interface{}) *redis.Client {
 
 func PaaSConnection(env map[string]interface{}) (*gorm.DB, *cfclient.Client) {
 	// DB 설정
-	paasDBClient, paasDBErr := gorm.Open(
-		helpers.GetDBConnectionString(
-			env["paas_db_type"].(string),
-			env["paas_db_username"].(string),
-			env["paas_db_password"].(string),
-			env["paas_db_protocol"].(string),
-			env["paas_db_host"].(string),
-			env["paas_db_port"].(string),
-			env["paas_db_name"].(string),
-			env["paas_db_charset"].(string),
-			env["paas_db_parseTime"].(string)),
-	)
+	dsn := helpers.GetDBConnectionString(
+		env["paas_db_username"].(string),
+		env["paas_db_password"].(string),
+		env["paas_db_protocol"].(string),
+		env["paas_db_host"].(string),
+		env["paas_db_port"].(string),
+		env["paas_db_name"].(string),
+		env["paas_db_charset"].(string),
+		env["paas_db_parseTime"].(string))
+
+	paasDBClient, paasDBErr := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if paasDBErr != nil {
 		panic(paasDBErr)

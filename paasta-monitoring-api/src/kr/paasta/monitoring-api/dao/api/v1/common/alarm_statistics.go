@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"log"
 	models "paasta-monitoring-api/models/api/v1"
 )

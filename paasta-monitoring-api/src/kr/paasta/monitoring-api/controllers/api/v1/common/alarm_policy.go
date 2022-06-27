@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"

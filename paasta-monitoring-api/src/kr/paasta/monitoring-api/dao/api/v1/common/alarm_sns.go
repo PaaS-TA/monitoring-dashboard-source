@@ -1,11 +1,9 @@
 package common
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	models "paasta-monitoring-api/models/api/v1"
-	"time"
 )
-
 
 type AlarmSnsDao struct {
 	DbInfo *gorm.DB
@@ -18,9 +16,8 @@ func GetAlarmSnsDao(DbInfo *gorm.DB) *AlarmSnsDao {
 }
 
 
-func (ap *AlarmSnsDao) CreateAlarmSns(request models.SnsAccountRequest) error {
-	results := ap.DbInfo.Debug().Table("alarm_sns").Create(&request)
-
+func (ap *AlarmSnsDao) CreateAlarmSns(request []models.AlarmSns) error {
+	results := ap.DbInfo.Debug().CreateInBatches(&request, 100)
 	if results.Error != nil {
 		return results.Error
 	}
@@ -40,19 +37,10 @@ func (ap *AlarmSnsDao) GetAlarmSns(params models.AlarmSns) ([]models.AlarmSns, e
 }
 
 
-func (ap *AlarmSnsDao) UpdateAlarmSns(request models.SnsAccountRequest) error {
-	results := ap.DbInfo.Debug().Table("alarm_sns").
-		Where("sns_id = ?", request.SnsId).
-		Updates(map[string]interface{}{
-			"origin_type": request.OriginType,
-			"sns_type":    request.SnsType,
-			"sns_id":      request.SnsId,
-			"token":       request.Token,
-			"expl":        request.Expl,
-			"sns_send_yn": request.SnsSendYN,
-			"modi_date":   time.Now().UTC().Add(time.Hour * 9),
-			"modi_user":   "admin"})
-
+func (ap *AlarmSnsDao) UpdateAlarmSns(request *models.AlarmSns) error {
+	results := ap.DbInfo.Debug().Model(&request).
+		Where("channel_id = ?", request.ChannelId).
+		Updates(&request)
 	if results.Error != nil {
 		return results.Error
 	}
@@ -61,11 +49,10 @@ func (ap *AlarmSnsDao) UpdateAlarmSns(request models.SnsAccountRequest) error {
 }
 
 
-func (ap *AlarmSnsDao) DeleteAlarmSns(request models.SnsAccountRequest) error {
-	results := ap.DbInfo.Debug().Table("alarm_sns").
-		Where("sns_id = ?", request.SnsId).
+func (ap *AlarmSnsDao) DeleteAlarmSns(request models.AlarmSns) error {
+	results := ap.DbInfo.Debug().
+		Where("channel_id = ?", request.ChannelId).
 		Delete(&request)
-
 	if results.Error != nil {
 		return results.Error
 	}
