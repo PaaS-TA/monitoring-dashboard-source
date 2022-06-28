@@ -3,7 +3,7 @@ package common
 import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	models "paasta-monitoring-api/models/api/v1"
 )
 

@@ -1,8 +1,8 @@
 package common
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
