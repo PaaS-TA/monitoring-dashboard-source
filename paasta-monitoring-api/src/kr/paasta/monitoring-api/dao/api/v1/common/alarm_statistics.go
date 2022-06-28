@@ -16,9 +16,9 @@ func GetAlarmStatisticsDao(DbInfo *gorm.DB) *AlarmStatisticsDao {
 }
 
 
-func (dao *AlarmStatisticsDao) GetAlarmStatisticsForGraphByTime(param models.AlarmStatisticsParam) ([]map[string]interface{}, error) {
+func (dao *AlarmStatisticsDao) GetAlarmStatisticsForGraphByTime(params models.AlarmStatisticsParam) ([]map[string]interface{}, error) {
 	var countByTimeline []models.CountByTimeline
-	extraParams := param.ExtraParams.([]models.AlarmStatisticsCriteriaRequest)
+	extraParams := params.ExtraParams.([]models.AlarmStatisticsCriteriaRequest)
 	var response []map[string]interface{}
 
 	for _, v := range extraParams {
@@ -35,22 +35,22 @@ func (dao *AlarmStatisticsDao) GetAlarmStatisticsForGraphByTime(param models.Ala
 WITH RECURSIVE AggregateTable
 AS
   (
-         SELECT DATE_FORMAT(NOW(), '` + param.DateFormat + `') AS TimelineA
+         SELECT DATE_FORMAT(NOW(), '` + params.DateFormat + `') AS TimelineA
          UNION ALL
-         SELECT DATE_FORMAT(DATE_SUB(AggregateTable.TimelineA, INTERVAL 1 ` + param.TimeCriterion + `), '` + param.DateFormat + `') AS TimelineB
+         SELECT DATE_FORMAT(DATE_SUB(AggregateTable.TimelineA, INTERVAL 1 ` + params.TimeCriterion + `), '` + params.DateFormat + `') AS TimelineB
          FROM   AggregateTable )
-  SELECT   DATE_FORMAT(AggregateTable.TimelineA, '` + param.DateFormat + `') AS Timeline
+  SELECT   DATE_FORMAT(AggregateTable.TimelineA, '` + params.DateFormat + `') AS Timeline
   FROM     AggregateTable
-  WHERE    AggregateTable.TimelineA > DATE_SUB(NOW(), INTERVAL 1 ` + param.Period + `)
+  WHERE    AggregateTable.TimelineA > DATE_SUB(NOW(), INTERVAL 1 ` + params.Period + `)
   ORDER BY Timeline ASC ) L`
 
 		sqlRight := `
 LEFT JOIN
 (
-         SELECT   DATE_FORMAT(reg_date, '` + param.DateFormat + `') AS Timeline,
+         SELECT   DATE_FORMAT(reg_date, '` + params.DateFormat + `') AS Timeline,
                   COUNT(*)                                    AS COUNT
          FROM     alarms
-         WHERE    DATE_FORMAT(reg_date, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 ` + param.Period + `)
+         WHERE    DATE_FORMAT(reg_date, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 ` + params.Period + `)
          AND      DATE_FORMAT(reg_date, '%Y-%m-%d') <= NOW()
          AND      ` + whereRight + `
          GROUP BY Timeline

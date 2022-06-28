@@ -3,7 +3,7 @@ package common
 import (
 	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
-	common "paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
 	"time"
 )
@@ -18,6 +18,21 @@ func GetAlarmPolicyService(DbInfo *gorm.DB) *AlarmPolicyService {
 	}
 }
 
+
+func (service *AlarmPolicyService) CreateAlarmPolicy(params []models.AlarmPolicies, regUser string) (string, error) {
+	for _, param := range params {
+		param.RegUser = regUser
+		param.RegDate = time.Now()
+	}
+
+	err := common.GetAlarmPolicyDao(service.DbInfo).CreateAlarmPolicy(params)
+	if err != nil {
+		return "FAILED REGISTER SNS ACCOUNT!", err
+	}
+	return "SUCCEEDED REGISTER SNS ACCOUNT!", nil
+}
+
+
 func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.AlarmPolicies, error) {
 	params := models.AlarmPolicies{
 		OriginType: c.QueryParam("originType"),
@@ -30,6 +45,7 @@ func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.Alar
 	}
 	return results, nil
 }
+
 
 func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []models.AlarmPolicyRequest) (string, error) {
 	for _, policyParam := range params {
@@ -50,6 +66,7 @@ func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []
 	}
 	return "SUCCEEDED UPDATE POLICY!", nil
 }
+
 
 func (service *AlarmPolicyService) UpdateAlarmTarget(request []models.AlarmTargetRequest) (string, error) {
 	for _, request := range request {

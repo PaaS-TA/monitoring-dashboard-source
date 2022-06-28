@@ -3,7 +3,7 @@ package common
 import (
 	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
-	dao "paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
 )
 
@@ -25,7 +25,7 @@ func (ap *AlarmService) GetAlarms(ctx echo.Context) ([]models.Alarms, error) {
 		ResolveStatus: ctx.QueryParam("resolveStatus"),
 	}
 
-	results, err := dao.GetAlarmDao(ap.DbInfo).GetAlarms(params)
+	results, err := common.GetAlarmDao(ap.DbInfo).GetAlarms(params)
 	if err != nil {
 		return results, err
 	}

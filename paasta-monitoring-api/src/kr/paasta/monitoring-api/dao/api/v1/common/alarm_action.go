@@ -54,8 +54,8 @@ func (dao *AlarmActionDao) UpdateAlarmAction(params models.AlarmActions) error {
 }
 
 
-func (dao *AlarmActionDao) DeleteAlarmAction(request models.AlarmActionRequest) error {
-	results := dao.DbInfo.Debug().Model(&request).Where("id = ?", request.Id).Delete(&request)
+func (dao *AlarmActionDao) DeleteAlarmAction(params models.AlarmActionRequest) error {
+	results := dao.DbInfo.Debug().Model(&params).Where("id = ?", params.Id).Delete(&params)
 
 	if results.Error != nil {
 		fmt.Println(results.Error)

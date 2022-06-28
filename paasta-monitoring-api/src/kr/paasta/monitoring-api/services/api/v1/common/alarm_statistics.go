@@ -3,7 +3,7 @@ package common
 import (
 	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
-	common "paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/dao/api/v1/common"
 	models "paasta-monitoring-api/models/api/v1"
 )
 
