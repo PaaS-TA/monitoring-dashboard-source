@@ -76,6 +76,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/alarm/sns", alarmSns.GetAlarmSns)
 	v1.PUT("/alarm/sns", alarmSns.UpdateAlarmSns)
 	v1.DELETE("/alarm/sns", alarmSns.DeleteAlarmSns)
+	v1.POST("/alarm/policy", alarmPolicy.CreateAlarmPolicy)
 	v1.GET("/alarm/policy", alarmPolicy.GetAlarmPolicy)
 	v1.PUT("/alarm/policy", alarmPolicy.UpdateAlarmPolicy)
 	v1.PUT("/alarm/target", alarmPolicy.UpdateAlarmTarget)

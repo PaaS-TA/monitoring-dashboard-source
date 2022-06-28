@@ -16,8 +16,8 @@ func GetAlarmSnsDao(DbInfo *gorm.DB) *AlarmSnsDao {
 }
 
 
-func (ap *AlarmSnsDao) CreateAlarmSns(request []models.AlarmSns) error {
-	results := ap.DbInfo.Debug().CreateInBatches(&request, 100)
+func (dao *AlarmSnsDao) CreateAlarmSns(params []models.AlarmSns) error {
+	results := dao.DbInfo.Debug().CreateInBatches(&params, 100)
 	if results.Error != nil {
 		return results.Error
 	}
@@ -25,9 +25,9 @@ func (ap *AlarmSnsDao) CreateAlarmSns(request []models.AlarmSns) error {
 	return nil
 }
 
-func (ap *AlarmSnsDao) GetAlarmSns(params models.AlarmSns) ([]models.AlarmSns, error) {
+func (dao *AlarmSnsDao) GetAlarmSns(params models.AlarmSns) ([]models.AlarmSns, error) {
 	var response []models.AlarmSns
-	results := ap.DbInfo.Debug().Where(&params).Find(&response)
+	results := dao.DbInfo.Debug().Where(&params).Find(&response)
 
 	if results.Error != nil {
 		return response, results.Error
@@ -37,10 +37,10 @@ func (ap *AlarmSnsDao) GetAlarmSns(params models.AlarmSns) ([]models.AlarmSns, e
 }
 
 
-func (ap *AlarmSnsDao) UpdateAlarmSns(request *models.AlarmSns) error {
-	results := ap.DbInfo.Debug().Model(&request).
-		Where("channel_id = ?", request.ChannelId).
-		Updates(&request)
+func (dao *AlarmSnsDao) UpdateAlarmSns(params *models.AlarmSns) error {
+	results := dao.DbInfo.Debug().Model(&params).
+		Where("channel_id = ?", params.ChannelId).
+		Updates(&params)
 	if results.Error != nil {
 		return results.Error
 	}
@@ -49,10 +49,10 @@ func (ap *AlarmSnsDao) UpdateAlarmSns(request *models.AlarmSns) error {
 }
 
 
-func (ap *AlarmSnsDao) DeleteAlarmSns(request models.AlarmSns) error {
-	results := ap.DbInfo.Debug().
-		Where("channel_id = ?", request.ChannelId).
-		Delete(&request)
+func (dao *AlarmSnsDao) DeleteAlarmSns(params models.AlarmSns) error {
+	results := dao.DbInfo.Debug().
+		Where("channel_id = ?", params.ChannelId).
+		Delete(&params)
 	if results.Error != nil {
 		return results.Error
 	}

@@ -21,6 +21,37 @@ func GetAlarmPolicyController(conn connections.Connections) *AlarmPolicyControll
 	}
 }
 
+
+// CreateAlarmSns
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      알람 받을 SNS 계정 등록하기
+//  @Description  알람 받을 SNS 계정을 등록한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "알람 받을 SNS 계정 정보를 주입한다."
+//  @Success      200                {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/ap/alarm/sns [post]
+func (controller *AlarmPolicyController) CreateAlarmPolicy(ctx echo.Context) error {
+	var request []models.AlarmPolicies
+	err := helpers.BindJsonAndCheckValid(ctx, &request)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the REQUEST JSON", err.Error())
+		return err
+	}
+	regUser := ctx.Get("userId").(string)
+
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).CreateAlarmPolicy(request, regUser)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to register sns account.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to register sns account.", results)
+	return nil
+}
+
+
 // GetAlarmPolicy
 //  * Annotations for Swagger *
 //  @tags         AP

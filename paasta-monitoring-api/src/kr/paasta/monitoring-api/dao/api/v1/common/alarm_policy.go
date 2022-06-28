@@ -31,6 +31,16 @@ func (dao *AlarmPolicyDao) GetAlarmStatus() ([]models.Alarms, error) {
 	return response, nil
 }
 
+
+func (dao *AlarmPolicyDao) CreateAlarmPolicy(params []models.AlarmPolicies) error {
+	results := dao.DbInfo.Debug().CreateInBatches(&params, 100)
+	if results.Error != nil {
+		return results.Error
+	}
+
+	return nil
+}
+
 func (dao *AlarmPolicyDao) GetAlarmPolicy(params models.AlarmPolicies) ([]models.AlarmPolicies, error) {
 	var response []models.AlarmPolicies
 	results := dao.DbInfo.Debug().Where(params).Find(&response)
