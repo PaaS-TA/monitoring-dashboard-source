@@ -69,8 +69,8 @@ func GetDataFloatFromInterfaceSingle(data map[string]interface{}) float64 {
 
 	var jsonValue json.Number
 
-	fmt.Printf("model.RESULT_DATA_NAME : %v\n", models.RESULT_DATA_NAME)
-	fmt.Printf("data : %v\n", data[models.RESULT_DATA_NAME])
+	//fmt.Printf("model.RESULT_DATA_NAME : %v\n", models.RESULT_DATA_NAME)
+	//fmt.Printf("data : %v\n", data[models.RESULT_DATA_NAME])
 
 	// 임시 오류 처리
 	if data[models.RESULT_DATA_NAME] == nil {
@@ -477,4 +477,57 @@ func FindStructFieldWithBlankValues(object interface{}) string {
 		}
 	}
 	return strings.Join(result, ",")
+}
+
+func PrintJsonFormat(params interface{}) {
+	json, _ := json.MarshalIndent(params, "", "  ")
+	fmt.Println(string(json))
+}
+
+func ConvertDataFormatForCellMetricData(params []models.CellMetricData) []models.CellMetricDataFloat64 {
+	var response []models.CellMetricDataFloat64
+	var data models.CellMetricDataFloat64
+
+	for _, param := range params {
+		data.CpuCore = uint(len(param.CpuCore))
+		data.CpuUsage = GetDataFloatFromInterfaceSingle(param.CpuUsage)
+		data.MemTotal = GetDataFloatFromInterfaceSingle(param.MemTotal)
+		data.MemFree = GetDataFloatFromInterfaceSingle(param.MemFree)
+		data.MemUsage = RoundFloatDigit2(100 - ((data.MemFree / data.MemTotal) * 100))
+		data.DiskTotal = GetDataFloatFromInterfaceSingle(param.DiskTotal)
+		data.DiskUsage = GetDataFloatFromInterfaceSingle(param.DiskUsage)
+		response = append(response, data)
+	}
+	return response
+}
+
+func SetStatusSummary(params []models.StatusByResource) models.StatusSummary {
+	var response models.StatusSummary
+
+	for i, param := range params {
+		if param.CpuStatus == "Failed" || param.MemoryStatus == "Failed" || param.DiskStatus == "Failed" {
+			params[i].TotalStatus = "Failed"
+		} else if param.CpuStatus == "Critical" || param.MemoryStatus == "Critical" || param.DiskStatus == "Critical" {
+			params[i].TotalStatus = "Critical"
+		} else if param.CpuStatus == "Warning" || param.MemoryStatus == "Warning" || param.DiskStatus == "Warning" {
+			params[i].TotalStatus = "Warning"
+		} else {
+			params[i].TotalStatus = "Running"
+		}
+	}
+
+	for _, status := range params {
+		switch status.TotalStatus {
+		case "Failed":
+			response.Failed++
+		case "Critical":
+			response.Critical++
+		case "Warning":
+			response.Warning++
+		case "Running":
+			response.Running++
+		}
+	}
+
+	return response
 }

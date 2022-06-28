@@ -3,8 +3,10 @@ package ap
 import (
 	"fmt"
 	"github.com/cloudfoundry-community/go-cfclient"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"gorm.io/gorm"
 	"paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 )
 
@@ -126,8 +128,7 @@ func (ap *ApContainerDao) GetContainerPageOverview() (models.Overview, error) {
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetContainerStatus() (models.Status, error) {
-	var response models.Status
+func (ap *ApContainerDao) GetContainerStatus() (models.StatusSummary, error) {
 	var status models.StatusByResource
 	var statuses []models.StatusByResource
 
@@ -173,34 +174,134 @@ func (ap *ApContainerDao) GetContainerStatus() (models.Status, error) {
 		}
 	}
 
-	// For defining container status
-	for i, status := range statuses {
-		if status.CpuStatus == "Critical" || status.MemoryStatus == "Critical" || status.DiskStatus == "Critical" {
-			statuses[i].TotalStatus = "Critical"
-		} else if status.CpuStatus == "Warning" || status.MemoryStatus == "Warning" || status.DiskStatus == "Warning" {
-			statuses[i].TotalStatus = "Warning"
-		} else {
-			statuses[i].TotalStatus = "Running"
-		}
-	}
-
-	// For counting container status
-	for _, status := range statuses {
-		switch status.TotalStatus {
-		case "Critical":
-			response.Critical++
-		case "Warning":
-			response.Warning++
-		case "Running":
-			response.Running++
-		}
-	}
-
+	response := helpers.SetStatusSummary(statuses)
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetCellStatus() (models.Status, error) {
-	var response models.Status
+func (ap *ApContainerDao) GetCellStatus() (models.StatusSummary, error) {
+	var request models.CellMetricQueryRequest
+	var cellsMetricData []models.CellMetricData
+	var status models.StatusByResource
+	var statuses []models.StatusByResource
 
+	alarmPolicyParam := models.AlarmPolicies{
+		OriginType: "pas",
+	}
+	policies, _ := common.GetAlarmPolicyDao(ap.DbInfo).GetAlarmPolicy(alarmPolicyParam)
+	cells, _ := ap.GetCellInfo()
+
+	for _, cell := range cells {
+		request.CellIp = cell.Ip
+		tmp := ap.GetCellMetricData(request)
+		cellsMetricData = append(cellsMetricData, tmp)
+	}
+
+	convertedMetricData := helpers.ConvertDataFormatForCellMetricData(cellsMetricData)
+
+	for _, cellMetricData := range convertedMetricData {
+		for _, policy := range policies {
+			switch policy.AlarmType {
+			case "cpu":
+				if cellMetricData.CpuUsage >= float64(policy.CriticalThreshold) {
+					status.CpuStatus = "Critical"
+				} else if cellMetricData.CpuUsage >= float64(policy.WarningThreshold) {
+					status.CpuStatus = "Warning"
+				} else if cellMetricData.CpuUsage == 0 {
+					status.CpuStatus = "Failed"
+				} else {
+					status.CpuStatus = "Running"
+				}
+			case "memory":
+				if cellMetricData.MemUsage >= float64(policy.CriticalThreshold) {
+					status.MemoryStatus = "Critical"
+				} else if cellMetricData.MemUsage >= float64(policy.WarningThreshold) {
+					status.MemoryStatus = "Warning"
+				} else if cellMetricData.MemUsage == 0 {
+					status.MemoryStatus = "Failed"
+				} else {
+					status.MemoryStatus = "Running"
+				}
+			case "disk":
+				if cellMetricData.DiskUsage >= float64(policy.CriticalThreshold) {
+					status.DiskStatus = "Critical"
+				} else if cellMetricData.DiskUsage >= float64(policy.WarningThreshold) {
+					status.DiskStatus = "Warning"
+				} else if cellMetricData.DiskUsage == 0 {
+					status.DiskStatus = "Failed"
+				} else {
+					status.DiskStatus = "Running"
+				}
+			}
+		}
+		statuses = append(statuses, status)
+	}
+
+	response := helpers.SetStatusSummary(statuses)
 	return response, nil
+}
+
+func (ap *ApContainerDao) GetCellMetricData(request models.CellMetricQueryRequest) models.CellMetricData {
+	var response models.CellMetricData
+	var cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage client.Response
+
+	for i := 0; i < 6; i++ {
+		switch i {
+		case 0:
+			request.MetricName = "cpuStats.core"
+			request.Sql = "SELECT value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/ GROUP BY metricname ORDER BY time DESC LIMIT 1"
+			cpuCore, _ = ap.GetInfluxDbQueryResult(request)
+		case 1:
+			request.MetricName = "cpuStats.core"
+			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/"
+			cpuUsage, _ = ap.GetInfluxDbQueryResult(request)
+		case 2:
+			request.MetricName = "memoryStats.TotalMemory"
+			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+			memTotal, _ = ap.GetInfluxDbQueryResult(request)
+		case 3:
+			request.MetricName = "memoryStats.FreeMemory"
+			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+			memFree, _ = ap.GetInfluxDbQueryResult(request)
+		case 4:
+			request.MetricName = "diskStats./.Total"
+			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+			diskTotal, _ = ap.GetInfluxDbQueryResult(request)
+		case 5:
+			request.MetricName = "diskStats./.Usage"
+			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+			diskUsage, _ = ap.GetInfluxDbQueryResult(request)
+		}
+	}
+
+	response.CpuCore, _ = helpers.InfluxConverterToMap(&cpuCore)
+	response.CpuUsage, _ = helpers.InfluxConverter(&cpuUsage)
+	response.MemTotal, _ = helpers.InfluxConverter(&memTotal)
+	response.MemFree, _ = helpers.InfluxConverter(&memFree)
+	response.DiskTotal, _ = helpers.InfluxConverter(&diskTotal)
+	response.DiskUsage, _ = helpers.InfluxConverter(&diskUsage)
+
+	return response
+}
+
+func (ap *ApContainerDao) GetInfluxDbQueryResult(request models.CellMetricQueryRequest) (_ client.Response, errMsg models.ErrMessage) {
+	var errLogMsg string
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg = models.ErrMessage{
+				"Message": errLogMsg,
+			}
+		}
+	}()
+
+	query := client.Query{
+		Command:  fmt.Sprintf(request.Sql, request.CellIp, request.MetricName),
+		Database: ap.InfluxDbClient.DbName.PaastaDatabase,
+	}
+
+	response, err := ap.InfluxDbClient.HttpClient.Query(query)
+	if err != nil {
+		errLogMsg = err.Error()
+	}
+
+	return *response, errMsg
 }

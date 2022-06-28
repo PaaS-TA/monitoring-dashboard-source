@@ -53,7 +53,7 @@ func (ap *ApContainerService) GetContainerPageOverview() (models.Overview, error
 	return results, nil
 }
 
-func (ap *ApContainerService) GetContainerStatus() (models.Status, error) {
+func (ap *ApContainerService) GetContainerStatus() (models.StatusSummary, error) {
 	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerStatus()
 	if err != nil {
 		return results, err
@@ -61,7 +61,7 @@ func (ap *ApContainerService) GetContainerStatus() (models.Status, error) {
 	return results, nil
 }
 
-func (ap *ApContainerService) GetCellStatus() (models.Status, error) {
+func (ap *ApContainerService) GetCellStatus() (models.StatusSummary, error) {
 	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellStatus()
 	if err != nil {
 		return results, err

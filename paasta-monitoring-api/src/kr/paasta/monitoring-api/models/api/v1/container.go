@@ -6,7 +6,7 @@ type (
 	ZoneInfo struct {
 		ZoneName string     `json:"zoneName"`
 		CellCnt  uint       `json:"cellCnt"`
-		CellInfo []CellInfo `json:"cellInfo,omitempty"`
+		CellInfo []CellInfo `json:"cellInfo,omitempty" gorm:"-"`
 	}
 
 	CellInfo struct {
@@ -16,7 +16,7 @@ type (
 		Id           uint      `json:"cellId"`
 		AppCnt       uint      `json:"appCnt"`
 		ContainerCnt uint      `json:"containerCnt"`
-		AppInfo      []AppInfo `json:"appInfo,omitempty"`
+		AppInfo      []AppInfo `json:"appInfo,omitempty" gorm:"-"`
 	}
 
 	AppInfo struct {
@@ -37,7 +37,7 @@ type (
 		ZoneInfo []ZoneInfo `json:"zoneInfo,omitempty"`
 	}
 
-	Status struct {
+	StatusSummary struct {
 		Running  uint `json:"running"`
 		Warning  uint `json:"warning"`
 		Critical uint `json:"critical"`
@@ -61,5 +61,30 @@ type (
 	InfluxDbClient struct {
 		HttpClient client.Client
 		DbName     InfluxDbName
+	}
+
+	CellMetricQueryRequest struct {
+		Sql        string
+		CellIp     string
+		MetricName string
+	}
+
+	CellMetricData struct {
+		CpuCore   []map[string]interface{}
+		CpuUsage  map[string]interface{}
+		MemTotal  map[string]interface{}
+		MemFree   map[string]interface{}
+		DiskTotal map[string]interface{}
+		DiskUsage map[string]interface{}
+	}
+
+	CellMetricDataFloat64 struct {
+		CpuCore   uint
+		CpuUsage  float64
+		MemTotal  float64
+		MemFree   float64
+		MemUsage  float64
+		DiskTotal float64
+		DiskUsage float64
 	}
 )
