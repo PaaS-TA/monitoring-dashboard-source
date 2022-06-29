@@ -8,6 +8,7 @@ import (
 	"paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
+	"sync"
 )
 
 type ApContainerDao struct {
@@ -128,7 +129,7 @@ func (ap *ApContainerDao) GetContainerPageOverview() (models.Overview, error) {
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetContainerStatus() (models.StatusSummary, error) {
+func (ap *ApContainerDao) GetContainerStatus() (models.Status, error) {
 	var status models.StatusByResource
 	var statuses []models.StatusByResource
 
@@ -138,7 +139,6 @@ func (ap *ApContainerDao) GetContainerStatus() (models.StatusSummary, error) {
 	policies, _ := common.GetAlarmPolicyDao(ap.DbInfo).GetAlarmPolicy(params)
 	apps, _ := ap.CfClient.ListApps()
 
-	// For inserting status data by container resources
 	for _, app := range apps {
 		appStats, _ := ap.CfClient.GetAppStats(app.Guid)
 		for _, appStat := range appStats {
@@ -174,11 +174,11 @@ func (ap *ApContainerDao) GetContainerStatus() (models.StatusSummary, error) {
 		}
 	}
 
-	response := helpers.SetStatusSummary(statuses)
+	response := helpers.SetStatus(statuses)
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetCellStatus() (models.StatusSummary, error) {
+func (ap *ApContainerDao) GetCellStatus() (models.Status, error) {
 	var request models.CellMetricQueryRequest
 	var cellsMetricData []models.CellMetricData
 	var status models.StatusByResource
@@ -236,42 +236,48 @@ func (ap *ApContainerDao) GetCellStatus() (models.StatusSummary, error) {
 		statuses = append(statuses, status)
 	}
 
-	response := helpers.SetStatusSummary(statuses)
+	response := helpers.SetStatus(statuses)
 	return response, nil
 }
 
 func (ap *ApContainerDao) GetCellMetricData(request models.CellMetricQueryRequest) models.CellMetricData {
 	var response models.CellMetricData
 	var cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage client.Response
+	var wg sync.WaitGroup
 
+	wg.Add(6)
 	for i := 0; i < 6; i++ {
-		switch i {
-		case 0:
-			request.MetricName = "cpuStats.core"
-			request.Sql = "SELECT value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/ GROUP BY metricname ORDER BY time DESC LIMIT 1"
-			cpuCore, _ = ap.GetInfluxDbQueryResult(request)
-		case 1:
-			request.MetricName = "cpuStats.core"
-			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/"
-			cpuUsage, _ = ap.GetInfluxDbQueryResult(request)
-		case 2:
-			request.MetricName = "memoryStats.TotalMemory"
-			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-			memTotal, _ = ap.GetInfluxDbQueryResult(request)
-		case 3:
-			request.MetricName = "memoryStats.FreeMemory"
-			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-			memFree, _ = ap.GetInfluxDbQueryResult(request)
-		case 4:
-			request.MetricName = "diskStats./.Total"
-			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-			diskTotal, _ = ap.GetInfluxDbQueryResult(request)
-		case 5:
-			request.MetricName = "diskStats./.Usage"
-			request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-			diskUsage, _ = ap.GetInfluxDbQueryResult(request)
-		}
+		go func(index int) {
+			switch index {
+			case 0:
+				request.MetricName = "cpuStats.core"
+				request.Sql = "SELECT value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/ GROUP BY metricname ORDER BY time DESC LIMIT 1"
+				cpuCore, _ = ap.GetInfluxDbQueryResult(request)
+			case 1:
+				request.MetricName = "cpuStats.core"
+				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/"
+				cpuUsage, _ = ap.GetInfluxDbQueryResult(request)
+			case 2:
+				request.MetricName = "memoryStats.TotalMemory"
+				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				memTotal, _ = ap.GetInfluxDbQueryResult(request)
+			case 3:
+				request.MetricName = "memoryStats.FreeMemory"
+				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				memFree, _ = ap.GetInfluxDbQueryResult(request)
+			case 4:
+				request.MetricName = "diskStats./.Total"
+				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				diskTotal, _ = ap.GetInfluxDbQueryResult(request)
+			case 5:
+				request.MetricName = "diskStats./.Usage"
+				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				diskUsage, _ = ap.GetInfluxDbQueryResult(request)
+			}
+			wg.Done()
+		}(i)
 	}
+	wg.Wait()
 
 	response.CpuCore, _ = helpers.InfluxConverterToMap(&cpuCore)
 	response.CpuUsage, _ = helpers.InfluxConverter(&cpuUsage)

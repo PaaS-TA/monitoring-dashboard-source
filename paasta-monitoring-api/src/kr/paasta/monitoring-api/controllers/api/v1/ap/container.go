@@ -112,7 +112,7 @@ func (ap *ApContainerController) GetContainerPageOverview(ctx echo.Context) erro
 //  @Description  Container 페이지의 Overview 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.StatusSummary}
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Status}
 //  @Router       /api/v1/ap/container/overview [get]
 func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerStatus()

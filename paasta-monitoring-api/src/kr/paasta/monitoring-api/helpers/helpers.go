@@ -501,8 +501,8 @@ func ConvertDataFormatForCellMetricData(params []models.CellMetricData) []models
 	return response
 }
 
-func SetStatusSummary(params []models.StatusByResource) models.StatusSummary {
-	var response models.StatusSummary
+func SetStatus(params []models.StatusByResource) models.Status {
+	var response models.Status
 
 	for i, param := range params {
 		if param.CpuStatus == "Failed" || param.MemoryStatus == "Failed" || param.DiskStatus == "Failed" {
@@ -516,8 +516,8 @@ func SetStatusSummary(params []models.StatusByResource) models.StatusSummary {
 		}
 	}
 
-	for _, status := range params {
-		switch status.TotalStatus {
+	for _, param := range params {
+		switch param.TotalStatus {
 		case "Failed":
 			response.Failed++
 		case "Critical":

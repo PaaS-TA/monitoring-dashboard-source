@@ -37,7 +37,7 @@ type (
 		ZoneInfo []ZoneInfo `json:"zoneInfo,omitempty"`
 	}
 
-	StatusSummary struct {
+	Status struct {
 		Running  uint `json:"running"`
 		Warning  uint `json:"warning"`
 		Critical uint `json:"critical"`
