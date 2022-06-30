@@ -129,7 +129,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	// CaaS
 	v1.GET("/caas/cluster/average/:type", clusterModule.GetClusterAverage)
-	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNodeList)
+	v1.GET("/caas/cluster/worknodes", clusterModule.GetWorkNodeList)
+	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNode)
 
 	return e
 }

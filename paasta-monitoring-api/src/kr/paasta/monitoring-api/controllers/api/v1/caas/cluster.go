@@ -44,3 +44,19 @@ func (controller *ClusterController) GetWorkNodeList(ctx echo.Context) error {
 	}
 	return nil
 }
+
+
+func (controller *ClusterController) GetWorkNode(ctx echo.Context) error {
+	nodeName := ctx.QueryParam("nodename")
+	instance := ctx.QueryParam("instance")
+
+	results, err := service.GetClusterService(controller.CaasConfig).GetWorkNode(nodeName, instance)
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Worker Node data.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", results)
+	}
+	return nil
+}

@@ -7,6 +7,7 @@ import (
 	models "paasta-monitoring-api/models/api/v1"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type ClusterService struct {
@@ -24,7 +25,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 
 	switch typeParam {
 	case "pod":
-		podUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_POD_USAGE)
+		podUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_POD_USAGE)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +35,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		break;
 
 	case "cpu":
-		cpuUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_CPU_USAGE)
+		cpuUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_CPU_USAGE)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +45,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		break;
 
 	case "disk" :
-		diskUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_DISK_USAGE)
+		diskUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_DISK_USAGE)
 		if err != nil {
 			return nil, err
 		}
@@ -54,7 +55,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		break;
 
 	case "memory" :
-		memoryUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_MEMORY_USAGE)
+		memoryUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_MEMORY_USAGE)
 		if err != nil {
 			return nil, err
 		}
@@ -71,13 +72,13 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
-	nameListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_NAME_LIST)
-	memoryListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_MEMORY_USAGE)
-	memoryUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_MEMORY_USE)
-	cpuUsageListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_CPU_USAGE)
-	cpuUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_CPU_ALLOC)
-	diskUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_DISK_USE)
-	conditionListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl, "query="+models.PROMQL_WORKNODE_CONDITION)
+	nameListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_NAME_LIST)
+	memoryListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USAGE)
+	memoryUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USE)
+	cpuUsageListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CPU_USAGE)
+	cpuUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CPU_ALLOC)
+	diskUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_DISK_USE)
+	conditionListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CONDITION)
 	if err != nil {
 		return nil, err
 	}
@@ -141,4 +142,123 @@ func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, erro
 	}
 
 	return result, nil
+}
+
+
+func (service *ClusterService) GetWorkNode(nodeName string, instanceName string) ([]map[string]interface{}, error){
+	var result []map[string]interface{}
+	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
+
+	// 1.podUsage (input:nodeName)
+	pqPodUsage := "sum(kube_pod_info{node='" + nodeName + "'})" + fromToTimeParmameter
+	// 2.cpuUsage (input:Instance)
+	pqCpuUsage := "node_cpu_seconds_total{mode!='idle',job='node-exporter',instance='" + instanceName + "'}" + fromToTimeParmameter
+	// 3.memoryUsage (input:Instance)
+	pqMemoryUsage := "node_memory_Active_bytes{job='node-exporter',instance='" + instanceName + "'}" + fromToTimeParmameter
+	// 4.diskUsage (input:nodeName)
+	pqDiskUsage := "sum(node_filesystem_size_bytes{instance='" + instanceName + "'}-node_filesystem_free_bytes{instance='" + instanceName + "'})" + fromToTimeParmameter
+
+	podSeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqPodUsage)
+	if err != nil {
+		return nil, err
+	}
+	cpuSeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqCpuUsage)
+	if err != nil {
+		return nil, err
+	}
+	memorySeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqMemoryUsage)
+	if err != nil {
+		return nil, err
+	}
+	diskSeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqDiskUsage)
+	if err != nil {
+		return nil, err
+	}
+
+	podSeriesResult := gjson.Get(string(podSeriesBytes), "data.result.0.values")
+	cpuSeriesResult := gjson.Get(string(cpuSeriesBytes), "data.result.0.values")
+	memorySeriesResult := gjson.Get(string(memorySeriesBytes), "data.result.0.values")
+	diskSeriesResult := gjson.Get(string(diskSeriesBytes), "data.result.0.values")
+
+	podSeriesMap := make(map[string]interface{})
+	var podSeriesDataArr []map[string]interface{}
+	for _, item := range podSeriesResult.Array() {
+		itemMap := make(map[string]interface{})
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").String()
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		podSeriesDataArr = append(podSeriesDataArr, itemMap)
+	}
+	podSeriesMap["name"] = "pod"
+	podSeriesMap["metric"] = podSeriesDataArr
+
+	cpuSeriesMap := make(map[string]interface{})
+	var cpuSeriesDataArr []map[string]interface{}
+	for _, item := range cpuSeriesResult.Array() {
+		itemMap := make(map[string]interface{})
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").String()
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		cpuSeriesDataArr = append(cpuSeriesDataArr, itemMap)
+	}
+	cpuSeriesMap["name"] = "cpu"
+	cpuSeriesMap["metric"] = cpuSeriesDataArr
+
+	memorySeriesMap := make(map[string]interface{})
+	var memorySeriesDataArr []map[string]interface{}
+	for _, item := range memorySeriesResult.Array() {
+		itemMap := make(map[string]interface{})
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").String()
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		memorySeriesDataArr = append(memorySeriesDataArr, itemMap)
+	}
+	memorySeriesMap["name"] = "memory"
+	memorySeriesMap["metric"] = memorySeriesDataArr
+
+	diskSeriesMap := make(map[string]interface{})
+	var diskSeriesDataArr []map[string]interface{}
+	for _, item := range diskSeriesResult.Array() {
+		itemMap := make(map[string]interface{})
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").String()
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		diskSeriesDataArr = append(diskSeriesDataArr, itemMap)
+	}
+	diskSeriesMap["name"] = "disk"
+	diskSeriesMap["metric"] = diskSeriesDataArr
+
+	result = append(result, podSeriesMap)
+	result = append(result, cpuSeriesMap)
+	result = append(result, memorySeriesMap)
+	result = append(result, diskSeriesMap)
+
+	return result, nil
+}
+
+
+
+
+
+
+
+func GetUnixTimeFromTo(interval int64) (string, string) {
+	currentTime := time.Now().Unix()
+	previousTime := currentTime - interval
+
+	pTime := strconv.FormatInt(previousTime, 10)
+	cTime := strconv.FormatInt(currentTime, 10)
+
+	return pTime, cTime
+}
+
+func GetPromqlFromToParameter(interval int64, timeStep string) string {
+	fromTime, toTime := GetUnixTimeFromTo(interval)
+
+	parameter := "&start=" + fromTime + "&end=" + toTime + "&step=" + timeStep
+	return parameter
 }
