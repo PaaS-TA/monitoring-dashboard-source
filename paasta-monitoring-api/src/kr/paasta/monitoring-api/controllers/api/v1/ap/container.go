@@ -85,6 +85,26 @@ func (ap *ApContainerController) GetAppInfo(ctx echo.Context) error {
 	return nil
 }
 
+// GetContainerInfo
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      App 정보 가져오기
+//  @Description  App 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=cfclient.App}
+//  @Router       /api/v1/ap/container/zone [get]
+func (ap *ApContainerController) GetContainerInfo(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerInfo()
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get containers info.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get containers info.", results)
+	return nil
+}
+
 // GetContainerPageOverview
 //  * Annotations for Swagger *
 //  @tags         AP

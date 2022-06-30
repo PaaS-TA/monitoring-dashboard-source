@@ -20,17 +20,28 @@ type (
 	}
 
 	AppInfo struct {
-		CellName  string `json:"cellName"`
-		AppName   string `json:"appName"`
-		Uri       string `json:"uri"`
-		Buildpack string `json:"buildpack"`
-		Status    string `json:"status"`
-		Instances int    `json:"instances"`
-		Memory    int    `json:"memory"`
-		DiskQuota int    `json:"diskQuota"`
-		CfApi     string `json:"cfApi"`
-		CreatedAt string `json:"createdAt"`
-		UpdatedAt string `json:"updatedAt"`
+		CellName      string         `json:"cellName"`
+		AppName       string         `json:"appName"`
+		Uri           string         `json:"uri"`
+		Buildpack     string         `json:"buildpack"`
+		Status        string         `json:"status"`
+		Instances     int            `json:"instances"`
+		Memory        int            `json:"memory"`
+		DiskQuota     int            `json:"diskQuota"`
+		CfApi         string         `json:"cfApi"`
+		CreatedAt     string         `json:"createdAt"`
+		UpdatedAt     string         `json:"updatedAt"`
+		ContainerInfo *ContainerInfo `json:"containerInfo,omitempty" gorm:"-"`
+	}
+
+	ContainerInfo struct {
+		AppName   string      `json:"appName"`
+		Container []Container `json:"container"`
+	}
+
+	Container struct {
+		AppIndex    string `json:"appIndex"`
+		ContainerId string `json:"containerId"`
 	}
 
 	Overview struct {
@@ -63,7 +74,7 @@ type (
 		DbName     InfluxDbName
 	}
 
-	CellMetricQueryRequest struct {
+	InfluxDbQueryRequest struct {
 		Sql        string
 		CellIp     string
 		MetricName string

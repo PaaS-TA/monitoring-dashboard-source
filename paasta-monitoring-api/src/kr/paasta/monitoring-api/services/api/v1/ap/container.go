@@ -45,6 +45,14 @@ func (ap *ApContainerService) GetAppInfo() ([]models.AppInfo, error) {
 	return results, nil
 }
 
+func (ap *ApContainerService) GetContainerInfo() ([]models.ContainerInfo, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerInfo()
+	if err != nil {
+		return results, err
+	}
+	return results, nil
+}
+
 func (ap *ApContainerService) GetContainerPageOverview() (models.Overview, error) {
 	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerPageOverview()
 	if err != nil {
