@@ -317,33 +317,3 @@ func (p *PaastaDao) GetPaastaNetworkErrorList(boshChart models.BoshChart) (*clie
 
 	return resp, err
 }
-
-func (p *PaastaDao) GetPaastaLog(paastaLog models.PaastaLog) (*client.Response, error) {
-	paastaLogSql := "select * from \"logging_measurement\""
-	if paastaLog.Period != "" {
-		paastaLogSql += " where \"time\" <= now() + " + paastaLog.Period
-	}
-	if paastaLog.StartTime != "" && paastaLog.EndTime != "" {
-		paastaLogSql += " where \"time\" >= '" + paastaLog.StartTime + "' and \"time\" <= '" + paastaLog.EndTime + "'"
-	}
-	if paastaLog.UUID != "" {
-		paastaLogSql += " and \"extradata\" =~ /" + paastaLog.UUID + "*/"
-	}
-	if paastaLog.Keyword != "" {
-		paastaLogSql += " and \"message\" =~ /" + paastaLog.Keyword + "/"
-	}
-	paastaLogSql += " ORDER BY \"time\" DESC limit 100;"
-
-	//fmt.Println("GetBoshLog Sql======>", boshLogSql)
-
-	q := client.Query{
-		Command:  paastaLogSql,
-		Database: p.InfluxDbClient.DbName.LoggingDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	//fmt.Println("GetBoshLog resp======>", resp)
-	return resp, err
-}

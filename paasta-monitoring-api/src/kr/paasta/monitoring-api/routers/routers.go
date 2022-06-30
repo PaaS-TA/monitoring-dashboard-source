@@ -49,6 +49,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	alarmPolicy := commonModule.GetAlarmPolicyController(conn)
 	alarmStatistics := commonModule.GetAlarmStatisticsController(conn)
 	alarmAction := commonModule.GetAlarmActionController(conn)
+	logsearch := commonModule.GetLogSearchController(conn)
 
 	// IaaS
 	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
@@ -90,6 +91,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/alarm/action", alarmAction.GetAlarmAction)
 	v1.PATCH("/alarm/action", alarmAction.UpdateAlarmAction)
 	v1.DELETE("/alarm/action", alarmAction.DeleteAlarmAction)
+	v1.GET("/log/:uuid", logsearch.GetLogs)
 
 	// AP - BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
@@ -97,7 +99,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/bosh/summary", apBosh.GetBoshSummary)
 	v1.GET("/ap/bosh/process", apBosh.GetBoshProcessByMemory)
 	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
-	v1.GET("/ap/bosh/log/:uuid", apBosh.GetBoshLog)
 
 	// AP - PaaS-TA
 	v1.GET("/ap/paasta", apPaasta.GetPaastaInfoList)
@@ -105,7 +106,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/paasta/summary", apPaasta.GetPaastaSummary)
 	v1.GET("/ap/paasta/process", apPaasta.GetPaastaProcessByMemory)
 	v1.GET("/ap/paasta/chart/:uuid", apPaasta.GetPaastaChart)
-	v1.GET("/ap/paasta/log/:uuid", apPaasta.GetPaastaLog)
 
 	// AP - Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
