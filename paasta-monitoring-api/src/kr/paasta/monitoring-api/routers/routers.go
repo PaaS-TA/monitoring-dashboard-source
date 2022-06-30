@@ -10,6 +10,7 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
+	caasModule "paasta-monitoring-api/controllers/api/v1/caas"
 	commonModule "paasta-monitoring-api/controllers/api/v1/common"
 	iaasModule "paasta-monitoring-api/controllers/api/v1/iaas"
 	"paasta-monitoring-api/middlewares"
@@ -52,6 +53,9 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// IaaS
 	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
 	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
+
+	// Caas
+	clusterModule := caasModule.GetClusterController(conn.CaasConfig)
 
 	apBosh := AP.GetBoshController(conn)
 	apPaasta := AP.GetPaastaController(conn)
@@ -122,6 +126,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/iaas/instance/cpu/load/average", zabbixModule.GetCpuLoadAverage)
 	v1.GET("/iaas/instance/disk/io/rate", zabbixModule.GetDiskIORate)
 	v1.GET("/iaas/instance/network/io/bytes", zabbixModule.GetNetworkIOBytes)
+
+	// CaaS
+	v1.GET("/caas/cluster/average/:type", clusterModule.GetClusterAverage)
+	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNodeList)
 
 	return e
 }

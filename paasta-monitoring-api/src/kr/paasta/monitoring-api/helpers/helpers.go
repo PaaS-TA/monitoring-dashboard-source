@@ -5,7 +5,12 @@ import (
 	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"github.com/tidwall/gjson"
+	"log"
+	"io/ioutil"
 	"math"
+	"net/http"
+	"net/url"
 	models "paasta-monitoring-api/models/api/v1"
 	"reflect"
 	"strconv"
@@ -442,4 +447,29 @@ func FindStructFieldWithBlankValues(object interface{}) string {
 		}
 	}
 	return strings.Join(result, ",")
+}
+
+
+func RequestHttpGet(urlStr string, queryString string) ([]byte, error){
+	queryString = url.PathEscape(queryString)   // URL encoding
+	httpResponse, httpErr := http.Get(urlStr + "?" + queryString)
+	log.Println("url : " + urlStr)
+	log.Println("query params : " + queryString)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+
+	responseData, readErr := ioutil.ReadAll(httpResponse.Body)
+	if readErr != nil {
+		return nil, readErr
+	}
+
+	defer httpResponse.Body.Close()
+
+	return responseData, nil
+}
+
+func GetValueFromJsonBytes(jsonStr string, key string) interface{} {
+	result := gjson.Get(jsonStr, key)
+	return result;
 }

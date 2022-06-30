@@ -33,6 +33,7 @@ type Connections struct {
 	ZabbixSession     *zabbix.Session
 	Logger            *zap.Logger
 	CfClient          *cfclient.Client
+	CaasConfig        models.CaasConfig
 }
 
 /*
@@ -264,6 +265,19 @@ func (connection *Connections) initZabbixSession() {
 	connection.ZabbixSession = zabbixSession
 }
 
+
+func (connection *Connections) initCaaSConfig() {
+	caasConfig := models.CaasConfig{
+		PromethusUrl      : connection.Env["prometheus_host"].(string),
+		PromethusRangeUrl : connection.Env["prometheus_host"].(string) + "/api/v1/query_range?query=",
+		K8sUrl            : connection.Env["kubernetes_host"].(string),
+		K8sAdminToken     : connection.Env["kubernetes_admin_token"].(string),
+	}
+
+	connection.CaasConfig = caasConfig
+}
+
+
 func SetupConnection() Connections {
 
 	Conn := Connections{
@@ -288,7 +302,7 @@ func SetupConnection() Connections {
 		case "SaaS":
 			SaasConnection(Conn.Env)
 		case "CaaS":
-			CaaSConnection(Conn.Env)
+			Conn.initCaaSConfig()
 		case "IaaS":
 			iaasConnection(Conn.Env)
 			Conn.initOpenstackProvider()
