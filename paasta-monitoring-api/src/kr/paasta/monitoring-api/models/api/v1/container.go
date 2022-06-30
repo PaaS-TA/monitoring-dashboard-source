@@ -78,6 +78,7 @@ type (
 		Sql        string
 		CellIp     string
 		MetricName string
+		Database   string
 	}
 
 	CellMetricData struct {
