@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"github.com/tidwall/gjson"
 	"log"
 	"io/ioutil"
 	"math"
@@ -74,8 +73,8 @@ func GetDataFloatFromInterfaceSingle(data map[string]interface{}) float64 {
 
 	var jsonValue json.Number
 
-	fmt.Printf("model.RESULT_DATA_NAME : %v\n", models.RESULT_DATA_NAME)
-	fmt.Printf("data : %v\n", data[models.RESULT_DATA_NAME])
+	//fmt.Printf("model.RESULT_DATA_NAME : %v\n", models.RESULT_DATA_NAME)
+	//fmt.Printf("data : %v\n", data[models.RESULT_DATA_NAME])
 
 	// 임시 오류 처리
 	if data[models.RESULT_DATA_NAME] == nil {
@@ -434,6 +433,41 @@ func GetAlarmStatusByServiceName(originType, alarmType string, usage float64, th
 	return ""
 }
 
+// InfluxDB Time Set Formatter
+func InfluxTimeSetFormatter(params models.Logs) models.Logs {
+	/**
+	Period 파라미터가 존재하면 Period 값으로 DB 조회
+	없으면 StartTime, EndTime 파라미터 값으로 DB조회
+	*/
+	if params.Period == "" {
+		/**
+		날짜 시간 값을 DB에서 조회할 수 있는 포맷으로 변경
+		*/
+		if params.StartTime == "" && params.EndTime == "" {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, "00:00:00")
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, "23:59:59")
+		} else if params.StartTime != "" && params.EndTime == "" {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, params.StartTime)
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, "23:59:59")
+		} else if params.StartTime == "" && params.EndTime != "" {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, "00:00:00")
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, params.EndTime)
+		} else {
+			params.StartTime = fmt.Sprintf("%sT%s", params.TargetDate, params.StartTime)
+			params.EndTime = fmt.Sprintf("%sT%s", params.TargetDate, params.EndTime)
+		}
+		convert_start_time, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", params.StartTime))
+		convert_end_time, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s+09:00", params.EndTime))
+		startTime := convert_start_time.Unix() - int64(models.GmtTimeGap)*60*60
+		endTime := convert_end_time.Unix() - int64(models.GmtTimeGap)*60*60
+
+		// Make RFC3339 date-time strings
+		params.StartTime = time.Unix(startTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
+		params.EndTime = time.Unix(endTime, 0).Format(time.RFC3339)[0:19] + ".000000000Z"
+	}
+
+	return params
+}
 
 func FindStructFieldWithBlankValues(object interface{}) string {
 	var result []string
@@ -448,7 +482,6 @@ func FindStructFieldWithBlankValues(object interface{}) string {
 	}
 	return strings.Join(result, ",")
 }
-
 
 func RequestHttpGet(urlStr string, queryString string) ([]byte, error){
 	queryString = url.PathEscape(queryString)   // URL encoding
@@ -469,7 +502,55 @@ func RequestHttpGet(urlStr string, queryString string) ([]byte, error){
 	return responseData, nil
 }
 
-func GetValueFromJsonBytes(jsonStr string, key string) interface{} {
-	result := gjson.Get(jsonStr, key)
-	return result;
+func PrintJsonFormat(params interface{}) {
+	json, _ := json.MarshalIndent(params, "", "  ")
+	fmt.Println(string(json))
+}
+
+func ConvertDataFormatForCellMetricData(params []models.CellMetricData) []models.CellMetricDataFloat64 {
+	var response []models.CellMetricDataFloat64
+	var data models.CellMetricDataFloat64
+
+	for _, param := range params {
+		data.CpuCore = uint(len(param.CpuCore))
+		data.CpuUsage = GetDataFloatFromInterfaceSingle(param.CpuUsage)
+		data.MemTotal = GetDataFloatFromInterfaceSingle(param.MemTotal)
+		data.MemFree = GetDataFloatFromInterfaceSingle(param.MemFree)
+		data.MemUsage = RoundFloatDigit2(100 - ((data.MemFree / data.MemTotal) * 100))
+		data.DiskTotal = GetDataFloatFromInterfaceSingle(param.DiskTotal)
+		data.DiskUsage = GetDataFloatFromInterfaceSingle(param.DiskUsage)
+		response = append(response, data)
+	}
+	return response
+}
+
+func SetStatus(params []models.StatusByResource) models.Status {
+	var response models.Status
+
+	for i, param := range params {
+		if param.CpuStatus == "Failed" || param.MemoryStatus == "Failed" || param.DiskStatus == "Failed" {
+			params[i].TotalStatus = "Failed"
+		} else if param.CpuStatus == "Critical" || param.MemoryStatus == "Critical" || param.DiskStatus == "Critical" {
+			params[i].TotalStatus = "Critical"
+		} else if param.CpuStatus == "Warning" || param.MemoryStatus == "Warning" || param.DiskStatus == "Warning" {
+			params[i].TotalStatus = "Warning"
+		} else {
+			params[i].TotalStatus = "Running"
+		}
+	}
+
+	for _, param := range params {
+		switch param.TotalStatus {
+		case "Failed":
+			response.Failed++
+		case "Critical":
+			response.Critical++
+		case "Warning":
+			response.Warning++
+		case "Running":
+			response.Running++
+		}
+	}
+
+	return response
 }
