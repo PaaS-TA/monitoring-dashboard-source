@@ -74,7 +74,7 @@ type (
 		DbName     InfluxDbName
 	}
 
-	CellMetricQueryRequest struct {
+	InfluxDbQueryRequest struct {
 		Sql        string
 		CellIp     string
 		MetricName string
