@@ -135,6 +135,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNode)
 
 	v1.GET("/caas/workload/status", worklaodModule.GetWorkloadStatus)
+	v1.GET("/caas/workload/list", worklaodModule.GetWorkloadContainerList)
 
 	return e
 }

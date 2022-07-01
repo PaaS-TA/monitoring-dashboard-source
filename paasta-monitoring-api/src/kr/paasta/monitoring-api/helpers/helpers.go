@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"log"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -486,8 +485,8 @@ func FindStructFieldWithBlankValues(object interface{}) string {
 func RequestHttpGet(urlStr string, queryString string) ([]byte, error){
 	queryString = url.PathEscape(queryString)   // URL encoding
 	httpResponse, httpErr := http.Get(urlStr + "?" + queryString)
-	log.Println("url : " + urlStr)
-	log.Println("query params : " + queryString)
+	//log.Println("url : " + urlStr)
+	//log.Println("query params : " + queryString)
 	if httpErr != nil {
 		return nil, httpErr
 	}

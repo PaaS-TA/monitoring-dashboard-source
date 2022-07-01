@@ -30,3 +30,16 @@ func (controller *WorkloadController) GetWorkloadStatus(ctx echo.Context) error 
 	}
 	return nil
 }
+
+
+func (controller *WorkloadController) GetWorkloadContainerList(ctx echo.Context) error {
+	results, err := service.GetWorkloadService(controller.CaasConfig).GetWorkloadContainerList()
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", results)
+	}
+	return nil
+}

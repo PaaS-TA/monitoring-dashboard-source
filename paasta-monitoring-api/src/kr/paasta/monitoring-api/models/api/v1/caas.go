@@ -22,23 +22,30 @@ const (
 	PROMQL_WORKNODE_CONDITION = "count(kube_node_status_condition{condition='Ready',status='true'})by(node)"
 
 
-	PROMQL_WORKLOAD_DEPLOYMENT_TOTAL       = "sum(kube_deployment_status_replicas)"
-	PROMQL_WORKLOAD_DEPLOYMENT_AVAILABLE   = "sum(kube_deployment_status_replicas_available)"
-	PROMQL_WORKLOAD_DEPLOYMENT_UNAVAILABLE = "sum(kube_deployment_status_replicas_unavailable)"
-	PROMQL_WORKLOAD_DEPLOYMENT_UPDATED     = "sum(kube_deployment_status_replicas_updated)"
+	PROMQL_WORKLOAD_DEPLOYMENT_TOTAL        = "sum(kube_deployment_status_replicas)"
+	PROMQL_WORKLOAD_DEPLOYMENT_AVAILABLE    = "sum(kube_deployment_status_replicas_available)"
+	PROMQL_WORKLOAD_DEPLOYMENT_UNAVAILABLE  = "sum(kube_deployment_status_replicas_unavailable)"
+	PROMQL_WORKLOAD_DEPLOYMENT_UPDATED      = "sum(kube_deployment_status_replicas_updated)"
+
+	PROMQL_WORKLOAD_STATEFULSET_TOTAL        = "sum(kube_statefulset_status_replicas)"
+	PROMQL_WORKLOAD_STATEFULSET_AVAILABLE    = "sum(kube_statefulset_status_replicas_available)"
+	PROMQL_WORKLOAD_STATEFULSET_UNAVAILABLE  = "sum(kube_statefulset_status_replicas_unavailable)"
+	PROMQL_WORKLOAD_STATEFULSET_UPDATED      = "sum(kube_statefulset_status_replicas_updated)"
+
 	PROMQL_WORKLOAD_DAEMONSET_READY        = "sum(kube_daemonset_status_number_ready)"
 	PROMQL_WORKLOAD_DAEMONSET_AVAILABLE    = "sum(kube_daemonset_status_number_available)"
 	PROMQL_WORKLOAD_DAEMONSET_UNAVAILABLE  = "sum(kube_daemonset_status_number_unavailable)"
 	PROMQL_WORKLOAD_DAEMONSET_MISSCHEDULED = "sum(kube_daemonset_status_number_misscheduled)"
-	PROMQL_WORKLOAD_STATEFULSET_TOTAL      = "sum(kube_statefulset_status_replicas)"
-	PROMQL_WORKLOAD_STATEFULSET_READY      = "sum(kube_statefulset_status_replicas_ready)"
-	PROMQL_WORKLOAD_STATEFULSET_UPDATED    = "sum(kube_statefulset_status_replicas_updated)"
-	PROMQL_WORKLOAD_STATEFULSET_REVISION   = "sum(kube_statefulset_status_update_revision)"
+
 	PROMQL_WORKLOAD_PODCONTAINER_READY     = "sum(kube_pod_container_status_ready)"
 	PROMQL_WORKLOAD_PODCONTAINER_RUNNING   = "sum(kube_pod_container_status_running)"
-	PROMQL_WORKLOAD_PODCONTAINER_RESTARTS   = "sum(kube_pod_container_status_restarts_total)"
+	PROMQL_WORKLOAD_PODCONTAINER_RESTARTS  = "sum(kube_pod_container_status_restarts_total)"
 	PROMQL_WORKLOAD_PODCONTAINER_TERMINATE = "sum(kube_pod_container_status_terminated)"
+
+
 )
+
+var BULITIN_WORKLOAD = [...]string {"deployment", "daemonset", "statefulset"}
 
 type (
 	CaasConfig struct {
