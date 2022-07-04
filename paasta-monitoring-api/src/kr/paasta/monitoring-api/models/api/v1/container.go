@@ -74,7 +74,7 @@ type (
 		DbName     InfluxDbName
 	}
 
-	InfluxDbQueryRequest struct {
+	CellMetricQueryRequest struct {
 		Sql        string
 		CellIp     string
 		MetricName string
@@ -98,5 +98,35 @@ type (
 		MemUsage  float64
 		DiskTotal float64
 		DiskUsage float64
+	}
+
+	ContainerUsageQueryRequest struct {
+		BaseModel
+		PageIndex     int    `json:"pageIndex"`
+		PageItems     int    `json:"pageItems"`
+		AppName       string `json:"appName"`
+		AppIndex      string `json:"appIndex"`
+		ContainerName string `json:"containerName"`
+		Name          string `json:"name"`
+		CellIp        string `json:"cellIp"`
+		Status        string
+		SqlQuery      string
+		Time          string
+		Item          []ContainerDetail
+	}
+
+	ContainerDetail struct {
+		Name    string
+		ResName string
+	}
+
+	BaseModel struct {
+		Service          string `json:"service"`
+		JobName          string `json:"jobName"`
+		MetricName       string `json:"metricName"`
+		DefaultTimeRange string `json:"defaultTimeRange"`
+		TimeRangeFrom    string `json:"timeRangeFrom"`
+		TimeRangeTo      string `json:"timeRangeTo"`
+		GroupBy          string `json:"groupBy"`
 	}
 )

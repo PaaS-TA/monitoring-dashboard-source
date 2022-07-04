@@ -128,8 +128,8 @@ func (ap *ApContainerController) GetContainerPageOverview(ctx echo.Context) erro
 // GetContainerStatus
 //  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Container 페이지 Overview 정보 가져오기
-//  @Description  Container 페이지의 Overview 정보를 가져온다.
+//  @Summary      Container의 Status 정보 가져오기
+//  @Description  Container의 Status 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Status}
@@ -148,14 +148,154 @@ func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
 // GetCellStatus
 //  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Container 페이지 Overview 정보 가져오기
-//  @Description  Container 페이지의 Overview 정보를 가져온다.
+//  @Summary      Cell(Diego-Cell VM)의 Status 정보 가져오기
+//  @Description  Cell(Diego-Cell VM)의 Status 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
 //  @Router       /api/v1/ap/container/overview [get]
 func (ap *ApContainerController) GetCellStatus(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellStatus()
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerCpuUsages
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container CPU Usages 정보 가져오기
+//  @Description  Container CPU Usages 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerCpuUsages(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerCpuUsages(ctx)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerCpuLoads
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container CPU Loads 정보 가져오기
+//  @Description  Container CPU Loads 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerCpuLoads(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerCpuLoads(ctx)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerMemoryUsages
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container Memory Usages 정보 가져오기
+//  @Description  Container Memory Usages 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerMemoryUsages(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerMemoryUsages(ctx)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerDiskUsages
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container Disk Usages 정보 가져오기
+//  @Description  Container Disk Usages 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerDiskUsages(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerDiskUsages(ctx)
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerNetworkBytes
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container Network Bytes 정보 가져오기
+//  @Description  Container Network Bytes 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerNetworkBytes(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkBytes()
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerNetworkDrops
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container Network Drops 정보 가져오기
+//  @Description  Container Network Drops 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerNetworkDrops(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkDrops()
+	if err != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		return err
+	}
+
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	return nil
+}
+
+// GetContainerNetworkErrors
+//  * Annotations for Swagger *
+//  @tags         AP
+//  @Summary      Container Newtwork Errors 정보 가져오기
+//  @Description  Container Newtwork Errors 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
+//  @Router       /api/v1/ap/container/overview [get]
+func (ap *ApContainerController) GetContainerNetworkErrors(ctx echo.Context) error {
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkErrors()
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
 		return err

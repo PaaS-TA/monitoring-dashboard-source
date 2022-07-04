@@ -116,6 +116,13 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/ap/container/overview", apContainer.GetContainerPageOverview)
 	v1.GET("/ap/container/cell/status", apContainer.GetCellStatus)
 	v1.GET("/ap/container/container/status", apContainer.GetContainerStatus)
+	v1.GET("/ap/container/container/cpu/:id/usages", apContainer.GetContainerCpuUsages)
+	v1.GET("/ap/container/container/cpu/:id/loads", apContainer.GetContainerCpuLoads)
+	v1.GET("/ap/container/container/memory/:id/usages", apContainer.GetContainerMemoryUsages)
+	v1.GET("/ap/container/container/disk/:id/usages", apContainer.GetContainerDiskUsages)
+	v1.GET("/ap/container/container/network/:id/bytes", apContainer.GetContainerNetworkBytes)
+	v1.GET("/ap/container/container/network/:id/drops", apContainer.GetContainerNetworkDrops)
+	v1.GET("/ap/container/container/network/:id/errors", apContainer.GetContainerNetworkErrors)
 
 	// IaaS
 	v1.GET("/iaas/hypervisor/stats", openstackModule.GetHypervisorStatistics)
