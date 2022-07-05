@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/cloudfoundry-community/go-cfclient"
 	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 	"paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"reflect"
+	"strings"
 	"sync"
 )
 
@@ -108,18 +110,19 @@ func (ap *ApContainerDao) GetAppInfo() ([]models.AppInfo, error) {
 }
 
 func (ap *ApContainerDao) GetContainerInfo() ([]models.ContainerInfo, error) {
-	var request models.InfluxDbQueryRequest
+	var request client.Query
 	var response []models.ContainerInfo
 	cells, _ := ap.GetCellInfo()
 
 	// For making appMap that contains Container infos
 	appMap := make(map[string]map[string]string)
 
+	request.Database = ap.InfluxDbClient.DbName.ContainerDatabase
+	sql := "SELECT application_name, application_index, container_interface, value FROM container_metrics " +
+		"WHERE cell_ip = '%s' AND \"name\" = 'load_average' AND container_id <> '/' AND time > NOW() - 2m"
+
 	for _, cell := range cells {
-		request.CellIp = cell.Ip
-		request.Sql = "SELECT application_name, application_index, container_interface, value FROM container_metrics " +
-			"WHERE cell_ip = '%s' AND \"name\" = 'load_average' AND container_id <> '/' AND time > NOW() - 2m"
-		request.Database = ap.InfluxDbClient.DbName.ContainerDatabase
+		request.Command = fmt.Sprintf(sql, cell.Ip)
 		results, _ := ap.getQueryResultsFromInfluxDb(request)
 		values, _ := helpers.InfluxConverterToMap(&results)
 
@@ -241,7 +244,7 @@ func (ap *ApContainerDao) GetContainerStatus() (models.Status, error) {
 }
 
 func (ap *ApContainerDao) GetCellStatus() (models.Status, error) {
-	var request models.InfluxDbQueryRequest
+	var request models.CellMetricQueryRequest
 	var cellsMetricData []models.CellMetricData
 	var status models.StatusByResource
 	var statuses []models.StatusByResource
@@ -302,44 +305,170 @@ func (ap *ApContainerDao) GetCellStatus() (models.Status, error) {
 	return response, nil
 }
 
-func (ap *ApContainerDao) getCellMetricData(request models.InfluxDbQueryRequest) models.CellMetricData {
+func (ap *ApContainerDao) GetContainerCpuUsages(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"cpu_usage_total", "CPU Usages"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
+
+	return response, nil
+}
+
+func (ap *ApContainerDao) GetContainerCpuLoads(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"load_average", "CPU Loads"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
+
+	return response, nil
+}
+
+func (ap *ApContainerDao) GetContainerMemoryUsages(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"memory_usage", "Memory"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
+
+	return response, nil
+}
+
+func (ap *ApContainerDao) GetContainerDiskUsages(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"disk_usage", "Disk"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
+
+	return response, nil
+}
+
+func (ap *ApContainerDao) GetContainerNetworkBytes() (models.Status, error) {
+	var response models.Status
+	return response, nil
+}
+
+func (ap *ApContainerDao) GetContainerNetworkDrops() (models.Status, error) {
+	var response models.Status
+	return response, nil
+}
+
+func (ap *ApContainerDao) GetContainerNetworkErrors() (models.Status, error) {
+	var response models.Status
+	return response, nil
+}
+
+func (ap *ApContainerDao) getCellMetricData(params models.CellMetricQueryRequest) models.CellMetricData {
 	var response models.CellMetricData
+	var request client.Query
 	var cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage client.Response
 	var wg sync.WaitGroup
+
+	request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
 
 	wg.Add(6)
 	for i := 0; i < 6; i++ {
 		go func(index int) {
 			switch index {
 			case 0:
-				request.MetricName = "cpuStats.core"
-				request.Sql = "SELECT value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/ GROUP BY metricname ORDER BY time DESC LIMIT 1"
-				request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
+				metricName := "cpuStats.core"
+				sql := "SELECT value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/ GROUP BY metricname ORDER BY time DESC LIMIT 1"
+				request.Command = fmt.Sprintf(sql, params.CellIp, metricName)
 				cpuCore, _ = ap.getQueryResultsFromInfluxDb(request)
 			case 1:
-				request.MetricName = "cpuStats.core"
-				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/"
-				request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
+				metricName := "cpuStats.core"
+				sql := "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname =~ /%s/"
+				request.Command = fmt.Sprintf(sql, params.CellIp, metricName)
 				cpuUsage, _ = ap.getQueryResultsFromInfluxDb(request)
 			case 2:
-				request.MetricName = "memoryStats.TotalMemory"
-				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-				request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
+				metricName := "memoryStats.TotalMemory"
+				sql := "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				request.Command = fmt.Sprintf(sql, params.CellIp, metricName)
 				memTotal, _ = ap.getQueryResultsFromInfluxDb(request)
 			case 3:
-				request.MetricName = "memoryStats.FreeMemory"
-				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-				request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
+				metricName := "memoryStats.FreeMemory"
+				sql := "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				request.Command = fmt.Sprintf(sql, params.CellIp, metricName)
 				memFree, _ = ap.getQueryResultsFromInfluxDb(request)
 			case 4:
-				request.MetricName = "diskStats./.Total"
-				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-				request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
+				metricName := "diskStats./.Total"
+				sql := "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				request.Command = fmt.Sprintf(sql, params.CellIp, metricName)
 				diskTotal, _ = ap.getQueryResultsFromInfluxDb(request)
 			case 5:
-				request.MetricName = "diskStats./.Usage"
-				request.Sql = "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
-				request.Database = ap.InfluxDbClient.DbName.PaastaDatabase
+				metricName := "diskStats./.Usage"
+				sql := "SELECT MEAN(value) AS value FROM cf_metrics WHERE ip = '%s' AND time > NOW() - 1m AND metricname = '%s'"
+				request.Command = fmt.Sprintf(sql, params.CellIp, metricName)
 				diskUsage, _ = ap.getQueryResultsFromInfluxDb(request)
 			}
 			wg.Done()
@@ -357,31 +486,71 @@ func (ap *ApContainerDao) getCellMetricData(request models.InfluxDbQueryRequest)
 	return response
 }
 
-func (ap *ApContainerDao) getQueryResultsFromInfluxDb(request models.InfluxDbQueryRequest) (_ client.Response, errMsg models.ErrMessage) {
+func (ap *ApContainerDao) getContainerUsageData(params models.ContainerUsageQueryRequest) (client.Response, error) {
+	var request client.Query
+
+	request.Database = ap.InfluxDbClient.DbName.ContainerDatabase
+	sql := "SELECT MEAN(value) AS usage FROM container_metrics WHERE \"name\" = '%s' AND container_interface = '%s' "
+
+	switch params.MetricName {
+	case "cpu_usage_total":
+		sql = "SELECT non_negative_derivative(usage, 30s) / 30000000000 * 100000000000 AS usage FROM (" + sql
+	case "load_average":
+		sql = strings.Replace(sql, "MEAN(value)", "value", 1)
+		sql = "SELECT MEAN(usage) AS usage FROM (" + sql
+	case "memory_usage":
+		sql = strings.Replace(sql, "MEAN(value)", "value / app_mem * 100", 1)
+		sql = "SELECT MEAN(usage) AS usage FROM (" + sql
+	case "disk_usage":
+		sql = strings.Replace(sql, "MEAN(value)", "value / app_disk * 100", 1)
+		sql = "SELECT MEAN(usage) AS usage FROM (" + sql
+	default:
+		sql = strings.Replace(sql, "MEAN(value)", "value / 1024", 1)
+		sql = strings.Replace(sql, "container_interface", "container_id", 1)
+		sql = "SELECT MEAN(usage) AS usage FROM (" + sql
+	}
+
+	switch params.MetricName {
+	case "cpu_usage_total":
+		if params.DefaultTimeRange != "" {
+			sql += "AND time > NOW() - %s GROUP BY time(%s))"
+			request.Command = fmt.Sprintf(sql, params.MetricName, params.ContainerName, params.DefaultTimeRange, params.GroupBy)
+		} else {
+			sql += "AND time > NOW() %s AND time > NOW() - %s GROUP BY time(%s))"
+			request.Command = fmt.Sprintf(sql, params.MetricName, params.ContainerName, params.TimeRangeFrom, params.TimeRangeTo, params.GroupBy)
+		}
+	default:
+		if params.DefaultTimeRange != "" {
+			sql += "AND time > NOW() - %s) WHERE time > NOW() - %s GROUP BY time(%s)"
+			request.Command = fmt.Sprintf(sql, params.MetricName, params.ContainerName, params.DefaultTimeRange, params.DefaultTimeRange, params.GroupBy)
+		} else {
+			sql += "AND time < NOW() - %s AND time > NOW() - %s ) WHERE time < NOW() - %s AND time > NOW() - %s GROUP BY time(%s)"
+			request.Command = fmt.Sprintf(sql, params.MetricName, params.ContainerName, params.TimeRangeFrom, params.TimeRangeTo, params.TimeRangeFrom, params.TimeRangeTo, params.GroupBy)
+		}
+	}
+
+	response, err := ap.getQueryResultsFromInfluxDb(request)
+
+	return response, err
+}
+
+func (ap *ApContainerDao) getQueryResultsFromInfluxDb(request client.Query) (client.Response, error) {
 	var errLogMsg string
-	var query client.Query
 
 	defer func() {
 		if r := recover(); r != nil {
-			errMsg = models.ErrMessage{
+			errMsg := models.ErrMessage{
 				"Message": errLogMsg,
 			}
+			fmt.Println(errMsg)
 		}
 	}()
 
-	// Set query.Command field by condition
-	if request.MetricName != "" {
-		query.Command = fmt.Sprintf(request.Sql, request.CellIp, request.MetricName)
-	} else {
-		query.Command = fmt.Sprintf(request.Sql, request.CellIp)
-	}
-
-	query.Database = request.Database
-
-	response, err := ap.InfluxDbClient.HttpClient.Query(query)
+	response, err := ap.InfluxDbClient.HttpClient.Query(request)
 	if err != nil {
 		errLogMsg = err.Error()
+		return *response, err
 	}
 
-	return *response, errMsg
+	return *response, nil
 }
