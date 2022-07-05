@@ -2,12 +2,15 @@ package caas
 
 import (
 	"github.com/tidwall/gjson"
+	"log"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 )
+
 
 type WorkloadService struct {
 	CaasConfig models.CaasConfig
@@ -127,6 +130,99 @@ func (service *WorkloadService) GetWorkloadContainerList() ([]map[string]interfa
 }
 
 
+var metricTypes = [...]string{"cpu", "memory", "disk"}
+var metricValues = [len(metricTypes)]float64{}
+func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) ([]map[string]interface{}, error) {
+	var result []map[string]interface{}
+
+	runtime.GOMAXPROCS(5)
+	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
+
+	promqlWorkloadList := "count(kube_" + workloadParam + "_metadata_generation)by(namespace," + workloadParam + ")"
+	workloadsByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlWorkloadList) // Retrieve workload list per type
+	workloadArray := gjson.Get(string(workloadsByte), "data.result")
+
+	// cpu, memory, disk 배열 루프
+	for _, metricType := range metricTypes {
+
+		seriesMap := make(map[string]interface{})
+		var seriesDataArr []map[string]interface{}
+
+		// 워크로드 배열 루프
+		for workloadIdx, workload := range workloadArray.Array() {
+			itemMap := workload.Get("metric")
+			var namespace string
+			var workloadOrPod string
+			if strings.Compare(workloadParam, "daemonset") == 0 {
+				workloadOrPod = itemMap.Get("pod").String()
+				namespace = ""
+			} else {
+				workloadOrPod = itemMap.Get(workloadParam).String()
+				namespace = itemMap.Get("namespace").String()
+			}
+
+			promQLStr := makePromQLScriptForWorkloadMetrics(metricType, namespace, workloadOrPod, fromToTimeParmameter)
+			metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+promQLStr) // Retrieve workload's metric data
+			metricsResult := gjson.Get(string(metricsBytes), "data.result.0.values")
+
+			for metricsIdx, item := range metricsResult.Array() {
+				timestamp := item.Get("0").String()
+				usage := item.Get("1").Float()
+
+				var itemMap map[string]interface{}
+				if workloadIdx == 0 {
+					itemMap = make(map[string]interface{})
+					itemMap["time"] = timestamp
+					itemMap["usage"] = usage
+					seriesDataArr = append(seriesDataArr, itemMap)
+				} else {
+					itemMap = seriesDataArr[metricsIdx]
+
+					prevUsage := itemMap["usage"].(float64)
+					itemMap["usage"] = prevUsage + usage
+				}
+			}
+		}
+		seriesMap["name"] = metricType
+		seriesMap["metric"] = seriesDataArr
+
+		result = append(result, seriesMap)
+
+	}
+	log.Printf("result : %v\n", result)
+	return result, nil
+}
+
+
+func makePromQLScriptForWorkloadMetrics(metricType string, namespace string, pod string, timeCondition string) string {
+	var promQLStr string
+	var promQLLabel string
+	var promQLCondition string
+
+	switch metricType {
+	case "cpu":
+		promQLLabel = "container_cpu_usage_seconds_total"
+		break
+	case "memory":
+		promQLLabel = "container_memory_working_set_bytes"
+		break
+	case "disk":
+		promQLLabel = "container_fs_usage_bytes"
+		break
+	}
+
+	promQLCondition = "{container!='POD',image!='',"
+	if len(namespace) > 0 {
+		promQLCondition += "namespace='" + namespace + "',pod=~'" + pod + "-.*'}"
+	} else {
+		promQLCondition += "pod='" + pod + "'}"
+	}
+	promQLStr = "sum(" + promQLLabel + promQLCondition + ")" + timeCondition
+	//log.Printf("promQL script : %v\n", promQLStr)
+
+	return promQLStr
+}
+
 
 func getWorkloadMetrics(url string, workloadNameParam string) map[string]interface{} {
 	result := make(map[string]interface{})
@@ -196,5 +292,5 @@ func getWorkloadMetrics(url string, workloadNameParam string) map[string]interfa
 	result["disk"] = diskUse
 	result["diskUsage"] = diskUsage
 
-	return result;
+	return result
 }
