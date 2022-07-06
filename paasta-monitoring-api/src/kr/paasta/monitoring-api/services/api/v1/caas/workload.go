@@ -95,7 +95,7 @@ func (service *WorkloadService) GetWorkloadStatus() ([]map[string]interface{}, e
 }
 
 
-func (service *WorkloadService) GetWorkloadContainerList() ([]map[string]interface{}, error) {
+func (service *WorkloadService) GetWorkloadList() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
 	var waitGroup sync.WaitGroup
@@ -162,7 +162,7 @@ func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) (
 			}
 
 			promQLStr := makePromQLScriptForWorkloadMetrics(metricType, namespace, workloadOrPod, fromToTimeParmameter)
-			metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+promQLStr) // Retrieve workload's metric data
+			metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+promQLStr)  // Retrieve workload's metric data
 			metricsResult := gjson.Get(string(metricsBytes), "data.result.0.values")
 
 			for metricsIdx, item := range metricsResult.Array() {
@@ -191,6 +191,165 @@ func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) (
 	}
 	log.Printf("result : %v\n", result)
 	return result, nil
+}
+
+
+func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) ([]map[string]interface{}, error) {
+	var containerList []map[string]interface{}
+
+	promqlWorkloadList := "count(kube_" + workloadParam + "_metadata_generation)by(namespace," + workloadParam + ")"
+	workloadsByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlWorkloadList) // Retrieve workload list per type
+	workloadArray := gjson.Get(string(workloadsByte), "data.result")
+
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(len(workloadArray.Array()))
+
+	for _, item := range workloadArray.Array() {
+		workload := item.Get("metric." + workloadParam).String()
+		namespace := item.Get("metric.namespace").String()
+
+		// TODO: Retrieve container list in workload
+		promqlContainerList := "count(kube_pod_container_info{namespace='" + namespace + "',pod=~'" + workload + "-.*'})by(namespace,pod,container)"
+		containersByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlContainerList) // Retrieve container list in workload
+		containerArray := gjson.Get(string(containersByte), "data.result")
+
+		for _, container := range containerArray.Array() {
+			containerMap := make(map[string]interface{})
+			podName := container.Get("metric.pod").String()
+			containerName := container.Get("metric.container").String()
+			containerMap["namespace"] = namespace
+			containerMap["pod"] = podName
+			containerMap["container"] = containerName
+			containerList = append(containerList, containerMap)
+		}
+	}
+
+	var cpuUseList []map[string]interface{}
+	promqlCpuUse := "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod,container)"
+	cpuUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlCpuUse) // Retrieve container list in workload
+	cpuUseArray := gjson.Get(string(cpuUseByte), "data.result")
+	for _, item := range cpuUseArray.Array() {
+		cpuUseMap := make(map[string]interface{})
+		namespace := item.Get("metric.namespace").String()
+		podName := item.Get("metric.pod").String()
+		containerName := item.Get("metric.container").String()
+		value := item.Get("value.1").Float()
+		cpuUseMap["namespace"] = namespace
+		cpuUseMap["pod"] = podName
+		cpuUseMap["container"] = containerName
+		cpuUseMap["value"] = value
+		cpuUseList = append(cpuUseList, cpuUseMap)
+	}
+
+	var cpuUsageList []map[string]interface{}
+	promqlCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!=''}[5m])*100)by(namespace,pod,container)"
+	cpuUsageByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlCpuUsage) // Retrieve container list in workload
+	cpuUsageArray := gjson.Get(string(cpuUsageByte), "data.result")
+	for _, item := range cpuUsageArray.Array() {
+		cpuUsageMap := make(map[string]interface{})
+		namespace := item.Get("metric.namespace").String()
+		podName := item.Get("metric.pod").String()
+		containerName := item.Get("metric.container").String()
+		value := item.Get("value.1").Float()
+		cpuUsageMap["namespace"] = namespace
+		cpuUsageMap["pod"] = podName
+		cpuUsageMap["container"] = containerName
+		cpuUsageMap["value"] = value
+		cpuUsageList = append(cpuUsageList, cpuUsageMap)
+	}
+
+	var memoryUseList []map[string]interface{}
+	promqlMemoryUse := "sum(container_memory_working_set_bytes{container!='POD',image!=''})by(namespace,pod,container)/1024/1024"
+	memoryUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlMemoryUse) // Retrieve container list in workload
+	memoryUseArray := gjson.Get(string(memoryUseByte), "data.result")
+	for _, item := range memoryUseArray.Array() {
+		memoryUseMap := make(map[string]interface{})
+		namespace := item.Get("metric.namespace").String()
+		podName := item.Get("metric.pod").String()
+		containerName := item.Get("metric.container").String()
+		value := item.Get("value.1").Float()
+		memoryUseMap["namespace"] = namespace
+		memoryUseMap["pod"] = podName
+		memoryUseMap["container"] = containerName
+		memoryUseMap["value"] = value
+		memoryUseList = append(memoryUseList, memoryUseMap)
+	}
+
+	var memoryUsageList []map[string]interface{}
+	promqlMemoryUsage := "avg(container_memory_working_set_bytes{container!='POD',image!=''})by(namespace,pod,container)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
+	memoryUsageByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlMemoryUsage) // Retrieve container list in workload
+	memoryUsageArray := gjson.Get(string(memoryUsageByte), "data.result")
+	for _, item := range memoryUsageArray.Array() {
+		memoryUsageMap := make(map[string]interface{})
+		namespace := item.Get("metric.namespace").String()
+		podName := item.Get("metric.pod").String()
+		containerName := item.Get("metric.container").String()
+		value := item.Get("value.1").Float()
+		memoryUsageMap["namespace"] = namespace
+		memoryUsageMap["pod"] = podName
+		memoryUsageMap["container"] = containerName
+		memoryUsageMap["value"] = value
+		memoryUsageList = append(memoryUsageList, memoryUsageMap)
+	}
+
+	var diskUseList []map[string]interface{}
+	promqlDiskUse := "sum(container_fs_usage_bytes{container!='POD',image!=''})by(namespace,pod,container)/1024/1024"
+	diskUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlDiskUse) // Retrieve container list in workload
+	diskUseArray := gjson.Get(string(diskUseByte), "data.result")
+	for _, item := range diskUseArray.Array() {
+		diskUseMap := make(map[string]interface{})
+		namespace := item.Get("metric.namespace").String()
+		podName := item.Get("metric.pod").String()
+		containerName := item.Get("metric.container").String()
+		value := item.Get("value.1").Float()
+		diskUseMap["namespace"] = namespace
+		diskUseMap["pod"] = podName
+		diskUseMap["container"] = containerName
+		diskUseMap["value"] = value
+		diskUseList = append(diskUseList, diskUseMap)
+	}
+
+	for _, containerMap := range containerList {
+		namespace := containerMap["namespace"].(string)
+		pod := containerMap["pod"].(string)
+		container := containerMap["container"].(string)
+		for _, cpuUseMap := range cpuUseList {
+			if (strings.Compare(namespace, cpuUseMap["namespace"].(string)) == 0) &&
+				(strings.Compare(pod, cpuUseMap["pod"].(string)) == 0) &&
+					(strings.Compare(container, cpuUseMap["container"].(string)) == 0) {
+				containerMap["cpu"] = cpuUseMap["value"].(float64)
+			}
+		}
+		for _, cpuUsage := range cpuUsageList {
+			if (strings.Compare(namespace, cpuUsage["namespace"].(string)) == 0) &&
+				(strings.Compare(pod, cpuUsage["pod"].(string)) == 0) &&
+				(strings.Compare(container, cpuUsage["container"].(string)) == 0) {
+				containerMap["cpuUsage"] = cpuUsage["value"].(float64)
+			}
+		}
+		for _, memoryUseMap := range memoryUseList {
+			if (strings.Compare(namespace, memoryUseMap["namespace"].(string)) == 0) &&
+				(strings.Compare(pod, memoryUseMap["pod"].(string)) == 0) &&
+				(strings.Compare(container, memoryUseMap["container"].(string)) == 0) {
+				containerMap["memory"] = memoryUseMap["value"].(float64)
+			}
+		}
+		for _, memoryUsageMap := range memoryUsageList {
+			if (strings.Compare(namespace, memoryUsageMap["namespace"].(string)) == 0) &&
+				(strings.Compare(pod, memoryUsageMap["pod"].(string)) == 0) &&
+				(strings.Compare(container, memoryUsageMap["container"].(string)) == 0) {
+				containerMap["memoryUsage"] = memoryUsageMap["value"].(float64)
+			}
+		}
+		for _, diskUseMap := range diskUseList {
+			if (strings.Compare(namespace, diskUseMap["namespace"].(string)) == 0) &&
+				(strings.Compare(pod, diskUseMap["pod"].(string)) == 0) &&
+				(strings.Compare(container, diskUseMap["container"].(string)) == 0) {
+				containerMap["disk"] = diskUseMap["value"].(float64)
+			}
+		}
+	}
+	return containerList, nil
 }
 
 
