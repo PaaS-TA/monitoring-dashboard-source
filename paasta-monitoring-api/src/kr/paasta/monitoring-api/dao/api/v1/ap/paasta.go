@@ -35,6 +35,36 @@ func (p *PaastaDao) GetPaastaInfoList() ([]models.Paasta, error) {
 	return response, results.Error
 }
 
+func (p *PaastaDao) GetPaastaCfMetrics(ip string) (*client.Response, models.ErrMessage) {
+	var errLogMsg string
+	var errMsg models.ErrMessage
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg = models.ErrMessage{
+				"Message": errLogMsg,
+			}
+		}
+	}()
+
+	sql := "select time, id, ip, metricname, origin, value from cf_metrics " +
+		"where time > now() - 2m and ip = '%s' group by metricname order by time desc limit 1"
+
+	var q client.Query
+	q = client.Query{
+		Command:  fmt.Sprintf(sql, ip),
+		Database: p.InfluxDbClient.DbName.PaastaDatabase,
+	}
+
+	resp, err := p.InfluxDbClient.HttpClient.Query(q)
+	if err != nil {
+		errLogMsg = err.Error()
+		return resp, errMsg
+	}
+	fmt.Println("GetPaastaCfMetrics resp======>", resp)
+
+	return resp, nil
+}
+
 func (p *PaastaDao) GetPaastaSummary(boshSummary models.BoshSummary) (*client.Response, models.ErrMessage) {
 	var errLogMsg string
 	var errMsg models.ErrMessage
@@ -81,239 +111,68 @@ func (p *PaastaDao) GetPaastaProcessByMemory(paastaProcess models.PaastaProcess)
 	return resp, err
 }
 
-func (p *PaastaDao) GetPaastaCpuUsageList(boshChart models.BoshChart) (*client.Response, error) {
-	cpuUsageSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname =~ /%s/ "
-
-	if boshChart.DefaultTimeRange != "" {
-		cpuUsageSql += " and time > now() - %s  group by time(%s);"
-		cpuUsageSql = fmt.Sprintf(cpuUsageSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-
-	} else {
-		cpuUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		cpuUsageSql = fmt.Sprintf(cpuUsageSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
+func (p *PaastaDao) GetPaastaCommonUsageByTime(paastaChart models.PaastaChart) (*client.Response, error) {
+	field := "mean(value)"
+	if paastaChart.IsNonNegativeDerivative {
+		field = fmt.Sprintf("non_negative_derivative(%s)", field)
 	}
-	fmt.Println("GetBoshCpuUsageList Sql======>", cpuUsageSql)
-
-	q := client.Query{
-		Command:  cpuUsageSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
+	if paastaChart.IsRespondKb {
+		field = field + "/1024"
 	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
+
+	sql := "select %s as usage from cf_metrics where id = '%s' and metricname = '%s'"
+	if paastaChart.IsLikeQuery {
+		sql = strings.Replace(sql, "metricname = '%s'", "metricname =~ /%s/", 1)
 	}
-	fmt.Println("GetBoshCpuUsageList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaCpuLoadList(boshChart models.BoshChart) (*client.Response, error) {
-	cpuLoadSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-
-	if boshChart.DefaultTimeRange != "" {
-		cpuLoadSql += " and time > now() - %s  group by time(%s);"
-		cpuLoadSql = fmt.Sprintf(cpuLoadSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-	} else {
-		cpuLoadSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		cpuLoadSql = fmt.Sprintf(cpuLoadSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
-	}
-	fmt.Println("GetBoshCpuLoadList Sql======>", cpuLoadSql)
-
-	q := client.Query{
-		Command:  cpuLoadSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	fmt.Println("GetBoshCpuLoadList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaMemoryUsageList(boshChart models.BoshChart) (*client.Response, error) {
-	totalMemorySql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = 'memoryStats.TotalMemory'"
-	freeMemorySql := "select mean(value) as memUsage from bosh_metrics  where id = '%s' and metricname = 'memoryStats.FreeMemory'"
-	var Sql string
 
 	var q client.Query
-	if boshChart.DefaultTimeRange != "" {
-		totalMemorySql += " and time > now() - %s  group by time(%s);"
-		freeMemorySql += " and time > now() - %s  group by time(%s);"
-		Sql = fmt.Sprintf(totalMemorySql+freeMemorySql,
-			boshChart.UUID, boshChart.DefaultTimeRange, boshChart.GroupBy,
-			boshChart.UUID, boshChart.DefaultTimeRange, boshChart.GroupBy)
+	if paastaChart.DefaultTimeRange != "" {
+		sql += " and time > now() - %s group by time(%s)"
+		q = client.Query{
+			Command:  fmt.Sprintf(sql, field, paastaChart.UUID, paastaChart.MetricName, paastaChart.DefaultTimeRange, paastaChart.GroupBy),
+			Database: p.InfluxDbClient.DbName.PaastaDatabase,
+		}
 	} else {
-		totalMemorySql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		freeMemorySql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		Sql = fmt.Sprintf(totalMemorySql+freeMemorySql,
-			boshChart.UUID, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy,
-			boshChart.UUID, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
+		sql += " and time < now() - %s and time > now() - %s group by time(%s)"
+		q = client.Query{
+			Command:  fmt.Sprintf(sql, field, paastaChart.UUID, paastaChart.MetricName, paastaChart.TimeRangeFrom, paastaChart.TimeRangeTo, paastaChart.GroupBy),
+			Database: p.InfluxDbClient.DbName.PaastaDatabase,
+		}
 	}
 
-	q = client.Query{
-		Command:  Sql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
+	response, err := p.InfluxDbClient.HttpClient.Query(q)
+	if err != nil {
+		return response, err
 	}
-	fmt.Println("GetBoshMemUsageList Sql======>", q)
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-
-	return resp, err
+	return response, err
 }
 
-func (p *PaastaDao) GetPaastaDiskUsageList(boshChart models.BoshChart) (*client.Response, error) {
-	boshDiskUsageSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-
-	if boshChart.DefaultTimeRange != "" {
-		boshDiskUsageSql += " and time > now() - %s  group by time(%s);"
-		boshDiskUsageSql = fmt.Sprintf(boshDiskUsageSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
+func (p *PaastaDao) GetPaastaMemoryUsage(paastaChart models.PaastaChart) (*client.Response, error) {
+	memoryTotalSql := "select mean(value) as usage from cf_metrics where id = '%s' and metricname = '%s' "
+	memoryFreeSql := "select mean(value) as usage from cf_metrics where id = '%s' and metricname = '%s' "
+	var q client.Query
+	if paastaChart.DefaultTimeRange != "" {
+		memoryTotalSql += " and time > now() - %s group by time(%s);"
+		memoryFreeSql += " and time > now() - %s group by time(%s);"
+		q = client.Query{
+			Command: fmt.Sprintf(memoryTotalSql+memoryFreeSql,
+				paastaChart.UUID, models.METRIC_NAME_TOTAL_MEMORY, paastaChart.DefaultTimeRange, paastaChart.GroupBy,
+				paastaChart.UUID, models.METRIC_NAME_FREE_MEMORY, paastaChart.DefaultTimeRange, paastaChart.GroupBy),
+			Database: p.InfluxDbClient.DbName.PaastaDatabase,
+		}
 	} else {
-		boshDiskUsageSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		boshDiskUsageSql = fmt.Sprintf(boshDiskUsageSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
+		memoryTotalSql += " and time < now() - %s and time > now() - %s group by time(%s);"
+		memoryFreeSql += " and time < now() - %s and time > now() - %s group by time(%s);"
+		q = client.Query{
+			Command: fmt.Sprintf(memoryTotalSql+memoryFreeSql,
+				paastaChart.UUID, models.METRIC_NAME_TOTAL_MEMORY, paastaChart.TimeRangeFrom, paastaChart.TimeRangeTo, paastaChart.GroupBy,
+				paastaChart.UUID, models.METRIC_NAME_FREE_MEMORY, paastaChart.TimeRangeFrom, paastaChart.TimeRangeTo, paastaChart.GroupBy),
+			Database: p.InfluxDbClient.DbName.PaastaDatabase,
+		}
 	}
-	fmt.Println("GetBoshCpuLoadList Sql======>", boshDiskUsageSql)
-
-	q := client.Query{
-		Command:  boshDiskUsageSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
+	response, err := p.InfluxDbClient.HttpClient.Query(q)
 	if err != nil {
-		return resp, err
+		return response, err
 	}
-	fmt.Println("GetBoshCpuLoadList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaDiskIoList(boshChart models.BoshChart) (*client.Response, error) {
-	boshDiskIoSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-	boshDiskIoSql = strings.Replace(boshDiskIoSql, "mean(value)", "non_negative_derivative(mean(value),1m)/1024", 1)
-	boshDiskIoSql = strings.Replace(boshDiskIoSql, "metricname = '%s'", "metricname =~ /%s/", 1)
-
-	if boshChart.DefaultTimeRange != "" {
-		boshDiskIoSql += " and time > now() - %s  group by time(%s);"
-		boshDiskIoSql = fmt.Sprintf(boshDiskIoSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-	} else {
-		boshDiskIoSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		boshDiskIoSql = fmt.Sprintf(boshDiskIoSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
-	}
-	fmt.Println("GetBoshNetworkPacketList Sql======>", boshDiskIoSql)
-
-	q := client.Query{
-		Command:  boshDiskIoSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	fmt.Println("GetBoshNetworkPacketList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaNetworkByteList(boshChart models.BoshChart) (*client.Response, error) {
-	boshNetworkByteSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-	boshNetworkByteSql = strings.Replace(boshNetworkByteSql, "mean(value)", "non_negative_derivative(mean(value))/1024", 1)
-
-	if boshChart.DefaultTimeRange != "" {
-		boshNetworkByteSql += " and time > now() - %s  group by time(%s);"
-		boshNetworkByteSql = fmt.Sprintf(boshNetworkByteSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-	} else {
-		boshNetworkByteSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		boshNetworkByteSql = fmt.Sprintf(boshNetworkByteSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
-	}
-	fmt.Println("GetBoshNetworkPacketList Sql======>", boshNetworkByteSql)
-
-	q := client.Query{
-		Command:  boshNetworkByteSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	fmt.Println("GetBoshNetworkPacketList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaNetworkPacketList(boshChart models.BoshChart) (*client.Response, error) {
-	boshNetworkPacketSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-	boshNetworkPacketSql = strings.Replace(boshNetworkPacketSql, "mean(value)", "non_negative_derivative(mean(value))", 1)
-
-	if boshChart.DefaultTimeRange != "" {
-		boshNetworkPacketSql += " and time > now() - %s  group by time(%s);"
-		boshNetworkPacketSql = fmt.Sprintf(boshNetworkPacketSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-	} else {
-		boshNetworkPacketSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		boshNetworkPacketSql = fmt.Sprintf(boshNetworkPacketSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
-	}
-	fmt.Println("GetBoshNetworkPacketList Sql======>", boshNetworkPacketSql)
-
-	q := client.Query{
-		Command:  boshNetworkPacketSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	fmt.Println("GetBoshNetworkPacketList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaNetworkDropList(boshChart models.BoshChart) (*client.Response, error) {
-	boshNetworkDropSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-	boshNetworkDropSql = strings.Replace(boshNetworkDropSql, "mean(value)", "non_negative_derivative(sum(value))", 1)
-
-	if boshChart.DefaultTimeRange != "" {
-		boshNetworkDropSql += " and time > now() - %s  group by time(%s);"
-		boshNetworkDropSql = fmt.Sprintf(boshNetworkDropSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-	} else {
-		boshNetworkDropSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		boshNetworkDropSql = fmt.Sprintf(boshNetworkDropSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
-	}
-	fmt.Println("GetBoshNetworkDropList Sql======>", boshNetworkDropSql)
-
-	q := client.Query{
-		Command:  boshNetworkDropSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	fmt.Println("GetBoshNetworkDropList resp======>", resp)
-
-	return resp, err
-}
-
-func (p *PaastaDao) GetPaastaNetworkErrorList(boshChart models.BoshChart) (*client.Response, error) {
-	boshNetworkErrorSql := "select mean(value) as usage from bosh_metrics where id = '%s' and metricname = '%s' "
-	boshNetworkErrorSql = strings.Replace(boshNetworkErrorSql, "mean(value)", "non_negative_derivative(sum(value))", 1)
-
-	if boshChart.DefaultTimeRange != "" {
-		boshNetworkErrorSql += " and time > now() - %s  group by time(%s);"
-		boshNetworkErrorSql = fmt.Sprintf(boshNetworkErrorSql, boshChart.UUID, boshChart.MetricName, boshChart.DefaultTimeRange, boshChart.GroupBy)
-	} else {
-		boshNetworkErrorSql += " and time < now() - %s and time > now() - %s  group by time(%s);"
-		boshNetworkErrorSql = fmt.Sprintf(boshNetworkErrorSql, boshChart.UUID, boshChart.MetricName, boshChart.TimeRangeFrom, boshChart.TimeRangeTo, boshChart.GroupBy)
-	}
-	fmt.Println("GetBoshNetworkErrorList Sql======>", boshNetworkErrorSql)
-
-	q := client.Query{
-		Command:  boshNetworkErrorSql,
-		Database: p.InfluxDbClient.DbName.BoshDatabase,
-	}
-	resp, err := p.InfluxDbClient.HttpClient.Query(q)
-	if err != nil {
-		return resp, err
-	}
-	fmt.Println("GetBoshNetworkErrorList resp======>", resp)
-
-	return resp, err
+	return response, err
 }

@@ -3,7 +3,6 @@ package ap
 import (
 	"encoding/json"
 	"fmt"
-	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
@@ -12,6 +11,7 @@ import (
 	models "paasta-monitoring-api/models/api/v1"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -29,7 +29,6 @@ func GetApPaastaService(DbInfo *gorm.DB, InfluxDbClient models.InfluxDbClient) *
 }
 
 func (p *ApPaastaService) GetPaastaInfoList() ([]models.Paasta, error) {
-	// after Use Database
 	results, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaInfoList()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -39,267 +38,184 @@ func (p *ApPaastaService) GetPaastaInfoList() ([]models.Paasta, error) {
 	return results, nil
 }
 
-func (p *ApPaastaService) GetPaastaOverview(c echo.Context) (models.BoshOverview, error) {
-	var result models.BoshOverview
-	boshSummary, err := p.GetPaastaSummary(c)
+func (p *ApPaastaService) GetPaastaOverview(c echo.Context) (models.PaastaOverview, error) {
+	var paastaOverview models.PaastaOverview
+	var paastaRequest models.PaastaRequest
+	paastaSummary, err := p.GetPaastaSummary(paastaRequest)
 	if err != nil {
 		fmt.Println(err.Error())
-		return result, err
+		return paastaOverview, err
 	}
 
-	// bosh overview
-	totalCnt, failedCnt, criticalCnt, warningCnt := len(boshSummary), 0, 0, 0
-	for _, value := range boshSummary {
-		if value.BoshSummaryMetric.BoshState == models.BOSH_STATE_FAIL {
-			failedCnt++
-		} else if value.BoshSummaryMetric.BoshState == models.ALARM_LEVEL_CRITICAL {
-			criticalCnt++
-		} else if value.BoshSummaryMetric.BoshState == models.ALARM_LEVEL_WARNING {
-			warningCnt++
+	// paasta overview
+	var overviewTotal, overviewFailed, overviewCritical, overviewWarning = len(paastaSummary), 0, 0, 0
+	for _, value := range paastaSummary {
+		if value.PaastaSummaryMetric.CpuState == models.STATE_FAILED || value.PaastaSummaryMetric.MemoryState == models.STATE_FAILED || value.PaastaSummaryMetric.DiskState == models.STATE_FAILED {
+			overviewFailed++
+		} else if value.PaastaSummaryMetric.CpuState == models.STATE_CRITICAL || value.PaastaSummaryMetric.MemoryState == models.STATE_CRITICAL || value.PaastaSummaryMetric.DiskState == models.STATE_CRITICAL {
+			overviewCritical++
+		} else if value.PaastaSummaryMetric.CpuState == models.STATE_WARNING || value.PaastaSummaryMetric.MemoryState == models.STATE_WARNING || value.PaastaSummaryMetric.DiskState == models.STATE_WARNING {
+			overviewWarning++
 		}
 	}
-	result.Total = strconv.Itoa(totalCnt)
-	result.Running = strconv.Itoa(totalCnt - failedCnt - criticalCnt - warningCnt)
-	result.Failed = strconv.Itoa(failedCnt)
-	result.Critical = strconv.Itoa(criticalCnt)
-	result.Warning = strconv.Itoa(warningCnt)
+	paastaOverview.Total = strconv.Itoa(overviewTotal)
+	paastaOverview.Failed = strconv.Itoa(overviewFailed)
+	paastaOverview.Critical = strconv.Itoa(overviewCritical)
+	paastaOverview.Warning = strconv.Itoa(overviewWarning)
+	paastaOverview.Running = strconv.Itoa(overviewTotal - overviewFailed - overviewCritical - overviewWarning)
 
-	return result, nil
+	return paastaOverview, nil
 }
 
-func (p *ApPaastaService) GetPaastaSummary(c echo.Context) ([]models.BoshSummary, error) {
-	var results []models.BoshSummary
-	//var errs []models.ErrMessage
-	//var resultsResponse map[string]interface{}
+func (p *ApPaastaService) GetPaastaSummary(paastaRequest models.PaastaRequest) ([]models.PaastaSummary, error) {
+	var results []models.PaastaSummary
+
+	var overviewTotal = 0
+	var thresholdWarningCpu, thresholdCriticalCpu float64 = 0, 0
+	var thresholdWarningMemory, thresholdCriticalMemory float64 = 0, 0
+	var thresholdWarningDisk, thresholdCriticalDisk float64 = 0, 0
 
 	//임계치 설정정보를 조회한다.
 	var params models.AlarmPolicies
-	serverThresholds, err := Common.GetAlarmPolicyDao(p.DbInfo).GetAlarmPolicy(params)
+	policies, err := Common.GetAlarmPolicyDao(p.DbInfo).GetAlarmPolicy(params)
+	for _, v := range policies {
+		if models.ORIGIN_TYPE_PAAS == v.OriginType {
+			switch v.AlarmType {
+			case models.ALARM_TYPE_CPU:
+				thresholdWarningCpu = float64(v.WarningThreshold)
+				thresholdCriticalCpu = float64(v.CriticalThreshold)
+			case models.ALARM_TYPE_MEMORY:
+				thresholdWarningMemory = float64(v.WarningThreshold)
+				thresholdCriticalMemory = float64(v.CriticalThreshold)
+			case models.ALARM_TYPE_DISK:
+				thresholdWarningDisk = float64(v.WarningThreshold)
+				thresholdCriticalDisk = float64(v.CriticalThreshold)
+			}
+		}
+	}
 	if err != nil {
 		fmt.Println(err.Error())
 		return results, err
 	}
-	fmt.Println(serverThresholds)
+	fmt.Println(policies)
 
-	/*for _, boshInfo := range p.BoshInfoList {
-		var boshSummary models.BoshSummary
-		boshSummary.Name = boshInfo.Name
-		boshSummary.Ip = boshInfo.Ip
-		boshSummary.UUID = boshInfo.UUID
-		cpuCoreData, cpuData, memTotData, memFreeData, diskTotalData, diskUsedData, diskDataTotalData, diskDataUsedData, errs := p.GetPaastaSummaryMetric(boshSummary)
-		fmt.Println(resultsResponse)
-		fmt.Println(errs)
+	vms, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaInfoList()
+	if err != nil {
+		fmt.Println(err.Error())
+		return results, err
+	}
+	overviewTotal = len(vms)
+	paasVms := make([]models.PaastaSummary, overviewTotal)
+	conditionalPaasVms := make([]models.PaastaSummary, 0, overviewTotal)
 
-		cpuUsage := helpers.GetDataFloatFromInterfaceSingle(cpuData)
-		memTot := helpers.GetDataFloatFromInterfaceSingle(memTotData)
-		memFree := helpers.GetDataFloatFromInterfaceSingle(memFreeData)
-		memUsage := helpers.RoundFloatDigit2(100 - ((memFree / memTot) * 100))
-		diskTotal := helpers.GetDataFloatFromInterfaceSingle(diskTotalData)
-		diskUsed := helpers.GetDataFloatFromInterfaceSingle(diskUsedData)
-		diskUsage := 100 - ((diskTotal - diskUsed) / diskTotal * 100)
+	for vmIdx, vmValue := range vms {
 
-		diskDataTotal := helpers.GetDataFloatFromInterfaceSingle(diskDataTotalData)
-		diskDataUsed := helpers.GetDataFloatFromInterfaceSingle(diskDataUsedData)
-		diskDataUsage := 100 - ((diskDataTotal - diskDataUsed) / diskDataTotal * 100)
+		paasVms[vmIdx].Name = vmValue.Name
+		paasVms[vmIdx].Address = vmValue.Ip
+		paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_RUNNING
 
-		var boshSummaryMetric models.BoshSummaryMetric
-		boshSummaryMetric.Core = strconv.Itoa(len(cpuCoreData))
-		boshSummaryMetric.CpuUsage = helpers.RoundFloat(cpuUsage, 2)
-		boshSummaryMetric.TotalMemory = memTot / models.MB
-		boshSummaryMetric.MemoryUsage = memUsage
-		boshSummaryMetric.TotalDisk = diskTotal / models.MB
-		boshSummaryMetric.DataDisk = diskDataTotal / models.MB
+		resp, _ := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCfMetrics(vmValue.Ip)
 
-		if boshSummaryMetric.Core == "0" || boshSummaryMetric.TotalMemory == 0 {
-			boshSummaryMetric.State, boshSummaryMetric.BoshState, boshSummaryMetric.CpuErrStat, boshSummaryMetric.MemErrStat = models.BOSH_STATE_FAIL, models.BOSH_STATE_FAIL, models.BOSH_STATE_FAIL, models.BOSH_STATE_FAIL
+		result, _ := helpers.InfluxConverter(resp)
+
+		for _, data := range result {
+
+			switch data.(type) {
+			case []map[string]interface{}:
+				dataMap := data.([]map[string]interface{})
+
+				core := 0
+				var sumCpuUsed float64 = 0
+				var memoryTotal int64 = 0
+				var memoryFree int64 = 0
+				var wg sync.WaitGroup
+				wg.Add(len(dataMap))
+				for _, v := range dataMap {
+					go func(wg *sync.WaitGroup, metric map[string]interface{}) {
+						defer wg.Done()
+
+						switch metric["metricname"] {
+						case models.METRIC_NAME_TOTAL_MEMORY:
+							memoryTotal, _ = metric["value"].(json.Number).Int64()
+							paasVms[vmIdx].PaastaSummaryMetric.TotalMemory = memoryTotal / models.MB
+							paasVms[vmIdx].UUID = metric["id"].(string)
+						case models.METRIC_NAME_FREE_MEMORY:
+							memoryFree, _ = metric["value"].(json.Number).Int64()
+						case models.METRIC_NAME_TOTAL_DISK_ROOT:
+							value, _ := metric["value"].(json.Number).Int64()
+							paasVms[vmIdx].PaastaSummaryMetric.TotalDisk = value / models.MB
+						case models.METRIC_NAME_TOTAL_DISK_VCAP:
+							value, _ := metric["value"].(json.Number).Int64()
+							paasVms[vmIdx].PaastaSummaryMetric.DataDisk = value / models.MB
+						case models.METRIC_NAME_DISK_ROOT_USAGE:
+							paasVms[vmIdx].PaastaSummaryMetric.TotalDiskUsage, _ = metric["value"].(json.Number).Float64()
+							if paasVms[vmIdx].PaastaSummaryMetric.TotalDiskUsage > thresholdCriticalDisk {
+								paasVms[vmIdx].PaastaSummaryMetric.TotalDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_CRITICAL, models.STATE_CRITICAL, models.STATE_CRITICAL
+							} else if paasVms[vmIdx].PaastaSummaryMetric.TotalDiskUsage > thresholdWarningDisk {
+								paasVms[vmIdx].PaastaSummaryMetric.TotalDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_WARNING, models.STATE_WARNING, models.STATE_WARNING
+							} else if paasVms[vmIdx].PaastaSummaryMetric.TotalDiskUsage == 0 {
+								paasVms[vmIdx].PaastaSummaryMetric.TotalDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_FAILED, models.STATE_FAILED, models.STATE_FAILED
+							} else {
+								paasVms[vmIdx].PaastaSummaryMetric.TotalDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState = models.DISK_STATE_NORMAL, models.DISK_STATE_NORMAL
+							}
+						case models.METRIC_NAME_DISK_VCAP_USAGE:
+							paasVms[vmIdx].PaastaSummaryMetric.DataDiskUsage, _ = metric["value"].(json.Number).Float64()
+							if paasVms[vmIdx].PaastaSummaryMetric.DataDiskUsage > thresholdCriticalDisk {
+								paasVms[vmIdx].PaastaSummaryMetric.DataDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_CRITICAL, models.STATE_CRITICAL, models.STATE_CRITICAL
+							} else if paasVms[vmIdx].PaastaSummaryMetric.DataDiskUsage > thresholdWarningDisk {
+								paasVms[vmIdx].PaastaSummaryMetric.DataDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_WARNING, models.STATE_WARNING, models.STATE_WARNING
+							} else if paasVms[vmIdx].PaastaSummaryMetric.DataDiskUsage == 0 {
+								paasVms[vmIdx].PaastaSummaryMetric.DataDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_FAILED, models.STATE_FAILED, models.STATE_FAILED
+							} else {
+								paasVms[vmIdx].PaastaSummaryMetric.DataDiskState, paasVms[vmIdx].PaastaSummaryMetric.DiskState = models.DISK_STATE_NORMAL, models.DISK_STATE_NORMAL
+							}
+						default:
+							if strings.Contains(metric["metricname"].(string), models.METRIC_NAME_CPU_CORE_PREFIX) {
+								core++
+								value, _ := metric["value"].(json.Number).Float64()
+								sumCpuUsed += value
+							}
+						}
+					}(&wg, v)
+				}
+				wg.Wait()
+
+				paasVms[vmIdx].PaastaSummaryMetric.MemoryUsage = 100.0 - (float64(memoryFree) / float64(memoryTotal) * 100.0)
+				if paasVms[vmIdx].PaastaSummaryMetric.MemoryUsage > thresholdCriticalMemory {
+					paasVms[vmIdx].PaastaSummaryMetric.MemoryState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_CRITICAL, models.STATE_CRITICAL
+				} else if paasVms[vmIdx].PaastaSummaryMetric.MemoryUsage > thresholdWarningMemory {
+					paasVms[vmIdx].PaastaSummaryMetric.MemoryState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_WARNING, models.STATE_WARNING
+				} else if paasVms[vmIdx].PaastaSummaryMetric.MemoryUsage == 0 {
+					paasVms[vmIdx].PaastaSummaryMetric.MemoryState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_FAILED, models.STATE_FAILED
+				} else {
+					paasVms[vmIdx].PaastaSummaryMetric.MemoryState = models.STATE_RUNNING
+				}
+
+				paasVms[vmIdx].PaastaSummaryMetric.Core = strconv.Itoa(core)
+				if core > 0 {
+					paasVms[vmIdx].PaastaSummaryMetric.CpuUsage = sumCpuUsed / float64(core)
+					if paasVms[vmIdx].PaastaSummaryMetric.CpuUsage > thresholdCriticalCpu {
+						paasVms[vmIdx].PaastaSummaryMetric.CpuState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_CRITICAL, models.STATE_CRITICAL
+					} else if paasVms[vmIdx].PaastaSummaryMetric.CpuUsage > thresholdWarningCpu {
+						paasVms[vmIdx].PaastaSummaryMetric.CpuState, paasVms[vmIdx].PaastaSummaryMetric.State = models.STATE_WARNING, models.STATE_WARNING
+					} else {
+						paasVms[vmIdx].PaastaSummaryMetric.CpuState = models.STATE_RUNNING
+					}
+				}
+
+				results = append(results, paasVms[vmIdx])
+			}
 		}
 
-		if boshSummaryMetric.TotalDisk == 0 || boshSummaryMetric.DataDisk == 0 {
-			boshSummaryMetric.DiskStatus, boshSummaryMetric.BoshState, boshSummaryMetric.DiskRootErrStat, boshSummaryMetric.DiskDataErrStat = models.BOSH_STATE_FAIL, models.BOSH_STATE_FAIL, models.BOSH_STATE_FAIL, models.BOSH_STATE_FAIL
+		/* conditional search */
+		if (paastaRequest.Ip != "" && strings.Contains(paasVms[vmIdx].Address, paastaRequest.Ip)) ||
+			(paastaRequest.Name != "" && strings.Contains(paasVms[vmIdx].Name, paastaRequest.Name) ||
+				paastaRequest.Status != "" && paasVms[vmIdx].PaastaSummaryMetric.State == paastaRequest.Status) {
+			conditionalPaasVms = append(conditionalPaasVms, paasVms[vmIdx])
 		}
-
-		// bosh state setting
-		if boshSummaryMetric.State != models.BOSH_STATE_FAIL {
-			var alarmStatus []string
-
-			cpuStatus := helpers.GetAlarmStatusByServiceName(models.ORIGIN_TYPE_BOSH, models.ALARM_TYPE_CPU, boshSummaryMetric.CpuUsage, serverThresholds)
-			memStatus := helpers.GetAlarmStatusByServiceName(models.ORIGIN_TYPE_BOSH, models.ALARM_TYPE_MEMORY, boshSummaryMetric.MemoryUsage, serverThresholds)
-
-			if cpuStatus != "" {
-				alarmStatus = append(alarmStatus, cpuStatus)
-				boshSummaryMetric.CpuErrStat = cpuStatus
-			} else {
-				boshSummaryMetric.CpuErrStat = models.BOSH_STATE_RUNNING
-			}
-			if memStatus != "" {
-				alarmStatus = append(alarmStatus, memStatus)
-				boshSummaryMetric.MemErrStat = memStatus
-			} else {
-				boshSummaryMetric.MemErrStat = models.BOSH_STATE_RUNNING
-			}
-
-			state := helpers.GetMaxAlarmLevel(alarmStatus)
-			if state == "" {
-				boshSummaryMetric.State = models.BOSH_STATE_RUNNING
-			} else {
-				boshSummaryMetric.State = state
-			}
-		}
-
-		// bosh diskStatus setting
-		if boshSummaryMetric.DiskStatus != models.BOSH_STATE_FAIL {
-			var diskStatusList []string
-			diskStatus := helpers.GetAlarmStatusByServiceName(models.ORIGIN_TYPE_BOSH, models.ALARM_TYPE_DISK, diskUsage, serverThresholds)
-			if diskStatus != "" {
-				diskStatusList = append(diskStatusList, diskStatus)
-				boshSummaryMetric.DiskRootErrStat = diskStatus
-			} else {
-				boshSummaryMetric.DiskRootErrStat = models.BOSH_STATE_NORMAL
-			}
-
-			diskDataStatus := helpers.GetAlarmStatusByServiceName(models.ORIGIN_TYPE_BOSH, models.ALARM_TYPE_DISK, diskDataUsage, serverThresholds)
-			if diskDataStatus != "" {
-				diskStatusList = append(diskStatusList, diskDataStatus)
-				boshSummaryMetric.DiskDataErrStat = diskDataStatus
-			} else {
-				boshSummaryMetric.DiskDataErrStat = models.BOSH_STATE_NORMAL
-			}
-
-			diskState := helpers.GetMaxAlarmLevel(diskStatusList)
-			if diskState == "" {
-				boshSummaryMetric.DiskStatus = models.BOSH_STATE_NORMAL
-			} else {
-				boshSummaryMetric.DiskStatus = diskState
-			}
-		}
-
-		if boshSummaryMetric.State == models.BOSH_STATE_RUNNING && boshSummaryMetric.DiskStatus == models.BOSH_STATE_NORMAL {
-			boshSummaryMetric.BoshState = models.BOSH_STATE_RUNNING
-		} else if boshSummaryMetric.BoshState != models.BOSH_STATE_FAIL {
-			var boshStatusList []string
-			boshStatusList = append(boshStatusList, boshSummaryMetric.State)
-			if boshSummaryMetric.DiskStatus == models.BOSH_STATE_NORMAL {
-				boshStatusList = append(boshStatusList, models.BOSH_STATE_RUNNING)
-			} else {
-				boshStatusList = append(boshStatusList, boshSummaryMetric.DiskStatus)
-			}
-			boshSummaryMetric.BoshState = helpers.GetMaxAlarmLevel(boshStatusList)
-			boshSummaryMetric.State = boshSummaryMetric.BoshState
-		}
-
-		boshSummary.BoshSummaryMetric = boshSummaryMetric
-		results = append(results, boshSummary)
-	}*/
+	}
 
 	return results, nil
-}
-
-func (p *ApPaastaService) GetPaastaSummaryMetric(boshSummary models.BoshSummary) ([]map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, map[string]interface{}, []models.ErrMessage) {
-	var cpuResp, cpuCoreResp, memTotalResp, memFreeResp, diskTotalResp, diskUsedResp, diskDataTotalResp, diskDataUsedResp *client.Response
-	var errs []models.ErrMessage
-	//var err models.ErrMessage
-	var wg sync.WaitGroup
-
-	wg.Add(8)
-	/*for i := 0; i < 8; i++ {
-		go func(wg *sync.WaitGroup, index int) {
-			switch index {
-			case 0:
-				boshSummary.MetricName = models.MTR_CPU_CORE
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select value from bosh_metrics where id = '%s' and time > now() - %s and metricname =~ /%s/ group by metricname order by time desc limit 1;"
-				cpuCoreResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 1:
-				boshSummary.MetricName = models.MTR_CPU_CORE
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname =~ /%s/ ;"
-				cpuResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 2:
-				boshSummary.MetricName = models.MTR_MEM_TOTAL
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				memTotalResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 3:
-				boshSummary.MetricName = models.MTR_MEM_FREE
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				memFreeResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 4:
-				boshSummary.MetricName = models.MTR_DISK_TOTAL
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskTotalResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 5:
-				boshSummary.MetricName = models.MTR_DISK_USED
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskUsedResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 6:
-				boshSummary.MetricName = models.MTR_DISK_DATA_TOTAL
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskDataTotalResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			case 7:
-				boshSummary.MetricName = models.MTR_DISK_DATA_USED
-				boshSummary.Time = "1m"
-				boshSummary.SqlQuery = "select mean(value) as value from bosh_metrics where id = '%s' and time > now() - %s and metricname = '%s' ;"
-				diskDataUsedResp, err = dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshSummary(boshSummary)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			default:
-				break
-			}
-			wg.Done()
-		}(&wg, i)
-	}*/
-	wg.Wait()
-
-	//==========================================================================
-	// Error가 여러건일 경우 대해 고려해야함.
-	if len(errs) > 0 {
-		/*var returnErrMessage string
-		for _, err := range errs {
-			returnErrMessage = returnErrMessage + " " + err["Message"].(string)
-		}
-		errMessage := models.ErrMessage{
-			"Message": returnErrMessage,
-		}*/
-		return nil, nil, nil, nil, nil, nil, nil, nil, errs
-	}
-	//==========================================================================
-
-	cpuCore, _ := helpers.InfluxConverterToMap(cpuCoreResp)
-	memTotal, _ := helpers.InfluxConverter(memTotalResp)
-	memFree, _ := helpers.InfluxConverter(memFreeResp)
-	diskTotal, _ := helpers.InfluxConverter(diskTotalResp)
-	cpuUsage, _ := helpers.InfluxConverter(cpuResp)
-	diskUsage, _ := helpers.InfluxConverter(diskUsedResp)
-	diskDataTotal, _ := helpers.InfluxConverter(diskDataTotalResp)
-	diskDataUsage, _ := helpers.InfluxConverter(diskDataUsedResp)
-
-	return cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage, diskDataTotal, diskDataUsage, nil
 }
 
 func (p *ApPaastaService) GetPaastaProcessByMemory(paastaProcess models.PaastaProcess) ([]models.PaastaProcess, error) {
@@ -348,111 +264,121 @@ func (p *ApPaastaService) GetPaastaProcessByMemory(paastaProcess models.PaastaPr
 	return results, nil
 }
 
-func (p *ApPaastaService) GetPaastaChart(boshChart models.BoshChart) ([]models.BoshChart, error) {
-	var results []models.BoshChart
+func (p *ApPaastaService) GetPaastaChart(paastaChart models.PaastaChart) (models.PaastaChart, error) {
+	var results models.PaastaChart
 
-	/*for _, boshInfo := range p.BoshInfoList {
-		boshChart.MetricName = models.MTR_CPU_CORE
-		cpuUsageResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshCpuUsageList(boshChart)
-		boshChart.MetricName = models.MTR_CPU_LOAD_1M
-		cpuLoad1MResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshCpuLoadList(boshChart)
-		boshChart.MetricName = models.MTR_CPU_LOAD_5M
-		cpuLoad5MResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshCpuLoadList(boshChart)
-		boshChart.MetricName = models.MTR_CPU_LOAD_15M
-		cpuLoad15MResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshCpuLoadList(boshChart)
+	// CPU
 
-		boshChart.MetricName = models.MTR_MEM_USAGE
-		memoryUsageResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshMemoryUsageList(boshChart)
+	paastaChart.MetricName = models.METRIC_NAME_CPU_CORE_PREFIX
+	paastaChart.IsLikeQuery = true
+	cpuUsageResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_CPU_LOAD_AVG_01_MIN
+	cpuLoad1MResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_CPU_LOAD_AVG_05_MIN
+	cpuLoad5MResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_CPU_LOAD_AVG_15_MIN
+	cpuLoad15MResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
 
-		boshChart.MetricName = models.MTR_DISK_USAGE
-		diskUsageRootResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshDiskUsageList(boshChart)
-		boshChart.MetricName = models.MTR_DISK_DATA_USAGE
-		diskUsageVcapDataResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshDiskUsageList(boshChart)
+	// Memory
+	//paastaChart.MetricName = models.MTR_MEM_USAGE
+	memoryUsageResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaMemoryUsage(paastaChart)
 
-		boshChart.MetricName = "diskIOStats.\\/\\..*.readBytes"
-		diskIoRootReadByteList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshDiskIoList(boshChart)
-		boshChart.MetricName = "diskIOStats.\\/\\..*.writeBytes"
-		diskIoRootWriteByteList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshDiskIoList(boshChart)
-		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.readBytes"
-		diskIoVcapReadByteList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshDiskIoList(boshChart)
-		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.writeBytes"
-		diskIoVcapWriteByteList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshDiskIoList(boshChart)
+	// Disk
 
-		boshChart.MetricName = "networkIOStats.eth0.bytesSent"
-		networkByteSentList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkByteList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.bytesRecv"
-		networkByteRecvList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkByteList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.packetSent"
-		networkPacketSentList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkPacketList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.packetRecv"
-		networkPacketRecvList, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkPacketList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.dropIn"
-		networkDropInResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkDropList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.dropOut"
-		networkDropOutResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkDropList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.errIn"
-		networkErrorInResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkErrorList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.errOut"
-		networkErrorOutResp, err := dao.GetBoshDao(p.DbInfo, p.InfluxDbClient).GetBoshNetworkErrorList(boshChart)
-		if err != nil {
-			fmt.Println(err.Error())
-			return results, err
-		}
-		fmt.Println(boshInfo)
+	paastaChart.IsLikeQuery = false
+	paastaChart.MetricName = models.METRIC_NAME_DISK_ROOT_USAGE
+	diskUsageRootResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_DISK_VCAP_USAGE
+	diskUsageVcapDataResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.IsLikeQuery = true
+	paastaChart.IsRespondKb = true
+	paastaChart.IsNonNegativeDerivative = true
+	paastaChart.MetricName = models.METRIC_NAME_DISK_IO_ROOT_READ_BYTES
+	diskIoRootReadByteResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_DISK_IO_ROOT_WRITE_BYTES
+	diskIoRootWriteByteResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_DISK_IO_VCAP_READ_BYTES
+	diskIoVcapReadByteResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NAME_DISK_IO_VCAP_WRITE_BYTES
+	diskIoVcapWriteByteResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
 
-		cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResp, models.RESP_DATA_CPU_NAME)
-		cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResp, models.RESP_DATA_LOAD_1M_NAME)
-		cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResp, models.RESP_DATA_LOAD_5M_NAME)
-		cpuLoad15M, _ := helpers.InfluxConverterList(cpuLoad15MResp, models.RESP_DATA_LOAD_5M_NAME)
-		memoryUsage, _ := helpers.InfluxConverter4Usage(memoryUsageResp, models.MTR_MEM_USAGE)
-		diskRootUsage, _ := helpers.InfluxConverterList(diskUsageRootResp, models.MTR_MEM_USAGE)
-		diskVcapDataUsage, _ := helpers.InfluxConverterList(diskUsageVcapDataResp, models.MTR_MEM_USAGE)
+	// Network
 
-		diskIoRootReadByte, _ := helpers.InfluxConverterList(diskIoRootReadByteList, "/-read")
-		diskIoRootWriteByte, _ := helpers.InfluxConverterList(diskIoRootWriteByteList, "/-write")
-		diskIoVcapReadByte, _ := helpers.InfluxConverterList(diskIoVcapReadByteList, "data-read")
-		diskIoVcapWriteByte, _ := helpers.InfluxConverterList(diskIoVcapWriteByteList, "data-write")
+	paastaChart.IsLikeQuery = false
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_BYTES_SENT
+	networkByteSentResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_BYTES_RECV
+	networkByteRecvResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_BYTES_SENT
+	networkPacketSentResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_BYTES_RECV
+	networkPacketRecvResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_DROP_IN
+	networkDropInResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_DROP_OUT
+	networkDropOutResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_ERR_IN
+	networkErrorInResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
+	paastaChart.MetricName = models.METRIC_NETWORK_IO_ERR_OUT
+	networkErrorOutResponse, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaCommonUsageByTime(paastaChart)
 
-		networkByteSent, _ := helpers.InfluxConverterList(networkByteSentList, "sent")
-		networkByteRecv, _ := helpers.InfluxConverterList(networkByteRecvList, "recv")
-		networkPacketSent, _ := helpers.InfluxConverterList(networkPacketSentList, "in")
-		networkPacketRecv, _ := helpers.InfluxConverterList(networkPacketRecvList, "out")
-		networkDropIn, _ := helpers.InfluxConverterList(networkDropInResp, "in")
-		networkDropOut, _ := helpers.InfluxConverterList(networkDropOutResp, "out")
-		networkErrorIn, _ := helpers.InfluxConverterList(networkErrorInResp, "in")
-		networkErrorOut, _ := helpers.InfluxConverterList(networkErrorOutResp, "out")
+	// CPU
 
-		MetricData := map[string]interface{}{
-			"cpuUsage":            cpuUsage,
-			"cpuLoad1M":           cpuLoad1M,
-			"cpuLoad5M":           cpuLoad5M,
-			"cpuLoad15M":          cpuLoad15M,
-			"memoryUsage":         memoryUsage,
-			"diskRootUsage":       diskRootUsage,
-			"diskVcapDataUsage":   diskVcapDataUsage,
-			"diskIoRootReadByte":  diskIoRootReadByte,
-			"diskIoRootWriteByte": diskIoRootWriteByte,
-			"diskIoVcapReadByte":  diskIoVcapReadByte,
-			"diskIoVcapWriteByte": diskIoVcapWriteByte,
-			"networkByteSent":     networkByteSent,
-			"networkByteRecv":     networkByteRecv,
-			"networkPacketSent":   networkPacketSent,
-			"networkPacketRecv":   networkPacketRecv,
-			"networkDropIn":       networkDropIn,
-			"networkDropOut":      networkDropOut,
-			"networkErrorIn":      networkErrorIn,
-			"networkErrorOut":     networkErrorOut,
-		}
+	cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResponse, models.RESP_DATA_CPU_NAME)
+	cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResponse, models.RESP_DATA_LOAD_1M_NAME)
+	cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResponse, models.RESP_DATA_LOAD_5M_NAME)
+	cpuLoad15M, _ := helpers.InfluxConverterList(cpuLoad15MResponse, models.RESP_DATA_LOAD_5M_NAME)
 
-		var resultBoshChart models.BoshChart
-		resultBoshChart.UUID = boshChart.UUID
-		resultBoshChart.DefaultTimeRange = boshChart.DefaultTimeRange
-		resultBoshChart.TimeRangeFrom = boshChart.TimeRangeFrom
-		resultBoshChart.TimeRangeTo = boshChart.TimeRangeTo
-		resultBoshChart.GroupBy = boshChart.GroupBy
-		resultBoshChart.MetricData = MetricData
-		results = append(results, resultBoshChart)
-	}*/
+	// Memory
+	memoryUsage, _ := helpers.InfluxConverter4Usage(memoryUsageResponse, models.MTR_MEM_USAGE)
 
-	return results, nil
+	// Disk
+
+	diskRootUsage, _ := helpers.InfluxConverterList(diskUsageRootResponse, models.MTR_MEM_USAGE)
+	diskVcapDataUsage, _ := helpers.InfluxConverterList(diskUsageVcapDataResponse, models.MTR_MEM_USAGE)
+	diskIoRootReadByteUsage, _ := helpers.InfluxConverterList(diskIoRootReadByteResponse, "/-read")
+	diskIoRootWriteByteUsage, _ := helpers.InfluxConverterList(diskIoRootWriteByteResponse, "/-write")
+	diskIoVcapReadByteUsage, _ := helpers.InfluxConverterList(diskIoVcapReadByteResponse, "data-read")
+	diskIoVcapWriteByteUsage, _ := helpers.InfluxConverterList(diskIoVcapWriteByteResponse, "data-write")
+
+	// Network
+
+	networkByteSent, _ := helpers.InfluxConverterList(networkByteSentResponse, "sent")
+	networkByteRecv, _ := helpers.InfluxConverterList(networkByteRecvResponse, "recv")
+	networkPacketSent, _ := helpers.InfluxConverterList(networkPacketSentResponse, "in")
+	networkPacketRecv, _ := helpers.InfluxConverterList(networkPacketRecvResponse, "out")
+	networkDropIn, _ := helpers.InfluxConverterList(networkDropInResponse, "in")
+	networkDropOut, _ := helpers.InfluxConverterList(networkDropOutResponse, "out")
+	networkErrorIn, _ := helpers.InfluxConverterList(networkErrorInResponse, "in")
+	networkErrorOut, _ := helpers.InfluxConverterList(networkErrorOutResponse, "out")
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return results, err
+	}
+
+	MetricData := map[string]interface{}{
+		"cpuUsage":                 cpuUsage,
+		"cpuLoad1M":                cpuLoad1M,
+		"cpuLoad5M":                cpuLoad5M,
+		"cpuLoad15M":               cpuLoad15M,
+		"memoryUsage":              memoryUsage,
+		"diskRootUsage":            diskRootUsage,
+		"diskVcapDataUsage":        diskVcapDataUsage,
+		"diskIoRootReadByteUsage":  diskIoRootReadByteUsage,
+		"diskIoRootWriteByteUsage": diskIoRootWriteByteUsage,
+		"diskIoVcapReadByteUsage":  diskIoVcapReadByteUsage,
+		"diskIoVcapWriteByteUsage": diskIoVcapWriteByteUsage,
+		"networkByteSent":          networkByteSent,
+		"networkByteRecv":          networkByteRecv,
+		"networkPacketSent":        networkPacketSent,
+		"networkPacketRecv":        networkPacketRecv,
+		"networkDropIn":            networkDropIn,
+		"networkDropOut":           networkDropOut,
+		"networkErrorIn":           networkErrorIn,
+		"networkErrorOut":          networkErrorOut,
+	}
+	paastaChart.MetricData = MetricData
+
+	return paastaChart, nil
 }

@@ -58,7 +58,7 @@ func (p *PaastaController) GetPaastaOverview(c echo.Context) (err error) {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Overview", results)
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Paasta Overview", results)
 	return nil
 }
 
@@ -72,7 +72,8 @@ func (p *PaastaController) GetPaastaOverview(c echo.Context) (err error) {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaSummary}
 //  @Router       /api/v1/ap/paasta/summary [get]
 func (p *PaastaController) GetPaastaSummary(c echo.Context) (err error) {
-	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaSummary(c)
+	var paastaRequest models.PaastaRequest
+	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaSummary(paastaRequest)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
@@ -120,18 +121,18 @@ func (p *PaastaController) GetPaastaProcessByMemory(c echo.Context) (err error) 
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaChart}
 //  @Router       /api/v1/paasta/Chart [get]
 func (p *PaastaController) GetPaastaChart(c echo.Context) (err error) {
-	var boshChart models.BoshChart
-	boshChart.UUID = c.Param("uuid")
-	boshChart.DefaultTimeRange = c.QueryParam("defaultTimeRange")
-	boshChart.TimeRangeFrom = c.QueryParam("timeRangeFrom")
-	boshChart.TimeRangeTo = c.QueryParam("timeRangeTo")
-	boshChart.GroupBy = c.QueryParam("groupBy")
+	var paastaChart models.PaastaChart
+	paastaChart.UUID = c.Param("uuid")
+	paastaChart.DefaultTimeRange = c.QueryParam("defaultTimeRange")
+	paastaChart.TimeRangeFrom = c.QueryParam("timeRangeFrom")
+	paastaChart.TimeRangeTo = c.QueryParam("timeRangeTo")
+	paastaChart.GroupBy = c.QueryParam("groupBy")
 
-	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaChart(boshChart)
+	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaChart(paastaChart)
 	if err != nil {
 		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Chart", results)
+	apiHelpers.Respond(c, http.StatusOK, "Success to get Paasta Chart", results)
 	return nil
 }
