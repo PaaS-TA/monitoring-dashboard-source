@@ -70,11 +70,26 @@ func (controller *WorkloadController) GetWorkloadContainerList(ctx echo.Context)
 	return nil
 }
 
-func (controller *WorkloadController) GetContainerStatus(ctx echo.Context) error {
+func (controller *WorkloadController) GetContainerMetrics(ctx echo.Context) error {
 	namespace := ctx.QueryParam("namespace")
 	container := ctx.QueryParam("container")
 	pod := ctx.QueryParam("pod")
-	results, err := service.GetWorkloadService(controller.CaasConfig).GetContainerStatus(namespace, container, pod)
+	results, err := service.GetWorkloadService(controller.CaasConfig).GetContainerMetrics(namespace, container, pod)
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", results)
+	}
+	return nil
+}
+
+func (controller *WorkloadController) GetContainerLog(ctx echo.Context) error {
+	namespace := ctx.QueryParam("namespace")
+	container := ctx.QueryParam("container")
+	pod := ctx.QueryParam("pod")
+	results, err := service.GetWorkloadService(controller.CaasConfig).GetContainerLog(namespace, container, pod)
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())

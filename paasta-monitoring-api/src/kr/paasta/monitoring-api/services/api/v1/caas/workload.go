@@ -26,13 +26,13 @@ func GetWorkloadService(config models.CaasConfig) *WorkloadService{
 func (service *WorkloadService) GetWorkloadStatus() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
-	deploymentTotalResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_TOTAL)
+	deploymentTotalResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_TOTAL, "")
 	deploymentTotal := gjson.Get(string(deploymentTotalResult), "data.result.0.value.1").String()
-	deploymentActiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_AVAILABLE)
+	deploymentActiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_AVAILABLE, "")
 	deploymentActive := gjson.Get(string(deploymentActiveResult), "data.result.0.value.1").String()
-	deploymentInactiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_UNAVAILABLE)
+	deploymentInactiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_UNAVAILABLE, "")
 	deploymentInactive := gjson.Get(string(deploymentInactiveResult), "data.result.0.value.1").String()
-	deploymentUpdatedResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_UPDATED)
+	deploymentUpdatedResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_UPDATED, "")
 	deploymentUpdated := gjson.Get(string(deploymentUpdatedResult), "data.result.0.value.1").String()
 	deploymentMap := make(map[string]interface{})
 	deploymentMap["name"] = "Deployment"
@@ -41,13 +41,13 @@ func (service *WorkloadService) GetWorkloadStatus() ([]map[string]interface{}, e
 	deploymentMap["unavailable"] = deploymentInactive
 	deploymentMap["updated"] = deploymentUpdated
 
-	statefulsetTotalResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_TOTAL)
+	statefulsetTotalResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_TOTAL, "")
 	statefulsetTotal := gjson.Get(string(statefulsetTotalResult), "data.result.0.value.1").String()
-	statefulsetActiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_AVAILABLE)
+	statefulsetActiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_AVAILABLE, "")
 	statefulsetActive := gjson.Get(string(statefulsetActiveResult), "data.result.0.value.1").String()
-	statefulsetInactiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_UNAVAILABLE)
+	statefulsetInactiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_UNAVAILABLE, "")
 	statefulsetInactive := gjson.Get(string(statefulsetInactiveResult), "data.result.0.value.1").String()
-	statefulsetUpdatedResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_UPDATED)
+	statefulsetUpdatedResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_UPDATED, "")
 	statefulsetUpdated := gjson.Get(string(statefulsetUpdatedResult), "data.result.0.value.1").String()
 	statefulsetMap := make(map[string]interface{})
 	statefulsetMap["name"] = "Stateful"
@@ -56,13 +56,13 @@ func (service *WorkloadService) GetWorkloadStatus() ([]map[string]interface{}, e
 	statefulsetMap["unavailable"] = statefulsetInactive
 	statefulsetMap["updated"] = statefulsetUpdated
 
-	daemonsetReadyResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_READY)
+	daemonsetReadyResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_READY, "")
 	daemonsetReady := gjson.Get(string(daemonsetReadyResult), "data.result.0.value.1").String()
-	daemonsetActiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_AVAILABLE)
+	daemonsetActiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_AVAILABLE, "")
 	daemonsetActive := gjson.Get(string(daemonsetActiveResult), "data.result.0.value.1").String()
-	daemonsetInactiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_UNAVAILABLE)
+	daemonsetInactiveResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_UNAVAILABLE, "")
 	daemonsetInactive := gjson.Get(string(daemonsetInactiveResult), "data.result.0.value.1").String()
-	daemonsetMisscheduleResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_MISSCHEDULED)
+	daemonsetMisscheduleResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_MISSCHEDULED, "")
 	daemonsetMisschedule := gjson.Get(string(daemonsetMisscheduleResult), "data.result.0.value.1").String()
 	daemonsetMap := make(map[string]interface{})
 	daemonsetMap["name"] = "DaemonSet"
@@ -71,13 +71,13 @@ func (service *WorkloadService) GetWorkloadStatus() ([]map[string]interface{}, e
 	daemonsetMap["unavailable"] = daemonsetInactive
 	daemonsetMap["misscheduled"] = daemonsetMisschedule
 
-	podcontainerReadyResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_READY)
+	podcontainerReadyResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_READY, "")
 	podcontainerReady := gjson.Get(string(podcontainerReadyResult), "data.result.0.value.1").String()
-	podcontainerRunningResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_RUNNING)
+	podcontainerRunningResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_RUNNING, "")
 	podcontainerRunning := gjson.Get(string(podcontainerRunningResult), "data.result.0.value.1").String()
-	podcontainerRestatsResult, _ := 	helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_RESTARTS)
+	podcontainerRestatsResult, _ := 	helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_RESTARTS, "")
 	podcontainerRestarts := gjson.Get(string(podcontainerRestatsResult), "data.result.0.value.1").String()
-	podcontainerTerminateResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_TERMINATE)
+	podcontainerTerminateResult, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_TERMINATE, "")
 	podcontainerTerminate := gjson.Get(string(podcontainerTerminateResult), "data.result.0.value.1").String()
 	podcontainerMap := make(map[string]interface{})
 	podcontainerMap["name"] = "Pod"
@@ -139,7 +139,7 @@ func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) (
 	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
 
 	promqlWorkloadList := "count(kube_" + workloadParam + "_metadata_generation)by(namespace," + workloadParam + ")"
-	workloadsByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlWorkloadList) // Retrieve workload list per type
+	workloadsByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlWorkloadList, "") // Retrieve workload list per type
 	workloadArray := gjson.Get(string(workloadsByte), "data.result")
 
 	// cpu, memory, disk 배열 루프
@@ -162,7 +162,7 @@ func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) (
 			}
 
 			promQLStr := makePromQLScriptForWorkloadMetrics(metricType, namespace, workloadOrPod, fromToTimeParmameter)
-			metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+promQLStr)  // Retrieve workload's metric data
+			metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+promQLStr, "")  // Retrieve workload's metric data
 			metricsResult := gjson.Get(string(metricsBytes), "data.result.0.values")
 
 			for metricsIdx, item := range metricsResult.Array() {
@@ -198,7 +198,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 	var containerList []map[string]interface{}
 
 	promqlWorkloadList := "count(kube_" + workloadParam + "_metadata_generation)by(namespace," + workloadParam + ")"
-	workloadsByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlWorkloadList) // Retrieve workload list per type
+	workloadsByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlWorkloadList, "") // Retrieve workload list per type
 	workloadArray := gjson.Get(string(workloadsByte), "data.result")
 
 	var waitGroup sync.WaitGroup
@@ -210,7 +210,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 		// TODO: Retrieve container list in workload
 		promqlContainerList := "count(kube_pod_container_info{namespace='" + namespace + "',pod=~'" + workload + "-.*'})by(namespace,pod,container)"
-		containersByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlContainerList) // Retrieve container list in workload
+		containersByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlContainerList, "") // Retrieve container list in workload
 		containerArray := gjson.Get(string(containersByte), "data.result")
 
 		for _, container := range containerArray.Array() {
@@ -226,7 +226,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 	var cpuUseList []map[string]interface{}
 	promqlCpuUse := "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod,container)"
-	cpuUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlCpuUse) // Retrieve container list in workload
+	cpuUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlCpuUse, "") // Retrieve container list in workload
 	cpuUseArray := gjson.Get(string(cpuUseByte), "data.result")
 	for _, item := range cpuUseArray.Array() {
 		cpuUseMap := make(map[string]interface{})
@@ -243,7 +243,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 	var cpuUsageList []map[string]interface{}
 	promqlCpuUsage := "sum(rate(container_cpu_usage_seconds_total{container!='POD',image!=''}[5m])*100)by(namespace,pod,container)"
-	cpuUsageByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlCpuUsage) // Retrieve container list in workload
+	cpuUsageByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlCpuUsage, "") // Retrieve container list in workload
 	cpuUsageArray := gjson.Get(string(cpuUsageByte), "data.result")
 	for _, item := range cpuUsageArray.Array() {
 		cpuUsageMap := make(map[string]interface{})
@@ -260,7 +260,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 	var memoryUseList []map[string]interface{}
 	promqlMemoryUse := "sum(container_memory_working_set_bytes{container!='POD',image!=''})by(namespace,pod,container)/1024/1024"
-	memoryUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlMemoryUse) // Retrieve container list in workload
+	memoryUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlMemoryUse, "") // Retrieve container list in workload
 	memoryUseArray := gjson.Get(string(memoryUseByte), "data.result")
 	for _, item := range memoryUseArray.Array() {
 		memoryUseMap := make(map[string]interface{})
@@ -277,7 +277,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 	var memoryUsageList []map[string]interface{}
 	promqlMemoryUsage := "avg(container_memory_working_set_bytes{container!='POD',image!=''})by(namespace,pod,container)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
-	memoryUsageByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlMemoryUsage) // Retrieve container list in workload
+	memoryUsageByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlMemoryUsage, "") // Retrieve container list in workload
 	memoryUsageArray := gjson.Get(string(memoryUsageByte), "data.result")
 	for _, item := range memoryUsageArray.Array() {
 		memoryUsageMap := make(map[string]interface{})
@@ -294,7 +294,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 	var diskUseList []map[string]interface{}
 	promqlDiskUse := "sum(container_fs_usage_bytes{container!='POD',image!=''})by(namespace,pod,container)/1024/1024"
-	diskUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlDiskUse) // Retrieve container list in workload
+	diskUseByte, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query", "query="+promqlDiskUse, "") // Retrieve container list in workload
 	diskUseArray := gjson.Get(string(diskUseByte), "data.result")
 	for _, item := range diskUseArray.Array() {
 		diskUseMap := make(map[string]interface{})
@@ -353,7 +353,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 }
 
 
-func (service *WorkloadService) GetContainerStatus(namespace string, container string, pod string) ([]map[string]interface{}, error) {
+func (service *WorkloadService) GetContainerMetrics(namespace string, container string, pod string) ([]map[string]interface{}, error) {
 	var resultList []map[string]interface{}
 
 	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
@@ -361,7 +361,8 @@ func (service *WorkloadService) GetContainerStatus(namespace string, container s
 	pqMemoryUsage := "sum(container_memory_working_set_bytes{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
 	pqDiskUsage := "sum(container_fs_usage_bytes{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
 
-	metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqCpuUsage)  // Retrieve workload's metric data
+	// CPU
+	metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqCpuUsage, "")  // Retrieve workload's metric data
 	metricsResult := gjson.Get(string(metricsBytes), "data.result.0.values")
 	var seriesDataArr []map[string]interface{}
 	for _, item := range metricsResult.Array() {
@@ -380,7 +381,8 @@ func (service *WorkloadService) GetContainerStatus(namespace string, container s
 	resultList = append(resultList, cpuMetricsMap)
 	seriesDataArr = nil
 
-	metricsBytes, _ = helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqMemoryUsage)  // Retrieve workload's metric data
+	// Memory
+	metricsBytes, _ = helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqMemoryUsage, "")  // Retrieve workload's metric data
 	metricsResult = gjson.Get(string(metricsBytes), "data.result.0.values")
 	for _, item := range metricsResult.Array() {
 		timestamp := item.Get("0").String()
@@ -397,8 +399,9 @@ func (service *WorkloadService) GetContainerStatus(namespace string, container s
 	memoryMetricsMap["metric"] = seriesDataArr
 	resultList = append(resultList, memoryMetricsMap)
 	seriesDataArr = nil
-	
-	metricsBytes, _ = helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqDiskUsage)  // Retrieve workload's metric data
+
+	// Disk
+	metricsBytes, _ = helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqDiskUsage, "")  // Retrieve workload's metric data
 	metricsResult = gjson.Get(string(metricsBytes), "data.result.0.values")
 	for _, item := range metricsResult.Array() {
 		timestamp := item.Get("0").String()
@@ -417,6 +420,19 @@ func (service *WorkloadService) GetContainerStatus(namespace string, container s
 
 	return resultList, nil
 }
+
+
+
+func (service *WorkloadService) GetContainerLog(namespace string, container string, pod string) (string, error) {
+	k8sLogUrl := "namespaces/" + namespace + "/pods/" + pod + "/log"
+	queryParam := "container=" + container + "&tailLines=100"
+	resultBytes, err := helpers.RequestHttpGet(service.CaasConfig.K8sUrl+k8sLogUrl, queryParam, service.CaasConfig.K8sAdminToken)
+	if err != nil {
+		return "", err
+	}
+	return string(resultBytes), nil
+}
+
 
 
 func makePromQLScriptForWorkloadMetrics(metricType string, namespace string, pod string, timeCondition string) string {
@@ -456,7 +472,7 @@ func getWorkloadMetrics(url string, workloadNameParam string) map[string]interfa
 	var wg sync.WaitGroup
 
 	promqlWorkloadList := "count(kube_" + workloadNameParam + "_metadata_generation)by(namespace," + workloadNameParam + ")"
-	resultBytes, _ := helpers.RequestHttpGet(url, "query="+promqlWorkloadList)
+	resultBytes, _ := helpers.RequestHttpGet(url, "query="+promqlWorkloadList, "")
 	resultArray := gjson.Get(string(resultBytes), "data.result")
 
 	var cpuUse float64
@@ -476,32 +492,32 @@ func getWorkloadMetrics(url string, workloadNameParam string) map[string]interfa
 			defer wg.Done()
 
 			pqUrl := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'})"
-			resultBytes, _ := helpers.RequestHttpGet(url, "query="+pqUrl)
+			resultBytes, _ := helpers.RequestHttpGet(url, "query="+pqUrl, "")
 			cpuUseVal, _ := strconv.ParseFloat(gjson.Get(string(resultBytes), "data.result.0.value.1").String(), 64)
 			cpuUse += cpuUseVal
 
 			pqUrl = "sum(rate(container_cpu_usage_seconds_total{container!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'}[5m]))*100"
-			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl)
+			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl, "")
 			cpuUsageVal, _ := strconv.ParseFloat(gjson.Get(string(resultBytes), "data.result.0.value.1").String(), 64)
 			cpuUsage += cpuUsageVal
 
 			pqUrl = "sum(container_memory_working_set_bytes{container!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'})/1024/1024"
-			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl)
+			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl, "")
 			memoryUseVal, _ := strconv.ParseFloat(gjson.Get(string(resultBytes), "data.result.0.value.1").String(), 64)
 			memoryUse += memoryUseVal
 
 			pqUrl = "avg(container_memory_working_set_bytes{container!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'})/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{container!='POD',image!=''}))"
-			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl)
+			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl, "")
 			memoryUsageVal, _ := strconv.ParseFloat(gjson.Get(string(resultBytes), "data.result.0.value.1").String(), 64)
 			memoryUsage += memoryUsageVal
 
 			pqUrl = "sum(container_fs_usage_bytes{container!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'}/1024/1024)"
-			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl)
+			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl, "")
 			diskUseVal, _ := strconv.ParseFloat(gjson.Get(string(resultBytes), "data.result.0.value.1").String(), 64)
 			diskUse += diskUseVal
 
 			pqUrl = "sum(container_fs_usage_bytes{container!='POD',image!=''.container!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'})by(pod)/max(container_fs_limit_bytes{container!='POD',image!='',container!='',namespace='" + namespace + "',pod=~'" + workload + "-.*'})by(pod)*100"
-			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl)
+			resultBytes, _ = helpers.RequestHttpGet(url, "query="+pqUrl, "")
 			diskUsageVal, _ := strconv.ParseFloat(gjson.Get(string(resultBytes), "data.result.0.value.1").String(), 64)
 			diskUsage += diskUsageVal
 

@@ -145,7 +145,9 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/caas/workload/list", worklaodModule.GetWorkloadList)
 	v1.GET("/caas/workload/metrics", worklaodModule.GetWorkloadDetailMetrics)
 	v1.GET("/caas/workload/container/list", worklaodModule.GetWorkloadContainerList)
-	v1.GET("/caas/workload/container/status", worklaodModule.GetContainerStatus)
+	v1.GET("/caas/workload/container/status", worklaodModule.GetContainerMetrics)
+	v1.GET("/caas/workload/container/log", worklaodModule.GetContainerLog)
+
 
 
 	return e
