@@ -353,6 +353,72 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 }
 
 
+func (service *WorkloadService) GetContainerStatus(namespace string, container string, pod string) ([]map[string]interface{}, error) {
+	var resultList []map[string]interface{}
+
+	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
+	pqCpuUsage := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
+	pqMemoryUsage := "sum(container_memory_working_set_bytes{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
+	pqDiskUsage := "sum(container_fs_usage_bytes{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
+
+	metricsBytes, _ := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqCpuUsage)  // Retrieve workload's metric data
+	metricsResult := gjson.Get(string(metricsBytes), "data.result.0.values")
+	var seriesDataArr []map[string]interface{}
+	for _, item := range metricsResult.Array() {
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").Float()
+
+		var itemMap map[string]interface{}
+		itemMap = make(map[string]interface{})
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		seriesDataArr = append(seriesDataArr, itemMap)
+	}
+	cpuMetricsMap := make(map[string]interface{})
+	cpuMetricsMap["name"] = "cpu"
+	cpuMetricsMap["metric"] = seriesDataArr
+	resultList = append(resultList, cpuMetricsMap)
+	seriesDataArr = nil
+
+	metricsBytes, _ = helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqMemoryUsage)  // Retrieve workload's metric data
+	metricsResult = gjson.Get(string(metricsBytes), "data.result.0.values")
+	for _, item := range metricsResult.Array() {
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").Float()
+
+		var itemMap map[string]interface{}
+		itemMap = make(map[string]interface{})
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		seriesDataArr = append(seriesDataArr, itemMap)
+	}
+	memoryMetricsMap := make(map[string]interface{})
+	memoryMetricsMap["name"] = "memory"
+	memoryMetricsMap["metric"] = seriesDataArr
+	resultList = append(resultList, memoryMetricsMap)
+	seriesDataArr = nil
+	
+	metricsBytes, _ = helpers.RequestHttpGet(service.CaasConfig.PromethusUrl+"/query_range", "query="+pqDiskUsage)  // Retrieve workload's metric data
+	metricsResult = gjson.Get(string(metricsBytes), "data.result.0.values")
+	for _, item := range metricsResult.Array() {
+		timestamp := item.Get("0").String()
+		usage := item.Get("1").Float()
+
+		var itemMap map[string]interface{}
+		itemMap = make(map[string]interface{})
+		itemMap["time"] = timestamp
+		itemMap["usage"] = usage
+		seriesDataArr = append(seriesDataArr, itemMap)
+	}
+	diskMetricsMap := make(map[string]interface{})
+	diskMetricsMap["name"] = "disk"
+	diskMetricsMap["metric"] = seriesDataArr
+	resultList = append(resultList, diskMetricsMap)
+
+	return resultList, nil
+}
+
+
 func makePromQLScriptForWorkloadMetrics(metricType string, namespace string, pod string, timeCondition string) string {
 	var promQLStr string
 	var promQLLabel string
@@ -453,3 +519,5 @@ func getWorkloadMetrics(url string, workloadNameParam string) map[string]interfa
 
 	return result
 }
+
+
