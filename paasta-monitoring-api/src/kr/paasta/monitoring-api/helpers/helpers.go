@@ -484,6 +484,7 @@ func FindStructFieldWithBlankValues(object interface{}) string {
 	return strings.Join(result, ",")
 }
 
+
 func RequestHttpGet(urlStr string, queryString string, token string) ([]byte, error){
 	var transportOpt *http.Transport
 	transportOpt = &http.Transport{

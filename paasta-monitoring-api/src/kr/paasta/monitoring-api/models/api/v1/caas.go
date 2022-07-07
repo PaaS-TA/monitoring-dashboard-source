@@ -42,6 +42,7 @@ const (
 	PROMQL_WORKLOAD_PODCONTAINER_RESTARTS  = "sum(kube_pod_container_status_restarts_total)"
 	PROMQL_WORKLOAD_PODCONTAINER_TERMINATE = "sum(kube_pod_container_status_terminated)"
 
+	PROMQL_POD_PHASE = "count(kube_pod_status_phase>0)by(phase)"
 
 )
 
