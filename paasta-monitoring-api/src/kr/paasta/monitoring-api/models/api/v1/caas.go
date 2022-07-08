@@ -53,15 +53,17 @@ const (
 
 )
 
+
 var BULITIN_WORKLOAD = [...]string {"deployment", "daemonset", "statefulset"}
 
+type CaaS struct {
+	PromethusUrl string
+	PromethusRangeUrl string
+	K8sUrl string
+	K8sAdminToken string
+}
+
 type (
-	CaasConfig struct {
-		PromethusUrl string
-		PromethusRangeUrl string
-		K8sUrl string
-		K8sAdminToken string
-	}
 
 	ClusterAverage struct {
 		PodUsage    string `json:"PodUsage"`
@@ -70,3 +72,32 @@ type (
 		DiskUsage   string `json:"DiskUsage"`
 	}
 )
+
+func (c CaaS) MakePromQLScriptForWorkloadMetrics(metricType string, namespace string, pod string, timeCondition string) string {
+	var promQLStr string
+	var promQLLabel string
+	var promQLCondition string
+
+	switch metricType {
+	case "cpu":
+		promQLLabel = "container_cpu_usage_seconds_total"
+		break
+	case "memory":
+		promQLLabel = "container_memory_working_set_bytes"
+		break
+	case "disk":
+		promQLLabel = "container_fs_usage_bytes"
+		break
+	}
+
+	promQLCondition = "{container!='POD',image!='',"
+	if len(namespace) > 0 {
+		promQLCondition += "namespace='" + namespace + "',pod=~'" + pod + "-.*'}"
+	} else {
+		promQLCondition += "pod='" + pod + "'}"
+	}
+	promQLStr = "sum(" + promQLLabel + promQLCondition + ")" + timeCondition
+	//log.Printf("promQL script : %v\n", promQLStr)
+
+	return promQLStr
+}

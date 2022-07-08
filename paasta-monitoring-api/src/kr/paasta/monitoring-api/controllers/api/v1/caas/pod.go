@@ -10,17 +10,17 @@ import (
 )
 
 type PodController struct {
-	CaasConfig models.CaasConfig
+	CaaS models.CaaS
 }
 
-func GetPodController(config models.CaasConfig) *PodController{
+func GetPodController(config models.CaaS) *PodController{
 	return &PodController{
-		CaasConfig: config,
+		CaaS: config,
 	}
 }
 
 func (controller *PodController) GetPodStatus(ctx echo.Context) error {
-	results, err := service.GetPodService(controller.CaasConfig).GetPodStatus()
+	results, err := service.GetPodService(controller.CaaS).GetPodStatus()
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
@@ -33,7 +33,7 @@ func (controller *PodController) GetPodStatus(ctx echo.Context) error {
 
 
 func (controller *PodController) GetPodList(ctx echo.Context) error {
-	results, err := service.GetPodService(controller.CaasConfig).GetPodList()
+	results, err := service.GetPodService(controller.CaaS).GetPodList()
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
@@ -42,5 +42,18 @@ func (controller *PodController) GetPodList(ctx echo.Context) error {
 		apiHelpers.Respond(ctx, http.StatusOK, "", results)
 	}
 	return nil
+}
 
+
+func (controller *PodController) GetPodDetailMetrics(ctx echo.Context) error {
+	pod := ctx.QueryParam("pod")
+	results, err := service.GetPodService(controller.CaaS).GetPodDetailMetrics(pod)
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", results)
+	}
+	return nil
 }

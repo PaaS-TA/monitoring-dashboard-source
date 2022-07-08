@@ -56,9 +56,9 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
 
 	// Caas
-	clusterModule := caasModule.GetClusterController(conn.CaasConfig)
-	worklaodModule := caasModule.GetWorkloadController(conn.CaasConfig)
-	podModule := caasModule.GetPodController(conn.CaasConfig)
+	clusterModule := caasModule.GetClusterController(conn.CaaS)
+	worklaodModule := caasModule.GetWorkloadController(conn.CaaS)
+	podModule := caasModule.GetPodController(conn.CaaS)
 
 	apBosh := AP.GetBoshController(conn)
 	apPaasta := AP.GetPaastaController(conn)
@@ -151,6 +151,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	v1.GET("/caas/pod/status", podModule.GetPodStatus)
 	v1.GET("/caas/pod/list", podModule.GetPodList)
+	v1.GET("/caas/pod/metrics", podModule.GetPodDetailMetrics)
 
 	return e
 }

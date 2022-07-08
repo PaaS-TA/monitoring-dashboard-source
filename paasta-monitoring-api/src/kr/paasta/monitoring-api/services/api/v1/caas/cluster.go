@@ -11,12 +11,12 @@ import (
 )
 
 type ClusterService struct {
-	CaasConfig models.CaasConfig
+	CaaS models.CaaS
 }
 
-func GetClusterService(config models.CaasConfig) *ClusterService{
+func GetClusterService(config models.CaaS) *ClusterService{
 	return &ClusterService{
-		CaasConfig: config,
+		CaaS: config,
 	}
 }
 
@@ -25,7 +25,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 
 	switch typeParam {
 	case "pod":
-		podUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_POD_USAGE, "")
+		podUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_POD_USAGE, "")
 		if err != nil {
 			return nil, err
 		}
@@ -35,7 +35,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		break;
 
 	case "cpu":
-		cpuUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_CPU_USAGE, "")
+		cpuUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_CPU_USAGE, "")
 		if err != nil {
 			return nil, err
 		}
@@ -45,7 +45,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		break;
 
 	case "disk" :
-		diskUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_DISK_USAGE, "")
+		diskUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_DISK_USAGE, "")
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		break;
 
 	case "memory" :
-		memoryUsageBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_MEMORY_USAGE, "")
+		memoryUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_MEMORY_USAGE, "")
 		if err != nil {
 			return nil, err
 		}
@@ -72,13 +72,13 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
-	nameListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_NAME_LIST, "")
-	memoryListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USAGE, "")
-	memoryUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USE, "")
-	cpuUsageListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CPU_USAGE, "")
-	cpuUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CPU_ALLOC, "")
-	diskUseListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_DISK_USE, "")
-	conditionListBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CONDITION, "")
+	nameListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_NAME_LIST, "")
+	memoryListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USAGE, "")
+	memoryUseListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USE, "")
+	cpuUsageListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CPU_USAGE, "")
+	cpuUseListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CPU_ALLOC, "")
+	diskUseListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_DISK_USE, "")
+	conditionListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CONDITION, "")
 	if err != nil {
 		return nil, err
 	}
@@ -158,19 +158,19 @@ func (service *ClusterService) GetWorkNode(nodeName string, instanceName string)
 	// 4.diskUsage (input:nodeName)
 	pqDiskUsage := "sum(node_filesystem_size_bytes{instance='" + instanceName + "'}-node_filesystem_free_bytes{instance='" + instanceName + "'})" + fromToTimeParmameter
 
-	podSeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqPodUsage, "")
+	podSeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqPodUsage, "")
 	if err != nil {
 		return nil, err
 	}
-	cpuSeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqCpuUsage, "")
+	cpuSeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqCpuUsage, "")
 	if err != nil {
 		return nil, err
 	}
-	memorySeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqMemoryUsage, "")
+	memorySeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqMemoryUsage, "")
 	if err != nil {
 		return nil, err
 	}
-	diskSeriesBytes, err := helpers.RequestHttpGet(service.CaasConfig.PromethusUrl + "/query_range", "query="+pqDiskUsage, "")
+	diskSeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqDiskUsage, "")
 	if err != nil {
 		return nil, err
 	}

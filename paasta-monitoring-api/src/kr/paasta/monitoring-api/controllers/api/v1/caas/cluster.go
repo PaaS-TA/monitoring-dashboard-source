@@ -10,18 +10,18 @@ import (
 )
 
 type ClusterController struct {
-	CaasConfig models.CaasConfig
+	CaaS models.CaaS
 }
 
-func GetClusterController(config models.CaasConfig) *ClusterController{
+func GetClusterController(config models.CaaS) *ClusterController{
 	return &ClusterController{
-		CaasConfig: config,
+		CaaS: config,
 	}
 }
 
 func (controller *ClusterController) GetClusterAverage(ctx echo.Context) error {
 	typeParam := ctx.Param("type")
-	results, err := service.GetClusterService(controller.CaasConfig).GetClusterAverage(typeParam)
+	results, err := service.GetClusterService(controller.CaaS).GetClusterAverage(typeParam)
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
@@ -34,7 +34,7 @@ func (controller *ClusterController) GetClusterAverage(ctx echo.Context) error {
 
 
 func (controller *ClusterController) GetWorkNodeList(ctx echo.Context) error {
-	results, err := service.GetClusterService(controller.CaasConfig).GetWorkNodeList()
+	results, err := service.GetClusterService(controller.CaaS).GetWorkNodeList()
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
@@ -50,7 +50,7 @@ func (controller *ClusterController) GetWorkNode(ctx echo.Context) error {
 	nodeName := ctx.QueryParam("nodename")
 	instance := ctx.QueryParam("instance")
 
-	results, err := service.GetClusterService(controller.CaasConfig).GetWorkNode(nodeName, instance)
+	results, err := service.GetClusterService(controller.CaaS).GetWorkNode(nodeName, instance)
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Worker Node data.", err.Error())
