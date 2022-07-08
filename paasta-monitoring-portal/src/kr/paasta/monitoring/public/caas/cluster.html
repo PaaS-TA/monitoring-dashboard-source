@@ -160,10 +160,22 @@
 			<div id="chartWrap">
 				<div class="chart on">
 					<h4><span class="chartTitle"></span></h4>
-					<ul class="one">
+					<ul class="chart">
 						<li>
-							<h5>Node Info</h5>
-							<div id="nodeChart" class="gaugeChart"></div>
+							<h5>Pod Usage</h5>
+							<div id="podChart"></div>
+						</li>
+						<li>
+							<h5>CPU Usage</h5>
+							<div id="cpuChart"></div>
+						</li>
+						<li>
+							<h5>Memory Usage</h5>
+							<div id="memoryChart"></div>
+						</li>
+						<li>
+							<h5>Disk Usage</h5>
+							<div id="diskChart"></div>
 						</li>
 					</ul>
 					<h5>Node Log</h5>
@@ -313,9 +325,27 @@
 					nodeInfo(data){
 						document.getElementById('chartWrap').classList.toggle('on', true);
 
+						console.log('data :: ', data);
+
+						var podArr = [];
+						var cpuArr = [];
+						var memoryArr = [];
+						var diskArr = [];
+
+						podArr.push(data[0]);
+						cpuArr.push(data[1]);
+						memoryArr.push(data[2]);
+						diskArr.push(data[3]);
+
 						setTimeout(() => {
 							// CPU Usage 정보
-							fnComm.detailChart(data, '#nodeChart');
+							fnComm.detailChart(podArr, '#podChart');
+
+							fnComm.detailChart(cpuArr, '#cpuChart');
+
+							fnComm.detailChart(memoryArr, '#memoryChart');
+
+							fnComm.detailChart(diskArr, '#diskChart');
 						},500);
 					},
 

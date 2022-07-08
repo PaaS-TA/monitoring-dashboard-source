@@ -551,6 +551,7 @@ const fnComm = {
 				detailData[idx].push(Number(Math.ceil(value.usage)));
 
 				if(yPos < Number(value.usage)) yPos = Math.ceil(value.usage);
+
 			});
 
 			cnt = idx;
@@ -563,6 +564,8 @@ const fnComm = {
 		for (var i = 0; i <= cnt; i++) {
 			dataType.push(detailData[i]);
 		};
+
+		console.log('detailTime :: ', detailTime);
 
 		switch (target){
 			case '#cpuUsageChart':
@@ -590,10 +593,12 @@ const fnComm = {
 			break;
 		};
 
-		console.log(dataType);
+		console.log("dataType ::" ,dataType);
+		console.log('11 :: ', typeof(dataType[0][0]))
 
 		var chart = c3.generate({
     		bindto: target,
+			style: "overflow: visible",
 			data: {
 				x: 'time',
 				xFormat: '%H:%M:%S',
@@ -607,9 +612,10 @@ const fnComm = {
 			axis: {
 				x: {
 					type: 'timeseries',
-					localtime: false,
+					localtime: true,
 					tick: {
-						count: 2,
+						count: 3,
+						format: '%H:%M:%S'
 					}
 				},
 				y: {
@@ -617,11 +623,28 @@ const fnComm = {
 					min: 0,
 					tick: {
 						count: 5,
-					}
+					},
+					padding: {top: 0, bottom: 0}
+					// tick: {
+					// 	count: 5,
+					// 	max: yPos,
+					// 	min: 0,
+					// },
 				}
 			},
 			point: {
-				show: false
+				show: true
+			},
+			grid: {
+				x: {
+					lines: [{value: detailTime[4], class:'dash-line'},{value: detailTime[8], class:'dash-line'},{value: detailTime[12], class:'dash-line'}]
+				},
+				y: {
+					//show: true
+				}
+			},
+			padding: {
+				right:20
 			}
 		});
 	},
