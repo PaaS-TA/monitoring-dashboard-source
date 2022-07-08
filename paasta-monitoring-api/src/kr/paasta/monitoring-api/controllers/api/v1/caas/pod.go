@@ -30,3 +30,17 @@ func (controller *PodController) GetPodStatus(ctx echo.Context) error {
 	}
 	return nil
 }
+
+
+func (controller *PodController) GetPodList(ctx echo.Context) error {
+	results, err := service.GetPodService(controller.CaasConfig).GetPodList()
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", results)
+	}
+	return nil
+
+}

@@ -150,6 +150,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/caas/workload/container/log", worklaodModule.GetContainerLog)
 
 	v1.GET("/caas/pod/status", podModule.GetPodStatus)
+	v1.GET("/caas/pod/list", podModule.GetPodList)
 
 	return e
 }

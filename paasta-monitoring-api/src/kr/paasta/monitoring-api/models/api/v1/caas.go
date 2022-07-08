@@ -43,6 +43,13 @@ const (
 	PROMQL_WORKLOAD_PODCONTAINER_TERMINATE = "sum(kube_pod_container_status_terminated)"
 
 	PROMQL_POD_PHASE = "count(kube_pod_status_phase>0)by(phase)"
+	PROMQL_POD_LIST         = "sum(container_cpu_usage_seconds_total{pod!='',image!=''})by(pod,namespace)"
+	PROMQL_POD_CPU_USE      = "sum(container_cpu_usage_seconds_total{pod!='',image!=''})by(pod)"
+	PROMQL_POD_CPU_USAGE    = "sum(rate(container_cpu_usage_seconds_total{pod!='',image!=''}[5m]))by(pod,namespace)*100"
+	PROMQL_POD_MEMORY_USE   = "sum(container_memory_working_set_bytes{pod!='',image!=''})by(pod,namespace)/1024/1024"
+	PROMQL_POD_DISK_USE     = "sum(container_fs_usage_bytes{pod!='',image!=''})by(pod,namespace)/1024/1024"
+	PROMQL_POD_DISK_USAGE   = "sum(container_fs_usage_bytes{pod!='',image!=''})by(pod,namespace)/max(container_fs_limit_bytes{pod!='',image!=''})by(pod,namespace)*100"
+	PROMQL_POD_MEMORY_USAGE = "avg(container_memory_working_set_bytes{pod!='',image!=''})by(pod,namespace)/scalar(sum(machine_memory_bytes))*100*scalar(count(container_memory_usage_bytes{pod!='',image!=''}))"
 
 )
 
