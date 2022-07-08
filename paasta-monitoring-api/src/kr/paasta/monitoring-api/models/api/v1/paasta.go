@@ -3,28 +3,47 @@ package v1
 type (
 	PaastaSummary struct {
 		Name                string `json:"name"`
-		Ip                  string `json:"ip"`
 		UUID                string `json:"uuid"`
-		SqlQuery            string
-		Time                string
-		MetricName          string
+		Address             string `json:"address"`
 		PaastaSummaryMetric PaastaSummaryMetric
 	}
 
+	PaastaRequest struct {
+		//PagingReq               PagingReq
+		Origin                  string `json:"origin"`
+		Addr                    string `json:"addr"`
+		MetricName              string `json:"metricName"`
+		DefaultTimeRange        string `json:"defaultTimeRange"`
+		TimeRangeFrom           string `json:"timeRangeFrom"`
+		TimeRangeTo             string `json:"timeRangeTo"`
+		GroupBy                 string `json:"groupBy"`
+		ServiceName             string `json:"serviceName"`
+		Ip                      string `json:"ip"`
+		Index                   string `json:"index"`
+		Name                    string `json:"name"`
+		Id                      string `json:"id"`
+		Args                    interface{}
+		IsLikeQuery             bool
+		IsRespondKb             bool
+		IsNonNegativeDerivative bool
+		Status                  string
+	}
+
 	PaastaSummaryMetric struct {
-		State           string  `json:"state"`
-		Core            string  `json:"core"`
-		CpuUsage        float64 `json:"cpuUsage"`
-		TotalMemory     float64 `json:"totalMemory"`
-		MemoryUsage     float64 `json:"memoryUsage"`
-		TotalDisk       float64 `json:"totalDisk"`
-		DataDisk        float64 `json:"dataDisk"`
-		DiskStatus      string  `json:"diskStatus"`
-		PaastaState     string  `json:"-"`
-		CpuErrStat      string  `json:"cpuErrStat"`
-		MemErrStat      string  `json:"memErrStat"`
-		DiskRootErrStat string  `json:"diskRootErrStat"`
-		DiskDataErrStat string  `json:"diskDataErrStat"`
+		State          string  `json:"state"`
+		Core           string  `json:"core"`
+		CpuUsage       float64 `json:"cpuUsage"`
+		CpuState       string  `json:"cpuErrStat"`
+		TotalMemory    int64   `json:"totalMemory"`
+		MemoryUsage    float64 `json:"memoryUsage"`
+		MemoryState    string  `json:"memErrStat"`
+		TotalDisk      int64   `json:"totalDisk"`
+		TotalDiskUsage float64 `json:"-"`
+		TotalDiskState string  `json:"diskRootErrStat"`
+		DataDisk       int64   `json:"dataDisk"`
+		DataDiskUsage  float64 `json:"-"`
+		DataDiskState  string  `json:"diskDataErrStat"`
+		DiskState      string  `json:"diskStatus"`
 	}
 
 	PaastaOverview struct {
@@ -57,15 +76,18 @@ type (
 	}
 
 	PaastaChart struct {
-		UUID             string `json:"uuid"`
-		MetricName       string `json:"metricname"`
-		SqlQuery         string `json:"sqlquery"`
-		DefaultTimeRange string `json:"defaulttimerange"`
-		TimeRangeFrom    string `json:"timerangefrom"`
-		TimeRangeTo      string `json:"timerangeto"`
-		GroupBy          string `json:"groupby"`
-		IsConvertKb      bool   `json:"isconvertkb"`
-		MetricData       map[string]interface{}
+		UUID                    string `json:"uuid"`
+		MetricName              string `json:"metricname"`
+		SqlQuery                string `json:"sqlquery"`
+		DefaultTimeRange        string `json:"defaulttimerange"`
+		TimeRangeFrom           string `json:"timerangefrom"`
+		TimeRangeTo             string `json:"timerangeto"`
+		GroupBy                 string `json:"groupby"`
+		IsConvertKb             bool   `json:"isconvertkb"`
+		MetricData              map[string]interface{}
+		IsLikeQuery             bool
+		IsRespondKb             bool
+		IsNonNegativeDerivative bool
 	}
 
 	PaastaLog struct {

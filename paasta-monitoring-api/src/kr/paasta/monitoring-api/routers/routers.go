@@ -58,6 +58,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// Caas
 	clusterModule := caasModule.GetClusterController(conn.CaasConfig)
 	worklaodModule := caasModule.GetWorkloadController(conn.CaasConfig)
+	podModule := caasModule.GetPodController(conn.CaasConfig)
 
 	apBosh := AP.GetBoshController(conn)
 	apPaasta := AP.GetPaastaController(conn)
@@ -142,7 +143,14 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNode)
 
 	v1.GET("/caas/workload/status", worklaodModule.GetWorkloadStatus)
-	v1.GET("/caas/workload/list", worklaodModule.GetWorkloadContainerList)
+	v1.GET("/caas/workload/list", worklaodModule.GetWorkloadList)
+	v1.GET("/caas/workload/metrics", worklaodModule.GetWorkloadDetailMetrics)
+	v1.GET("/caas/workload/container/list", worklaodModule.GetWorkloadContainerList)
+	v1.GET("/caas/workload/container/metrics", worklaodModule.GetContainerMetrics)
+	v1.GET("/caas/workload/container/log", worklaodModule.GetContainerLog)
+
+	v1.GET("/caas/pod/status", podModule.GetPodStatus)
+	v1.GET("/caas/pod/list", podModule.GetPodList)
 
 	return e
 }
