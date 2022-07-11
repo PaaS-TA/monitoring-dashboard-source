@@ -208,7 +208,7 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 		workload := item.Get("metric." + workloadParam).String()
 		namespace := item.Get("metric.namespace").String()
 
-		// TODO: Retrieve container list in workload
+		// Retrieve container list in workload
 		promqlContainerList := "count(kube_pod_container_info{namespace='" + namespace + "',pod=~'" + workload + "-.*'})by(namespace,pod,container)"
 		containersByte, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlContainerList, "") // Retrieve container list in workload
 		containerArray := gjson.Get(string(containersByte), "data.result")

@@ -57,3 +57,17 @@ func (controller *PodController) GetPodDetailMetrics(ctx echo.Context) error {
 	}
 	return nil
 }
+
+
+func (controller *PodController) GetPodContainerList(ctx echo.Context) error {
+	pod := ctx.QueryParam("pod")
+	results, err := service.GetPodService(controller.CaaS).GetPodContainerList(pod)
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", results)
+	}
+	return nil
+}
