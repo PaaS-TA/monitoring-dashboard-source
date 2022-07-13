@@ -10,10 +10,11 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
-	caasModule "paasta-monitoring-api/controllers/api/v1/caas"
+
+	caas "paasta-monitoring-api/controllers/api/v1/caas"
 	commonModule "paasta-monitoring-api/controllers/api/v1/common"
-	iaasModule "paasta-monitoring-api/controllers/api/v1/iaas"
-	saasModule "paasta-monitoring-api/controllers/api/v1/saas"
+	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
+	saas "paasta-monitoring-api/controllers/api/v1/saas"
 	"paasta-monitoring-api/middlewares"
 	"time"
 )
@@ -53,16 +54,17 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	logsearch := commonModule.GetLogSearchController(conn)
 
 	// IaaS
-	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
-	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
+	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
+	zabbixModule := iaas.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
 
 	// CaaS
-	clusterModule := caasModule.GetClusterController(conn.CaaS)
-	worklaodModule := caasModule.GetWorkloadController(conn.CaaS)
-	podModule := caasModule.GetPodController(conn.CaaS)
+	clusterModule := caas.GetClusterController(conn.CaaS)
+	worklaodModule := caas.GetWorkloadController(conn.CaaS)
+	podModule := caas.GetPodController(conn.CaaS)
 
 	// SaaS
-	pinpointModule := saasModule.GetPinpointController(conn.SaaS)
+	pinpointModule := saas.GetPinpointController(conn.SaaS)
+	saasModule := saas.GetSaasController(conn.SaaS)
 
 	apBosh := AP.GetBoshController(conn)
 	apPaasta := AP.GetPaastaController(conn)
@@ -159,6 +161,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	// SaaS
 	v1.GET("/saas/pinpoint/getAgentList", pinpointModule.GetAgentList)
 	v1.GET("/saas/pinpoint/:chartType/getAgentStat", pinpointModule.GetAgentStat)
+
+	v1.GET("/saas/app/status", saasModule.GetApplicationStatus)
 
 	return e
 }

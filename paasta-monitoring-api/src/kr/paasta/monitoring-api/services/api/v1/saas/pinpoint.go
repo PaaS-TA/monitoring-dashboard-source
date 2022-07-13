@@ -3,7 +3,6 @@ package saas
 import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
-	"github.com/tidwall/gjson"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"strconv"
@@ -52,7 +51,6 @@ func (service *PinpointService) GetAgentStat(ctx echo.Context) (map[string]inter
 
 	queryString := "agentId="+agentId+"&from="+from +"&to="+to
 	resultBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentStat/"+chartType+"/chart.pinpoint", queryString,"")
-	gjson.Get(string(resultBytes), "")
 	json.Unmarshal(resultBytes, &result)
 	return result, nil
 }
