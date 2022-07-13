@@ -21,10 +21,12 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -394,6 +396,15 @@ func (s *influxdbStorage) containerStatsToPoints(
 	// Disk Usage
 	points = append(points, makePoint(s.machineName, s.cellIp, cInfo.Name, serDiskUsage, containerMetric, float64(containerMetric.UsageMetrics.DiskUsageInBytes)))
 
+	// Get Host's outbound interface address
+	// It is used to store local outbound interface address info in InfluxDB
+	connection, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer connection.Close()
+	localOutboundInterface := connection.LocalAddr().(*net.UDPAddr)
+
 	// Network Stats
 	for i := 0; i < len(stats.Network.Interfaces); i++ {
 		/*fmt.Println("interface name :", stats.Network.Interfaces[i].Name)
@@ -403,12 +414,40 @@ func (s *influxdbStorage) containerStatsToPoints(
 		fmt.Println("txbytes :", stats.Network.Interfaces[i].TxBytes)
 		fmt.Println("txerror :", stats.Network.Interfaces[i].TxErrors)
 		fmt.Println("txdropped :", stats.Network.Interfaces[i].TxDropped)*/
-		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serRxBytes, containerMetric, float64(stats.Network.Interfaces[i].RxBytes)))
-		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serRxErrors, containerMetric, float64(stats.Network.Interfaces[i].RxErrors)))
-		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serRxDropped, containerMetric, float64(stats.Network.Interfaces[i].RxDropped)))
-		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serTxBytes, containerMetric, float64(stats.Network.Interfaces[i].TxBytes)))
-		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serTxErrors, containerMetric, float64(stats.Network.Interfaces[i].TxErrors)))
-		points = append(points, makePoint(s.machineName, s.cellIp, stats.Network.Interfaces[i].Name, serTxDropped, containerMetric, float64(stats.Network.Interfaces[i].TxDropped)))
+
+		// Convert cAdvisor's Interface ID to IP Address form
+		// For example it will be converted "s-010255116050" to "10.255.116.50"
+		var parsedCAdvisorInterfaceIdSlice []int
+		if stats.Network.Interfaces[i].Name[:2] == "s-" {
+			temp, _ := strconv.Atoi(stats.Network.Interfaces[i].Name[2:5])
+			parsedCAdvisorInterfaceIdSlice = append(parsedCAdvisorInterfaceIdSlice, temp)
+			temp, _ = strconv.Atoi(stats.Network.Interfaces[i].Name[5:8])
+			parsedCAdvisorInterfaceIdSlice = append(parsedCAdvisorInterfaceIdSlice, temp)
+			temp, _ = strconv.Atoi(stats.Network.Interfaces[i].Name[8:11])
+			parsedCAdvisorInterfaceIdSlice = append(parsedCAdvisorInterfaceIdSlice, temp)
+			temp, _ = strconv.Atoi(stats.Network.Interfaces[i].Name[11:14])
+			parsedCAdvisorInterfaceIdSlice = append(parsedCAdvisorInterfaceIdSlice, temp)
+		}
+
+		var cAdvisorInterface string
+		for i, temp := range parsedCAdvisorInterfaceIdSlice {
+			if i != len(parsedCAdvisorInterfaceIdSlice)-1 {
+				cAdvisorInterface += strconv.Itoa(temp) + "."
+			} else {
+				cAdvisorInterface += strconv.Itoa(temp)
+			}
+		}
+
+		if cAdvisorInterface != "" {
+			containerInterface := fmt.Sprintf("%v-%v", cAdvisorInterface, localOutboundInterface.IP)
+			containerMetric.Interface_Id = containerInterface
+			points = append(points, makePoint(s.machineName, s.cellIp, containerInterface, serRxBytes, containerMetric, float64(stats.Network.Interfaces[i].RxBytes)))
+			points = append(points, makePoint(s.machineName, s.cellIp, containerInterface, serRxErrors, containerMetric, float64(stats.Network.Interfaces[i].RxErrors)))
+			points = append(points, makePoint(s.machineName, s.cellIp, containerInterface, serRxDropped, containerMetric, float64(stats.Network.Interfaces[i].RxDropped)))
+			points = append(points, makePoint(s.machineName, s.cellIp, containerInterface, serTxBytes, containerMetric, float64(stats.Network.Interfaces[i].TxBytes)))
+			points = append(points, makePoint(s.machineName, s.cellIp, containerInterface, serTxErrors, containerMetric, float64(stats.Network.Interfaces[i].TxErrors)))
+			points = append(points, makePoint(s.machineName, s.cellIp, containerInterface, serTxDropped, containerMetric, float64(stats.Network.Interfaces[i].TxDropped)))
+		}
 	}
 
 	return points
