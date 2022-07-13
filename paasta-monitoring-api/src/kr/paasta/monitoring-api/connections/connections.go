@@ -34,6 +34,7 @@ type Connections struct {
 	Logger            *zap.Logger
 	CfClient          *cfclient.Client
 	CaaS              models.CaaS
+	SaaS              models.SaaS
 }
 
 /*
@@ -180,17 +181,7 @@ func PaaSConnection(env map[string]interface{}) (*gorm.DB, *cfclient.Client) {
 	return paasDBClient, cloudFoundryClient
 }
 
-func SaasConnection(env map[string]interface{}) error {
-	return nil
-}
 
-func CaaSConnection(env map[string]interface{}) error {
-	return nil
-}
-
-func iaasConnection(env map[string]interface{}) error {
-	return nil
-}
 
 func InfluxDbConnection(env map[string]interface{}) models.InfluxDbClient {
 	httpClient, err := client.NewHTTPClient(client.HTTPConfig{
@@ -277,6 +268,13 @@ func (connection *Connections) initCaaSConfig() {
 	connection.CaaS = caas
 }
 
+func (connection *Connections) initSaaSConfig() {
+	saas := models.SaaS{
+		PinpointWebUrl: connection.Env["pinpoint_web_url"].(string),
+	}
+	connection.SaaS = saas
+}
+
 
 func SetupConnection() Connections {
 
@@ -299,14 +297,13 @@ func SetupConnection() Connections {
 		case "PaaS":
 			Conn.DbInfo, Conn.CfClient = PaaSConnection(Conn.Env)
 			Conn.InfluxDbClient = InfluxDbConnection(Conn.Env)
-		case "SaaS":
-			SaasConnection(Conn.Env)
 		case "CaaS":
 			Conn.initCaaSConfig()
 		case "IaaS":
-			iaasConnection(Conn.Env)
 			Conn.initOpenstackProvider()
 			Conn.initZabbixSession()
+		case "SaaS":
+			Conn.initSaaSConfig()
 		}
 	}
 	return Conn

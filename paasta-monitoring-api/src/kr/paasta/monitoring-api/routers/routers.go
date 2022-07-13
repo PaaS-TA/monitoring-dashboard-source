@@ -13,6 +13,7 @@ import (
 	caasModule "paasta-monitoring-api/controllers/api/v1/caas"
 	commonModule "paasta-monitoring-api/controllers/api/v1/common"
 	iaasModule "paasta-monitoring-api/controllers/api/v1/iaas"
+	saasModule "paasta-monitoring-api/controllers/api/v1/saas"
 	"paasta-monitoring-api/middlewares"
 	"time"
 )
@@ -55,10 +56,13 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	openstackModule := iaasModule.GetOpenstackController(conn.OpenstackProvider)
 	zabbixModule := iaasModule.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
 
-	// Caas
+	// CaaS
 	clusterModule := caasModule.GetClusterController(conn.CaaS)
 	worklaodModule := caasModule.GetWorkloadController(conn.CaaS)
 	podModule := caasModule.GetPodController(conn.CaaS)
+
+	// SaaS
+	pinpointModule := saasModule.GetPinpointController(conn.SaaS)
 
 	apBosh := AP.GetBoshController(conn)
 	apPaasta := AP.GetPaastaController(conn)
@@ -141,18 +145,20 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/caas/cluster/average/:type", clusterModule.GetClusterAverage)
 	v1.GET("/caas/cluster/worknodes", clusterModule.GetWorkNodeList)
 	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNode)
-
 	v1.GET("/caas/workload/status", worklaodModule.GetWorkloadStatus)
 	v1.GET("/caas/workload/list", worklaodModule.GetWorkloadList)
 	v1.GET("/caas/workload/metrics", worklaodModule.GetWorkloadDetailMetrics)
 	v1.GET("/caas/workload/container/list", worklaodModule.GetWorkloadContainerList)
 	v1.GET("/caas/workload/container/metrics", worklaodModule.GetContainerMetrics)
 	v1.GET("/caas/workload/container/log", worklaodModule.GetContainerLog)
-
 	v1.GET("/caas/pod/status", podModule.GetPodStatus)
 	v1.GET("/caas/pod/list", podModule.GetPodList)
 	v1.GET("/caas/pod/metrics", podModule.GetPodDetailMetrics)
 	v1.GET("/caas/pod/container/list", podModule.GetPodContainerList)
+
+	// SaaS
+	v1.GET("/saas/pinpoint/getAgentList", pinpointModule.GetAgentList)
+	v1.GET("/saas/pinpoint/:chartType/getAgentStat", pinpointModule.GetAgentStat)
 
 	return e
 }
