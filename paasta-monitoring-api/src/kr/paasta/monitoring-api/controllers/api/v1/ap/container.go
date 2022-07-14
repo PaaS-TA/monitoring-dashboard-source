@@ -73,7 +73,7 @@ func (ap *ApContainerController) GetCellInfo(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=cfclient.App}
-//  @Router       /api/v1/ap/container/zone [get]
+//  @Router       /api/v1/ap/container/app [get]
 func (ap *ApContainerController) GetAppInfo(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetAppInfo()
 	if err != nil {
@@ -93,7 +93,7 @@ func (ap *ApContainerController) GetAppInfo(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=cfclient.App}
-//  @Router       /api/v1/ap/container/zone [get]
+//  @Router       /api/v1/ap/container/container [get]
 func (ap *ApContainerController) GetContainerInfo(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerInfo()
 	if err != nil {
@@ -133,7 +133,7 @@ func (ap *ApContainerController) GetContainerPageOverview(ctx echo.Context) erro
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Status}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/status [get]
 func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerStatus()
 	if err != nil {
@@ -153,7 +153,7 @@ func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/cell/status [get]
 func (ap *ApContainerController) GetCellStatus(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellStatus()
 	if err != nil {
@@ -173,15 +173,15 @@ func (ap *ApContainerController) GetCellStatus(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/cpu/:id/usages [get]
 func (ap *ApContainerController) GetContainerCpuUsages(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerCpuUsages(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container CPU usages.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container CPU usages.", results)
 	return nil
 }
 
@@ -193,15 +193,15 @@ func (ap *ApContainerController) GetContainerCpuUsages(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/cpu/:id/loads [get]
 func (ap *ApContainerController) GetContainerCpuLoads(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerCpuLoads(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container CPU Loads.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container CPU Loads.", results)
 	return nil
 }
 
@@ -213,15 +213,15 @@ func (ap *ApContainerController) GetContainerCpuLoads(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/memory/:id/usages [get]
 func (ap *ApContainerController) GetContainerMemoryUsages(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerMemoryUsages(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container Memory usages.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container Memory usages.", results)
 	return nil
 }
 
@@ -233,15 +233,15 @@ func (ap *ApContainerController) GetContainerMemoryUsages(ctx echo.Context) erro
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/disk/:id/usages [get]
 func (ap *ApContainerController) GetContainerDiskUsages(ctx echo.Context) error {
 	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerDiskUsages(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container Disk usages.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container Disk usages.", results)
 	return nil
 }
 
@@ -253,15 +253,15 @@ func (ap *ApContainerController) GetContainerDiskUsages(ctx echo.Context) error 
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/network/:id/bytes [get]
 func (ap *ApContainerController) GetContainerNetworkBytes(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkBytes()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkBytes(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container Network Bytes usages by time.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container Network Bytes usages by time.", results)
 	return nil
 }
 
@@ -273,34 +273,34 @@ func (ap *ApContainerController) GetContainerNetworkBytes(ctx echo.Context) erro
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/network/:id/drops [get]
 func (ap *ApContainerController) GetContainerNetworkDrops(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkDrops()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkDrops(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container Network Drops usages by time.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container Network Drops usages by time.", results)
 	return nil
 }
 
 // GetContainerNetworkErrors
 //  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Container Newtwork Errors 정보 가져오기
-//  @Description  Container Newtwork Errors 정보를 가져온다.
+//  @Summary      Container Network Errors 정보 가져오기
+//  @Description  Container Network Errors 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
-//  @Router       /api/v1/ap/container/overview [get]
+//  @Router       /api/v1/ap/container/container/network/:id/errors [get]
 func (ap *ApContainerController) GetContainerNetworkErrors(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkErrors()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkErrors(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Container Network Errors usages by time.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get cell status.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Container Network Errors usages by time.", results)
 	return nil
 }

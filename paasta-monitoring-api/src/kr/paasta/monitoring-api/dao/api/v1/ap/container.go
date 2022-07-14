@@ -413,18 +413,85 @@ func (ap *ApContainerDao) GetContainerDiskUsages(ctx echo.Context) ([]map[string
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetContainerNetworkBytes() (models.Status, error) {
-	var response models.Status
+func (ap *ApContainerDao) GetContainerNetworkBytes(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"rx_bytes", "RX"},
+		{"tx_bytes", "TX"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
+
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetContainerNetworkDrops() (models.Status, error) {
-	var response models.Status
+func (ap *ApContainerDao) GetContainerNetworkDrops(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"rx_dropped", "RX"},
+		{"rx_dropped", "TX"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
 	return response, nil
 }
 
-func (ap *ApContainerDao) GetContainerNetworkErrors() (models.Status, error) {
-	var response models.Status
+func (ap *ApContainerDao) GetContainerNetworkErrors(ctx echo.Context) ([]map[string]interface{}, error) {
+	var response []map[string]interface{}
+	var request models.ContainerUsageQueryRequest
+
+	request.ContainerName = ctx.Param("id")
+	request.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	request.GroupBy = ctx.QueryParam("groupBy")
+	request.Item = []models.ContainerDetail{
+		{"rx_errors", "RX"},
+		{"rx_errors", "TX"},
+	}
+
+	for _, item := range request.Item {
+		request.MetricName = item.Name
+		results, err := ap.getContainerUsageData(request)
+
+		if err != nil {
+			fmt.Println(err)
+			return response, err
+		} else {
+			usage, _ := helpers.InfluxConverterList(&results, item.ResName)
+			response = append(response, usage)
+		}
+	}
 	return response, nil
 }
 
@@ -506,7 +573,6 @@ func (ap *ApContainerDao) getContainerUsageData(params models.ContainerUsageQuer
 		sql = "SELECT MEAN(usage) AS usage FROM (" + sql
 	default:
 		sql = strings.Replace(sql, "MEAN(value)", "value / 1024", 1)
-		sql = strings.Replace(sql, "container_interface", "container_id", 1)
 		sql = "SELECT MEAN(usage) AS usage FROM (" + sql
 	}
 
@@ -524,7 +590,7 @@ func (ap *ApContainerDao) getContainerUsageData(params models.ContainerUsageQuer
 			sql += "AND time > NOW() - %s) WHERE time > NOW() - %s GROUP BY time(%s)"
 			request.Command = fmt.Sprintf(sql, params.MetricName, params.ContainerName, params.DefaultTimeRange, params.DefaultTimeRange, params.GroupBy)
 		} else {
-			sql += "AND time < NOW() - %s AND time > NOW() - %s ) WHERE time < NOW() - %s AND time > NOW() - %s GROUP BY time(%s)"
+			sql += "AND time < NOW() - %s AND time > NOW() - %s) WHERE time < NOW() - %s AND time > NOW() - %s GROUP BY time(%s)"
 			request.Command = fmt.Sprintf(sql, params.MetricName, params.ContainerName, params.TimeRangeFrom, params.TimeRangeTo, params.TimeRangeFrom, params.TimeRangeTo, params.GroupBy)
 		}
 	}
