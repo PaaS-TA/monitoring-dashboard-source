@@ -163,6 +163,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/saas/pinpoint/:chartType/getAgentStat", pinpointModule.GetAgentStat)
 
 	v1.GET("/saas/app/status", saasModule.GetApplicationStatus)
+	v1.GET("/saas/app/usage", saasModule.GetApplicationUsage)
 
 	return e
 }
