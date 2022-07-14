@@ -120,6 +120,96 @@ func (service *SaasService) GetApplicationUsage(period string)(map[string]interf
 	return result, nil
 }
 
+
+func (service *SaasService) GetApplicationUsageList(period string)([]map[string]interface{}, error) {
+	var results []map[string]interface{}
+	var from string
+	var to string
+
+	to = strconv.FormatInt(time.Now().UTC().Unix(), 10) + "000"
+	if len(period) == 0 {
+		from = strconv.FormatInt(time.Now().Add(-600*time.Second).UTC().Unix(), 10) + "000"
+	} else {
+		periodNum, _ := strconv.Atoi(period[0:1])
+		periodUnit := period[1:2]
+		switch periodUnit {
+		case "m" :
+			periodNum = periodNum
+		case "h" :
+			periodNum = 60*periodNum;
+		case "d" :
+			periodNum = 1400*periodNum;
+		}
+		from = strconv.FormatInt(time.Now().Add(time.Duration(-periodNum)*time.Minute).UTC().Unix(), 10) + "000"
+	}
+
+	resultBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	resultJson := gjson.Parse(string(resultBytes))
+	resultJson.ForEach(func(key, value gjson.Result) bool {
+		appDataMap := make(map[string]interface{})
+		for _, item := range value.Array() {
+			//statusCode := item.Get("status.state.code").Int()
+			agentId := item.Get("agentId").String()
+			appName := item.Get("applicationName").String()
+			ipAddr := item.Get("ip").String()
+			queryString := "agentId="+agentId +"&from=" + from + "&to=" + to
+
+			cpuUsageBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentStat/cpuLoad/chart.pinpoint", queryString,"")
+			cpuUsageArray := gjson.Get(string(cpuUsageBytes), "charts.y.CPU_LOAD_SYSTEM.#.2").Array()
+			cpuUsageSum := summaryValueInGjsonArray(cpuUsageArray)
+			cpuPercent, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", cpuUsageSum/float64(len(cpuUsageArray))), 0)
+			jvmCpuUsageArray := gjson.Get(string(cpuUsageBytes), "charts.y.CPU_LOAD_JVM.#.2").Array()
+			jvmCpuUsageSum := summaryValueInGjsonArray(jvmCpuUsageArray)
+			jvmCpuPercent, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", jvmCpuUsageSum/float64(len(jvmCpuUsageArray))), 0)
+
+			memoryUsageBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentStat/jvmGc/chart.pinpoint", queryString,"")
+			heapUsageArray := gjson.Get(string(memoryUsageBytes), "charts.y.JVM_MEMORY_HEAP_USED.#.2").Array()
+			heapUsageSum := summaryValueInGjsonArray(heapUsageArray)
+			heapUsage, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", heapUsageSum/float64(len(heapUsageArray))), 0)
+
+			noneHeapUsageArray := gjson.Get(string(memoryUsageBytes), "charts.y.JVM_MEMORY_NON_HEAP_USED.#.2").Array()
+			noneHeapUsageSum := summaryValueInGjsonArray(noneHeapUsageArray)
+			noneHeapUsage, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", noneHeapUsageSum/float64(len(noneHeapUsageArray))), 0)
+
+
+			activeTraceBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentStat/activeTrace/chart.pinpoint", queryString,"")
+			activeTraceArray := gjson.Get(string(activeTraceBytes), "charts.y.ACTIVE_TRACE_FAST.#.3").Array()
+			activeTraceSum := summaryValueInGjsonArray(activeTraceArray)
+			activeTrace, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", activeTraceSum/float64(len(activeTraceArray))), 0)
+			if activeTrace < 0 {
+				activeTrace = 0
+			}
+
+			responseTimeBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentStat/responseTime/chart.pinpoint", queryString,"")
+			responseTimeArray := gjson.Get(string(responseTimeBytes), "charts.y.AVG.#.2").Array()
+			responseTimeSum := summaryValueInGjsonArray(responseTimeArray)
+			responseTime, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", responseTimeSum/float64(len(responseTimeArray))), 0)
+			if responseTime < 0 {
+				responseTime = 0
+			}
+
+			appDataMap["agentId"] = agentId
+			appDataMap["applicationName"] = appName
+			appDataMap["ip"] = ipAddr
+			appDataMap["cpuUsage"] = cpuPercent
+			appDataMap["jvmCpuUsage"] = jvmCpuPercent
+			appDataMap["heapUsage"] = heapUsage
+			appDataMap["noneHeapUsage"] = noneHeapUsage
+			appDataMap["activeTrace"] = activeTrace
+			appDataMap["responseTime"] = responseTime
+			results = append(results, appDataMap)
+		}
+		return true
+	})
+
+	return results, nil
+}
+
+
+
+
+
+
 func summaryValueInGjsonArray(array []gjson.Result) float64 {
 	var total float64
 	for _, usage := range array {

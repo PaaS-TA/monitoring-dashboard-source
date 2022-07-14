@@ -47,3 +47,16 @@ func (controller *SaasController) GetApplicationUsage(ctx echo.Context) error {
 	return nil
 }
 
+
+func (controller *SaasController) GetApplicationUsageList(ctx echo.Context) error {
+	period := ctx.QueryParam("period")
+	result, err := service.GetSaasService(controller.SaaS).GetApplicationUsageList(period)
+	if err != nil {
+		log.Println(err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
+		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "", result)
+	}
+	return nil
+}
