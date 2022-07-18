@@ -29,7 +29,7 @@ func GetAlarmActionController(conn connections.Connections) *AlarmActionControll
 //  @Accept       json
 //  @Produce      json
 //  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "새로 작성할 알람 정보를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/action [post]
 func (controller *AlarmActionController) CreateAlarmAction(ctx echo.Context) error {
 	var request models.AlarmActionRequest

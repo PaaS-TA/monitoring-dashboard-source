@@ -30,7 +30,7 @@ func GetAlarmPolicyController(conn connections.Connections) *AlarmPolicyControll
 //  @Accept       json
 //  @Produce      json
 //  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "알람 받을 SNS 계정 정보를 주입한다."
-//  @Success      200                {object}  apiHelpers.BasicResponseForm
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/sns [post]
 func (controller *AlarmPolicyController) CreateAlarmPolicy(ctx echo.Context) error {
 	var request []models.AlarmPolicies
@@ -80,7 +80,7 @@ func (controller *AlarmPolicyController) GetAlarmPolicy(ctx echo.Context) error 
 //  @Accept       json
 //  @Produce      json
 //  @Param        AlarmPolicyRequest  body      v1.AlarmPolicyRequest  true  "알람 정책을 변경하기 위한 정보를 주입한다."
-//  @Success      200                {object}  apiHelpers.BasicResponseForm
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/policy [put]
 func (controller *AlarmPolicyController) UpdateAlarmPolicy(ctx echo.Context) error {
 	var request []models.AlarmPolicyRequest

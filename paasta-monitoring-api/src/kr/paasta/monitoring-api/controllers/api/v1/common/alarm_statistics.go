@@ -28,7 +28,7 @@ func GetAlarmStatisticsController(conn connections.Connections) *AlarmStatistics
 //  @Description  알람 통계 그래프를 그리기 위한 데이터를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Success      200  {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/statistics/total [get]
 func (ap *AlarmStatisticsController) GetAlarmStatistics(ctx echo.Context) error {
 	results, err := common.GetAlarmStatisticsService(ap.DbInfo).GetAlarmStatistics(ctx)
@@ -50,7 +50,7 @@ func (ap *AlarmStatisticsController) GetAlarmStatistics(ctx echo.Context) error 
 //  @Description  알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Success      200  {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/statistics/resource [get]
 func (ap *AlarmStatisticsController) GetAlarmStatisticsResource(c echo.Context) error {
 	results, err := common.GetAlarmStatisticsService(ap.DbInfo).GetAlarmStatisticsResource(c)

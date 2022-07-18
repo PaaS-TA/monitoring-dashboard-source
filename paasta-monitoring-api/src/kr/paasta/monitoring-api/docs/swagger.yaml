@@ -11,6 +11,168 @@ definitions:
       statusText:
         type: string
     type: object
+  cfclient.App:
+    properties:
+      buildpack:
+        type: string
+      command:
+        type: string
+      created_at:
+        type: string
+      detected_buildpack:
+        type: string
+      detected_buildpack_guid:
+        type: string
+      detected_start_command:
+        type: string
+      diego:
+        type: boolean
+      disk_quota:
+        type: integer
+      docker_credentials:
+        $ref: '#/definitions/cfclient.DockerCredentials'
+      docker_credentials_json:
+        additionalProperties: true
+        type: object
+      docker_image:
+        type: string
+      enable_ssh:
+        type: boolean
+      environment_json:
+        additionalProperties: true
+        type: object
+      guid:
+        type: string
+      health_check_http_endpoint:
+        type: string
+      health_check_timeout:
+        type: integer
+      health_check_type:
+        type: string
+      instances:
+        type: integer
+      memory:
+        type: integer
+      name:
+        type: string
+      package_state:
+        type: string
+      package_updated_at:
+        type: string
+      ports:
+        items:
+          type: integer
+        type: array
+      space:
+        $ref: '#/definitions/cfclient.SpaceResource'
+      space_guid:
+        type: string
+      space_url:
+        type: string
+      stack_guid:
+        type: string
+      staging_failed_description:
+        type: string
+      staging_failed_reason:
+        type: string
+      state:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  cfclient.DockerCredentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  cfclient.Meta:
+    properties:
+      created_at:
+        type: string
+      guid:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+    type: object
+  cfclient.Org:
+    properties:
+      created_at:
+        type: string
+      default_isolation_segment_guid:
+        type: string
+      guid:
+        type: string
+      name:
+        type: string
+      quota_definition_guid:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  cfclient.OrgResource:
+    properties:
+      entity:
+        $ref: '#/definitions/cfclient.Org'
+      metadata:
+        $ref: '#/definitions/cfclient.Meta'
+    type: object
+  cfclient.Space:
+    properties:
+      allow_ssh:
+        type: boolean
+      created_at:
+        type: string
+      guid:
+        type: string
+      isolation_segment_guid:
+        type: string
+      name:
+        type: string
+      organization:
+        $ref: '#/definitions/cfclient.OrgResource'
+      organization_guid:
+        type: string
+      organization_url:
+        type: string
+      space_quota_definition_guid:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  cfclient.SpaceResource:
+    properties:
+      entity:
+        $ref: '#/definitions/cfclient.Space'
+      metadata:
+        $ref: '#/definitions/cfclient.Meta'
+    type: object
+  gogobosh.Client:
+    properties:
+      endpoint:
+        $ref: '#/definitions/gogobosh.Endpoint'
+    type: object
+  gogobosh.Endpoint:
+    properties:
+      doppler_logging_endpoint:
+        type: string
+    type: object
+  v1.AlarmActionRequest:
+    properties:
+      alarmActionDesc:
+        type: string
+      alarmId:
+        type: integer
+      id:
+        type: integer
+      regUser:
+        type: string
+    type: object
   v1.AlarmPolicies:
     properties:
       alarmType:
@@ -44,10 +206,6 @@ definitions:
         type: string
       criticalThreshold:
         type: integer
-      mailAddress:
-        type: string
-      mailSendYn:
-        type: string
       measureTime:
         type: integer
       originType:
@@ -59,13 +217,36 @@ definitions:
     required:
     - originType
     type: object
+  v1.AlarmSns:
+    properties:
+      channelId:
+        type: integer
+      expl:
+        type: string
+      modiDate:
+        type: string
+      modiUser:
+        type: string
+      originType:
+        type: string
+      regDate:
+        type: string
+      regUser:
+        type: string
+      snsId:
+        type: string
+      snsSendYN:
+        type: string
+      snsType:
+        type: string
+      token:
+        type: string
+    type: object
   v1.Alarms:
     properties:
       alarmCnt:
         type: integer
       alarmMessage:
-        type: string
-      alarmSendDate:
         type: string
       alarmTitle:
         type: string
@@ -104,55 +285,180 @@ definitions:
       resolveStatus:
         type: string
     type: object
+  v1.AppInfo:
+    properties:
+      appName:
+        type: string
+      buildpack:
+        type: string
+      cellName:
+        type: string
+      cfApi:
+        type: string
+      containerInfo:
+        $ref: '#/definitions/v1.ContainerInfo'
+      createdAt:
+        type: string
+      diskQuota:
+        type: integer
+      instances:
+        type: integer
+      memory:
+        type: integer
+      status:
+        type: string
+      updatedAt:
+        type: string
+      uri:
+        type: string
+    type: object
   v1.Bosh:
     properties:
+      address:
+        type: string
+      client:
+        $ref: '#/definitions/gogobosh.Client'
+      deployment:
+        type: string
+      ip:
+        type: string
+      name:
+        type: string
       password:
         type: string
       username:
         type: string
-    required:
-    - password
-    - username
+      uuid:
+        type: string
     type: object
   v1.BoshChart:
     properties:
-      password:
+      defaulttimerange:
         type: string
-      username:
+      groupby:
         type: string
-    required:
-    - password
-    - username
+      isconvertkb:
+        type: boolean
+      metricData:
+        additionalProperties: true
+        type: object
+      metricname:
+        type: string
+      sqlquery:
+        type: string
+      timerangefrom:
+        type: string
+      timerangeto:
+        type: string
+      uuid:
+        type: string
     type: object
-  v1.BoshLog:
+  v1.BoshOverview:
     properties:
-      password:
+      critical:
         type: string
-      username:
+      failed:
         type: string
-    required:
-    - password
-    - username
+      running:
+        type: string
+      total:
+        type: string
+      warning:
+        type: string
     type: object
   v1.BoshProcess:
     properties:
-      password:
+      index:
         type: string
-      username:
+      memory:
+        type: number
+      pid:
         type: string
-    required:
-    - password
-    - username
+      process:
+        type: string
+      time:
+        type: string
+      uuid:
+        type: string
     type: object
   v1.BoshSummary:
     properties:
-      password:
+      boshSummaryMetric:
+        $ref: '#/definitions/v1.BoshSummaryMetric'
+      ip:
         type: string
-      username:
+      metricName:
         type: string
-    required:
-    - password
-    - username
+      name:
+        type: string
+      sqlQuery:
+        type: string
+      time:
+        type: string
+      uuid:
+        type: string
+    type: object
+  v1.BoshSummaryMetric:
+    properties:
+      core:
+        type: string
+      cpuErrStat:
+        type: string
+      cpuUsage:
+        type: number
+      dataDisk:
+        type: number
+      diskDataErrStat:
+        type: string
+      diskRootErrStat:
+        type: string
+      diskStatus:
+        type: string
+      memErrStat:
+        type: string
+      memoryUsage:
+        type: number
+      state:
+        type: string
+      totalDisk:
+        type: number
+      totalMemory:
+        type: number
+    type: object
+  v1.CellInfo:
+    properties:
+      appCnt:
+        type: integer
+      appInfo:
+        items:
+          $ref: '#/definitions/v1.AppInfo'
+        type: array
+      cellId:
+        type: integer
+      cellIp:
+        type: string
+      cellName:
+        type: string
+      containerCnt:
+        type: integer
+      zoneName:
+        type: string
+    type: object
+  v1.Container:
+    properties:
+      appIndex:
+        type: string
+      containerId:
+        type: string
+    type: object
+  v1.ContainerInfo:
+    properties:
+      appName:
+        type: string
+      container:
+        items:
+          $ref: '#/definitions/v1.Container'
+        type: array
     type: object
   v1.CreateToken:
     properties:
@@ -166,6 +472,146 @@ definitions:
     - password
     - username
     type: object
+  v1.Logs:
+    properties:
+      endTime:
+        type: string
+      keyword:
+        type: string
+      logType:
+        type: string
+      messages: {}
+      period:
+        type: string
+      startTime:
+        type: string
+      targetDate:
+        type: string
+      uuid:
+        type: string
+    type: object
+  v1.Overview:
+    properties:
+      zoneInfo:
+        items:
+          $ref: '#/definitions/v1.ZoneInfo'
+        type: array
+    type: object
+  v1.Paasta:
+    properties:
+      id:
+        type: integer
+      ip:
+        type: string
+      modiDate:
+        type: string
+      modiUser:
+        type: string
+      name:
+        type: string
+      regDate:
+        type: string
+      regUser:
+        type: string
+      vmType:
+        type: string
+      zoneId:
+        type: integer
+    type: object
+  v1.PaastaChart:
+    properties:
+      defaulttimerange:
+        type: string
+      groupby:
+        type: string
+      isLikeQuery:
+        type: boolean
+      isNonNegativeDerivative:
+        type: boolean
+      isRespondKb:
+        type: boolean
+      isconvertkb:
+        type: boolean
+      metricData:
+        additionalProperties: true
+        type: object
+      metricname:
+        type: string
+      sqlquery:
+        type: string
+      timerangefrom:
+        type: string
+      timerangeto:
+        type: string
+      uuid:
+        type: string
+    type: object
+  v1.PaastaOverview:
+    properties:
+      critical:
+        type: string
+      failed:
+        type: string
+      running:
+        type: string
+      total:
+        type: string
+      warning:
+        type: string
+    type: object
+  v1.PaastaProcess:
+    properties:
+      index:
+        type: integer
+      memory:
+        type: integer
+      pid:
+        type: string
+      process:
+        type: string
+      time:
+        type: string
+      uuid:
+        type: string
+    type: object
+  v1.PaastaSummary:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
+      paastaSummaryMetric:
+        $ref: '#/definitions/v1.PaastaSummaryMetric'
+      uuid:
+        type: string
+    type: object
+  v1.PaastaSummaryMetric:
+    properties:
+      core:
+        type: string
+      cpuErrStat:
+        type: string
+      cpuUsage:
+        type: number
+      dataDisk:
+        type: integer
+      diskDataErrStat:
+        type: string
+      diskRootErrStat:
+        type: string
+      diskStatus:
+        type: string
+      memErrStat:
+        type: string
+      memoryUsage:
+        type: number
+      state:
+        type: string
+      totalDisk:
+        type: integer
+      totalMemory:
+        type: integer
+    type: object
   v1.RefreshToken:
     properties:
       refreshToken:
@@ -173,6 +619,32 @@ definitions:
         type: string
     required:
     - refreshToken
+    type: object
+  v1.SnsAccountRequest:
+    properties:
+      expl:
+        type: string
+      originType:
+        type: string
+      snsId:
+        type: string
+      snsSendYN:
+        type: string
+      snsType:
+        type: string
+      token:
+        type: string
+    type: object
+  v1.Status:
+    properties:
+      critical:
+        type: integer
+      failed:
+        type: integer
+      running:
+        type: integer
+      warning:
+        type: integer
     type: object
   v1.TokenDetails:
     properties:
@@ -251,17 +723,28 @@ definitions:
     - password
     - username
     type: object
+  v1.ZoneInfo:
+    properties:
+      cellCnt:
+        type: integer
+      cellInfo:
+        items:
+          $ref: '#/definitions/v1.CellInfo'
+        type: array
+      zoneName:
+        type: string
+    type: object
 host: localhost:8395
 info:
   contact: {}
   title: Monitoring Dashboard API
   version: 5.8.0
 paths:
-  /api/v1/ap/alarm/policy:
+  /api/v1/alarm/policy:
     get:
       consumes:
       - application/json
-      description: '[테스트] 전체 알람 정책을 가져온다.'
+      description: 전체 알람 정책을 가져온다.
       produces:
       - application/json
       responses:
@@ -274,11 +757,13 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.AlarmPolicies'
               type: object
-      summary: '[테스트] 전체 알람 정책 가져오기'
+      summary: 전체 알람 정책 가져오기
+      tags:
+      - AP
     put:
       consumes:
       - application/json
-      description: '[테스트] 전체 알람 정책을 업데이트 한다.'
+      description: 전체 알람 정책을 업데이트 한다.
       parameters:
       - description: 알람 정책을 변경하기 위한 정보를 주입한다.
         in: body
@@ -293,12 +778,227 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: '[테스트] 전체 알람 정책 업데이트하기'
+      summary: 전체 알람 정책 업데이트하기
+      tags:
+      - AP
+  /api/v1/alarm/target:
+    put:
+      consumes:
+      - application/json
+      description: 전체 알람 타겟을 업데이트 한다.
+      parameters:
+      - description: 알람 타겟을 변경하기 위한 정보를 주입한다.
+        in: body
+        name: AlarmTargetRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmPolicyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 전체 알람 타겟 업데이트하기
+      tags:
+      - AP
+  /api/v1/ap/alarm/action:
+    delete:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 삭제한다.
+      parameters:
+      - description: 삭제할 알람 정보(Id)를  주입한다.
+        in: body
+        name: AlarmActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 삭제하기
+      tags:
+      - AP
+    get:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 가져오기
+      tags:
+      - AP
+    patch:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 수정한다.
+      parameters:
+      - description: 수정할 알람 정보를 주입한다.
+        in: body
+        name: AlarmActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 수정하기
+      tags:
+      - AP
+    post:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 작성한다.
+      parameters:
+      - description: 새로 작성할 알람 정보를 주입한다.
+        in: body
+        name: AlarmActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 작성하기
+      tags:
+      - AP
+  /api/v1/ap/alarm/sns:
+    delete:
+      consumes:
+      - application/json
+      description: 알람 받는 SNS 계정을 삭제한다.
+      parameters:
+      - description: 삭제할 SNS 계정을 정보(ChannelId)를  주입한다.
+        in: body
+        name: SnsAccountRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SnsAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 받는 SNS 계정 삭제하기
+      tags:
+      - AP
+    get:
+      consumes:
+      - application/json
+      description: 알람 받는 SNS 계정 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.AlarmSns'
+              type: object
+      summary: 알람 받는 SNS 계정 가져오기
+      tags:
+      - AP
+    post:
+      consumes:
+      - application/json
+      description: 알람 받을 SNS 계정을 등록한다.
+      parameters:
+      - description: 알람 받을 SNS 계정 정보를 주입한다.
+        in: body
+        name: SnsAccountRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SnsAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 받을 SNS 계정 등록하기
+      tags:
+      - AP
+    put:
+      consumes:
+      - application/json
+      description: 알람 받을 SNS 계정 정보를 수정한다.
+      parameters:
+      - description: 수정할 SNS 계정 정보를 주입한다.
+        in: body
+        name: SnsAccountRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SnsAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 받을 SNS 계정 수정하기
+      tags:
+      - AP
+  /api/v1/ap/alarm/statistics/resource:
+    get:
+      consumes:
+      - application/json
+      description: 알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기
+      tags:
+      - AP
+  /api/v1/ap/alarm/statistics/total:
+    get:
+      consumes:
+      - application/json
+      description: 알람 통계 그래프를 그리기 위한 데이터를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 통계 그래프를 그리기 위한 데이터 가져오기
+      tags:
+      - AP
   /api/v1/ap/alarm/status:
     get:
       consumes:
       - application/json
-      description: '[테스트] 전체 알람 현황을 가져온다.'
+      description: 전체 알람 현황을 가져온다.
       produces:
       - application/json
       responses:
@@ -311,7 +1011,419 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.Alarms'
               type: object
-      summary: '[테스트] 전체 알람 현황 가져오기'
+      summary: 전체 알람 현황 가져오기
+      tags:
+      - AP
+  /api/v1/ap/bosh/overview:
+    get:
+      consumes:
+      - application/json
+      description: Bosh Overview 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshOverview'
+              type: object
+      summary: Bosh Overview 정보를 가져온다.
+      tags:
+      - AP
+  /api/v1/ap/bosh/process:
+    get:
+      consumes:
+      - application/json
+      description: Bosh의 프로세스 목록을 가져온다.
+      parameters:
+      - description: Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.
+        in: query
+        name: uuid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshProcess'
+              type: object
+      summary: Bosh의 프로세스 목록을 가져온다.
+      tags:
+      - AP
+  /api/v1/ap/bosh/summary:
+    get:
+      consumes:
+      - application/json
+      description: Bosh Summary 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshSummary'
+              type: object
+      summary: Bosh Summary 정보를 가져온다.
+      tags:
+      - AP
+  /api/v1/ap/container/app:
+    get:
+      consumes:
+      - application/json
+      description: App 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/cfclient.App'
+              type: object
+      summary: App 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/cell:
+    get:
+      consumes:
+      - application/json
+      description: Cell 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.CellInfo'
+              type: object
+      summary: Cell 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/cell/status:
+    get:
+      consumes:
+      - application/json
+      description: Cell(Diego-Cell VM)의 Status 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Cell(Diego-Cell VM)의 Status 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container:
+    get:
+      consumes:
+      - application/json
+      description: App 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/cfclient.App'
+              type: object
+      summary: App 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/cpu/:id/loads:
+    get:
+      consumes:
+      - application/json
+      description: Container CPU Loads 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container CPU Loads 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/cpu/:id/usages:
+    get:
+      consumes:
+      - application/json
+      description: Container CPU Usages 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container CPU Usages 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/disk/:id/usages:
+    get:
+      consumes:
+      - application/json
+      description: Container Disk Usages 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container Disk Usages 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/memory/:id/usages:
+    get:
+      consumes:
+      - application/json
+      description: Container Memory Usages 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container Memory Usages 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/network/:id/bytes:
+    get:
+      consumes:
+      - application/json
+      description: Container Network Bytes 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container Network Bytes 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/network/:id/drops:
+    get:
+      consumes:
+      - application/json
+      description: Container Network Drops 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container Network Drops 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/network/:id/errors:
+    get:
+      consumes:
+      - application/json
+      description: Container Network Errors 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container Network Errors 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/container/status:
+    get:
+      consumes:
+      - application/json
+      description: Container의 Status 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Status'
+              type: object
+      summary: Container의 Status 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/overview:
+    get:
+      consumes:
+      - application/json
+      description: Container 페이지의 Overview 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Overview'
+              type: object
+      summary: Container 페이지 Overview 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/container/zone:
+    get:
+      consumes:
+      - application/json
+      description: Zone 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.ZoneInfo'
+              type: object
+      summary: Zone 정보 가져오기
+      tags:
+      - AP
+  /api/v1/ap/paasta/overview:
+    get:
+      consumes:
+      - application/json
+      description: PaaS-TA Overview 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.PaastaOverview'
+              type: object
+      summary: PaaS-TA Overview 정보를 가져온다.
+      tags:
+      - AP
+  /api/v1/ap/paasta/process:
+    get:
+      consumes:
+      - application/json
+      description: PaaS-TA Core 별 프로세스 목록을 가져온다.
+      parameters:
+      - description: Paasta의 프로세스 목록 조회시 VM ID를 주입한다.
+        in: query
+        name: uuid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.PaastaProcess'
+              type: object
+      summary: PaaS-TA Core 별 프로세스 목록을 가져온다.
+      tags:
+      - AP
+  /api/v1/ap/paasta/summary:
+    get:
+      consumes:
+      - application/json
+      description: PaaS-TA Summary 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.PaastaSummary'
+              type: object
+      summary: PaaS-TA Summary 정보를 가져온다.
+      tags:
+      - AP
   /api/v1/bosh:
     get:
       consumes:
@@ -357,15 +1469,35 @@ paths:
       summary: Bosh의 차트 정보를 가져온다.
       tags:
       - AP
-  /api/v1/bosh/log:
+  /api/v1/log:
     get:
       consumes:
       - application/json
-      description: Bosh의 로그 정보를 가져온다.
+      description: 로그 정보를 가져온다.
       parameters:
-      - description: Bosh의 로그 정보 조회시 Bosh ID를 주입한다.
+      - description: PaaS-TA Core 별 로그 정보 조회시 VM UUID를 주입한다.
         in: query
-        name: id
+        name: uuid
+        type: string
+      - description: PaaS-TA Core 별 로그 정보 조회시 키워드 (keyword)를      주입한다.
+        in: query
+        name: keyword
+        type: string
+      - description: PaaS-TA Core 별 로그 정보 조회시 대상날짜 (targetDate)를  주입한다.
+        in: query
+        name: targetDate
+        type: string
+      - description: PaaS-TA Core 별 로그 정보 조회시 시작시간 (startTime)를   주입한다.
+        in: query
+        name: startTime
+        type: string
+      - description: PaaS-TA Core 별 로그 정보 조회시 종료시간 (endTime)를     주입한다.
+        in: query
+        name: endTime
+        type: string
+      - description: PaaS-TA Core 별 로그 정보 조회시 조회기간 (period)를      주입한다.
+        in: query
+        name: period
         type: string
       produces:
       - application/json
@@ -377,16 +1509,14 @@ paths:
             - $ref: '#/definitions/apiHelpers.BasicResponseForm'
             - properties:
                 responseInfo:
-                  $ref: '#/definitions/v1.BoshLog'
+                  $ref: '#/definitions/v1.Logs'
               type: object
-      summary: Bosh의 로그 정보를 가져온다.
-      tags:
-      - AP
-  /api/v1/bosh/overview:
+      summary: 로그 정보 가져오기
+  /api/v1/paasta:
     get:
       consumes:
       - application/json
-      description: Bosh의 상태 별 개수를 가져온다.
+      description: PaaS-TA Core의 목록을 가져온다.
       produces:
       - application/json
       responses:
@@ -397,20 +1527,36 @@ paths:
             - $ref: '#/definitions/apiHelpers.BasicResponseForm'
             - properties:
                 responseInfo:
-                  $ref: '#/definitions/v1.BoshSummary'
+                  $ref: '#/definitions/v1.Paasta'
               type: object
-      summary: Bosh의 상태 별 개수를 가져온다.
+      summary: PaaS-TA Core의 목록을 가져온다.
       tags:
       - AP
-  /api/v1/bosh/process:
+  /api/v1/paasta/Chart:
     get:
       consumes:
       - application/json
-      description: Bosh의 프로세스 목록을 가져온다.
+      description: PaaS-TA Core 별 차트 정보를 가져온다.
       parameters:
-      - description: Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.
+      - description: PaaS-TA Core 별 차트 정보 조회시 VM UUID를 주입한다.
         in: query
-        name: id
+        name: uuid
+        type: string
+      - description: PaaS-TA Core 별 차트 정보 조회시 기본 시간 범위 (defaultTimeRange=15m)를               주입한다.
+        in: query
+        name: defaultTimeRange
+        type: string
+      - description: PaaS-TA Core 별 차트 정보 조회시 시간 범위 시작 (timeRangeFrom=2022-06-16T10:21:39)를  주입한다.
+        in: query
+        name: timeRangeFrom
+        type: string
+      - description: PaaS-TA Core 별 차트 정보 조회시 시간 범위 종료 (timeRangeTo=2022-06-16T10:21:39)를    주입한다.
+        in: query
+        name: timeRangeTo
+        type: string
+      - description: PaaS-TA Core 별 차트 정보 조회시 그룹 (groupBy=1m)을                               주입한다.
+        in: query
+        name: groupBy
         type: string
       produces:
       - application/json
@@ -422,16 +1568,16 @@ paths:
             - $ref: '#/definitions/apiHelpers.BasicResponseForm'
             - properties:
                 responseInfo:
-                  $ref: '#/definitions/v1.BoshProcess'
+                  $ref: '#/definitions/v1.PaastaChart'
               type: object
-      summary: Bosh의 프로세스 목록을 가져온다.
+      summary: PaaS-TA Core 별 차트 정보를 가져온다.
       tags:
       - AP
   /api/v1/token:
     post:
       consumes:
       - application/json
-      description: '[테스트] 토큰 정보를 생성한다.'
+      description: 토큰 정보를 생성한다.
       parameters:
       - description: 토큰을 생성하기 위해 필요한 유저 정보를 제공한다.
         in: body
@@ -451,11 +1597,11 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.TokenDetails'
               type: object
-      summary: '[테스트] 토큰 생성하기'
+      summary: 토큰 생성하기
     put:
       consumes:
       - application/json
-      description: '[테스트] 토큰 정보를 리프레시한다.'
+      description: 토큰 정보를 리프레시한다.
       parameters:
       - description: 토큰을 리프레시하기 위한 토큰 정보를 제공한다.
         in: body
@@ -475,12 +1621,12 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.TokenDetails'
               type: object
-      summary: '[테스트] 토큰 리프레시하기'
+      summary: 토큰 리프레시하기
   /api/v1/users:
     get:
       consumes:
       - application/json
-      description: '[테스트] 전체 또는 단일 유저 정보를 가져온다.'
+      description: 전체 또는 단일 유저 정보를 가져온다.
       parameters:
       - description: 단일 사용자 정보 조회시 유저명을 주입한다.
         in: query
@@ -498,14 +1644,14 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.UserInfo'
               type: object
-      summary: '[테스트] 전체 또는 단일 유저 정보 가져오기'
+      summary: 전체 또는 단일 유저 정보 가져오기
 swagger: "2.0"
 tags:
-- description: Application Platform API (Cloud Foundry)
+- description: Application Platform API (Based on Cloud Foundry)
   name: AP
-- description: Container Platform API (Kubernetes)
+- description: Container Platform API (Based on Kubernetes)
   name: CP
-- description: APM (Pinpoint)
+- description: Application Performance Monitoring API (Based on Pinpoint)
   name: SaaS
-- description: Openstack(Zabbix)
+- description: Infrastructure Monitoring API (Based on Openstack/Zabbix)
   name: IaaS
