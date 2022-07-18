@@ -563,7 +563,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/container/app": {
             "get": {
-                "description": "App 정보를 가져온다.",
+                "description": "현재 배포된 모든 App의 상세정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -586,7 +586,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/cfclient.App"
+                                            "$ref": "#/definitions/v1.AppInfo"
                                         }
                                     }
                                 }
@@ -598,7 +598,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/container/cell": {
             "get": {
-                "description": "Cell 정보를 가져온다.",
+                "description": "현재 배포된 모든 Diego-Cell VM의 상세정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -633,7 +633,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/container/cell/status": {
             "get": {
-                "description": "Cell(Diego-Cell VM)의 Status 정보를 가져온다.",
+                "description": "Diego-Cell VM의 Status 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -643,7 +643,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Cell(Diego-Cell VM)의 Status 정보 가져오기",
+                "summary": "Cell Status 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -656,7 +656,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
+                                            "$ref": "#/definitions/v1.Status"
                                         }
                                     }
                                 }
@@ -668,7 +668,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/container/container": {
             "get": {
-                "description": "App 정보를 가져온다.",
+                "description": "현재 배포된 모든 App 당 생성된 Container 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -678,7 +678,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "App 정보 가져오기",
+                "summary": "Container 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -691,7 +691,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/cfclient.App"
+                                            "$ref": "#/definitions/v1.ContainerInfo"
                                         }
                                     }
                                 }
@@ -701,7 +701,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/container/container/cpu/:id/loads": {
+        "/api/v1/ap/container/container/cpu/{id}/loads": {
             "get": {
                 "description": "Container CPU Loads 정보를 가져온다.",
                 "consumes": [
@@ -714,29 +714,36 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container CPU Loads 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
-        "/api/v1/ap/container/container/cpu/:id/usages": {
+        "/api/v1/ap/container/container/cpu/{id}/usages": {
             "get": {
                 "description": "Container CPU Usages 정보를 가져온다.",
                 "consumes": [
@@ -749,29 +756,36 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container CPU Usages 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
-        "/api/v1/ap/container/container/disk/:id/usages": {
+        "/api/v1/ap/container/container/disk/{id}/usages": {
             "get": {
                 "description": "Container Disk Usages 정보를 가져온다.",
                 "consumes": [
@@ -784,29 +798,36 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container Disk Usages 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
-        "/api/v1/ap/container/container/memory/:id/usages": {
+        "/api/v1/ap/container/container/memory/{id}/usages": {
             "get": {
                 "description": "Container Memory Usages 정보를 가져온다.",
                 "consumes": [
@@ -819,29 +840,36 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container Memory Usages 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
-        "/api/v1/ap/container/container/network/:id/bytes": {
+        "/api/v1/ap/container/container/network/{id}/bytes": {
             "get": {
                 "description": "Container Network Bytes 정보를 가져온다.",
                 "consumes": [
@@ -854,29 +882,36 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container Network Bytes 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
-        "/api/v1/ap/container/container/network/:id/drops": {
+        "/api/v1/ap/container/container/network/{id}/drops": {
             "get": {
                 "description": "Container Network Drops 정보를 가져온다.",
                 "consumes": [
@@ -889,29 +924,36 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container Network Drops 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
-        "/api/v1/ap/container/container/network/:id/errors": {
+        "/api/v1/ap/container/container/network/{id}/errors": {
             "get": {
                 "description": "Container Network Errors 정보를 가져온다.",
                 "consumes": [
@@ -924,26 +966,33 @@ const docTemplate = `{
                     "AP"
                 ],
                 "summary": "Container Network Errors 정보 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Overview"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
                     }
-                }
+                ],
+                "responses": {}
             }
         },
         "/api/v1/ap/container/container/status": {
@@ -958,7 +1007,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Container의 Status 정보 가져오기",
+                "summary": "Container Status 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -983,7 +1032,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/container/overview": {
             "get": {
-                "description": "Container 페이지의 Overview 정보를 가져온다.",
+                "description": "Container 페이지를 위한 Overview 정보를 가져온다.\nZone - Cell - App - Container 구조를 매핑하여 보여준다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1018,7 +1067,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/container/zone": {
             "get": {
-                "description": "Zone 정보를 가져온다.",
+                "description": "Zone 기준 현재 배포된 Diego-Cell VM 갯수를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1555,220 +1604,6 @@ const docTemplate = `{
                 },
                 "statusText": {
                     "type": "string"
-                }
-            }
-        },
-        "cfclient.App": {
-            "type": "object",
-            "properties": {
-                "buildpack": {
-                    "type": "string"
-                },
-                "command": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "detected_buildpack": {
-                    "type": "string"
-                },
-                "detected_buildpack_guid": {
-                    "type": "string"
-                },
-                "detected_start_command": {
-                    "type": "string"
-                },
-                "diego": {
-                    "type": "boolean"
-                },
-                "disk_quota": {
-                    "type": "integer"
-                },
-                "docker_credentials": {
-                    "$ref": "#/definitions/cfclient.DockerCredentials"
-                },
-                "docker_credentials_json": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "docker_image": {
-                    "type": "string"
-                },
-                "enable_ssh": {
-                    "type": "boolean"
-                },
-                "environment_json": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "guid": {
-                    "type": "string"
-                },
-                "health_check_http_endpoint": {
-                    "type": "string"
-                },
-                "health_check_timeout": {
-                    "type": "integer"
-                },
-                "health_check_type": {
-                    "type": "string"
-                },
-                "instances": {
-                    "type": "integer"
-                },
-                "memory": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "package_state": {
-                    "type": "string"
-                },
-                "package_updated_at": {
-                    "type": "string"
-                },
-                "ports": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "space": {
-                    "$ref": "#/definitions/cfclient.SpaceResource"
-                },
-                "space_guid": {
-                    "type": "string"
-                },
-                "space_url": {
-                    "type": "string"
-                },
-                "stack_guid": {
-                    "type": "string"
-                },
-                "staging_failed_description": {
-                    "type": "string"
-                },
-                "staging_failed_reason": {
-                    "type": "string"
-                },
-                "state": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "cfclient.DockerCredentials": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "cfclient.Meta": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "guid": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "cfclient.Org": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "default_isolation_segment_guid": {
-                    "type": "string"
-                },
-                "guid": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "quota_definition_guid": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "cfclient.OrgResource": {
-            "type": "object",
-            "properties": {
-                "entity": {
-                    "$ref": "#/definitions/cfclient.Org"
-                },
-                "metadata": {
-                    "$ref": "#/definitions/cfclient.Meta"
-                }
-            }
-        },
-        "cfclient.Space": {
-            "type": "object",
-            "properties": {
-                "allow_ssh": {
-                    "type": "boolean"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "guid": {
-                    "type": "string"
-                },
-                "isolation_segment_guid": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "organization": {
-                    "$ref": "#/definitions/cfclient.OrgResource"
-                },
-                "organization_guid": {
-                    "type": "string"
-                },
-                "organization_url": {
-                    "type": "string"
-                },
-                "space_quota_definition_guid": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "cfclient.SpaceResource": {
-            "type": "object",
-            "properties": {
-                "entity": {
-                    "$ref": "#/definitions/cfclient.Space"
-                },
-                "metadata": {
-                    "$ref": "#/definitions/cfclient.Meta"
                 }
             }
         },
