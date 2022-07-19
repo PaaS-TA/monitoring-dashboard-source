@@ -46,27 +46,27 @@ type (
 	}
 
 	AlarmSns struct {
-		ChannelId  uint       `json:"channelId"    gorm:"primaryKey;autoIncrement;not null;-:write"`
-		OriginType string     `json:"originType"   gorm:"not null;default:all"`
-		SnsType    string     `json:"snsType"      gorm:"not null"`
-		SnsId      string     `json:"snsId"        gorm:"not null"`
-		Token      string     `json:"token"`
-		Expl       string     `json:"expl"         gorm:"not null"`
-		SnsSendYN  string     `json:"snsSendYN"    gorm:"not null;default:Y"`
-		RegDate    time.Time  `json:"regDate"      gorm:"<-:create"`
-		RegUser    string     `json:"regUser"      gorm:"<-:create;default:system"`
-		ModiDate   time.Time  `json:"modiDate"     gorm:"<-:update"`
-		ModiUser   string     `json:"modiUser"     gorm:"<-:update;default:system"`
+		ChannelId  uint      `json:"channelId"    gorm:"primaryKey;autoIncrement;not null;-:write"`
+		OriginType string    `json:"originType"   gorm:"not null;default:all"`
+		SnsType    string    `json:"snsType"      gorm:"not null"`
+		SnsId      string    `json:"snsId"        gorm:"not null"`
+		Token      string    `json:"token"`
+		Expl       string    `json:"expl"         gorm:"not null"`
+		SnsSendYN  string    `json:"snsSendYN"    gorm:"not null;default:Y"`
+		RegDate    time.Time `json:"regDate"      gorm:"<-:create"`
+		RegUser    string    `json:"regUser"      gorm:"<-:create;default:system"`
+		ModiDate   time.Time `json:"modiDate"     gorm:"<-:update"`
+		ModiUser   string    `json:"modiUser"     gorm:"<-:update;default:system"`
 	}
 
 	AlarmActions struct {
-		Id              int        `json:"id"               gorm:"primaryKey;autoIncrement;not null;-:write"`
-		AlarmId         int        `json:"alarmId"`
-		AlarmActionDesc string     `json:"alarmActionDesc"`
-		RegDate         time.Time  `json:"regDate"          gorm:"<-:create"`
-		RegUser         string     `json:"regUser"          gorm:"<-:create"`
-		ModiDate        time.Time  `json:"modiDate"         gorm:"<-:update"`
-		ModiUser        string     `json:"modiUser"         gorm:"<-:update"`
+		Id              int       `json:"id"               gorm:"primaryKey;autoIncrement;not null;-:write"`
+		AlarmId         int       `json:"alarmId"`
+		AlarmActionDesc string    `json:"alarmActionDesc"`
+		RegDate         time.Time `json:"regDate"          gorm:"<-:create"`
+		RegUser         string    `json:"regUser"          gorm:"<-:create"`
+		ModiDate        time.Time `json:"modiDate"         gorm:"<-:update"`
+		ModiUser        string    `json:"modiUser"         gorm:"<-:update"`
 	}
 )
 
@@ -109,7 +109,7 @@ type (
 		Id              int    `json:"id"`
 		AlarmId         int    `json:"alarmId"`
 		AlarmActionDesc string `json:"alarmActionDesc"`
-		RegUser         string
+		RegUser         string `json:"regUser" swaggerignore:"true"`
 	}
 
 	AlarmStatisticsCriteriaRequest struct {
@@ -120,12 +120,12 @@ type (
 	}
 
 	AlarmStatisticsParam struct {
-		OriginType string
-		ResourceType string
-		AliasPrefix string
-		Period string
+		OriginType    string
+		ResourceType  string
+		AliasPrefix   string
+		Period        string
 		TimeCriterion string
-		DateFormat string
-		ExtraParams interface{}
+		DateFormat    string
+		ExtraParams   interface{}
 	}
 )

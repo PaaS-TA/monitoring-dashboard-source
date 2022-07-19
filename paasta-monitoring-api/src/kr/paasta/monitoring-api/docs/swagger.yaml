@@ -29,8 +29,6 @@ definitions:
         type: integer
       id:
         type: integer
-      regUser:
-        type: string
     type: object
   v1.AlarmPolicies:
     properties:
@@ -603,7 +601,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: 전체 알람 현황을 가져온다.
+      description: 알람 현황을 가져온다.
       parameters:
       - description: Origin Type
         enum:
@@ -645,7 +643,7 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.Alarms'
               type: object
-      summary: 전체 알람 현황 가져오기
+      summary: 알람 현황 가져오기
       tags:
       - Common
   /api/v1/alarm/action:
@@ -654,7 +652,7 @@ paths:
       - application/json
       description: 알람에 대한 조치 내용을 삭제한다.
       parameters:
-      - description: 삭제할 알람 정보(Id)를  주입한다.
+      - description: 삭제할 알람 정보(ID)를  주입한다.
         in: body
         name: AlarmActionRequest
         required: true
@@ -674,6 +672,15 @@ paths:
       consumes:
       - application/json
       description: 알람에 대한 조치 내용을 가져온다.
+      parameters:
+      - description: Alarm ID
+        in: query
+        name: alarmId
+        type: integer
+      - description: Alarm Action Desc
+        in: query
+        name: alarmActionDesc
+        type: string
       produces:
       - application/json
       responses:
@@ -681,7 +688,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 가져오기
+      summary: 알람 조치 내용 가져오기
       tags:
       - Common
     patch:
@@ -689,7 +696,7 @@ paths:
       - application/json
       description: 알람에 대한 조치 내용을 수정한다.
       parameters:
-      - description: 수정할 알람 정보를 주입한다.
+      - description: 수정할 알람 정보(ID)를  주입한다.
         in: body
         name: AlarmActionRequest
         required: true
@@ -702,15 +709,15 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 수정하기
+      summary: 알람 조치 내용 수정하기
       tags:
       - Common
     post:
       consumes:
       - application/json
-      description: 알람에 대한 조치 내용을 작성한다.
+      description: 알람에 대한 조치 내용을 신규 작성한다.
       parameters:
-      - description: 새로 작성할 알람 정보를 주입한다.
+      - description: 신규 작성할 알람 정보를 주입한다.
         in: body
         name: AlarmActionRequest
         required: true
@@ -723,7 +730,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 작성하기
+      summary: 알람 조치 내용 신규 작성하기
       tags:
       - Common
   /api/v1/alarm/policy:

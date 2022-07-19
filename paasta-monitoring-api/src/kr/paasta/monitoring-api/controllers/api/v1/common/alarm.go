@@ -21,8 +21,8 @@ func GetAlarmController(conn connections.Connections) *AlarmController {
 
 // GetAlarms
 //  @Tags         Common
-//  @Summary      전체 알람 현황 가져오기
-//  @Description  전체 알람 현황을 가져온다.
+//  @Summary      알람 현황 가져오기
+//  @Description  알람 현황을 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        originType     query     string  false  "Origin Type"  enums(bos, pas, con, ias)

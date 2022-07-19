@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/api/v1/alarm": {
             "get": {
-                "description": "전체 알람 현황을 가져온다.",
+                "description": "알람 현황을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "Common"
                 ],
-                "summary": "전체 알람 현황 가져오기",
+                "summary": "알람 현황 가져오기",
                 "parameters": [
                     {
                         "enum": [
@@ -104,7 +104,21 @@ const docTemplate = `{
                 "tags": [
                     "Common"
                 ],
-                "summary": "알람에 대한 조치 내용 가져오기",
+                "summary": "알람 조치 내용 가져오기",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Alarm ID",
+                        "name": "alarmId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Alarm Action Desc",
+                        "name": "alarmActionDesc",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -115,7 +129,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "알람에 대한 조치 내용을 작성한다.",
+                "description": "알람에 대한 조치 내용을 신규 작성한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -125,10 +139,10 @@ const docTemplate = `{
                 "tags": [
                     "Common"
                 ],
-                "summary": "알람에 대한 조치 내용 작성하기",
+                "summary": "알람 조치 내용 신규 작성하기",
                 "parameters": [
                     {
-                        "description": "새로 작성할 알람 정보를 주입한다.",
+                        "description": "신규 작성할 알람 정보를 주입한다.",
                         "name": "AlarmActionRequest",
                         "in": "body",
                         "required": true,
@@ -160,7 +174,7 @@ const docTemplate = `{
                 "summary": "알람에 대한 조치 내용 삭제하기",
                 "parameters": [
                     {
-                        "description": "삭제할 알람 정보(Id)를  주입한다.",
+                        "description": "삭제할 알람 정보(ID)를  주입한다.",
                         "name": "AlarmActionRequest",
                         "in": "body",
                         "required": true,
@@ -189,10 +203,10 @@ const docTemplate = `{
                 "tags": [
                     "Common"
                 ],
-                "summary": "알람에 대한 조치 내용 수정하기",
+                "summary": "알람 조치 내용 수정하기",
                 "parameters": [
                     {
-                        "description": "수정할 알람 정보를 주입한다.",
+                        "description": "수정할 알람 정보(ID)를  주입한다.",
                         "name": "AlarmActionRequest",
                         "in": "body",
                         "required": true,
@@ -1675,9 +1689,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "regUser": {
-                    "type": "string"
                 }
             }
         },
