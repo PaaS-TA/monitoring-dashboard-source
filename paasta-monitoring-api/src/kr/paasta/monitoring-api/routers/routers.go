@@ -101,21 +101,21 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.DELETE("/alarm/action", alarmAction.DeleteAlarmAction)
 	v1.GET("/log/:uuid", logsearch.GetLogs)
 
-	// AP - BOSH
+	// AP > BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
 	v1.GET("/ap/bosh/overview", apBosh.GetBoshOverview)
 	v1.GET("/ap/bosh/summary", apBosh.GetBoshSummary)
 	v1.GET("/ap/bosh/process", apBosh.GetBoshProcessByMemory)
 	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
 
-	// AP - PaaS-TA
+	// AP > PaaS-TA
 	v1.GET("/ap/paasta", apPaasta.GetPaastaInfoList)
 	v1.GET("/ap/paasta/overview", apPaasta.GetPaastaOverview)
 	v1.GET("/ap/paasta/summary", apPaasta.GetPaastaSummary)
 	v1.GET("/ap/paasta/process", apPaasta.GetPaastaProcessByMemory)
 	v1.GET("/ap/paasta/chart/:uuid", apPaasta.GetPaastaChart)
 
-	// AP - Container
+	// AP > Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
 	v1.GET("/ap/container/zone", apContainer.GetZoneInfo)
 	v1.GET("/ap/container/app", apContainer.GetAppInfo)

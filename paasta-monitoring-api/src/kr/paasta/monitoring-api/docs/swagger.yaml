@@ -599,6 +599,133 @@ info:
   title: Monitoring Dashboard API
   version: 5.8.0
 paths:
+  /api/v1/alarm:
+    get:
+      consumes:
+      - application/json
+      description: 전체 알람 현황을 가져온다.
+      parameters:
+      - description: Origin Type
+        enum:
+        - bos
+        - pas
+        - con
+        - ias
+        in: query
+        name: originType
+        type: string
+      - description: Alarm Type
+        enum:
+        - cpu
+        - memory
+        - disk
+        in: query
+        name: alarmType
+        type: string
+      - description: Level
+        enum:
+        - warning
+        - critical
+        in: query
+        name: level
+        type: string
+      - description: Resolve Status
+        in: query
+        name: resolveStatus
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Alarms'
+              type: object
+      summary: 전체 알람 현황 가져오기
+      tags:
+      - Common
+  /api/v1/alarm/action:
+    delete:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 삭제한다.
+      parameters:
+      - description: 삭제할 알람 정보(Id)를  주입한다.
+        in: body
+        name: AlarmActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 삭제하기
+      tags:
+      - Common
+    get:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 가져오기
+      tags:
+      - Common
+    patch:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 수정한다.
+      parameters:
+      - description: 수정할 알람 정보를 주입한다.
+        in: body
+        name: AlarmActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 수정하기
+      tags:
+      - Common
+    post:
+      consumes:
+      - application/json
+      description: 알람에 대한 조치 내용을 작성한다.
+      parameters:
+      - description: 새로 작성할 알람 정보를 주입한다.
+        in: body
+        name: AlarmActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람에 대한 조치 내용 작성하기
+      tags:
+      - Common
   /api/v1/alarm/policy:
     get:
       consumes:
@@ -660,84 +787,6 @@ paths:
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
       summary: 전체 알람 타겟 업데이트하기
-      tags:
-      - AP
-  /api/v1/ap/alarm/action:
-    delete:
-      consumes:
-      - application/json
-      description: 알람에 대한 조치 내용을 삭제한다.
-      parameters:
-      - description: 삭제할 알람 정보(Id)를  주입한다.
-        in: body
-        name: AlarmActionRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.AlarmActionRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 삭제하기
-      tags:
-      - AP
-    get:
-      consumes:
-      - application/json
-      description: 알람에 대한 조치 내용을 가져온다.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 가져오기
-      tags:
-      - AP
-    patch:
-      consumes:
-      - application/json
-      description: 알람에 대한 조치 내용을 수정한다.
-      parameters:
-      - description: 수정할 알람 정보를 주입한다.
-        in: body
-        name: AlarmActionRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.AlarmActionRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 수정하기
-      tags:
-      - AP
-    post:
-      consumes:
-      - application/json
-      description: 알람에 대한 조치 내용을 작성한다.
-      parameters:
-      - description: 새로 작성할 알람 정보를 주입한다.
-        in: body
-        name: AlarmActionRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.AlarmActionRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람에 대한 조치 내용 작성하기
       tags:
       - AP
   /api/v1/ap/alarm/sns:
@@ -851,26 +900,6 @@ paths:
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
       summary: 알람 통계 그래프를 그리기 위한 데이터 가져오기
-      tags:
-      - AP
-  /api/v1/ap/alarm/status:
-    get:
-      consumes:
-      - application/json
-      description: 전체 알람 현황을 가져온다.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
-            - properties:
-                responseInfo:
-                  $ref: '#/definitions/v1.Alarms'
-              type: object
-      summary: 전체 알람 현황 가져오기
       tags:
       - AP
   /api/v1/ap/bosh/overview:
@@ -1578,6 +1607,8 @@ paths:
       summary: 전체 또는 단일 유저 정보 가져오기
 swagger: "2.0"
 tags:
+- description: Common Module API (Alarm & Log)
+  name: Common
 - description: Application Platform API (Based on Cloud Foundry)
   name: AP
 - description: Container Platform API (Based on Kubernetes)

@@ -16,6 +16,201 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/alarm": {
+            "get": {
+                "description": "전체 알람 현황을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "전체 알람 현황 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Alarm Type",
+                        "name": "alarmType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "warning",
+                            "critical"
+                        ],
+                        "type": "string",
+                        "description": "Level",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Resolve Status",
+                        "name": "resolveStatus",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Alarms"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/action": {
+            "get": {
+                "description": "알람에 대한 조치 내용을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람에 대한 조치 내용 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "알람에 대한 조치 내용을 작성한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람에 대한 조치 내용 작성하기",
+                "parameters": [
+                    {
+                        "description": "새로 작성할 알람 정보를 주입한다.",
+                        "name": "AlarmActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "알람에 대한 조치 내용을 삭제한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람에 대한 조치 내용 삭제하기",
+                "parameters": [
+                    {
+                        "description": "삭제할 알람 정보(Id)를  주입한다.",
+                        "name": "AlarmActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "알람에 대한 조치 내용을 수정한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람에 대한 조치 내용 수정하기",
+                "parameters": [
+                    {
+                        "description": "수정할 알람 정보를 주입한다.",
+                        "name": "AlarmActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/alarm/policy": {
             "get": {
                 "description": "전체 알람 정책을 가져온다.",
@@ -104,125 +299,6 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/v1.AlarmPolicyRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/ap/alarm/action": {
-            "get": {
-                "description": "알람에 대한 조치 내용을 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "알람에 대한 조치 내용 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "알람에 대한 조치 내용을 작성한다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "알람에 대한 조치 내용 작성하기",
-                "parameters": [
-                    {
-                        "description": "새로 작성할 알람 정보를 주입한다.",
-                        "name": "AlarmActionRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.AlarmActionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "알람에 대한 조치 내용을 삭제한다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "알람에 대한 조치 내용 삭제하기",
-                "parameters": [
-                    {
-                        "description": "삭제할 알람 정보(Id)를  주입한다.",
-                        "name": "AlarmActionRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.AlarmActionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "description": "알람에 대한 조치 내용을 수정한다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "알람에 대한 조치 내용 수정하기",
-                "parameters": [
-                    {
-                        "description": "수정할 알람 정보를 주입한다.",
-                        "name": "AlarmActionRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.AlarmActionRequest"
                         }
                     }
                 ],
@@ -408,41 +484,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/ap/alarm/status": {
-            "get": {
-                "description": "전체 알람 현황을 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "전체 알람 현황 가져오기",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Alarms"
-                                        }
-                                    }
-                                }
-                            ]
                         }
                     }
                 }
@@ -2494,6 +2535,10 @@ const docTemplate = `{
         }
     },
     "tags": [
+        {
+            "description": "Common Module API (Alarm \u0026 Log)",
+            "name": "Common"
+        },
         {
             "description": "Application Platform API (Based on Cloud Foundry)",
             "name": "AP"

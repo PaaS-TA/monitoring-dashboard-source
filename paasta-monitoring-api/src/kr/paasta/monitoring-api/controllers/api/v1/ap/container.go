@@ -26,7 +26,6 @@ func GetApContainerController(conn connections.Connections) *ApContainerControll
 }
 
 // GetZoneInfo
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Zone 정보 가져오기
 //  @Description  Zone 기준 현재 배포된 Diego-Cell VM 갯수를 가져온다.
@@ -46,7 +45,6 @@ func (ap *ApContainerController) GetZoneInfo(ctx echo.Context) error {
 }
 
 // GetCellInfo
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Cell 정보 가져오기
 //  @Description  현재 배포된 모든 Diego-Cell VM의 상세정보를 가져온다.
@@ -66,7 +64,6 @@ func (ap *ApContainerController) GetCellInfo(ctx echo.Context) error {
 }
 
 // GetAppInfo
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      App 정보 가져오기
 //  @Description  현재 배포된 모든 App의 상세정보를 가져온다.
@@ -86,7 +83,6 @@ func (ap *ApContainerController) GetAppInfo(ctx echo.Context) error {
 }
 
 // GetContainerInfo
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container 정보 가져오기
 //  @Description  현재 배포된 모든 App 당 생성된 Container 정보를 가져온다.
@@ -106,7 +102,6 @@ func (ap *ApContainerController) GetContainerInfo(ctx echo.Context) error {
 }
 
 // GetContainerPageOverview
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container 페이지 Overview 정보 가져오기
 //  @Description  Container 페이지를 위한 Overview 정보를 가져온다.
@@ -127,7 +122,6 @@ func (ap *ApContainerController) GetContainerPageOverview(ctx echo.Context) erro
 }
 
 // GetContainerStatus
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container Status 정보 가져오기
 //  @Description  Container의 Status 정보를 가져온다.
@@ -147,7 +141,6 @@ func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
 }
 
 // GetCellStatus
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Cell Status 정보 가져오기
 //  @Description  Diego-Cell VM의 Status 정보를 가져온다.
@@ -167,7 +160,6 @@ func (ap *ApContainerController) GetCellStatus(ctx echo.Context) error {
 }
 
 // GetContainerCpuUsages
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container CPU Usages 정보 가져오기
 //  @Description  Container CPU Usages 정보를 가져온다.
@@ -189,7 +181,6 @@ func (ap *ApContainerController) GetContainerCpuUsages(ctx echo.Context) error {
 }
 
 // GetContainerCpuLoads
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container CPU Loads 정보 가져오기
 //  @Description  Container CPU Loads 정보를 가져온다.
@@ -211,7 +202,6 @@ func (ap *ApContainerController) GetContainerCpuLoads(ctx echo.Context) error {
 }
 
 // GetContainerMemoryUsages
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container Memory Usages 정보 가져오기
 //  @Description  Container Memory Usages 정보를 가져온다.
@@ -233,7 +223,6 @@ func (ap *ApContainerController) GetContainerMemoryUsages(ctx echo.Context) erro
 }
 
 // GetContainerDiskUsages
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container Disk Usages 정보 가져오기
 //  @Description  Container Disk Usages 정보를 가져온다.
@@ -255,7 +244,6 @@ func (ap *ApContainerController) GetContainerDiskUsages(ctx echo.Context) error 
 }
 
 // GetContainerNetworkBytes
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container Network Bytes 정보 가져오기
 //  @Description  Container Network Bytes 정보를 가져온다.
@@ -277,7 +265,6 @@ func (ap *ApContainerController) GetContainerNetworkBytes(ctx echo.Context) erro
 }
 
 // GetContainerNetworkDrops
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container Network Drops 정보 가져오기
 //  @Description  Container Network Drops 정보를 가져온다.
@@ -299,7 +286,6 @@ func (ap *ApContainerController) GetContainerNetworkDrops(ctx echo.Context) erro
 }
 
 // GetContainerNetworkErrors
-//  * Annotations for Swagger *
 //  @Tags         AP
 //  @Summary      Container Network Errors 정보 가져오기
 //  @Description  Container Network Errors 정보를 가져온다.
