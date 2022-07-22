@@ -16,16 +16,228 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/ap/alarm/policy": {
+        "/api/v1/alarm": {
             "get": {
-                "description": "[테스트] 전체 알람 정책을 가져온다.",
+                "description": "알람 현황을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 전체 알람 정책 가져오기",
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 현황 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Alarm Type",
+                        "name": "alarmType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "warning",
+                            "critical"
+                        ],
+                        "type": "string",
+                        "description": "Level",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Resolve Status",
+                        "name": "resolveStatus",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Alarms"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/action": {
+            "get": {
+                "description": "알람에 대한 조치 내용을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 조치 내용 가져오기",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Alarm ID",
+                        "name": "alarmId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Alarm Action Desc",
+                        "name": "alarmActionDesc",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "알람에 대한 조치 내용을 신규 작성한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 조치 내용 신규 작성하기",
+                "parameters": [
+                    {
+                        "description": "신규 작성할 알람 정보를 주입한다.",
+                        "name": "AlarmActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "알람에 대한 조치 내용을 삭제한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람에 대한 조치 내용 삭제하기",
+                "parameters": [
+                    {
+                        "description": "삭제할 알람 정보(ID)를  주입한다.",
+                        "name": "AlarmActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "알람에 대한 조치 내용을 수정한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 조치 내용 수정하기",
+                "parameters": [
+                    {
+                        "description": "수정할 알람 정보(ID)를  주입한다.",
+                        "name": "AlarmActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/policy": {
+            "get": {
+                "description": "전체 알람 정책을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "전체 알람 정책 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -48,14 +260,17 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "[테스트] 전체 알람 정책을 업데이트 한다.",
+                "description": "전체 알람 정책을 업데이트 한다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 전체 알람 정책 업데이트하기",
+                "tags": [
+                    "AP"
+                ],
+                "summary": "전체 알람 정책 업데이트하기",
                 "parameters": [
                     {
                         "description": "알람 정책을 변경하기 위한 정보를 주입한다.",
@@ -77,16 +292,53 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/alarm/status": {
-            "get": {
-                "description": "[테스트] 전체 알람 현황을 가져온다.",
+        "/api/v1/alarm/target": {
+            "put": {
+                "description": "전체 알람 타겟을 업데이트 한다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 전체 알람 현황 가져오기",
+                "tags": [
+                    "AP"
+                ],
+                "summary": "전체 알람 타겟 업데이트하기",
+                "parameters": [
+                    {
+                        "description": "알람 타겟을 변경하기 위한 정보를 주입한다.",
+                        "name": "AlarmTargetRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/alarm/sns": {
+            "get": {
+                "description": "알람 받는 SNS 계정 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "알람 받는 SNS 계정 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -99,7 +351,914 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/v1.Alarms"
+                                            "$ref": "#/definitions/v1.AlarmSns"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "알람 받을 SNS 계정 정보를 수정한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "알람 받을 SNS 계정 수정하기",
+                "parameters": [
+                    {
+                        "description": "수정할 SNS 계정 정보를 주입한다.",
+                        "name": "SnsAccountRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "알람 받을 SNS 계정을 등록한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "알람 받을 SNS 계정 등록하기",
+                "parameters": [
+                    {
+                        "description": "알람 받을 SNS 계정 정보를 주입한다.",
+                        "name": "SnsAccountRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "알람 받는 SNS 계정을 삭제한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "알람 받는 SNS 계정 삭제하기",
+                "parameters": [
+                    {
+                        "description": "삭제할 SNS 계정을 정보(ChannelId)를  주입한다.",
+                        "name": "SnsAccountRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/alarm/statistics/resource": {
+            "get": {
+                "description": "알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/alarm/statistics/total": {
+            "get": {
+                "description": "알람 통계 그래프를 그리기 위한 데이터를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "알람 통계 그래프를 그리기 위한 데이터 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh/overview": {
+            "get": {
+                "description": "Bosh Overview 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh Overview 정보를 가져온다.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshOverview"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh/process": {
+            "get": {
+                "description": "Bosh의 프로세스 목록을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh의 프로세스 목록을 가져온다.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.",
+                        "name": "uuid",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshProcess"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh/summary": {
+            "get": {
+                "description": "Bosh Summary 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Bosh Summary 정보를 가져온다.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshSummary"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/app": {
+            "get": {
+                "description": "현재 배포된 모든 App의 상세정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "App 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.AppInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/cell": {
+            "get": {
+                "description": "현재 배포된 모든 Diego-Cell VM의 상세정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Cell 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.CellInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/cell/status": {
+            "get": {
+                "description": "Diego-Cell VM의 Status 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Cell Status 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Status"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/container": {
+            "get": {
+                "description": "현재 배포된 모든 App 당 생성된 Container 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.ContainerInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/container/cpu/{id}/loads": {
+            "get": {
+                "description": "Container CPU Loads 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container CPU Loads 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/cpu/{id}/usages": {
+            "get": {
+                "description": "Container CPU Usages 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container CPU Usages 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/disk/{id}/usages": {
+            "get": {
+                "description": "Container Disk Usages 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container Disk Usages 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/memory/{id}/usages": {
+            "get": {
+                "description": "Container Memory Usages 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container Memory Usages 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/network/{id}/bytes": {
+            "get": {
+                "description": "Container Network Bytes 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container Network Bytes 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/network/{id}/drops": {
+            "get": {
+                "description": "Container Network Drops 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container Network Drops 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/network/{id}/errors": {
+            "get": {
+                "description": "Container Network Errors 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container Network Errors 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10.255.116.231-10.200.1.132",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/ap/container/container/status": {
+            "get": {
+                "description": "Container의 Status 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container Status 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Status"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/overview": {
+            "get": {
+                "description": "Container 페이지를 위한 Overview 정보를 가져온다.\nZone - Cell - App - Container 구조를 매핑하여 보여준다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Container 페이지 Overview 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Overview"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/container/zone": {
+            "get": {
+                "description": "Zone 기준 현재 배포된 Diego-Cell VM 갯수를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "Zone 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.ZoneInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/paasta/overview": {
+            "get": {
+                "description": "PaaS-TA Overview 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "PaaS-TA Overview 정보를 가져온다.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.PaastaOverview"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/paasta/process": {
+            "get": {
+                "description": "PaaS-TA Core 별 프로세스 목록을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "PaaS-TA Core 별 프로세스 목록을 가져온다.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paasta의 프로세스 목록 조회시 VM ID를 주입한다.",
+                        "name": "uuid",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.PaastaProcess"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/paasta/summary": {
+            "get": {
+                "description": "PaaS-TA Summary 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "PaaS-TA Summary 정보를 가져온다.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.PaastaSummary"
                                         }
                                     }
                                 }
@@ -187,24 +1346,51 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/bosh/log": {
+        "/api/v1/log": {
             "get": {
-                "description": "Bosh의 로그 정보를 가져온다.",
+                "description": "로그 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "Bosh의 로그 정보를 가져온다.",
+                "summary": "로그 정보 가져오기",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Bosh의 로그 정보 조회시 Bosh ID를 주입한다.",
-                        "name": "id",
+                        "description": "PaaS-TA Core 별 로그 정보 조회시 VM UUID를 주입한다.",
+                        "name": "uuid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 로그 정보 조회시 키워드 (keyword)를      주입한다.",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 로그 정보 조회시 대상날짜 (targetDate)를  주입한다.",
+                        "name": "targetDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 로그 정보 조회시 시작시간 (startTime)를   주입한다.",
+                        "name": "startTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 로그 정보 조회시 종료시간 (endTime)를     주입한다.",
+                        "name": "endTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 로그 정보 조회시 조회기간 (period)를      주입한다.",
+                        "name": "period",
                         "in": "query"
                     }
                 ],
@@ -220,7 +1406,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/v1.BoshLog"
+                                            "$ref": "#/definitions/v1.Logs"
                                         }
                                     }
                                 }
@@ -230,9 +1416,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/bosh/overview": {
+        "/api/v1/paasta": {
             "get": {
-                "description": "Bosh의 상태 별 개수를 가져온다.",
+                "description": "PaaS-TA Core의 목록을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -242,7 +1428,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh의 상태 별 개수를 가져온다.",
+                "summary": "PaaS-TA Core의 목록을 가져온다.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -255,7 +1441,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/v1.BoshSummary"
+                                            "$ref": "#/definitions/v1.Paasta"
                                         }
                                     }
                                 }
@@ -265,9 +1451,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/bosh/process": {
+        "/api/v1/paasta/Chart": {
             "get": {
-                "description": "Bosh의 프로세스 목록을 가져온다.",
+                "description": "PaaS-TA Core 별 차트 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -277,12 +1463,36 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh의 프로세스 목록을 가져온다.",
+                "summary": "PaaS-TA Core 별 차트 정보를 가져온다.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.",
-                        "name": "id",
+                        "description": "PaaS-TA Core 별 차트 정보 조회시 VM UUID를 주입한다.",
+                        "name": "uuid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 차트 정보 조회시 기본 시간 범위 (defaultTimeRange=15m)를               주입한다.",
+                        "name": "defaultTimeRange",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 차트 정보 조회시 시간 범위 시작 (timeRangeFrom=2022-06-16T10:21:39)를  주입한다.",
+                        "name": "timeRangeFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 차트 정보 조회시 시간 범위 종료 (timeRangeTo=2022-06-16T10:21:39)를    주입한다.",
+                        "name": "timeRangeTo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA Core 별 차트 정보 조회시 그룹 (groupBy=1m)을                               주입한다.",
+                        "name": "groupBy",
                         "in": "query"
                     }
                 ],
@@ -298,7 +1508,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "responseInfo": {
-                                            "$ref": "#/definitions/v1.BoshProcess"
+                                            "$ref": "#/definitions/v1.PaastaChart"
                                         }
                                     }
                                 }
@@ -310,14 +1520,14 @@ const docTemplate = `{
         },
         "/api/v1/token": {
             "put": {
-                "description": "[테스트] 토큰 정보를 리프레시한다.",
+                "description": "토큰 정보를 리프레시한다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 토큰 리프레시하기",
+                "summary": "토큰 리프레시하기",
                 "parameters": [
                     {
                         "description": "토큰을 리프레시하기 위한 토큰 정보를 제공한다.",
@@ -351,14 +1561,14 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "[테스트] 토큰 정보를 생성한다.",
+                "description": "토큰 정보를 생성한다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 토큰 생성하기",
+                "summary": "토큰 생성하기",
                 "parameters": [
                     {
                         "description": "토큰을 생성하기 위해 필요한 유저 정보를 제공한다.",
@@ -394,14 +1604,14 @@ const docTemplate = `{
         },
         "/api/v1/users": {
             "get": {
-                "description": "[테스트] 전체 또는 단일 유저 정보를 가져온다.",
+                "description": "전체 또는 단일 유저 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "[테스트] 전체 또는 단일 유저 정보 가져오기",
+                "summary": "전체 또는 단일 유저 정보 가져오기",
                 "parameters": [
                     {
                         "type": "string",
@@ -449,6 +1659,36 @@ const docTemplate = `{
                 },
                 "statusText": {
                     "type": "string"
+                }
+            }
+        },
+        "gogobosh.Client": {
+            "type": "object",
+            "properties": {
+                "endpoint": {
+                    "$ref": "#/definitions/gogobosh.Endpoint"
+                }
+            }
+        },
+        "gogobosh.Endpoint": {
+            "type": "object",
+            "properties": {
+                "doppler_logging_endpoint": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.AlarmActionRequest": {
+            "type": "object",
+            "properties": {
+                "alarmActionDesc": {
+                    "type": "string"
+                },
+                "alarmId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -505,12 +1745,6 @@ const docTemplate = `{
                 "criticalThreshold": {
                     "type": "integer"
                 },
-                "mailAddress": {
-                    "type": "string"
-                },
-                "mailSendYn": {
-                    "type": "string"
-                },
                 "measureTime": {
                     "type": "integer"
                 },
@@ -525,6 +1759,44 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.AlarmSns": {
+            "type": "object",
+            "properties": {
+                "channelId": {
+                    "type": "integer"
+                },
+                "expl": {
+                    "type": "string"
+                },
+                "modiDate": {
+                    "type": "string"
+                },
+                "modiUser": {
+                    "type": "string"
+                },
+                "originType": {
+                    "type": "string"
+                },
+                "regDate": {
+                    "type": "string"
+                },
+                "regUser": {
+                    "type": "string"
+                },
+                "snsId": {
+                    "type": "string"
+                },
+                "snsSendYN": {
+                    "type": "string"
+                },
+                "snsType": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.Alarms": {
             "type": "object",
             "properties": {
@@ -532,9 +1804,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "alarmMessage": {
-                    "type": "string"
-                },
-                "alarmSendDate": {
                     "type": "string"
                 },
                 "alarmTitle": {
@@ -593,78 +1862,270 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.AppInfo": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "buildpack": {
+                    "type": "string"
+                },
+                "cellName": {
+                    "type": "string"
+                },
+                "cfApi": {
+                    "type": "string"
+                },
+                "containerInfo": {
+                    "$ref": "#/definitions/v1.ContainerInfo"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "diskQuota": {
+                    "type": "integer"
+                },
+                "instances": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "uri": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.Bosh": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "client": {
+                    "$ref": "#/definitions/gogobosh.Client"
+                },
+                "deployment": {
+                    "type": "string"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
         },
         "v1.BoshChart": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
+                "defaulttimerange": {
                     "type": "string"
                 },
-                "username": {
+                "groupby": {
+                    "type": "string"
+                },
+                "isconvertkb": {
+                    "type": "boolean"
+                },
+                "metricData": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "metricname": {
+                    "type": "string"
+                },
+                "sqlquery": {
+                    "type": "string"
+                },
+                "timerangefrom": {
+                    "type": "string"
+                },
+                "timerangeto": {
+                    "type": "string"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
         },
-        "v1.BoshLog": {
+        "v1.BoshOverview": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
+                "critical": {
                     "type": "string"
                 },
-                "username": {
+                "failed": {
+                    "type": "string"
+                },
+                "running": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "string"
+                },
+                "warning": {
                     "type": "string"
                 }
             }
         },
         "v1.BoshProcess": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
+                "index": {
                     "type": "string"
                 },
-                "username": {
+                "memory": {
+                    "type": "number"
+                },
+                "pid": {
+                    "type": "string"
+                },
+                "process": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
         },
         "v1.BoshSummary": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
+                "boshSummaryMetric": {
+                    "$ref": "#/definitions/v1.BoshSummaryMetric"
+                },
+                "ip": {
                     "type": "string"
                 },
-                "username": {
+                "metricName": {
                     "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sqlQuery": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.BoshSummaryMetric": {
+            "type": "object",
+            "properties": {
+                "core": {
+                    "type": "string"
+                },
+                "cpuErrStat": {
+                    "type": "string"
+                },
+                "cpuUsage": {
+                    "type": "number"
+                },
+                "dataDisk": {
+                    "type": "number"
+                },
+                "diskDataErrStat": {
+                    "type": "string"
+                },
+                "diskRootErrStat": {
+                    "type": "string"
+                },
+                "diskStatus": {
+                    "type": "string"
+                },
+                "memErrStat": {
+                    "type": "string"
+                },
+                "memoryUsage": {
+                    "type": "number"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "totalDisk": {
+                    "type": "number"
+                },
+                "totalMemory": {
+                    "type": "number"
+                }
+            }
+        },
+        "v1.CellInfo": {
+            "type": "object",
+            "properties": {
+                "appCnt": {
+                    "type": "integer"
+                },
+                "appInfo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.AppInfo"
+                    }
+                },
+                "cellId": {
+                    "type": "integer"
+                },
+                "cellIp": {
+                    "type": "string"
+                },
+                "cellName": {
+                    "type": "string"
+                },
+                "containerCnt": {
+                    "type": "integer"
+                },
+                "zoneName": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.Container": {
+            "type": "object",
+            "properties": {
+                "appIndex": {
+                    "type": "string"
+                },
+                "containerId": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.ContainerInfo": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "container": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Container"
+                    }
                 }
             }
         },
@@ -685,6 +2146,219 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.Logs": {
+            "type": "object",
+            "properties": {
+                "endTime": {
+                    "type": "string"
+                },
+                "keyword": {
+                    "type": "string"
+                },
+                "logType": {
+                    "type": "string"
+                },
+                "messages": {},
+                "period": {
+                    "type": "string"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "targetDate": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.Overview": {
+            "type": "object",
+            "properties": {
+                "zoneInfo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ZoneInfo"
+                    }
+                }
+            }
+        },
+        "v1.Paasta": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "modiDate": {
+                    "type": "string"
+                },
+                "modiUser": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "regDate": {
+                    "type": "string"
+                },
+                "regUser": {
+                    "type": "string"
+                },
+                "vmType": {
+                    "type": "string"
+                },
+                "zoneId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.PaastaChart": {
+            "type": "object",
+            "properties": {
+                "defaulttimerange": {
+                    "type": "string"
+                },
+                "groupby": {
+                    "type": "string"
+                },
+                "isLikeQuery": {
+                    "type": "boolean"
+                },
+                "isNonNegativeDerivative": {
+                    "type": "boolean"
+                },
+                "isRespondKb": {
+                    "type": "boolean"
+                },
+                "isconvertkb": {
+                    "type": "boolean"
+                },
+                "metricData": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "metricname": {
+                    "type": "string"
+                },
+                "sqlquery": {
+                    "type": "string"
+                },
+                "timerangefrom": {
+                    "type": "string"
+                },
+                "timerangeto": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.PaastaOverview": {
+            "type": "object",
+            "properties": {
+                "critical": {
+                    "type": "string"
+                },
+                "failed": {
+                    "type": "string"
+                },
+                "running": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "string"
+                },
+                "warning": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.PaastaProcess": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "pid": {
+                    "type": "string"
+                },
+                "process": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.PaastaSummary": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "paastaSummaryMetric": {
+                    "$ref": "#/definitions/v1.PaastaSummaryMetric"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.PaastaSummaryMetric": {
+            "type": "object",
+            "properties": {
+                "core": {
+                    "type": "string"
+                },
+                "cpuErrStat": {
+                    "type": "string"
+                },
+                "cpuUsage": {
+                    "type": "number"
+                },
+                "dataDisk": {
+                    "type": "integer"
+                },
+                "diskDataErrStat": {
+                    "type": "string"
+                },
+                "diskRootErrStat": {
+                    "type": "string"
+                },
+                "diskStatus": {
+                    "type": "string"
+                },
+                "memErrStat": {
+                    "type": "string"
+                },
+                "memoryUsage": {
+                    "type": "number"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "totalDisk": {
+                    "type": "integer"
+                },
+                "totalMemory": {
+                    "type": "integer"
+                }
+            }
+        },
         "v1.RefreshToken": {
             "type": "object",
             "required": [
@@ -694,6 +2368,46 @@ const docTemplate = `{
                 "refreshToken": {
                     "type": "string",
                     "example": "refreshToken"
+                }
+            }
+        },
+        "v1.SnsAccountRequest": {
+            "type": "object",
+            "properties": {
+                "expl": {
+                    "type": "string"
+                },
+                "originType": {
+                    "type": "string"
+                },
+                "snsId": {
+                    "type": "string"
+                },
+                "snsSendYN": {
+                    "type": "string"
+                },
+                "snsType": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.Status": {
+            "type": "object",
+            "properties": {
+                "critical": {
+                    "type": "integer"
+                },
+                "failed": {
+                    "type": "integer"
+                },
+                "running": {
+                    "type": "integer"
+                },
+                "warning": {
+                    "type": "integer"
                 }
             }
         },
@@ -812,23 +2526,44 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "v1.ZoneInfo": {
+            "type": "object",
+            "properties": {
+                "cellCnt": {
+                    "type": "integer"
+                },
+                "cellInfo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.CellInfo"
+                    }
+                },
+                "zoneName": {
+                    "type": "string"
+                }
+            }
         }
     },
     "tags": [
         {
-            "description": "Application Platform API (Cloud Foundry)",
+            "description": "Common Module API (Alarm \u0026 Log)",
+            "name": "Common"
+        },
+        {
+            "description": "Application Platform API (Based on Cloud Foundry)",
             "name": "AP"
         },
         {
-            "description": "Container Platform API (Kubernetes)",
+            "description": "Container Platform API (Based on Kubernetes)",
             "name": "CP"
         },
         {
-            "description": "APM (Pinpoint)",
+            "description": "Application Performance Monitoring API (Based on Pinpoint)",
             "name": "SaaS"
         },
         {
-            "description": "Openstack(Zabbix)",
+            "description": "Infrastructure Monitoring API (Based on Openstack/Zabbix)",
             "name": "IaaS"
         }
     ]

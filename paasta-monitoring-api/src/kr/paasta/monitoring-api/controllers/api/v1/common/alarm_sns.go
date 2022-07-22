@@ -60,7 +60,7 @@ func (controller *AlarmSnsController) CreateAlarmSns(ctx echo.Context) error {
 //  @Description  알람 받는 SNS 계정 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmSns}
+//  @Success      200                {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmSns}
 //  @Router       /api/v1/ap/alarm/sns [get]
 func (controller *AlarmSnsController) GetAlarmSns(ctx echo.Context) error {
 	params := models.AlarmSns{
@@ -88,7 +88,7 @@ func (controller *AlarmSnsController) GetAlarmSns(ctx echo.Context) error {
 //  @Accept       json
 //  @Produce      json
 //  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "수정할 SNS 계정 정보를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm
+//  @Success      200                {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/sns [put]
 func (controller *AlarmSnsController) UpdateAlarmSns(ctx echo.Context) error {
 	params := &models.AlarmSns {}

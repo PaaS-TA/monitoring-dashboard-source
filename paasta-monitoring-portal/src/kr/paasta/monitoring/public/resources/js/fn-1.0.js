@@ -56,7 +56,7 @@ const fnComm = {
 	},
 
 	// 로그인 TOKEN 할당 ////////////////////////////////////////////////////////////////
-    getToken(user, pw){
+	getToken(user, pw){
 		var request = new XMLHttpRequest();
 
 		try {
@@ -104,13 +104,13 @@ const fnComm = {
 		switch(type){
 			case 'paas':
 				url = `${fnComm.url}paas/alarm/status/count?resolveStatus=1&searchDateFrom=${form}&searchDateTo=${to}`;
-			break;
+				break;
 			case 'caas':
 				url = `${fnComm.url}caas/monitoring/alarmCount?searchDateFrom=${form}&searchDateTo=${to}`;
-			break;
+				break;
 			case 'saas':
 				url = `${fnComm.url}saas/app/application/alarmCount?searchDateFrom=${form}&searchDateTo=${to}`;
-			break;
+				break;
 		};
 
 		var request = new XMLHttpRequest();
@@ -205,6 +205,7 @@ const fnComm = {
 	/////////////////////////////////////////////////////////////////////////////////////
 	loadData(method, url, callbackFunction, list){
 		if(sessionStorage.getItem('token') == null){
+			document.location.href = '../login.html';
 			console.log("token expired..");
 			document.location.href = '../public/login.html';
 			return;
@@ -300,9 +301,9 @@ const fnComm = {
 	// 소수점 자릿수 제어 - numberComma(digit, number)
 	// (소수점 자릿수, 데이터 숫자)
 	/////////////////////////////////////////////////////////////////////////////////////
-    numberComma(digit, number){
-        return number.toFixed(digit).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    },
+	numberComma(digit, number){
+		return number.toFixed(digit).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	},
 
 	convertUnits(size, unit){
 		var convertedSize, convertedUnit;
@@ -336,11 +337,11 @@ const fnComm = {
 	// 날짜 컨버팅 - unixTime(time)
 	// (20190601)
 	/////////////////////////////////////////////////////////////////////////////////////
-    unixTime : function(time){
-        var timestamp = new Date((time+32400)*1000);
+	unixTime : function(time){
+		var timestamp = new Date((time+32400)*1000);
 
-        return ('0' + timestamp.getUTCHours()).slice(-2) + ':' + ('0' + timestamp.getUTCMinutes()).slice(-2);
-    },
+		return ('0' + timestamp.getUTCHours()).slice(-2) + ':' + ('0' + timestamp.getUTCMinutes()).slice(-2);
+	},
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// html 생성 - appendHtml(target, html)
@@ -414,7 +415,7 @@ const fnComm = {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Count UP
 	/////////////////////////////////////////////////////////////////////////////////////
-    countUp(el, num) {
+	countUp(el, num) {
 		var cnt = 0;
 		var dif = 0;
 
@@ -431,12 +432,12 @@ const fnComm = {
 				clearInterval(thisID);
 			};
 		}, 20);
-    },
+	},
 
 	// BOSH 컨디션 차트 ////////////////////////////////////////////////////////////////
 	boshConditionChart(data){
 		var chart = c3.generate({
-    		bindto: '#boshChart',
+			bindto: '#boshChart',
 			data: {
 				columns: [
 					['Running', 0, data.running, 0, 0, 0, 0, 0],
@@ -468,7 +469,7 @@ const fnComm = {
 	// PaaS 컨디션 차트 ////////////////////////////////////////////////////////////////
 	paasConditionChart(data){
 		var chart = c3.generate({
-    		bindto: '#paasChart',
+			bindto: '#paasChart',
 			data: {
 				columns: [
 					['Running', 0, data.Running, 0, 0, 0, 0, 0],
@@ -497,7 +498,7 @@ const fnComm = {
 	// CONTAINER 컨디션 차트 ////////////////////////////////////////////////////////////////
 	contConditionChart(data){
 		var chart = c3.generate({
-    		bindto: '#contChart',
+			bindto: '#contChart',
 			data: {
 				columns: [
 					['Running', 0, data.Running, 0, 0, 0, 0, 0],
@@ -530,9 +531,14 @@ const fnComm = {
 	detailChart(data, target){
 		let cnt = 0;
 		let yPos = 9;
+		let xPosArr = [];
+		let xPos = 0;
 		let detailTime = [];
 		let detailData = [];
 		let chartColor;
+		let xPosDiv;
+		let sizeHeightDiv;
+		let sizeWidthDiv;
 
 		data.forEach((load, idx) => {
 			if(idx === 0){
@@ -542,15 +548,25 @@ const fnComm = {
 			detailData[idx] = [load.name];
 
 			load.metric.forEach(value => {
+
 				if(idx === 0){
+
 					var timeStamp = new Date((value.time)*1000);
 
-					detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2) + ':' + ('0' + timeStamp.getUTCSeconds()).slice(-2));
+					timeStamp.setHours(timeStamp.getHours()+9);
+
+					let utcFullYear = timeStamp.getUTCFullYear();
+					let utcMonth = timeStamp.getUTCMonth()+1;
+					let utcDate = timeStamp.getUTCDate();
+
+					detailTime.push(utcFullYear + '-' + utcMonth + '-' + utcDate + ' ' + ('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2) + ':' + ('0' + timeStamp.getUTCSeconds()).slice(-2));
+					xPosArr.push(Number(value.usage));
 				};
 
 				detailData[idx].push(Number(Math.ceil(value.usage)));
 
-				if(yPos < Number(value.usage)) yPos = Math.ceil(value.usage);
+				if(yPos < Number(value.usage))
+					yPos = Math.ceil(value.usage);
 
 			});
 
@@ -558,6 +574,7 @@ const fnComm = {
 		});
 
 		yPos = Math.ceil((yPos / 10)) * 10;
+		xPos = Math.floor((Math.min.apply(null, xPosArr) / 10))* 10;
 
 		var dataType = [];
 		dataType.push(detailTime);
@@ -565,43 +582,70 @@ const fnComm = {
 			dataType.push(detailData[i]);
 		};
 
-		console.log('detailTime :: ', detailTime);
-
 		switch (target){
 			case '#cpuUsageChart':
 			case '#cpuLoadChart':
 				chartColor = ['#ff015a', '#fc6604', '#fcce34', '#cc86cc'];
-			break;
+				break;
 			case '#memoryUsageChart':
 				chartColor = ['#9cce34'];
-			break;
+				break;
 			case '#diskUsageChart':
 			case '#diskIoChart':
 				chartColor = ['#3d003d', '#c701c7', '#cc86cc', '#fccefc'];
-			break;
+				break;
 			case '#networkByteChart':
 			case '#networkPacktesChart':
 			case '#networkDropChart':
 			case '#networkErrorChart':
 				chartColor = ['#649afc', '#b7c3d8'];
-			break;
-			case '#nodeChart':
-				chartColor = ['#649afc', '#ff015a', '#9cce34', '#c701c7'];
-			break;
-			case '#logChart':
-				chartColor = ['#ff015a', '#9cce34', '#649afc'];
-			break;
+				break;
+			case '#podChart':
+				chartColor = ['#649afc'];
+				break;
+			case '#cpuChart' :
+				chartColor = ['#b7c3d8'];
+				break;
+			case '#memoryChart':
+				chartColor = ['#9cce34'];
+				break;
+			case '#diskChart' :
+				chartColor = ['#ff015a'];
+				break;
 		};
 
-		console.log("dataType ::" ,dataType);
-		console.log('11 :: ', typeof(dataType[0][0]))
+		switch (target){
+			case '#cpuUsageChart':
+			case '#cpuLoadChart':
+			case '#memoryUsageChart':
+			case '#diskUsageChart':
+			case '#diskIoChart':
+			case '#networkByteChart':
+			case '#networkPacktesChart':
+			case '#networkDropChart':
+			case '#networkErrorChart':
+				xPosDiv = 0;
+				sizeHeightDiv = 0;
+				sizeWidthDiv = 0;
+				break;
+			case '#podChart':
+			case '#cpuChart' :
+			case '#memoryChart':
+			case '#diskChart' :
+				xPosDiv = xPos;
+				sizeHeightDiv = 140;
+				sizeWidthDiv = 400;
+				break;
+		};
 
+		console.log(dataType);
+
+		var xGridline = [];
 		var chart = c3.generate({
-    		bindto: target,
-			style: "overflow: visible",
+			bindto: target,
 			data: {
 				x: 'time',
-				xFormat: '%H:%M:%S',
+				xFormat: '%Y-%m-%d %H:%M:%S',
 				columns: dataType,
 				labels: false,
 				type: 'spline',
@@ -611,25 +655,21 @@ const fnComm = {
 			},
 			axis: {
 				x: {
+					//type: 'category',
 					type: 'timeseries',
 					localtime: true,
 					tick: {
 						count: 3,
-						format: '%H:%M:%S'
-					}
+						format: '%H:%M'
+					},
 				},
 				y: {
 					max: yPos,
-					min: 0,
+					min: xPosDiv,
 					tick: {
 						count: 5,
 					},
 					padding: {top: 0, bottom: 0}
-					// tick: {
-					// 	count: 5,
-					// 	max: yPos,
-					// 	min: 0,
-					// },
 				}
 			},
 			point: {
@@ -637,7 +677,14 @@ const fnComm = {
 			},
 			grid: {
 				x: {
-					lines: [{value: detailTime[4], class:'dash-line'},{value: detailTime[8], class:'dash-line'},{value: detailTime[12], class:'dash-line'}]
+					lines: function() {
+						for(var i =1; detailTime.length > i; i++) {
+							if(i % 4 === 0) {
+								xGridline.push({value: detailTime[i], class:'dash-line'})
+							}
+						}
+						return xGridline;
+					},
 				},
 				y: {
 					//show: true
@@ -645,14 +692,17 @@ const fnComm = {
 			},
 			padding: {
 				right:20
+			},
+			size: {
+				height: sizeHeightDiv,
+				width: sizeWidthDiv
 			}
 		});
 	},
-
 	// Gauge 차트 //////////////////////////////////////////////////////////////////////////
 	gaugeChart(data, category, target){
 		var chart = c3.generate({
-    		bindto: target,
+			bindto: target,
 			data: {
 				columns: [
 					[category, 0]

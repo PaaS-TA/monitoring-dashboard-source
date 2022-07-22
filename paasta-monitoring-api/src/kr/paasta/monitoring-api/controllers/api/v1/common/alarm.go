@@ -1,8 +1,8 @@
 package common
 
 import (
-	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"
@@ -14,20 +14,23 @@ type AlarmController struct {
 }
 
 func GetAlarmController(conn connections.Connections) *AlarmController {
-	return &AlarmController {
+	return &AlarmController{
 		DbInfo: conn.DbInfo,
 	}
 }
 
 // GetAlarms
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      전체 알람 현황 가져오기
-//  @Description  전체 알람 현황을 가져온다.
+//  @Tags         Common
+//  @Summary      알람 현황 가져오기
+//  @Description  알람 현황을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Alarms}
-//  @Router       /api/v1/ap/alarm/status [get]
+//  @Param        originType     query     string  false  "Origin Type"  enums(bos, pas, con, ias)
+//  @Param        alarmType      query     string  false  "Alarm Type"   enums(cpu, memory, disk)
+//  @Param        level          query     string  false  "Level"        enums(warning, critical)
+//  @Param        resolveStatus  query     string  false  "Resolve Status"
+//  @Success      200            {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Alarms}
+//  @Router       /api/v1/alarm [get]
 func (ap *AlarmController) GetAlarms(ctx echo.Context) error {
 	results, err := service.GetAlarmService(ap.DbInfo).GetAlarms(ctx)
 	if err != nil {

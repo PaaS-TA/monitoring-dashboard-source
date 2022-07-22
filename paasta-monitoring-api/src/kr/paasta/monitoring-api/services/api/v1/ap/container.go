@@ -110,24 +110,24 @@ func (ap *ApContainerService) GetContainerDiskUsages(ctx echo.Context) ([]map[st
 	return results, nil
 }
 
-func (ap *ApContainerService) GetContainerNetworkBytes() (models.Status, error) {
-	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkBytes()
+func (ap *ApContainerService) GetContainerNetworkBytes(ctx echo.Context) ([]map[string]interface{}, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkBytes(ctx)
 	if err != nil {
 		return results, err
 	}
 	return results, nil
 }
 
-func (ap *ApContainerService) GetContainerNetworkDrops() (models.Status, error) {
-	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkDrops()
+func (ap *ApContainerService) GetContainerNetworkDrops(ctx echo.Context) ([]map[string]interface{}, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkDrops(ctx)
 	if err != nil {
 		return results, err
 	}
 	return results, nil
 }
 
-func (ap *ApContainerService) GetContainerNetworkErrors() (models.Status, error) {
-	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkErrors()
+func (ap *ApContainerService) GetContainerNetworkErrors(ctx echo.Context) ([]map[string]interface{}, error) {
+	results, err := AP.GetApContainerDao(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerNetworkErrors(ctx)
 	if err != nil {
 		return results, err
 	}
