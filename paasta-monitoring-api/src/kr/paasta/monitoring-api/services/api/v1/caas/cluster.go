@@ -32,7 +32,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		podUsage := gjson.Get(string(podUsageBytes), "data.result.0.value.1")
 		podUsageFloat, _ := strconv.ParseFloat(podUsage.String(), 64)
 		result["pod"] = podUsageFloat
-		break;
+		break
 
 	case "cpu":
 		cpuUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_CPU_USAGE, "")
@@ -42,7 +42,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		cpuUsage := gjson.Get(string(cpuUsageBytes), "data.result.0.value.1")
 		cpuUsageFloat, _ := strconv.ParseFloat(cpuUsage.String(), 64)
 		result["cpu"] = cpuUsageFloat
-		break;
+		break
 
 	case "disk" :
 		diskUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_DISK_USAGE, "")
@@ -52,7 +52,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		diskUsage := gjson.Get(string(diskUsageBytes), "data.result.0.value.1")
 		diskUsageFloat, _ := strconv.ParseFloat(diskUsage.String(), 64)
 		result["disk"] = diskUsageFloat
-		break;
+		break
 
 	case "memory" :
 		memoryUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_MEMORY_USAGE, "")
@@ -62,7 +62,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 		memoryUsage := gjson.Get(string(memoryUsageBytes), "data.result.0.value.1")
 		memoryUsageFloat, _ := strconv.ParseFloat(memoryUsage.String(), 64)
 		result["memory"] = memoryUsageFloat
-		break;
+		break
 
 	}
 	return result, nil
@@ -140,7 +140,6 @@ func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, erro
 		}
 		result = append(result, resultMap)
 	}
-
 	return result, nil
 }
 
@@ -241,12 +240,7 @@ func (service *ClusterService) GetWorkNode(nodeName string, instanceName string)
 }
 
 
-
-
-
-
-
-func GetUnixTimeFromTo(interval int64) (string, string) {
+func getUnixTimeFromTo(interval int64) (string, string) {
 	currentTime := time.Now().Unix()
 	previousTime := currentTime - interval
 
@@ -256,8 +250,9 @@ func GetUnixTimeFromTo(interval int64) (string, string) {
 	return pTime, cTime
 }
 
+
 func GetPromqlFromToParameter(interval int64, timeStep string) string {
-	fromTime, toTime := GetUnixTimeFromTo(interval)
+	fromTime, toTime := getUnixTimeFromTo(interval)
 
 	parameter := "&start=" + fromTime + "&end=" + toTime + "&step=" + timeStep
 	return parameter

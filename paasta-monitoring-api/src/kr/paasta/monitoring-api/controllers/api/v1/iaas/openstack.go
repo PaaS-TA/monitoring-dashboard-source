@@ -41,7 +41,6 @@ func (controller *OpenstackController) GetHypervisorStatistics(ctx echo.Context)
 	하이퍼바이저 목록 (상세 정보 포함) 조회
 */
 func (controller *OpenstackController) GetHypervisorList(ctx echo.Context) error {
-	log.Println("GetHypervisorList")
 	results, err := service.GetOpenstackService(controller.OpenstackProvider).GetHypervisorList()
 
 	if err != nil {
@@ -59,7 +58,6 @@ func (controller *OpenstackController) GetHypervisorList(ctx echo.Context) error
 	프로젝트 목록(만) 조회
 */
 func (controller *OpenstackController) GetProjectList(ctx echo.Context) error {
-	log.Println("GetProjectList")
 	serverParams := make(map[string]interface{}, 0)
 	results, err := service.GetOpenstackService(controller.OpenstackProvider).GetProjectList(serverParams)
 
@@ -79,16 +77,14 @@ func (controller *OpenstackController) GetProjectList(ctx echo.Context) error {
 	- 프로젝트에 속한 인스턴스 목록과 usage 조회도 가능하나 현재는 비활성화 되어 있음
 */
 func (controller *OpenstackController) GetProjectUsage(ctx echo.Context) error {
-	log.Println("GetProjectUsage")
-	tenantIdParam := ctx.Param("tenantId")
-
 	serverParams := make(map[string]interface{}, 0)
 	serverParams["allTenants"] = true
+	tenantIdParam := ctx.Param("tenantId")
 	if tenantIdParam != "" {
 		serverParams["tenantId"] = tenantIdParam
 	}
-	results, err := service.GetOpenstackService(controller.OpenstackProvider).RetrieveTenantUsage()
 
+	results, err := service.GetOpenstackService(controller.OpenstackProvider).RetrieveTenantUsage()
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())

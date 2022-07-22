@@ -13,11 +13,13 @@ type PinpointController struct {
 	SaaS models.SaaS
 }
 
+
 func GetPinpointController(saas models.SaaS) *PinpointController {
 	return &PinpointController{
 		SaaS: saas,
 	}
 }
+
 
 func (controller *PinpointController) GetAgentList(ctx echo.Context) error {
 	result, err := service.GetPinpointService(controller.SaaS).GetAgentList()
@@ -30,6 +32,7 @@ func (controller *PinpointController) GetAgentList(ctx echo.Context) error {
 	}
 	return nil
 }
+
 
 func (controller *PinpointController) GetAgentStat(ctx echo.Context) error {
 	result, err := service.GetPinpointService(controller.SaaS).GetAgentStat(ctx)

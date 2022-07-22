@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -10,7 +11,6 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
-
 	caas "paasta-monitoring-api/controllers/api/v1/caas"
 	commonModule "paasta-monitoring-api/controllers/api/v1/common"
 	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
@@ -24,10 +24,21 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e := echo.New()
 
 	// Logger 설정 (HTTP requests)
-	e.Use(middleware.Logger())
+	/*
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "[${time_rfc3339}] method=${method}, uri=${uri}, status=${status}\n",
+	}))
+	*/
 
 	// Recover 설정 (recovers panics, prints stack trace)
-	e.Use(middleware.Recover())
+	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+		LogLevel: log.ERROR,
+		DisablePrintStack: true,
+		DisableStackAll: true,
+	}))
+
+	e.Use(middleware.RequestID())
+	e.Use(middlewares.Logger())
 
 	// CORS 설정 (control domain access)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -101,21 +112,21 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.DELETE("/alarm/action", alarmAction.DeleteAlarmAction)
 	v1.GET("/log/:uuid", logsearch.GetLogs)
 
-	// AP - BOSH
+	// AP > BOSH
 	v1.GET("/ap/bosh", apBosh.GetBoshInfoList)
 	v1.GET("/ap/bosh/overview", apBosh.GetBoshOverview)
 	v1.GET("/ap/bosh/summary", apBosh.GetBoshSummary)
 	v1.GET("/ap/bosh/process", apBosh.GetBoshProcessByMemory)
 	v1.GET("/ap/bosh/chart/:uuid", apBosh.GetBoshChart)
 
-	// AP - PaaS-TA
+	// AP > PaaS-TA
 	v1.GET("/ap/paasta", apPaasta.GetPaastaInfoList)
 	v1.GET("/ap/paasta/overview", apPaasta.GetPaastaOverview)
 	v1.GET("/ap/paasta/summary", apPaasta.GetPaastaSummary)
 	v1.GET("/ap/paasta/process", apPaasta.GetPaastaProcessByMemory)
 	v1.GET("/ap/paasta/chart/:uuid", apPaasta.GetPaastaChart)
 
-	// AP - Container
+	// AP > Container
 	v1.GET("/ap/container/cell", apContainer.GetCellInfo)
 	v1.GET("/ap/container/zone", apContainer.GetZoneInfo)
 	v1.GET("/ap/container/app", apContainer.GetAppInfo)
@@ -168,6 +179,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	return e
 }
+
+
 
 func ApiLogger(logger *zap.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {

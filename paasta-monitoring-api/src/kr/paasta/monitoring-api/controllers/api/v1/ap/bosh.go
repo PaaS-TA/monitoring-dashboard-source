@@ -88,8 +88,8 @@ func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
 //  @Description  Bosh의 프로세스 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid   query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
+//  @Param        uuid  query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
+//  @Success      200   {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
 //  @Router       /api/v1/ap/bosh/process [get]
 func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
 	// Bosh Process 정보 조회

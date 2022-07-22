@@ -24,7 +24,6 @@
 ### Swagger Annotations Example Form
 ```go
 // CreateToken
-//  * Annotations for Swagger *
 //  @Summary      [테스트] 토큰 생성하기
 //  @Description  [테스트] 토큰 정보를 생성한다.
 //  @Accept       json

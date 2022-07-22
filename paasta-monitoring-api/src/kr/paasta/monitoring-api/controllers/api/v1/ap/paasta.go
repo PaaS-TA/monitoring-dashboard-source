@@ -89,8 +89,8 @@ func (p *PaastaController) GetPaastaSummary(c echo.Context) (err error) {
 //  @Description  PaaS-TA Core 별 프로세스 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid   query     string  false  "Paasta의 프로세스 목록 조회시 VM ID를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaProcess}
+//  @Param        uuid  query     string  false  "Paasta의 프로세스 목록 조회시 VM ID를 주입한다."
+//  @Success      200   {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaProcess}
 //  @Router       /api/v1/ap/paasta/process [get]
 func (p *PaastaController) GetPaastaProcessByMemory(c echo.Context) (err error) {
 	var paastaProcess models.PaastaProcess
@@ -113,12 +113,12 @@ func (p *PaastaController) GetPaastaProcessByMemory(c echo.Context) (err error) 
 //  @Description  PaaS-TA Core 별 차트 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid   query     string  false  "PaaS-TA Core 별 차트 정보 조회시 VM UUID를 주입한다."
-//  @Param        defaultTimeRange   query     string  false  "PaaS-TA Core 별 차트 정보 조회시 기본 시간 범위 (defaultTimeRange=15m)를 주입한다."
-//  @Param        timeRangeFrom   query     string  false  "PaaS-TA Core 별 차트 정보 조회시 시간 범위 시작 (timeRangeFrom=2022-06-16T10:21:39)를 주입한다."
-//  @Param        timeRangeTo   query     string  false  "PaaS-TA Core 별 차트 정보 조회시 시간 범위 종료 (timeRangeTo=2022-06-16T10:21:39)를 주입한다."
-//  @Param        groupBy   query     string  false  "PaaS-TA Core 별 차트 정보 조회시 그룹 (groupBy=1m)을 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaChart}
+//  @Param        uuid              query     string  false  "PaaS-TA Core 별 차트 정보 조회시 VM UUID를 주입한다."
+//  @Param        defaultTimeRange  query     string  false  "PaaS-TA Core 별 차트 정보 조회시 기본 시간 범위 (defaultTimeRange=15m)를               주입한다."
+//  @Param        timeRangeFrom     query     string  false  "PaaS-TA Core 별 차트 정보 조회시 시간 범위 시작 (timeRangeFrom=2022-06-16T10:21:39)를  주입한다."
+//  @Param        timeRangeTo       query     string  false  "PaaS-TA Core 별 차트 정보 조회시 시간 범위 종료 (timeRangeTo=2022-06-16T10:21:39)를    주입한다."
+//  @Param        groupBy           query     string  false  "PaaS-TA Core 별 차트 정보 조회시 그룹 (groupBy=1m)을                               주입한다."
+//  @Success      200               {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaChart}
 //  @Router       /api/v1/paasta/Chart [get]
 func (p *PaastaController) GetPaastaChart(c echo.Context) (err error) {
 	var paastaChart models.PaastaChart

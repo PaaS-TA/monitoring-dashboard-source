@@ -271,6 +271,7 @@ func (connection *Connections) initCaaSConfig() {
 func (connection *Connections) initSaaSConfig() {
 	saas := models.SaaS{
 		PinpointWebUrl: connection.Env["pinpoint_web_url"].(string),
+		Logger: connection.Logger,
 	}
 	connection.SaaS = saas
 }

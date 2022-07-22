@@ -13,31 +13,22 @@ import (
 // @title            Monitoring Dashboard API
 // @version          5.8.0
 // @host             localhost:8395
+// @tag.name         Common
+// @tag.description  Common Module API (Alarm & Log)
 // @tag.name         AP
-// @tag.description  Application Platform API (Cloud Foundry)
+// @tag.description  Application Platform API (Based on Cloud Foundry)
 // @tag.name         CP
-// @tag.description  Container Platform API (Kubernetes)
+// @tag.description  Container Platform API (Based on Kubernetes)
 // @tag.name         SaaS
-// @tag.description  APM (Pinpoint)
+// @tag.description  Application Performance Monitoring API (Based on Pinpoint)
 // @tag.name         IaaS
-// @tag.description  Openstack(Zabbix)
+// @tag.description  Infrastructure Monitoring API (Based on Openstack/Zabbix)
 func main() {
 	// .env 파일 로드
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
-	// Uber Zap logger initialize
-	/*
-	var logger *zap.Logger
-	if os.Getenv("mode") == "develop" {
-		logger, _ = zap.NewDevelopment()
-	} else {
-		logger, _ = zap.NewProduction()
-	}
-	defer logger.Sync()
-	*/
 
 	// connection 설정 (DB & API etc..)
 	c := Connections.SetupConnection()
