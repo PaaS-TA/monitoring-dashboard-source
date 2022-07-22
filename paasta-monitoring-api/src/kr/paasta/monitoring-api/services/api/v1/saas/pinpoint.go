@@ -3,6 +3,7 @@ package saas
 import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"strconv"
@@ -34,16 +35,19 @@ func (service *PinpointService) GetAgentStat(ctx echo.Context) (map[string]inter
 	chartType := ctx.Param("chartType")
 	agentId := ctx.QueryParam("agentId")
 	period := ctx.QueryParam("period")
-
-	periodNum, _ := strconv.Atoi(period[0:1])
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+	periodNum, err := strconv.Atoi(period[0:1])
+	if err != nil {
+		logger.Error(err)
+	}
 	periodUnit := period[1:2]
 	switch periodUnit {
 	case "m" :
 		periodNum = periodNum
 	case "h" :
-		periodNum = 60*periodNum;
+		periodNum = 60*periodNum
 	case "d" :
-		periodNum = 1400*periodNum;
+		periodNum = 1400*periodNum
 	}
 
 	from := strconv.FormatInt(time.Now().Add(time.Duration(-periodNum)*time.Minute).UTC().Unix(), 10) + "000"

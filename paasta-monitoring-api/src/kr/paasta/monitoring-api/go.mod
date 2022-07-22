@@ -3,6 +3,7 @@ module paasta-monitoring-api
 go 1.17
 
 require (
+	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20220601192014-596c068bcda2
 	github.com/cloudfoundry-community/gogobosh v0.0.0-20210826203159-894da954b612
 	github.com/go-playground/validator v9.31.0+incompatible
@@ -14,6 +15,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/labstack/gommon v0.3.1
+	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/echo-swagger v1.3.3
 	github.com/swaggo/swag v1.8.3
 	github.com/tidwall/gjson v1.14.1

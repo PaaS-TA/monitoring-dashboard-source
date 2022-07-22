@@ -28,17 +28,6 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// Uber Zap logger initialize
-	/*
-	var logger *zap.Logger
-	if os.Getenv("mode") == "develop" {
-		logger, _ = zap.NewDevelopment()
-	} else {
-		logger, _ = zap.NewProduction()
-	}
-	defer logger.Sync()
-	*/
-
 	// connection 설정 (DB & API etc..)
 	c := Connections.SetupConnection()
 

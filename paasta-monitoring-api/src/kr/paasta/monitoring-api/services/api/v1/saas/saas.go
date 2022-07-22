@@ -45,7 +45,6 @@ func (service *SaasService) GetApplicationStatus() (map[string]int, error) {
 		}
 		return true
 	})
-
 	return result, nil
 }
 
@@ -78,12 +77,10 @@ func (service *SaasService) GetApplicationUsage(period string)(map[string]interf
 		from = strconv.FormatInt(time.Now().Add(time.Duration(-periodNum)*time.Minute).UTC().Unix(), 10) + "000"
 	}
 
-
 	resultBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
 	resultJson := gjson.Parse(string(resultBytes))
 	resultJson.ForEach(func(key, value gjson.Result) bool {
 		for _, item := range value.Array() {
-			//statusCode := item.Get("status.state.code").Int()
 			agentId := item.Get("agentId").String()
 			queryString := "agentId="+agentId +"&from=" + from + "&to=" + to
 
@@ -136,9 +133,9 @@ func (service *SaasService) GetApplicationUsageList(period string)([]map[string]
 		case "m" :
 			periodNum = periodNum
 		case "h" :
-			periodNum = 60*periodNum;
+			periodNum = 60*periodNum
 		case "d" :
-			periodNum = 1400*periodNum;
+			periodNum = 1400*periodNum
 		}
 		from = strconv.FormatInt(time.Now().Add(time.Duration(-periodNum)*time.Minute).UTC().Unix(), 10) + "000"
 	}
@@ -171,7 +168,6 @@ func (service *SaasService) GetApplicationUsageList(period string)([]map[string]
 			noneHeapUsageSum := summaryValueInGjsonArray(noneHeapUsageArray)
 			noneHeapUsage, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", noneHeapUsageSum/float64(len(noneHeapUsageArray))), 0)
 
-
 			activeTraceBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentStat/activeTrace/chart.pinpoint", queryString,"")
 			activeTraceArray := gjson.Get(string(activeTraceBytes), "charts.y.ACTIVE_TRACE_FAST.#.3").Array()
 			activeTraceSum := summaryValueInGjsonArray(activeTraceArray)
@@ -201,13 +197,8 @@ func (service *SaasService) GetApplicationUsageList(period string)([]map[string]
 		}
 		return true
 	})
-
 	return results, nil
 }
-
-
-
-
 
 
 func summaryValueInGjsonArray(array []gjson.Result) float64 {

@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -10,7 +11,6 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
-
 	caas "paasta-monitoring-api/controllers/api/v1/caas"
 	commonModule "paasta-monitoring-api/controllers/api/v1/common"
 	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
@@ -24,10 +24,21 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	e := echo.New()
 
 	// Logger 설정 (HTTP requests)
-	e.Use(middleware.Logger())
+	/*
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "[${time_rfc3339}] method=${method}, uri=${uri}, status=${status}\n",
+	}))
+	*/
 
 	// Recover 설정 (recovers panics, prints stack trace)
-	e.Use(middleware.Recover())
+	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+		LogLevel: log.ERROR,
+		DisablePrintStack: true,
+		DisableStackAll: true,
+	}))
+
+	e.Use(middleware.RequestID())
+	e.Use(middlewares.Logger())
 
 	// CORS 설정 (control domain access)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -168,6 +179,8 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	return e
 }
+
+
 
 func ApiLogger(logger *zap.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
