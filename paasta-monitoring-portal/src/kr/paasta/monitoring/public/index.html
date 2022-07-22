@@ -133,7 +133,7 @@
 								<li class="saasCpu">
 									<h4>CPU</h4>
 									<div id="saasCpuChart"></div>
-									<span><strong>0</strong> / <em>100</em></span>
+									<span><strong>0</strong> / <em>100 %</em></span>
 								</li>
 								<li class="saasHeM">
 									<h4>Heap Memory</h4>
@@ -284,11 +284,6 @@
 					fnComm.loadData('GET', `${fnComm.url}saas/app/application/status`, total.saasEvent);
 				},
 				boshDraw(data){
-					// critical: "0"
-					// failed: "0"
-					// running: "0"
-					// total: "0"
-					// warning: "0"
 					document.querySelector('.boshCnt').innerHTML = data.total;
 
 					var chart = c3.generate({
@@ -319,16 +314,14 @@
 									return value;
 								}
 							}
+						},
+						size: {
+							width: 270,
 						}
 					});
 				},
 
 				paasDraw(data){
-					// critical: "0"
-					// failed: "0"
-					// running: "0"
-					// total: "0"
-					// warning: "0"
 					document.querySelector('.paasCnt').innerHTML = data.Total;
 
 					var chart = c3.generate({
@@ -340,7 +333,7 @@
 								['Critical', data.Critical],
 								['Failed', data.Failed],
 							],
-							type : 'donut'
+							type : 'donut',
 						},
 						color: {
 							pattern: ['#43be42', '#f6a200', '#f4256c', '#c048c8', '#ccc']
@@ -359,16 +352,14 @@
 									return value;
 								}
 							}
+						},
+						size: {
+							width: 270,
 						}
 					});
 				},
 
 				conDraw(data){
-					// critical: "0"
-					// failed: "0"
-					// running: "0"
-					// total: "0"
-					// warning: "0"
 					document.querySelector('.conCnt').innerHTML = data.Total;
 
 					var chart = c3.generate({
@@ -399,6 +390,9 @@
 									return value;
 								}
 							}
+						},
+						size: {
+							width: 270,
 						}
 					});
 				},
@@ -414,7 +408,7 @@
 					// noneHeapMemoryRate: 0.29
 					// systemCpuRate: 3.63
 
-					document.querySelector('.saasCpu strong').innerHTML = data.systemCpuRate;
+					document.querySelector('.saasCpu strong').innerHTML = data.systemCpuRate + ' %';
 
 					var chart1 = c3.generate({
 						bindto: '#saasCpuChart',
@@ -457,8 +451,8 @@
 						}
 					});
 					
-					document.querySelector('.saasHeM em').innerHTML = data.haepMaxMemory;
-					document.querySelector('.saasHeM strong').innerHTML = data.haepMemory;
+					document.querySelector('.saasHeM em').innerHTML = data.haepMaxMemory + ' MB';
+					document.querySelector('.saasHeM strong').innerHTML = data.haepMemory + ' MB';
 
 					var chart2 = c3.generate({
 						bindto: '#saasHeMChart',
@@ -501,8 +495,8 @@
 						}
 					});
 					
-					document.querySelector('.saasNoM em').innerHTML = data.noneHeapMaxMemory;
-					document.querySelector('.saasNoM strong').innerHTML = data.noneHeapMemory;
+					document.querySelector('.saasNoM em').innerHTML = data.noneHeapMaxMemory + ' MB';
+					document.querySelector('.saasNoM strong').innerHTML = data.noneHeapMemory + ' MB';
 
 					var chart3 = c3.generate({
 						bindto: '#saasNoMChart',
