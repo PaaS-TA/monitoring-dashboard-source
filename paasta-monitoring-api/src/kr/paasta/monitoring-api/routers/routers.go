@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -38,7 +39,18 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	}))
 
 	e.Use(middleware.RequestID())
-	e.Use(middlewares.Logger())
+	e.Use(middlewares.Logger(conn.Logger))
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
+			conn.Logger.WithFields(logrus.Fields{
+				"URI":   values.URI,
+				"status": values.Status,
+			}).Info("request")
+			return nil
+		},
+	}))
 
 	// CORS 설정 (control domain access)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

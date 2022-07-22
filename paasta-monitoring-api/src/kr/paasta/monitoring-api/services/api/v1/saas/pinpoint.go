@@ -35,7 +35,10 @@ func (service *PinpointService) GetAgentStat(ctx echo.Context) (map[string]inter
 	chartType := ctx.Param("chartType")
 	agentId := ctx.QueryParam("agentId")
 	period := ctx.QueryParam("period")
+
+
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	periodNum, err := strconv.Atoi(period[0:1])
 	if err != nil {
 		logger.Error(err)

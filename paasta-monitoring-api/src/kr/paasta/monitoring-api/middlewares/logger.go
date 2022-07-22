@@ -2,17 +2,11 @@ package middlewares
 
 import (
 	"context"
-	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
-func Logger() echo.MiddlewareFunc {
-	logger := logrus.New()
-	logger.SetFormatter(&nested.Formatter{
-		CallerFirst: true,
-	})
-	logger.SetReportCaller(true)
+func Logger(logger *logrus.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
 			logEntry := logrus.NewEntry(logger)

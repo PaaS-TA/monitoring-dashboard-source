@@ -1,7 +1,9 @@
 package main
 
 import (
+	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"log"
 	"os"
 	Connections "paasta-monitoring-api/connections"
@@ -24,6 +26,14 @@ import (
 // @tag.name         IaaS
 // @tag.description  Infrastructure Monitoring API (Based on Openstack/Zabbix)
 func main() {
+
+
+	logger := logrus.New()
+	logger.SetFormatter(&nested.Formatter{
+		CallerFirst: true,
+	})
+	logger.SetReportCaller(true)
+
 	// .env 파일 로드
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -31,7 +41,7 @@ func main() {
 	}
 
 	// connection 설정 (DB & API etc..)
-	c := Connections.SetupConnection()
+	c := Connections.SetupConnection(logger)
 
 	// Router 설정
 	r := Routers.SetupRouter(c)
