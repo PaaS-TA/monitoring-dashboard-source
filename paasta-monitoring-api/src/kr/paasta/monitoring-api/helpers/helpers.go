@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"log"
 	"io/ioutil"
 	"math"
@@ -572,4 +573,10 @@ func SetStatus(params []models.StatusByResource) models.Status {
 	}
 
 	return response
+}
+
+
+func GetLogger(ctx echo.Context) *logrus.Entry {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+	return logger
 }

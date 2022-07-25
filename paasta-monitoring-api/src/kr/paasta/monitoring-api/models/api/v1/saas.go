@@ -1,8 +1,8 @@
 package v1
 
-import "go.uber.org/zap"
+import "github.com/sirupsen/logrus"
 
 type SaaS struct {
 	PinpointWebUrl string
-	Logger *zap.Logger
+	Logger *logrus.Logger
 }

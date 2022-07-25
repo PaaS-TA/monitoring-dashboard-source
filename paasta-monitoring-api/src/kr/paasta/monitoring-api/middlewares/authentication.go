@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"os"
-	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 	"paasta-monitoring-api/connections"
 	v1service "paasta-monitoring-api/services/api/v1"
 
@@ -13,7 +13,7 @@ import (
 func CheckToken(conn connections.Connections) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-
+			logger := c.Request().Context().Value("LOG").(*logrus.Entry)
 			mode := os.Getenv("mode")
 			if mode == "development" {
 				c.Set("userId", "admin")  // For debug
@@ -44,14 +44,14 @@ func CheckToken(conn connections.Connections) echo.MiddlewareFunc {
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			fmt.Println(metadata)
+			logger.Info(metadata)
 
 			// 5. Redis 추출 (UUID를 이용한 userId 추출)
 			userId, err := v1service.FetchAuth(metadata, conn.RedisInfo)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 			}
-			fmt.Println(userId + " is authorized")
+			logger.Info(userId + " is authorized")
 			c.Set("userId", userId)
 
 			// Continue

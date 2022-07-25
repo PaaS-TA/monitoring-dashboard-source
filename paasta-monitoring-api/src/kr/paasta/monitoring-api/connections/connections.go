@@ -10,7 +10,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -31,7 +31,7 @@ type Connections struct {
 	Env               map[string]interface{}
 	OpenstackProvider *gophercloud.ProviderClient
 	ZabbixSession     *zabbix.Session
-	Logger            *zap.Logger
+	Logger            *logrus.Logger
 	CfClient          *cfclient.Client
 	CaaS              models.CaaS
 	SaaS              models.SaaS
@@ -223,7 +223,7 @@ func (connection *Connections) initOpenstackProvider() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Openstack TokenID : " + providerClient.TokenID)
+	connection.Logger.Info("Openstack TokenID : " + providerClient.TokenID)
 	//openstackToken := providerClient.TokenID
 
 	// TODO Openstack 토큰 적재 방식 수립 필요
@@ -233,6 +233,7 @@ func (connection *Connections) initOpenstackProvider() {
 }
 
 func (connection *Connections) initZabbixSession() {
+
 	zabbixHost := connection.Env["zabbix_host"].(string)
 	zabbixAdminId := connection.Env["zabbix_admin_id"].(string)
 	zabbixAdminPw := connection.Env["zabbix_admin_pw"].(string)
@@ -252,7 +253,7 @@ func (connection *Connections) initZabbixSession() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	log.Println("Zabbix Token : " + zabbixSession.Token)
+	connection.Logger.Info("Zabbix Token : " + zabbixSession.Token)
 	connection.ZabbixSession = zabbixSession
 }
 
@@ -277,10 +278,11 @@ func (connection *Connections) initSaaSConfig() {
 }
 
 
-func SetupConnection() Connections {
+func SetupConnection(logger *logrus.Logger) Connections {
 
 	Conn := Connections{
 		Env: SetEnv(),
+		Logger: logger,
 	}
 
 	// 내부 서비스 환경 설정
