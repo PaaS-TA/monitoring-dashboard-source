@@ -52,6 +52,67 @@
 				<!-- Contents -->
 				<div id="contents">
 					<section class="summary">
+						<article class="paas psContent">
+							<h3>PaaS-Monitoring Summary</h3>
+							<ul class="chartWrap">
+								<li>
+									<h4>BOSH</h4>
+									<p class="boshCnt">0</p>
+									<div id="boshChart"></div>
+								</li>
+								<li>
+									<h4>PaaS-TA</h4>
+									<p class="paasCnt">0</p>
+									<div id="paasChart"></div>
+								</li>
+								<li>
+									<h4>Container</h4>
+									<p class="conCnt">0</p>
+									<div id="conChart"></div>
+								</li>
+							</ul>
+						</article>
+						<article class="caas csContent">
+							<h3>CaaS-Monitoring Summary</h3>
+							<ul class="chartWrap">
+								<li class="caasPod">
+									<h4><span>POD</span></h4>
+									<div id="caasPodChart"></div>
+								</li>
+								<li class="caasCpu">
+									<h4><span>CPU</span></h4>
+									<div id="caasCpuChart"></div>
+								</li>
+								<li class="caasMemory">
+									<h4><span>Memory</span></h4>
+									<div id="caasMemoryChart"></div>
+								</li>
+								<li class="caasDisk">
+									<h4><span>Disk</span></h4>
+									<div id="caasDiskChart"></div>
+								</li>
+							</ul>
+						</article>
+						<article class="saas ssContent">
+							<h3>SaaS-Monitoring Summary</h3>
+							<ul class="chartWrap">
+								<li class="saasCpu">
+									<h4>CPU</h4>
+									<div id="saasCpuChart"></div>
+									<span><strong>0</strong> / <em>100 %</em></span>
+								</li>
+								<li class="saasHeM">
+									<h4>Heap Memory</h4>
+									<div id="saasHeMChart"></div>
+									<span><strong>0</strong> / <em>0</em></span>
+								</li>
+								<li class="saasNoM">
+									<h4>None Heap Memory</h4>
+									<div id="saasNoMChart"></div>
+									<span><strong>0</strong> / <em>0</em></span>
+								</li>
+							</ul>
+						</article>
 						<article class="iaas isContent">
 							<h3>IaaS-Monitoring Summary</h3>
 							<ul class="chartWrap">
@@ -106,88 +167,25 @@
 							</ul>
 						</article>
 
-						<article class="paas psContent">
-							<h3>PaaS-Monitoring Summary</h3>
-							<ul class="chartWrap">
-								<li>
-									<h4>BOSH</h4>
-									<p class="boshCnt">0</p>
-									<div id="boshChart"></div>
-								</li>
-								<li>
-									<h4>PaaS-TA</h4>
-									<p class="paasCnt">0</p>
-									<div id="paasChart"></div>
-								</li>
-								<li>
-									<h4>Container</h4>
-									<p class="conCnt">0</p>
-									<div id="conChart"></div>
-								</li>
-							</ul>
-						</article>
-							
-						<article class="saas ssContent">
-							<h3>SaaS-Monitoring Summary</h3>
-							<ul class="chartWrap">
-								<li class="saasCpu">
-									<h4>CPU</h4>
-									<div id="saasCpuChart"></div>
-									<span><strong>0</strong> / <em>100 %</em></span>
-								</li>
-								<li class="saasHeM">
-									<h4>Heap Memory</h4>
-									<div id="saasHeMChart"></div>
-									<span><strong>0</strong> / <em>0</em></span>
-								</li>
-								<li class="saasNoM">
-									<h4>None Heap Memory</h4>
-									<div id="saasNoMChart"></div>
-									<span><strong>0</strong> / <em>0</em></span>
-								</li>
-							</ul>
-						</article>
-							
-						<article class="caas csContent">
-							<h3>CaaS-Monitoring Summary</h3>
-							<ul class="chartWrap">
-								<li class="caasPod">
-									<h4><span>POD</span></h4>
-									<div id="caasPodChart"></div>
-								</li>
-								<li class="caasCpu">
-									<h4><span>CPU</span></h4>
-									<div id="caasCpuChart"></div>
-								</li>
-								<li class="caasMemory">
-									<h4><span>Memory</span></h4>
-									<div id="caasMemoryChart"></div>
-								</li>
-								<li class="caasDisk">
-									<h4><span>Disk</span></h4>
-									<div id="caasDiskChart"></div>
-								</li>
-							</ul>
-						</article>
 					</section>
 
 					<section class="event">
 						<article>
-							<div class="iaas isContent">
-								<h4>IaaS Event View</h4>
-								<ul id="iaasEvent"></ul>
-							</div>
 							<div class="paas psContent">
 								<h4>PaaS Event View</h4>
 								<ul id="paasEvent"></ul>
+							</div>
+							<div class="caas csContent">
+								<h4>CaaS Event View(POD)</h4>
+								<ul id="caasEvent"></ul>
 							</div>
 							<div class="saas ssContent">
 								<h4>SaaS Event View</h4>
 								<ul id="saasEvent"></ul>
 							</div>
-							<div class="caas csContent">
-								<h4>CaaS Event View(POD)</h4>
-								<ul id="caasEvent"></ul>
+							<div class="iaas isContent">
+								<h4>IaaS Event View</h4>
+								<ul id="iaasEvent"></ul>
 							</div>
 						</article>
 					</section>
