@@ -1,6 +1,8 @@
 package saas
 
 import (
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"fmt"
 	"paasta-monitoring-api/helpers"
@@ -20,13 +22,18 @@ func GetSaasService(saas models.SaaS) *SaasService {
 }
 
 
-func (service *SaasService) GetApplicationStatus() (map[string]int, error) {
+func (service *SaasService) GetApplicationStatus(ctx echo.Context) (map[string]int, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	result := make(map[string]int)
 	result["running"] = 0
 	result["shutdown"] = 0
 	result["disconnect"] = 0
 
-	resultBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	resultBytes, err := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	if err != nil {
+		logger.Error(err)
+	}
 	resultJson := gjson.Parse(string(resultBytes))
 
 	resultJson.ForEach(func(key, value gjson.Result) bool {
@@ -49,7 +56,10 @@ func (service *SaasService) GetApplicationStatus() (map[string]int, error) {
 }
 
 
-func (service *SaasService) GetApplicationUsage(period string)(map[string]interface{}, error) {
+func (service *SaasService) GetApplicationUsage(ctx echo.Context)(map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	period := ctx.QueryParam("period")
 	result := make(map[string]interface{})
 	var from string
 	var to string
@@ -77,7 +87,11 @@ func (service *SaasService) GetApplicationUsage(period string)(map[string]interf
 		from = strconv.FormatInt(time.Now().Add(time.Duration(-periodNum)*time.Minute).UTC().Unix(), 10) + "000"
 	}
 
-	resultBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	resultBytes, err := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	if err != nil {
+		logger.Error(err)
+	}
+
 	resultJson := gjson.Parse(string(resultBytes))
 	resultJson.ForEach(func(key, value gjson.Result) bool {
 		for _, item := range value.Array() {
@@ -118,12 +132,14 @@ func (service *SaasService) GetApplicationUsage(period string)(map[string]interf
 }
 
 
-func (service *SaasService) GetApplicationUsageList(period string)([]map[string]interface{}, error) {
+func (service *SaasService) GetApplicationUsageList(ctx echo.Context)([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var results []map[string]interface{}
 	var from string
 	var to string
-
 	to = strconv.FormatInt(time.Now().UTC().Unix(), 10) + "000"
+	period := ctx.QueryParam("period")
 	if len(period) == 0 {
 		from = strconv.FormatInt(time.Now().Add(-600*time.Second).UTC().Unix(), 10) + "000"
 	} else {
@@ -140,7 +156,11 @@ func (service *SaasService) GetApplicationUsageList(period string)([]map[string]
 		from = strconv.FormatInt(time.Now().Add(time.Duration(-periodNum)*time.Minute).UTC().Unix(), 10) + "000"
 	}
 
-	resultBytes, _ := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	resultBytes, err := helpers.RequestHttpGet(service.SaaS.PinpointWebUrl+"/getAgentList.pinpoint", "","")
+	if err != nil {
+		logger.Error(err)
+	}
+
 	resultJson := gjson.Parse(string(resultBytes))
 	resultJson.ForEach(func(key, value gjson.Result) bool {
 		appDataMap := make(map[string]interface{})
