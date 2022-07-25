@@ -37,6 +37,42 @@ type Connections struct {
 	SaaS              models.SaaS
 }
 
+
+
+func SetupConnection(logger *logrus.Logger) Connections {
+	connection := Connections{
+		Env: setEnv(),
+		Logger: logger,
+	}
+
+	// 내부 서비스 환경 설정
+	connection.redisConnection(connection.Env)
+
+	// 보쉬 정보 등록
+	connection.BoshInfoList = GetBoshInfoList(connection.Env)
+
+	services := os.Getenv("services")
+	servicesArr := strings.Split(services, ",")
+
+	// 외부 서비스 별 환경 설정
+	for _, value := range servicesArr {
+		switch value {
+		case "PaaS":
+			connection.initPaasConfig(connection.Env)
+			connection.initInfluxDbConfig(connection.Env)
+		case "CaaS":
+			connection.initCaaSConfig()
+		case "IaaS":
+			connection.initOpenstackProvider()
+			connection.initZabbixSession()
+		case "SaaS":
+			connection.initSaaSConfig()
+		}
+	}
+	return connection
+}
+
+
 /*
 	Read for environment variables including variables of system and program
 */
@@ -49,50 +85,17 @@ func getEnv(envData []string, getKeyVal func(item string) (key, value string)) m
 	return envMap
 }
 
-func SetEnv() map[string]interface{} {
+
+func setEnv() map[string]interface{} {
 	envMap := getEnv(os.Environ(), func(item string) (key, value string) {
 		keyValueSplit := strings.Split(item, "=")
 		key = keyValueSplit[0]
 		value = keyValueSplit[1]
 		return
 	})
-
-	/*
-		for key, value := range envMap {
-			if strings.Contains(key, "openstack") {
-				fmt.Println(key + " : " + value.(string))
-			}
-		}
-	*/
-
-	/*
-		env := make(map[string]interface{})
-
-		// Redis 설정
-		env["redis_url"] = os.Getenv("redis_url")
-		env["redis_db"], _ = strconv.Atoi(os.Getenv("redis_db"))
-
-		// PaaS DataBase 설정
-		env["paas_db_type"] = os.Getenv("paas_db_type")
-		env["paas_db_password"] = os.Getenv("paas_db_password")
-		env["paas_db_username"] = os.Getenv("paas_db_username")
-		env["paas_db_protocol"] = os.Getenv("paas_db_protocol")
-		env["paas_db_host"] = os.Getenv("paas_db_host")
-		env["paas_db_port"] = os.Getenv("paas_db_port")
-		env["paas_db_name"] = os.Getenv("paas_db_name")
-		env["paas_db_charset"] = os.Getenv("paas_db_charset")
-		env["paas_db_parseTime"] = os.Getenv("paas_db_parseTime")
-
-		env["paas_metric_db_username"] = os.Getenv("paas_metric_db_username")
-		env["paas_metric_db_password"] = os.Getenv("paas_metric_db_password")
-		env["paas_metric_db_url"] = os.Getenv("paas_metric_db_url")
-		env["paas_metric_db_name_paasta"] = os.Getenv("paas_metric_db_name_paasta")
-		env["paas_metric_db_name_bosh"] = os.Getenv("paas_metric_db_name_bosh")
-		env["paas_metric_db_name_container"] = os.Getenv("paas_metric_db_name_container")
-		env["paas_metric_db_name_logging"] = os.Getenv("paas_metric_db_name_logging")
-	*/
 	return envMap
 }
+
 
 func GetBoshInfoList(env map[string]interface{}) []models.Bosh {
 	// Bosh 설정
@@ -131,7 +134,7 @@ func BoshConnection(bosh models.Bosh) *gogobosh.Client {
 	return boshClient
 }
 
-func RedisConnection(env map[string]interface{}) *redis.Client {
+func (conn *Connections) redisConnection(env map[string]interface{}) {
 
 	// Redis 설정
 	dsn := env["redis_url"].(string)
@@ -146,12 +149,12 @@ func RedisConnection(env map[string]interface{}) *redis.Client {
 	})
 	_, err := redisClient.Ping().Result()
 	if err != nil {
-		panic(err)
+		conn.Logger.Panic(err)
 	}
-	return redisClient
+	conn.RedisInfo = redisClient
 }
 
-func PaaSConnection(env map[string]interface{}) (*gorm.DB, *cfclient.Client) {
+func (conn *Connections) initPaasConfig(env map[string]interface{}) {
 	// DB 설정
 	dsn := helpers.GetDBConnectionString(
 		env["paas_db_username"].(string),
@@ -163,11 +166,16 @@ func PaaSConnection(env map[string]interface{}) (*gorm.DB, *cfclient.Client) {
 		env["paas_db_charset"].(string),
 		env["paas_db_parseTime"].(string))
 
-	paasDBClient, paasDBErr := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-	if paasDBErr != nil {
-		panic(paasDBErr)
+	paasDBClient, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		conn.Logger.Panic(err)
 	}
+
+	if strings.Compare(os.Getenv("mode"), "development") == 0 {
+		paasDBClient.Debug()
+	}
+	conn.DbInfo = paasDBClient
+
 
 	// Cloud Foundry Client Initialize
 	config := &cfclient.Config{
@@ -177,13 +185,11 @@ func PaaSConnection(env map[string]interface{}) (*gorm.DB, *cfclient.Client) {
 		SkipSslValidation: true,
 	}
 	cloudFoundryClient, _ := cfclient.NewClient(config)
-
-	return paasDBClient, cloudFoundryClient
+	conn.CfClient = cloudFoundryClient
 }
 
 
-
-func InfluxDbConnection(env map[string]interface{}) models.InfluxDbClient {
+func (conn *Connections) initInfluxDbConfig(env map[string]interface{}) {
 	httpClient, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr:               env["paas_metric_db_url"].(string),
 		Username:           env["paas_metric_db_username"].(string),
@@ -192,7 +198,7 @@ func InfluxDbConnection(env map[string]interface{}) models.InfluxDbClient {
 	})
 
 	if err != nil {
-		panic(err)
+		conn.Logger.Panic(err)
 	}
 
 	DbName := models.InfluxDbName{
@@ -206,37 +212,37 @@ func InfluxDbConnection(env map[string]interface{}) models.InfluxDbClient {
 		HttpClient: httpClient,
 		DbName:     DbName,
 	}
-
-	return influxDbClient
+	conn.InfluxDbClient = influxDbClient
 }
 
-func (connection *Connections) initOpenstackProvider() {
+
+func (conn *Connections) initOpenstackProvider() {
 	opts := gophercloud.AuthOptions{
-		IdentityEndpoint: connection.Env["openstack_identity_endpoint"].(string),
-		DomainName:       connection.Env["openstack_domain"].(string),
-		Username:         connection.Env["openstack_username"].(string),
-		Password:         connection.Env["openstack_password"].(string),
-		TenantID:         connection.Env["openstack_tenant_id"].(string),
+		IdentityEndpoint: conn.Env["openstack_identity_endpoint"].(string),
+		DomainName:       conn.Env["openstack_domain"].(string),
+		Username:         conn.Env["openstack_username"].(string),
+		Password:         conn.Env["openstack_password"].(string),
+		TenantID:         conn.Env["openstack_tenant_id"].(string),
 		AllowReauth:      true,
 	}
 	providerClient, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
 		log.Println(err.Error())
 	}
-	connection.Logger.Info("Openstack TokenID : " + providerClient.TokenID)
+	conn.Logger.Info("Openstack TokenID : " + providerClient.TokenID)
 	//openstackToken := providerClient.TokenID
 
 	// TODO Openstack 토큰 적재 방식 수립 필요
 	//새로 로그인 되었으므로 변경된 토큰으로 변경하여 저장
 	//connections.RedisInfo.HSet(reqToken, "iaasToken", providerClient.TokenID)
-	connection.OpenstackProvider = providerClient
+	conn.OpenstackProvider = providerClient
 }
 
-func (connection *Connections) initZabbixSession() {
 
-	zabbixHost := connection.Env["zabbix_host"].(string)
-	zabbixAdminId := connection.Env["zabbix_admin_id"].(string)
-	zabbixAdminPw := connection.Env["zabbix_admin_pw"].(string)
+func (conn *Connections) initZabbixSession() {
+	zabbixHost := conn.Env["zabbix_host"].(string)
+	zabbixAdminId := conn.Env["zabbix_admin_id"].(string)
+	zabbixAdminPw := conn.Env["zabbix_admin_pw"].(string)
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -253,61 +259,27 @@ func (connection *Connections) initZabbixSession() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	connection.Logger.Info("Zabbix Token : " + zabbixSession.Token)
-	connection.ZabbixSession = zabbixSession
+	conn.Logger.Info("Zabbix Token : " + zabbixSession.Token)
+	conn.ZabbixSession = zabbixSession
 }
 
 
-func (connection *Connections) initCaaSConfig() {
+func (conn *Connections) initCaaSConfig() {
 	caas := models.CaaS{
-		PromethusUrl      : connection.Env["prometheus_host"].(string),
-		PromethusRangeUrl : connection.Env["prometheus_host"].(string) + "/api/v1/query_range?query=",
-		K8sUrl            : connection.Env["kubernetes_host"].(string),
-		K8sAdminToken     : connection.Env["kubernetes_admin_token"].(string),
+		PromethusUrl      : conn.Env["prometheus_host"].(string),
+		PromethusRangeUrl : conn.Env["prometheus_host"].(string) + "/api/v1/query_range?query=",
+		K8sUrl            : conn.Env["kubernetes_host"].(string),
+		K8sAdminToken     : conn.Env["kubernetes_admin_token"].(string),
 	}
 
-	connection.CaaS = caas
+	conn.CaaS = caas
 }
 
-func (connection *Connections) initSaaSConfig() {
+
+func (conn *Connections) initSaaSConfig() {
 	saas := models.SaaS{
-		PinpointWebUrl: connection.Env["pinpoint_web_url"].(string),
-		Logger: connection.Logger,
+		PinpointWebUrl: conn.Env["pinpoint_web_url"].(string),
+		Logger:         conn.Logger,
 	}
-	connection.SaaS = saas
-}
-
-
-func SetupConnection(logger *logrus.Logger) Connections {
-
-	Conn := Connections{
-		Env: SetEnv(),
-		Logger: logger,
-	}
-
-	// 내부 서비스 환경 설정
-	Conn.RedisInfo = RedisConnection(Conn.Env)
-
-	// 보쉬 정보 등록
-	Conn.BoshInfoList = GetBoshInfoList(Conn.Env)
-
-	services := os.Getenv("services")
-	servicesArr := strings.Split(services, ",")
-
-	// 외부 서비스 별 환경 설정
-	for _, value := range servicesArr {
-		switch value {
-		case "PaaS":
-			Conn.DbInfo, Conn.CfClient = PaaSConnection(Conn.Env)
-			Conn.InfluxDbClient = InfluxDbConnection(Conn.Env)
-		case "CaaS":
-			Conn.initCaaSConfig()
-		case "IaaS":
-			Conn.initOpenstackProvider()
-			Conn.initZabbixSession()
-		case "SaaS":
-			Conn.initSaaSConfig()
-		}
-	}
-	return Conn
+	conn.SaaS = saas
 }

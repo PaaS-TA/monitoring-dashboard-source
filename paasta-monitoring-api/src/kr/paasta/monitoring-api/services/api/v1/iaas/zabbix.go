@@ -3,7 +3,9 @@ package iaas
 import (
 	"fmt"
 	"github.com/gophercloud/gophercloud"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 	"paasta-monitoring-api/middlewares/zabbix-client/common"
 	"paasta-monitoring-api/middlewares/zabbix-client/history"
 	"paasta-monitoring-api/middlewares/zabbix-client/host"
@@ -26,7 +28,11 @@ func GetZabbixService(zabbixSession *zabbix.Session, openstackProvider *gophercl
 }
 
 
-func (service *ZabbixService) GetCpuUsage(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+func (service *ZabbixService) GetCpuUsage(ctx echo.Context) (map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -38,7 +44,7 @@ func (service *ZabbixService) GetCpuUsage(instanceId string, hypervisorName stri
 
 	zabbixHost, err := service.getZabbixHostDetail(paramMap)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -52,6 +58,7 @@ func (service *ZabbixService) GetCpuUsage(instanceId string, hypervisorName stri
 	itemParams["hostIds"] = hostIds
 	itemResult, err := item.GetItemList(service.ZabbixSession, itemParams)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -63,12 +70,24 @@ func (service *ZabbixService) GetCpuUsage(instanceId string, hypervisorName stri
 	params["itemType"] = itemType
 	params["offset"] = 10
 	result, err := history.GetHistory(service.ZabbixSession, params)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 
-	return result, err
+	resultMap := make(map[string]interface{})
+	resultMap["label"] = "CPU"
+	resultMap["data"] = result
+
+	return resultMap, err
 }
 
 
-func (service *ZabbixService) GetCpuLoadAverage(instanceId string, hypervisorName string, interval int) ([]zabbix.History, error) {
+func (service *ZabbixService) GetCpuLoadAverage(ctx echo.Context, interval int) ([]zabbix.History, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
 
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
@@ -81,13 +100,12 @@ func (service *ZabbixService) GetCpuLoadAverage(instanceId string, hypervisorNam
 
 	zabbixHost, err := service.getZabbixHostDetail(paramMap)
 	if err != nil {
-		log.Errorf(err.Error())
+		logger.Error(err)
 		return nil, err
 	}
 
 	hostIds := make([]string, 1)
 	hostIds[0] = zabbixHost.HostID
-
 
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
@@ -106,6 +124,7 @@ func (service *ZabbixService) GetCpuLoadAverage(instanceId string, hypervisorNam
 	itemParams["hostIds"] = hostIds
 	itemResult, err := item.GetItemList(service.ZabbixSession, itemParams)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -117,12 +136,19 @@ func (service *ZabbixService) GetCpuLoadAverage(instanceId string, hypervisorNam
 	params["itemType"] = itemType
 	params["offset"] = 10
 	result, err := history.GetHistory(service.ZabbixSession, params)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 
 	return result, err
 }
 
 
-func (service *ZabbixService) GetMemoryUsage(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+func (service *ZabbixService) GetMemoryUsage(ctx echo.Context) ([]interface{}, error) {
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
+
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -160,11 +186,23 @@ func (service *ZabbixService) GetMemoryUsage(instanceId string, hypervisorName s
 	params["offset"] = 10
 	result, err := history.GetHistory(service.ZabbixSession, params)
 
-	return result, err
+	resultMap := make(map[string]interface{})
+	resultMap["label"] = "Memory"
+	resultMap["data"] = result
+
+	resultList := make([]interface{}, 1)
+	resultList[0] = resultMap
+
+	return resultList, err
 }
 
 
-func (service *ZabbixService) GetDiskUsage(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+func (service *ZabbixService) GetDiskUsage(ctx echo.Context) ([]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
+
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -176,13 +214,12 @@ func (service *ZabbixService) GetDiskUsage(instanceId string, hypervisorName str
 
 	zabbixHost, err := service.getZabbixHostDetail(paramMap)
 	if err != nil {
-		log.Errorf(err.Error())
+		logger.Error(err)
 		return nil, err
 	}
 
 	hostIds := make([]string, 1)
 	hostIds[0] = zabbixHost.HostID
-
 
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
@@ -191,6 +228,7 @@ func (service *ZabbixService) GetDiskUsage(instanceId string, hypervisorName str
 	itemParams["hostIds"] = hostIds
 	itemResult, err := item.GetItemList(service.ZabbixSession, itemParams)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -203,10 +241,51 @@ func (service *ZabbixService) GetDiskUsage(instanceId string, hypervisorName str
 	params["offset"] = 10
 	result, err := history.GetHistory(service.ZabbixSession, params)
 
-	return result, err
+	resultMap := make(map[string]interface{})
+	resultMap["label"] = "Disk"
+	resultMap["data"] = result
+
+	resultList := make([]interface{}, 1)
+	resultList[0] = resultMap
+
+	return resultList, err
 }
 
-func (service *ZabbixService) GetDiskReadRate(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+
+/**
+	GetDiskIORate()
+		Return data integrating disk read rate data & disk write rate date
+ */
+func (service *ZabbixService) GetDiskIORate(ctx echo.Context) ([]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	resultReadRate, err := service.GetDiskReadRate(ctx)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	resultWriteRate, err := service.GetDiskWriteRate(ctx)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	resultList := make([]interface{}, 2)
+	resultList[0] = resultReadRate
+	resultList[1] = resultWriteRate
+
+	return resultList, err
+}
+
+
+/**
+	GetDiskReadRate
+		Return data disk read rate metrics
+ */
+func (service *ZabbixService) GetDiskReadRate(ctx echo.Context) (map[string]interface{}, error) {
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
+
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -218,13 +297,11 @@ func (service *ZabbixService) GetDiskReadRate(instanceId string, hypervisorName 
 
 	zabbixHost, err := service.getZabbixHostDetail(paramMap)
 	if err != nil {
-		log.Errorf(err.Error())
 		return nil, err
 	}
 
 	hostIds := make([]string, 1)
 	hostIds[0] = zabbixHost.HostID
-
 
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
@@ -245,10 +322,23 @@ func (service *ZabbixService) GetDiskReadRate(instanceId string, hypervisorName 
 	params["offset"] = 10
 	result, err := history.GetHistory(service.ZabbixSession, params)
 
-	return result, err
+	resultMapReadRate := make(map[string]interface{})
+
+	resultMapReadRate["label"] = "Disk read"
+	resultMapReadRate["data"] = result
+
+	return resultMapReadRate, err
 }
 
-func (service *ZabbixService) GetDiskWriteRate(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+
+/**
+	GetDiskWriteRate
+		Return data disk write rate metrics
+*/
+func (service *ZabbixService) GetDiskWriteRate(ctx echo.Context) (map[string]interface{}, error) {
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
+
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -260,13 +350,11 @@ func (service *ZabbixService) GetDiskWriteRate(instanceId string, hypervisorName
 
 	zabbixHost, err := service.getZabbixHostDetail(paramMap)
 	if err != nil {
-		log.Errorf(err.Error())
 		return nil, err
 	}
 
 	hostIds := make([]string, 1)
 	hostIds[0] = zabbixHost.HostID
-
 
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
@@ -287,11 +375,19 @@ func (service *ZabbixService) GetDiskWriteRate(instanceId string, hypervisorName
 	params["offset"] = 10
 	result, err := history.GetHistory(service.ZabbixSession, params)
 
-	return result, err
+	resultMapWriteRate := make(map[string]interface{})
+	resultMapWriteRate["label"] = "Disk write"
+	resultMapWriteRate["data"] = result
+
+	return resultMapWriteRate, err
 }
 
 
-func (service *ZabbixService) GetNetworkBitReceived(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+func (service *ZabbixService) GetNetworkBitReceived(ctx echo.Context) ([]zabbix.History, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -309,7 +405,6 @@ func (service *ZabbixService) GetNetworkBitReceived(instanceId string, hyperviso
 
 	hostIds := make([]string, 1)
 	hostIds[0] = zabbixHost.HostID
-
 
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
@@ -318,7 +413,7 @@ func (service *ZabbixService) GetNetworkBitReceived(instanceId string, hyperviso
 	itemParams["hostIds"] = hostIds
 	itemResult, err := item.GetItemList(service.ZabbixSession, itemParams)
 	if err != nil {
-		log.Errorf("%v\n", err)
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -335,7 +430,11 @@ func (service *ZabbixService) GetNetworkBitReceived(instanceId string, hyperviso
 }
 
 
-func (service *ZabbixService) GetNetworkBitSent(instanceId string, hypervisorName string) ([]zabbix.History, error) {
+func (service *ZabbixService) GetNetworkBitSent(ctx echo.Context) ([]zabbix.History, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	instanceId := ctx.QueryParam("instance_id")
+	hypervisorName := ctx.QueryParam("host")
 	paramMap := make(map[string]interface{})
 	if instanceId != "" {
 		hostIp := GetOpenstackService(service.OpenstackProvider).GetHostIpAddress(instanceId)
@@ -347,13 +446,12 @@ func (service *ZabbixService) GetNetworkBitSent(instanceId string, hypervisorNam
 
 	zabbixHost, err := service.getZabbixHostDetail(paramMap)
 	if err != nil {
-		log.Errorf(err.Error())
+		logger.Error(err)
 		return nil, err
 	}
 
 	hostIds := make([]string, 1)
 	hostIds[0] = zabbixHost.HostID
-
 
 	itemParams := make(map[string]interface{}, 0)
 	keywordArr := make([]string, 1)
@@ -362,7 +460,7 @@ func (service *ZabbixService) GetNetworkBitSent(instanceId string, hypervisorNam
 	itemParams["hostIds"] = hostIds
 	itemResult, err := item.GetItemList(service.ZabbixSession, itemParams)
 	if err != nil {
-		log.Errorf("%v\n", err)
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -379,14 +477,9 @@ func (service *ZabbixService) GetNetworkBitSent(instanceId string, hypervisorNam
 }
 
 
-
-
-
-
-
 /**
-Zabbix 호스트 정보를 조회
-	- IP주소나 호스트 이름으로 조회 가능
+	Zabbix 호스트 정보를 조회
+		- IP주소나 호스트 이름으로 조회 가능
 */
 func (service *ZabbixService) getZabbixHostDetail(paramMap map[string]interface{}) (zabbix.Host, error) {
 	// IP주소로 호스트 정보 조회
@@ -401,7 +494,6 @@ func (service *ZabbixService) getZabbixHostDetail(paramMap map[string]interface{
 	if ok {
 		filterMap["host"] = hostName
 	}
-
 	hostParams["filter"] = filterMap
 
 	fmt.Println(service.ZabbixSession.URL)

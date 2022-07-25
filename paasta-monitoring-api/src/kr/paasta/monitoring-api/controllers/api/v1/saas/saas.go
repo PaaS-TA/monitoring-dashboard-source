@@ -2,7 +2,6 @@ package saas
 
 import (
 	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	models "paasta-monitoring-api/models/api/v1"
@@ -22,9 +21,8 @@ func GetSaasController(saas models.SaaS) *SaasController {
 
 
 func (controller *SaasController) GetApplicationStatus(ctx echo.Context) error {
-	result, err := service.GetSaasService(controller.SaaS).GetApplicationStatus()
+	result, err := service.GetSaasService(controller.SaaS).GetApplicationStatus(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -35,10 +33,8 @@ func (controller *SaasController) GetApplicationStatus(ctx echo.Context) error {
 
 
 func (controller *SaasController) GetApplicationUsage(ctx echo.Context) error {
-	period := ctx.QueryParam("period")
-	result, err := service.GetSaasService(controller.SaaS).GetApplicationUsage(period)
+	result, err := service.GetSaasService(controller.SaaS).GetApplicationUsage(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -49,10 +45,8 @@ func (controller *SaasController) GetApplicationUsage(ctx echo.Context) error {
 
 
 func (controller *SaasController) GetApplicationUsageList(ctx echo.Context) error {
-	period := ctx.QueryParam("period")
-	result, err := service.GetSaasService(controller.SaaS).GetApplicationUsageList(period)
+	result, err := service.GetSaasService(controller.SaaS).GetApplicationUsageList(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {

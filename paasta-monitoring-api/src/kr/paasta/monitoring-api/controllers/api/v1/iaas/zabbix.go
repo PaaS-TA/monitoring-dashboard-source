@@ -25,24 +25,12 @@ func GetZabbixController(zabbixSession *zabbix.Session, openstackProvider *gophe
 
 
 func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
-	instanceId := ctx.QueryParam("instance_id")
-	hypervisorName := ctx.QueryParam("host")
-
-	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuUsage(instanceId, hypervisorName)
-
-	resultMap := make(map[string]interface{})
-	resultMap["label"] = "CPU"
-	resultMap["data"] = result
-
-	resultList := make([]interface{}, 1)
-	resultList[0] = resultMap
-
+	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuUsage(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
+		apiHelpers.Respond(ctx, http.StatusOK, "", result)
 	}
 	return nil
 }
@@ -53,24 +41,13 @@ func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 	메모리 사용률 차트 데이터를 불러옴
 */
 func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
-	instanceId := ctx.QueryParam("instance_id")
-	hypervisorName := ctx.QueryParam("host")
-
-	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetMemoryUsage(instanceId, hypervisorName)
-
-	resultMap := make(map[string]interface{})
-	resultMap["label"] = "Memory"
-	resultMap["data"] = result
-
-	resultList := make([]interface{}, 1)
-	resultList[0] = resultMap
-
+	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetMemoryUsage(ctx)
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
+		apiHelpers.Respond(ctx, http.StatusOK, "", result)
 	}
 	return nil
 }
@@ -80,24 +57,12 @@ func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 	디스크 사용률 차트 데이터를 불러옴
 */
 func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
-	instanceId := ctx.QueryParam("instance_id")
-	hypervisorName := ctx.QueryParam("host")
-
-	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskUsage(instanceId, hypervisorName)
-
-	resultMap := make(map[string]interface{})
-	resultMap["label"] = "Disk"
-	resultMap["data"] = result
-
-	resultList := make([]interface{}, 1)
-	resultList[0] = resultMap
-
+	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskUsage(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
+		apiHelpers.Respond(ctx, http.StatusOK, "", result)
 	}
 	return nil
 }
@@ -106,33 +71,29 @@ func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
 	CPU Load Average 차트 데이터를 불러옴 (1분 단위, 5분 단위, 15분 단위)
 */
 func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
-	instanceId := ctx.QueryParam("instance_id")
-	hypervisorName := ctx.QueryParam("host")
+	resultInterval1m, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(ctx, 1)
+	resultInterval5m, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(ctx, 5)
+	resultInterval15m, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(ctx, 15)
 
-	resultInterval1, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(instanceId, hypervisorName, 1)
-	resultInterval5, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(instanceId, hypervisorName, 5)
-	resultInterval15, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(instanceId, hypervisorName, 15)
+	resultMapInterval1m := make(map[string]interface{})
+	resultMapInterval5m := make(map[string]interface{})
+	resultMapInterval15m := make(map[string]interface{})
 
-	resultMapInterval1 := make(map[string]interface{})
-	resultMapInterval5 := make(map[string]interface{})
-	resultMapInterval15 := make(map[string]interface{})
+	resultMapInterval1m["label"] = "1M"
+	resultMapInterval1m["data"] = resultInterval1m
 
-	resultMapInterval1["label"] = "1M"
-	resultMapInterval1["data"] = resultInterval1
+	resultMapInterval5m["label"] = "5M"
+	resultMapInterval5m["data"] = resultInterval5m
 
-	resultMapInterval5["label"] = "5M"
-	resultMapInterval5["data"] = resultInterval5
-
-	resultMapInterval15["label"] = "15M"
-	resultMapInterval15["data"] = resultInterval15
+	resultMapInterval15m["label"] = "15M"
+	resultMapInterval15m["data"] = resultInterval15m
 
 	resultList := make([]interface{}, 3)
-	resultList[0] = resultMapInterval1
-	resultList[1] = resultMapInterval5
-	resultList[2] = resultMapInterval15
+	resultList[0] = resultMapInterval1m
+	resultList[1] = resultMapInterval5m
+	resultList[2] = resultMapInterval15m
 
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
@@ -143,39 +104,19 @@ func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 
 
 func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
-	instanceId := ctx.QueryParam("instance_id")
-	hypervisorName := ctx.QueryParam("host")
-
-	resultReadRate, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskReadRate(instanceId, hypervisorName)
-	resultWriteRate, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskWriteRate(instanceId, hypervisorName)
-
-	resultMapReadRate := make(map[string]interface{})
-	resultMapWriteRate := make(map[string]interface{})
-
-	resultMapReadRate["label"] = "Disk read"
-	resultMapReadRate["data"] = resultReadRate
-
-	resultMapWriteRate["label"] = "Disk write"
-	resultMapWriteRate["data"] = resultWriteRate
-
-	resultList := make([]interface{}, 2)
-	resultList[0] = resultMapReadRate
-	resultList[1] = resultMapWriteRate
-
+	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskIORate(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
+		apiHelpers.Respond(ctx, http.StatusOK, "", result)
 	}
 	return nil
 }
 
 
 func (controller *ZabbixController) GetNetworkIOBytes(ctx echo.Context) error {
-	instanceId := ctx.QueryParam("instance_id")
-	hypervisorName := ctx.QueryParam("host")
+
 
 	resultReceivedBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitReceived(instanceId, hypervisorName)
 	resultSentBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitSent(instanceId, hypervisorName)
