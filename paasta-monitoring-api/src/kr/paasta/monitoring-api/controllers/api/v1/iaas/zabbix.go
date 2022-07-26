@@ -11,18 +11,16 @@ import (
 )
 
 type ZabbixController struct {
-	ZabbixSession *zabbix.Session
+	ZabbixSession     *zabbix.Session
 	OpenstackProvider *gophercloud.ProviderClient
 }
 
-
 func GetZabbixController(zabbixSession *zabbix.Session, openstackProvider *gophercloud.ProviderClient) *ZabbixController {
 	return &ZabbixController{
-		ZabbixSession: zabbixSession,
-		OpenstackProvider : openstackProvider,
+		ZabbixSession:     zabbixSession,
+		OpenstackProvider: openstackProvider,
 	}
 }
-
 
 func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuUsage(ctx)
@@ -35,10 +33,8 @@ func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 	return nil
 }
 
-
-
 /**
-	메모리 사용률 차트 데이터를 불러옴
+메모리 사용률 차트 데이터를 불러옴
 */
 func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetMemoryUsage(ctx)
@@ -52,9 +48,8 @@ func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 	return nil
 }
 
-
 /**
-	디스크 사용률 차트 데이터를 불러옴
+디스크 사용률 차트 데이터를 불러옴
 */
 func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskUsage(ctx)
@@ -68,7 +63,7 @@ func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
 }
 
 /**
-	CPU Load Average 차트 데이터를 불러옴 (1분 단위, 5분 단위, 15분 단위)
+CPU Load Average 차트 데이터를 불러옴 (1분 단위, 5분 단위, 15분 단위)
 */
 func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 	resultInterval1m, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(ctx, 1)
@@ -102,7 +97,6 @@ func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 	return nil
 }
 
-
 func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskIORate(ctx)
 	if err != nil {
@@ -114,10 +108,7 @@ func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
 	return nil
 }
 
-
 func (controller *ZabbixController) GetNetworkIOBytes(ctx echo.Context) error {
-
-
 	resultReceivedBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitReceived(ctx)
 	resultSentBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitSent(ctx)
 
