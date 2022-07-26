@@ -27,25 +27,19 @@ func GetAlarmActionController(conn connections.Connections) *AlarmActionControll
 //  @Description  알람에 대한 조치 내용을 신규 작성한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        AlarmActionRequest  body      v1.AlarmActionRequest  true  "신규 작성할 알람 정보를 주입한다."
+//  @Param        AlarmActions  body      v1.AlarmActions  true  "신규 작성할 알람 정보를 주입한다."
 //  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/action [post]
 func (controller *AlarmActionController) CreateAlarmAction(ctx echo.Context) error {
-	var request models.AlarmActionRequest
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
-		return err
-	}
-
-	request.RegUser = ctx.Get("userId").(string)
-	results, err := service.GetAlarmActionService(controller.DbInfo).CreateAlarmAction(request)
+	results, err := service.GetAlarmActionService(controller.DbInfo).CreateAlarmAction(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to create alarm actions.", err.Error())
 		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to create alarm actions.", results)
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to create alarm actions.", results)
+
 	return nil
 }
 

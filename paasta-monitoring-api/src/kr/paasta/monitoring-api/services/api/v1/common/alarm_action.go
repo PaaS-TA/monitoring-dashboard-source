@@ -2,9 +2,11 @@ package common
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"strconv"
 	"time"
@@ -22,7 +24,17 @@ func GetAlarmActionService(DbInfo *gorm.DB) *AlarmActionService {
 }
 
 
-func (service *AlarmActionService) CreateAlarmAction(request models.AlarmActionRequest) (string, error) {
+func (service *AlarmActionService) CreateAlarmAction(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	var request models.AlarmActionRequest
+	err := helpers.BindJsonAndCheckValid(ctx, &request)
+	if err != nil {
+		logger.Error(err)
+		return "", err
+	}
+	request.RegUser = ctx.Get("userId").(string)
+
 	params := models.AlarmActions {
 		AlarmId : request.AlarmId,
 		AlarmActionDesc: request.AlarmActionDesc,

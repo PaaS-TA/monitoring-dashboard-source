@@ -118,8 +118,8 @@ func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
 func (controller *ZabbixController) GetNetworkIOBytes(ctx echo.Context) error {
 
 
-	resultReceivedBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitReceived(instanceId, hypervisorName)
-	resultSentBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitSent(instanceId, hypervisorName)
+	resultReceivedBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitReceived(ctx)
+	resultSentBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitSent(ctx)
 
 	resultMapReceivedBytes := make(map[string]interface{})
 	resultMapSentBytes := make(map[string]interface{})

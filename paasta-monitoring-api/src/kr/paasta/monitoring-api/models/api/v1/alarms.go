@@ -63,10 +63,10 @@ type (
 		Id              int       `json:"id"               gorm:"primaryKey;autoIncrement;not null;-:write"`
 		AlarmId         int       `json:"alarmId"`
 		AlarmActionDesc string    `json:"alarmActionDesc"`
-		RegDate         time.Time `json:"regDate"          gorm:"<-:create"`
-		RegUser         string    `json:"regUser"          gorm:"<-:create"`
-		ModiDate        time.Time `json:"modiDate"         gorm:"<-:update"`
-		ModiUser        string    `json:"modiUser"         gorm:"<-:update"`
+		RegDate         time.Time `json:"regDate"          gorm:"<-:create" swaggerignore:"true"`
+		RegUser         string    `json:"regUser"          gorm:"<-:create" swaggerignore:"true"`
+		ModiDate        time.Time `json:"modiDate"         gorm:"<-:update" swaggerignore:"true"`
+		ModiUser        string    `json:"modiUser"         gorm:"<-:update" swaggerignore:"true"`
 	}
 )
 

@@ -2,7 +2,6 @@ package caas
 
 import (
 	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	models "paasta-monitoring-api/models/api/v1"
@@ -20,9 +19,8 @@ func GetWorkloadController(config models.CaaS) *WorkloadController {
 }
 
 func (controller *WorkloadController) GetWorkloadStatus(ctx echo.Context) error {
-	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadStatus()
+	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadStatus(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -35,7 +33,6 @@ func (controller *WorkloadController) GetWorkloadStatus(ctx echo.Context) error 
 func (controller *WorkloadController) GetWorkloadList(ctx echo.Context) error {
 	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadList()
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -46,9 +43,8 @@ func (controller *WorkloadController) GetWorkloadList(ctx echo.Context) error {
 
 
 func (controller *WorkloadController) GetWorkloadDetailMetrics(ctx echo.Context) error {
-	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadDetailMetrics(ctx.QueryParam("workload"))
+	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadDetailMetrics(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -59,9 +55,8 @@ func (controller *WorkloadController) GetWorkloadDetailMetrics(ctx echo.Context)
 
 
 func (controller *WorkloadController) GetWorkloadContainerList(ctx echo.Context) error {
-	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadContainerList(ctx.QueryParam("workload"))
+	results, err := service.GetWorkloadService(controller.CaaS).GetWorkloadContainerList(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -69,14 +64,11 @@ func (controller *WorkloadController) GetWorkloadContainerList(ctx echo.Context)
 	}
 	return nil
 }
+
 
 func (controller *WorkloadController) GetContainerMetrics(ctx echo.Context) error {
-	namespace := ctx.QueryParam("namespace")
-	container := ctx.QueryParam("container")
-	pod := ctx.QueryParam("pod")
-	results, err := service.GetWorkloadService(controller.CaaS).GetContainerMetrics(namespace, container, pod)
+	results, err := service.GetWorkloadService(controller.CaaS).GetContainerMetrics(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -85,13 +77,10 @@ func (controller *WorkloadController) GetContainerMetrics(ctx echo.Context) erro
 	return nil
 }
 
+
 func (controller *WorkloadController) GetContainerLog(ctx echo.Context) error {
-	namespace := ctx.QueryParam("namespace")
-	container := ctx.QueryParam("container")
-	pod := ctx.QueryParam("pod")
-	results, err := service.GetWorkloadService(controller.CaaS).GetContainerLog(namespace, container, pod)
+	results, err := service.GetWorkloadService(controller.CaaS).GetContainerLog(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
