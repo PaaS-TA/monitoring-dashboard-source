@@ -2,7 +2,6 @@ package caas
 
 import (
 	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	models "paasta-monitoring-api/models/api/v1"
@@ -23,7 +22,6 @@ func (controller *ClusterController) GetClusterAverage(ctx echo.Context) error {
 
 	results, err := service.GetClusterService(controller.CaaS).GetClusterAverage(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -36,7 +34,6 @@ func (controller *ClusterController) GetClusterAverage(ctx echo.Context) error {
 func (controller *ClusterController) GetWorkNodeList(ctx echo.Context) error {
 	results, err := service.GetClusterService(controller.CaaS).GetWorkNodeList(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())
 		return err
 	} else {
@@ -47,11 +44,8 @@ func (controller *ClusterController) GetWorkNodeList(ctx echo.Context) error {
 
 
 func (controller *ClusterController) GetWorkNode(ctx echo.Context) error {
-
-
 	results, err := service.GetClusterService(controller.CaaS).GetWorkNode(ctx)
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Worker Node data.", err.Error())
 		return err
 	} else {

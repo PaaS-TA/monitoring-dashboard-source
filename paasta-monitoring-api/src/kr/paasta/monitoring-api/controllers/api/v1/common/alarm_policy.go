@@ -1,13 +1,11 @@
 package common
 
 import (
-	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"
-	"paasta-monitoring-api/helpers"
-	models "paasta-monitoring-api/models/api/v1"
 	common "paasta-monitoring-api/services/api/v1/common"
 )
 
@@ -33,15 +31,7 @@ func GetAlarmPolicyController(conn connections.Connections) *AlarmPolicyControll
 //  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/sns [post]
 func (controller *AlarmPolicyController) CreateAlarmPolicy(ctx echo.Context) error {
-	var request []models.AlarmPolicies
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the REQUEST JSON", err.Error())
-		return err
-	}
-	regUser := ctx.Get("userId").(string)
-
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).CreateAlarmPolicy(request, regUser)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).CreateAlarmPolicy(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to register sns account.", err.Error())
 		return err
@@ -83,14 +73,7 @@ func (controller *AlarmPolicyController) GetAlarmPolicy(ctx echo.Context) error 
 //  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/policy [put]
 func (controller *AlarmPolicyController) UpdateAlarmPolicy(ctx echo.Context) error {
-	var request []models.AlarmPolicyRequest
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
-		return err
-	}
-
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmPolicy(ctx, request)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmPolicy(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm policy.", err.Error())
 		return err
@@ -111,14 +94,7 @@ func (controller *AlarmPolicyController) UpdateAlarmPolicy(ctx echo.Context) err
 //  @Success      200                {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/target [put]
 func (controller *AlarmPolicyController) UpdateAlarmTarget(ctx echo.Context) error {
-	var request []models.AlarmTargetRequest
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
-		return err
-	}
-
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmTarget(request)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmTarget(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm target.", err.Error())
 		return err

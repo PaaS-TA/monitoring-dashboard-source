@@ -42,12 +42,14 @@ func (dao *AlarmActionDao) GetAlarmAction(params models.AlarmActions) ([]models.
 }
 
 
-func (dao *AlarmActionDao) UpdateAlarmAction(params models.AlarmActions) error {
+func (dao *AlarmActionDao) UpdateAlarmAction(params models.AlarmActions) *models.ApiError {
 	results := dao.DbInfo.Debug().Model(&params).Where("id = ?", params.Id).Updates(&params)
 
 	if results.Error != nil {
-		fmt.Println(results.Error)
-		return results.Error
+		return &models.ApiError{
+			OriginError: results.Error,
+			Message: results.Error.Error(),
+		}
 	}
 
 	return nil

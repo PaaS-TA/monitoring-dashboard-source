@@ -126,7 +126,6 @@ func (controller *ZabbixController) GetNetworkIOBytes(ctx echo.Context) error {
 	resultList[1] = resultMapSentBytes
 
 	if err != nil {
-		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {

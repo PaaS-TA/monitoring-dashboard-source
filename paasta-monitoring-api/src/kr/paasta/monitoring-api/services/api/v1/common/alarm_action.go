@@ -5,6 +5,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"net/http"
+	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
@@ -73,26 +75,47 @@ func (service *AlarmActionService) GetAlarmAction(ctx echo.Context) ([]models.Al
 }
 
 
-func (service *AlarmActionService) UpdateAlarmAction(request models.AlarmActionRequest) (string, error) {
+func (service *AlarmActionService) UpdateAlarmAction(ctx echo.Context) (string, *models.ApiError) {
+
+	var request models.AlarmActionRequest
+	errValid := helpers.BindJsonAndCheckValid(ctx, &request)
+	if errValid != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, models.ERR_PARAM_VALIDATION, errValid.Error())
+		apiError := &models.ApiError{
+			OriginError: errValid,
+			Message: errValid.Error(),
+		}
+		return "", apiError
+	}
 	params := models.AlarmActions {
 		Id : request.Id,
 		AlarmActionDesc: request.AlarmActionDesc,
 		ModiDate: time.Now(),
-		ModiUser: request.RegUser,
+		ModiUser: ctx.Get("userId").(string),
 	}
 
 	err := common.GetAlarmActionDao(service.DbInfo).UpdateAlarmAction(params)
 	if err != nil {
-		return "FAILED UPDATE ALARM ACTION!", err
+		return models.FAIL_UPD_ALARM_ACTION, err
 	}
-	return "SUCCEEDED UPDATE ALARM ACTION!", nil
+	return models.SUCC_UPD_ALARM_ACTION, nil
 }
 
 
-func (service *AlarmActionService) DeleteAlarmAction(request models.AlarmActionRequest) (string, error) {
-	err := common.GetAlarmActionDao(service.DbInfo).DeleteAlarmAction(request)
+func (service *AlarmActionService) DeleteAlarmAction(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	var request models.AlarmActionRequest
+	err := helpers.BindJsonAndCheckValid(ctx, &request)
 	if err != nil {
-		return "FAILED DELETE ALARM ACTION!", err
+		logger.Error(err)
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return "", err
+	}
+	errAction := common.GetAlarmActionDao(service.DbInfo).DeleteAlarmAction(request)
+	if errAction != nil {
+		logger.Error(errAction)
+		return "FAILED DELETE ALARM ACTION!", errAction
 	}
 	return "SUCCEEDED DELETE ALARM ACTION!", nil
 }
