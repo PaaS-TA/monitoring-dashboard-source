@@ -28,12 +28,12 @@ func (service *AlarmPolicyService) CreateAlarmPolicy(ctx echo.Context) (string, 
 	errValid := helpers.BindJsonAndCheckValid(ctx, &params)
 	if errValid != nil {
 		logger.Error(errValid)
-		return "", errors.New("Invalid JSON provided, please check the REQUEST JSON")
+		return "", errors.New("Invalid JSON provided, please check the request JSON")
 	}
 
-	for _, param := range params {
-		param.RegUser = ctx.Get("userId").(string)
-		param.RegDate = time.Now()
+	for i, _ := range params {
+		params[i].RegUser = ctx.Get("userId").(string)
+		params[i].RegDate = time.Now()
 	}
 
 	err := common.GetAlarmPolicyDao(service.DbInfo).CreateAlarmPolicy(params)
