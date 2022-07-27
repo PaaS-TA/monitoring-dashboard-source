@@ -1,9 +1,9 @@
 package common
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	errors "golang.org/x/xerrors"
 	"gorm.io/gorm"
 	"paasta-monitoring-api/dao/api/v1/common"
 	"paasta-monitoring-api/helpers"
@@ -65,7 +65,7 @@ func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context) (string, 
 	err := helpers.BindJsonAndCheckValid(ctx, &params)
 	if err != nil {
 		logger.Error(err)
-		return "", errors.New("Invalid JSON provided, please check the request JSON")
+		return "", errors.New(models.ERR_PARAM_VALIDATION)
 	}
 	for _, policyParam := range params {
 		param := models.AlarmPolicies{
