@@ -31,42 +31,42 @@ type (
 	}
 
 	AlarmPolicies struct {
-		Id                int       `json:"id"                 gorm:"primaryKey;autoIncrement;not null;-:write"`
-		OriginType        string    `json:"originType"         gorm:"not null"`
-		AlarmType         string    `json:"alarmType"          gorm:"not null"`
-		WarningThreshold  int       `json:"warningThreshold"   gorm:"not null"`
-		CriticalThreshold int       `json:"criticalThreshold"  gorm:"not null"`
-		RepeatTime        int       `json:"repeatTime"         gorm:"not null"`
-		MeasureTime       int       `json:"measureTime"        gorm:"not null"`
-		Comment           string    `json:"comment"`
-		RegDate           time.Time `json:"regDate"            gorm:"<-:create"`
-		RegUser           string    `json:"regUser"            gorm:"<-:create"`
-		ModiDate          time.Time `json:"modiDate"           gorm:"<-:update"`
-		ModiUser          string    `json:"modiUser"           gorm:"<-:update"`
+		Id                int       `json:"id"                gorm:"primaryKey;autoIncrement;not null;-:write"`
+		OriginType        string    `json:"originType"        gorm:"not null"  example:"bos"`
+		AlarmType         string    `json:"alarmType"         gorm:"not null"  example:"cpu"`
+		WarningThreshold  int       `json:"warningThreshold"  gorm:"not null"  example:"88"`
+		CriticalThreshold int       `json:"criticalThreshold" gorm:"not null"  example:"99"`
+		RepeatTime        int       `json:"repeatTime"        gorm:"not null"  example:"10"`
+		MeasureTime       int       `json:"measureTime"       gorm:"not null"  example:"600"`
+		Comment           string    `json:"comment"                            example:"Init From Swagger Web"`
+		RegDate           time.Time `json:"regDate"           gorm:"<-:create" swaggerignore:"true"`
+		RegUser           string    `json:"regUser"           gorm:"<-:create" swaggerignore:"true"`
+		ModiDate          time.Time `json:"modiDate"          gorm:"<-:update" swaggerignore:"true"`
+		ModiUser          string    `json:"modiUser"          gorm:"<-:update" swaggerignore:"true"`
 	}
 
 	AlarmSns struct {
-		ChannelId  uint      `json:"channelId"    gorm:"primaryKey;autoIncrement;not null;-:write"`
-		OriginType string    `json:"originType"   gorm:"not null;default:all"`
-		SnsType    string    `json:"snsType"      gorm:"not null"`
-		SnsId      string    `json:"snsId"        gorm:"not null"`
+		ChannelId  uint      `json:"channelId"  gorm:"primaryKey;autoIncrement;not null;-:write"`
+		OriginType string    `json:"originType" gorm:"not null;default:all"`
+		SnsType    string    `json:"snsType"    gorm:"not null"`
+		SnsId      string    `json:"snsId"      gorm:"not null"`
 		Token      string    `json:"token"`
-		Expl       string    `json:"expl"         gorm:"not null"`
-		SnsSendYN  string    `json:"snsSendYN"    gorm:"not null;default:Y"`
-		RegDate    time.Time `json:"regDate"      gorm:"<-:create"`
-		RegUser    string    `json:"regUser"      gorm:"<-:create;default:system"`
-		ModiDate   time.Time `json:"modiDate"     gorm:"<-:update"`
-		ModiUser   string    `json:"modiUser"     gorm:"<-:update;default:system"`
+		Expl       string    `json:"expl"       gorm:"not null"`
+		SnsSendYN  string    `json:"snsSendYN"  gorm:"not null;default:Y"`
+		RegDate    time.Time `json:"regDate"    gorm:"<-:create"`
+		RegUser    string    `json:"regUser"    gorm:"<-:create;default:system"`
+		ModiDate   time.Time `json:"modiDate"   gorm:"<-:update"`
+		ModiUser   string    `json:"modiUser"   gorm:"<-:update;default:system"`
 	}
 
 	AlarmActions struct {
-		Id              int       `json:"id"               gorm:"primaryKey;autoIncrement;not null;-:write"`
-		AlarmId         int       `json:"alarmId"`
-		AlarmActionDesc string    `json:"alarmActionDesc"`
-		RegDate         time.Time `json:"regDate"          gorm:"<-:create" swaggerignore:"true"`
-		RegUser         string    `json:"regUser"          gorm:"<-:create" swaggerignore:"true"`
-		ModiDate        time.Time `json:"modiDate"         gorm:"<-:update" swaggerignore:"true"`
-		ModiUser        string    `json:"modiUser"         gorm:"<-:update" swaggerignore:"true"`
+		Id              int       `json:"id"       gorm:"primaryKey;autoIncrement;not null;-:write" swaggerignore:"true"`
+		AlarmId         int       `json:"alarmId"         example:"115"`
+		AlarmActionDesc string    `json:"alarmActionDesc" example:"Creat From Swagger Web"`
+		RegDate         time.Time `json:"regDate"  gorm:"<-:create"                                 swaggerignore:"true"`
+		RegUser         string    `json:"regUser"  gorm:"<-:create"                                 swaggerignore:"true"`
+		ModiDate        time.Time `json:"modiDate" gorm:"<-:update"                                 swaggerignore:"true"`
+		ModiUser        string    `json:"modiUser" gorm:"<-:update"                                 swaggerignore:"true"`
 	}
 )
 
@@ -82,18 +82,18 @@ type (
 // For request container part.
 type (
 	AlarmPolicyRequest struct {
-		OriginType        string `json:"originType" validate:"required"`
-		AlarmType         string `json:"alarmType"`
-		WarningThreshold  int    `json:"warningThreshold"`
-		CriticalThreshold int    `json:"criticalThreshold"`
-		RepeatTime        int    `json:"repeatTime"`
-		MeasureTime       int    `json:"measureTime"`
+		OriginType        string `json:"originType" validate:"required" example:"bos"`
+		AlarmType         string `json:"alarmType"                      example:"cpu"`
+		WarningThreshold  int    `json:"warningThreshold"               example:"88"`
+		CriticalThreshold int    `json:"criticalThreshold"              example:"89"`
+		RepeatTime        int    `json:"repeatTime"                     example:"10"`
+		MeasureTime       int    `json:"measureTime"                    example:"600"`
 	}
 
 	AlarmTargetRequest struct {
-		OriginType  string `json:"originType" validate:"required"`
-		MailAddress string `json:"mailAddress" validate:"email"`
-		MailSendYN  string `json:"mailSendYN"`
+		OriginType  string `json:"originType"  validate:"required" example:"bos"`
+		MailAddress string `json:"mailAddress" validate:"email"    example:"paasta-admin@paasta.org"`
+		MailSendYN  string `json:"mailSendYN"                      example:"N"`
 	}
 
 	SnsAccountRequest struct {
@@ -106,9 +106,9 @@ type (
 	}
 
 	AlarmActionRequest struct {
-		Id              int    `json:"id"`
-		AlarmId         int    `json:"alarmId"`
-		AlarmActionDesc string `json:"alarmActionDesc"`
+		Id              int    `json:"id"              example:"1"`
+		AlarmId         int    `json:"alarmId"         example:"115"`
+		AlarmActionDesc string `json:"alarmActionDesc" example:"Modify From Swagger Web"`
 		RegUser         string `json:"regUser" swaggerignore:"true"`
 	}
 

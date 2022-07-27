@@ -18,13 +18,11 @@ type AlarmActionService struct {
 	DbInfo *gorm.DB
 }
 
-
 func GetAlarmActionService(DbInfo *gorm.DB) *AlarmActionService {
 	return &AlarmActionService{
 		DbInfo: DbInfo,
 	}
 }
-
 
 func (service *AlarmActionService) CreateAlarmAction(ctx echo.Context) (string, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
@@ -37,11 +35,11 @@ func (service *AlarmActionService) CreateAlarmAction(ctx echo.Context) (string, 
 	}
 	request.RegUser = ctx.Get("userId").(string)
 
-	params := models.AlarmActions {
-		AlarmId : request.AlarmId,
+	params := models.AlarmActions{
+		AlarmId:         request.AlarmId,
 		AlarmActionDesc: request.AlarmActionDesc,
-		RegDate: time.Now(),
-		RegUser: request.RegUser,
+		RegDate:         time.Now(),
+		RegUser:         request.RegUser,
 	}
 	alarmParams := models.Alarms{
 		Id: request.AlarmId,
@@ -60,11 +58,10 @@ func (service *AlarmActionService) CreateAlarmAction(ctx echo.Context) (string, 
 	return "SUCCEEDED CREATE ALARM ACTION!", nil
 }
 
-
 func (service *AlarmActionService) GetAlarmAction(ctx echo.Context) ([]models.AlarmActions, error) {
 	alarmId, _ := strconv.Atoi(ctx.QueryParam("alarmId"))
 	params := models.AlarmActions{
-		AlarmId: alarmId,
+		AlarmId:         alarmId,
 		AlarmActionDesc: ctx.QueryParam("alarmActionDesc"),
 	}
 	results, err := common.GetAlarmActionDao(service.DbInfo).GetAlarmAction(params)
@@ -74,7 +71,6 @@ func (service *AlarmActionService) GetAlarmAction(ctx echo.Context) ([]models.Al
 	return results, nil
 }
 
-
 func (service *AlarmActionService) UpdateAlarmAction(ctx echo.Context) (string, *models.ApiError) {
 
 	var request models.AlarmActionRequest
@@ -83,15 +79,15 @@ func (service *AlarmActionService) UpdateAlarmAction(ctx echo.Context) (string, 
 		apiHelpers.Respond(ctx, http.StatusBadRequest, models.ERR_PARAM_VALIDATION, errValid.Error())
 		apiError := &models.ApiError{
 			OriginError: errValid,
-			Message: errValid.Error(),
+			Message:     errValid.Error(),
 		}
 		return "", apiError
 	}
-	params := models.AlarmActions {
-		Id : request.Id,
+	params := models.AlarmActions{
+		Id:              request.Id,
 		AlarmActionDesc: request.AlarmActionDesc,
-		ModiDate: time.Now(),
-		ModiUser: ctx.Get("userId").(string),
+		ModiDate:        time.Now(),
+		ModiUser:        ctx.Get("userId").(string),
 	}
 
 	err := common.GetAlarmActionDao(service.DbInfo).UpdateAlarmAction(params)
@@ -100,7 +96,6 @@ func (service *AlarmActionService) UpdateAlarmAction(ctx echo.Context) (string, 
 	}
 	return models.SUCC_UPD_ALARM_ACTION, nil
 }
-
 
 func (service *AlarmActionService) DeleteAlarmAction(ctx echo.Context) (string, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)

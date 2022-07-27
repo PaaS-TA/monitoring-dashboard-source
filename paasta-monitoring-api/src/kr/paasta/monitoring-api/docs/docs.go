@@ -143,11 +143,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "신규 작성할 알람 정보를 주입한다.",
-                        "name": "AlarmActionRequest",
+                        "name": "AlarmActions",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                            "$ref": "#/definitions/v1.AlarmActions"
                         }
                     }
                 ],
@@ -235,9 +235,34 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "전체 알람 정책 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Alarm Type",
+                        "name": "alarmType",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -260,7 +285,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "전체 알람 정책을 업데이트 한다.",
+                "description": "알람 정책을 업데이트 한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -268,9 +293,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
-                "summary": "전체 알람 정책 업데이트하기",
+                "summary": "알람 정책 업데이트하기",
                 "parameters": [
                     {
                         "description": "알람 정책을 변경하기 위한 정보를 주입한다.",
@@ -278,7 +303,45 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "알람 정책을 생성한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 정책 생성하기",
+                "parameters": [
+                    {
+                        "description": "생성할 알람 정책 정보를 주입한다.",
+                        "name": "AlarmPolicies",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmPolicies"
+                            }
                         }
                     }
                 ],
@@ -294,7 +357,7 @@ const docTemplate = `{
         },
         "/api/v1/alarm/target": {
             "put": {
-                "description": "전체 알람 타겟을 업데이트 한다.",
+                "description": "알람 타겟을 업데이트 한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -302,9 +365,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
-                "summary": "전체 알람 타겟 업데이트하기",
+                "summary": "알람 타겟 업데이트하기",
                 "parameters": [
                     {
                         "description": "알람 타겟을 변경하기 위한 정보를 주입한다.",
@@ -312,7 +375,10 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmTargetRequest"
+                            }
                         }
                     }
                 ],
@@ -1682,13 +1748,29 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "alarmActionDesc": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Modify From Swagger Web"
                 },
                 "alarmId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 115
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "v1.AlarmActions": {
+            "type": "object",
+            "properties": {
+                "alarmActionDesc": {
+                    "type": "string",
+                    "example": "Creat From Swagger Web"
+                },
+                "alarmId": {
+                    "type": "integer",
+                    "example": 115
                 }
             }
         },
@@ -1696,40 +1778,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "alarmType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cpu"
                 },
                 "comment": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Init From Swagger Web"
                 },
                 "criticalThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 99
                 },
                 "id": {
                     "type": "integer"
                 },
                 "measureTime": {
-                    "type": "integer"
-                },
-                "modiDate": {
-                    "type": "string"
-                },
-                "modiUser": {
-                    "type": "string"
+                    "type": "integer",
+                    "example": 600
                 },
                 "originType": {
-                    "type": "string"
-                },
-                "regDate": {
-                    "type": "string"
-                },
-                "regUser": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bos"
                 },
                 "repeatTime": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 10
                 },
                 "warningThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 88
                 }
             }
         },
@@ -1740,22 +1817,28 @@ const docTemplate = `{
             ],
             "properties": {
                 "alarmType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cpu"
                 },
                 "criticalThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 89
                 },
                 "measureTime": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 600
                 },
                 "originType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bos"
                 },
                 "repeatTime": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 10
                 },
                 "warningThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 88
                 }
             }
         },
@@ -1794,6 +1877,26 @@ const docTemplate = `{
                 },
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.AlarmTargetRequest": {
+            "type": "object",
+            "required": [
+                "originType"
+            ],
+            "properties": {
+                "mailAddress": {
+                    "type": "string",
+                    "example": "paasta-admin@paasta.org"
+                },
+                "mailSendYN": {
+                    "type": "string",
+                    "example": "N"
+                },
+                "originType": {
+                    "type": "string",
+                    "example": "bos"
                 }
             }
         },

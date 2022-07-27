@@ -24,52 +24,69 @@ definitions:
   v1.AlarmActionRequest:
     properties:
       alarmActionDesc:
+        example: Modify From Swagger Web
         type: string
       alarmId:
+        example: 115
         type: integer
       id:
+        example: 1
+        type: integer
+    type: object
+  v1.AlarmActions:
+    properties:
+      alarmActionDesc:
+        example: Creat From Swagger Web
+        type: string
+      alarmId:
+        example: 115
         type: integer
     type: object
   v1.AlarmPolicies:
     properties:
       alarmType:
+        example: cpu
         type: string
       comment:
+        example: Init From Swagger Web
         type: string
       criticalThreshold:
+        example: 99
         type: integer
       id:
         type: integer
       measureTime:
+        example: 600
         type: integer
-      modiDate:
-        type: string
-      modiUser:
-        type: string
       originType:
-        type: string
-      regDate:
-        type: string
-      regUser:
+        example: bos
         type: string
       repeatTime:
+        example: 10
         type: integer
       warningThreshold:
+        example: 88
         type: integer
     type: object
   v1.AlarmPolicyRequest:
     properties:
       alarmType:
+        example: cpu
         type: string
       criticalThreshold:
+        example: 89
         type: integer
       measureTime:
+        example: 600
         type: integer
       originType:
+        example: bos
         type: string
       repeatTime:
+        example: 10
         type: integer
       warningThreshold:
+        example: 88
         type: integer
     required:
     - originType
@@ -98,6 +115,20 @@ definitions:
         type: string
       token:
         type: string
+    type: object
+  v1.AlarmTargetRequest:
+    properties:
+      mailAddress:
+        example: paasta-admin@paasta.org
+        type: string
+      mailSendYN:
+        example: "N"
+        type: string
+      originType:
+        example: bos
+        type: string
+    required:
+    - originType
     type: object
   v1.Alarms:
     properties:
@@ -719,10 +750,10 @@ paths:
       parameters:
       - description: 신규 작성할 알람 정보를 주입한다.
         in: body
-        name: AlarmActionRequest
+        name: AlarmActions
         required: true
         schema:
-          $ref: '#/definitions/v1.AlarmActionRequest'
+          $ref: '#/definitions/v1.AlarmActions'
       produces:
       - application/json
       responses:
@@ -738,6 +769,24 @@ paths:
       consumes:
       - application/json
       description: 전체 알람 정책을 가져온다.
+      parameters:
+      - description: Origin Type
+        enum:
+        - bos
+        - pas
+        - con
+        - ias
+        in: query
+        name: originType
+        type: string
+      - description: Alarm Type
+        enum:
+        - cpu
+        - memory
+        - disk
+        in: query
+        name: alarmType
+        type: string
       produces:
       - application/json
       responses:
@@ -752,18 +801,43 @@ paths:
               type: object
       summary: 전체 알람 정책 가져오기
       tags:
-      - AP
+      - Common
+    post:
+      consumes:
+      - application/json
+      description: 알람 정책을 생성한다.
+      parameters:
+      - description: 생성할 알람 정책 정보를 주입한다.
+        in: body
+        name: AlarmPolicies
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/v1.AlarmPolicies'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 정책 생성하기
+      tags:
+      - Common
     put:
       consumes:
       - application/json
-      description: 전체 알람 정책을 업데이트 한다.
+      description: 알람 정책을 업데이트 한다.
       parameters:
       - description: 알람 정책을 변경하기 위한 정보를 주입한다.
         in: body
         name: AlarmPolicyRequest
         required: true
         schema:
-          $ref: '#/definitions/v1.AlarmPolicyRequest'
+          items:
+            $ref: '#/definitions/v1.AlarmPolicyRequest'
+          type: array
       produces:
       - application/json
       responses:
@@ -771,21 +845,23 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 전체 알람 정책 업데이트하기
+      summary: 알람 정책 업데이트하기
       tags:
-      - AP
+      - Common
   /api/v1/alarm/target:
     put:
       consumes:
       - application/json
-      description: 전체 알람 타겟을 업데이트 한다.
+      description: 알람 타겟을 업데이트 한다.
       parameters:
       - description: 알람 타겟을 변경하기 위한 정보를 주입한다.
         in: body
         name: AlarmTargetRequest
         required: true
         schema:
-          $ref: '#/definitions/v1.AlarmPolicyRequest'
+          items:
+            $ref: '#/definitions/v1.AlarmTargetRequest'
+          type: array
       produces:
       - application/json
       responses:
@@ -793,9 +869,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 전체 알람 타겟 업데이트하기
+      summary: 알람 타겟 업데이트하기
       tags:
-      - AP
+      - Common
   /api/v1/ap/alarm/sns:
     delete:
       consumes:

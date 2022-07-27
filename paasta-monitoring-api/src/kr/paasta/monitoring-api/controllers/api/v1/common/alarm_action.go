@@ -28,7 +28,7 @@ func GetAlarmActionController(conn connections.Connections) *AlarmActionControll
 //  @Accept       json
 //  @Produce      json
 //  @Param        AlarmActions  body      v1.AlarmActions  true  "신규 작성할 알람 정보를 주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
+//  @Success      200           {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/action [post]
 func (controller *AlarmActionController) CreateAlarmAction(ctx echo.Context) error {
 	results, err := service.GetAlarmActionService(controller.DbInfo).CreateAlarmAction(ctx)
