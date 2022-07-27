@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
 	"paasta-monitoring-api/dao/api/v1/common"
@@ -19,6 +20,8 @@ func GetAlarmStatisticsService(DbInfo *gorm.DB) *AlarmStatisticsService {
 }
 
 func (service *AlarmStatisticsService) GetAlarmStatistics(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var params models.AlarmStatisticsParam
 	params.OriginType = ctx.QueryParam("originType")
 	params.ResourceType = ctx.QueryParam("resourceType")
@@ -51,6 +54,7 @@ func (service *AlarmStatisticsService) GetAlarmStatistics(ctx echo.Context) ([]m
 
 	results, err := common.GetAlarmStatisticsDao(service.DbInfo).GetAlarmStatisticsForGraphByTime(params)
 	if err != nil {
+		logger.Error(err)
 		return results, err
 	}
 	return results, nil
@@ -58,6 +62,8 @@ func (service *AlarmStatisticsService) GetAlarmStatistics(ctx echo.Context) ([]m
 
 
 func (service *AlarmStatisticsService) GetAlarmStatisticsResource(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var params models.AlarmStatisticsParam
 	params.OriginType = ctx.Param("originType")
 
@@ -92,6 +98,7 @@ func (service *AlarmStatisticsService) GetAlarmStatisticsResource(ctx echo.Conte
 
 	results, err := common.GetAlarmStatisticsDao(service.DbInfo).GetAlarmStatisticsForGraphByTime(params)
 	if err != nil {
+		logger.Error(err)
 		return results, err
 	}
 	return results, nil

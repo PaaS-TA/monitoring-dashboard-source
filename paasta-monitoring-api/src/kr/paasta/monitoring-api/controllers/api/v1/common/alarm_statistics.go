@@ -52,13 +52,13 @@ func (ap *AlarmStatisticsController) GetAlarmStatistics(ctx echo.Context) error 
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/ap/alarm/statistics/resource [get]
-func (ap *AlarmStatisticsController) GetAlarmStatisticsResource(c echo.Context) error {
-	results, err := common.GetAlarmStatisticsService(ap.DbInfo).GetAlarmStatisticsResource(c)
+func (ap *AlarmStatisticsController) GetAlarmStatisticsResource(ctx echo.Context) error {
+	results, err := common.GetAlarmStatisticsService(ap.DbInfo).GetAlarmStatisticsResource(ctx)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusBadRequest, "Failed to get alarm statistics.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get alarm statistics.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(c, http.StatusOK, "Succeeded to get alarm statistics.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get alarm statistics.", results)
 	return nil
 }
