@@ -4,6 +4,7 @@ import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
 	Common "paasta-monitoring-api/dao/api/v1/common"
@@ -35,11 +36,13 @@ func (b *ApBoshService) GetBoshInfoList() ([]models.Bosh, error) {
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshOverview(c echo.Context) (models.BoshOverview, error) {
+func (b *ApBoshService) GetBoshOverview(ctx echo.Context) (models.BoshOverview, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var result models.BoshOverview
-	boshSummary, err := b.GetBoshSummary(c)
+	boshSummary, err := b.GetBoshSummary(ctx)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return result, err
 	}
 
@@ -63,7 +66,9 @@ func (b *ApBoshService) GetBoshOverview(c echo.Context) (models.BoshOverview, er
 	return result, nil
 }
 
-func (b *ApBoshService) GetBoshSummary(c echo.Context) ([]models.BoshSummary, error) {
+func (b *ApBoshService) GetBoshSummary(ctx echo.Context) ([]models.BoshSummary, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var results []models.BoshSummary
 	//var errs []models.ErrMessage
 	var resultsResponse map[string]interface{}
@@ -72,10 +77,9 @@ func (b *ApBoshService) GetBoshSummary(c echo.Context) ([]models.BoshSummary, er
 	var params models.AlarmPolicies
 	serverThresholds, err := Common.GetAlarmPolicyDao(b.DbInfo).GetAlarmPolicy(params)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return results, err
 	}
-	//fmt.Println(serverThresholds)
 
 	for _, boshInfo := range b.BoshInfoList {
 		var boshSummary models.BoshSummary
@@ -298,14 +302,16 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 	return cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage, diskDataTotal, diskDataUsage, nil
 }
 
-func (b *ApBoshService) GetBoshProcessByMemory() ([]models.BoshProcess, error) {
+func (b *ApBoshService) GetBoshProcessByMemory(ctx echo.Context) ([]models.BoshProcess, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var results []models.BoshProcess
 
 	for _, BoshInfo := range b.BoshInfoList {
 		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(BoshInfo.UUID)
 
 		if err != nil {
-			fmt.Println(err.Error())
+			logger.Error(err)
 			return results, err
 		} else {
 			valueList, _ := helpers.InfluxConverterToMap(resp)
@@ -406,8 +412,7 @@ func (b *ApBoshService) GetBoshChart(boshChart models.BoshChart) ([]models.BoshC
 			fmt.Println(err.Error())
 			return results, err
 		}
-		fmt.Println(boshInfo)
-
+		
 		cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResp, models.RESP_DATA_CPU_NAME)
 		cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResp, models.RESP_DATA_LOAD_1M_NAME)
 		cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResp, models.RESP_DATA_LOAD_5M_NAME)
