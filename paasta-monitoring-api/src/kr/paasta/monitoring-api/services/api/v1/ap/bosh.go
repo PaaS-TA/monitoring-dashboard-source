@@ -362,7 +362,16 @@ func (b *ApBoshService) GetBoshProcessByMemory(ctx echo.Context) ([]models.BoshP
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshChart(boshChart models.BoshChart) ([]models.BoshChart, error) {
+func (b *ApBoshService) GetBoshChart(ctx echo.Context) ([]models.BoshChart, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	var boshChart models.BoshChart
+	boshChart.UUID = ctx.Param("uuid")
+	boshChart.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	boshChart.TimeRangeFrom = ctx.QueryParam("timeRangeFrom")
+	boshChart.TimeRangeTo = ctx.QueryParam("timeRangeTo")
+	boshChart.GroupBy = ctx.QueryParam("groupBy")
+
 	var results []models.BoshChart
 
 	for _, boshInfo := range b.BoshInfoList {
@@ -409,10 +418,10 @@ func (b *ApBoshService) GetBoshChart(boshChart models.BoshChart) ([]models.BoshC
 		boshChart.MetricName = "networkIOStats.eth0.errOut"
 		networkErrorOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
 		if err != nil {
-			fmt.Println(err.Error())
+			logger.Error(err)
 			return results, err
 		}
-		
+
 		cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResp, models.RESP_DATA_CPU_NAME)
 		cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResp, models.RESP_DATA_LOAD_1M_NAME)
 		cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResp, models.RESP_DATA_LOAD_5M_NAME)

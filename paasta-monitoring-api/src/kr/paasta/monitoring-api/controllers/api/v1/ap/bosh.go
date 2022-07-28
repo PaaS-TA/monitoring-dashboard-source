@@ -112,19 +112,12 @@ func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
 //  @Param        id   query     string  false  "Bosh의 차트 정보 조회시 Bosh ID를 주입한다."
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
 //  @Router       /api/v1/bosh/Chart [get]
-func (b *BoshController) GetBoshChart(c echo.Context) (err error) {
-	var boshChart models.BoshChart
-	boshChart.UUID = c.Param("uuid")
-	boshChart.DefaultTimeRange = c.QueryParam("defaultTimeRange")
-	boshChart.TimeRangeFrom = c.QueryParam("timeRangeFrom")
-	boshChart.TimeRangeTo = c.QueryParam("timeRangeTo")
-	boshChart.GroupBy = c.QueryParam("groupBy")
-
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshChart(boshChart)
+func (b *BoshController) GetBoshChart(ctx echo.Context) (err error) {
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshChart(ctx)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Chart", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Bosh Chart", results)
 	return nil
 }
