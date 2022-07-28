@@ -91,14 +91,14 @@ func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
 //  @Param        uuid  query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
 //  @Success      200   {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
 //  @Router       /api/v1/ap/bosh/process [get]
-func (b *BoshController) GetBoshProcessByMemory(c echo.Context) (err error) {
+func (b *BoshController) GetBoshProcessByMemory(ctx echo.Context) (err error) {
 	// Bosh Process 정보 조회
-	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory()
+	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(ctx)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Process By Memory", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Bosh Process By Memory", results)
 	return nil
 }
 

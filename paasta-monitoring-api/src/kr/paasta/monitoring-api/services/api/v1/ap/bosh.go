@@ -374,7 +374,8 @@ func (b *ApBoshService) GetBoshChart(ctx echo.Context) ([]models.BoshChart, erro
 
 	var results []models.BoshChart
 
-	for _, boshInfo := range b.BoshInfoList {
+	for i, _ := range b.BoshInfoList {
+		fmt.Printf("BOSH index is %d\n", i)
 		boshChart.MetricName = models.MTR_CPU_CORE
 		cpuUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuUsageList(boshChart)
 		boshChart.MetricName = models.MTR_CPU_LOAD_1M
