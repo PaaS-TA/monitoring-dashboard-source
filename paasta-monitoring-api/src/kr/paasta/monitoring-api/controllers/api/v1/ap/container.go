@@ -34,7 +34,7 @@ func GetApContainerController(conn connections.Connections) *ApContainerControll
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.ZoneInfo}
 //  @Router       /api/v1/ap/container/zone [get]
 func (ap *ApContainerController) GetZoneInfo(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetZoneInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetZoneInfo(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get zone info.", err.Error())
 		return err
@@ -53,7 +53,7 @@ func (ap *ApContainerController) GetZoneInfo(ctx echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.CellInfo}
 //  @Router       /api/v1/ap/container/cell [get]
 func (ap *ApContainerController) GetCellInfo(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellInfo(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell info.", err.Error())
 		return err
@@ -72,7 +72,7 @@ func (ap *ApContainerController) GetCellInfo(ctx echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AppInfo}
 //  @Router       /api/v1/ap/container/app [get]
 func (ap *ApContainerController) GetAppInfo(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetAppInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetAppInfo(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get apps info.", err.Error())
 		return err
@@ -91,7 +91,7 @@ func (ap *ApContainerController) GetAppInfo(ctx echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.ContainerInfo}
 //  @Router       /api/v1/ap/container/container [get]
 func (ap *ApContainerController) GetContainerInfo(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerInfo()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerInfo(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get containers info.", err.Error())
 		return err
@@ -111,7 +111,7 @@ func (ap *ApContainerController) GetContainerInfo(ctx echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Overview}
 //  @Router       /api/v1/ap/container/overview [get]
 func (ap *ApContainerController) GetContainerPageOverview(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerPageOverview()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerPageOverview(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get container page overview.", err.Error())
 		return err
@@ -130,7 +130,7 @@ func (ap *ApContainerController) GetContainerPageOverview(ctx echo.Context) erro
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Status}
 //  @Router       /api/v1/ap/container/container/status [get]
 func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerStatus()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetContainerStatus(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get container status.", err.Error())
 		return err
@@ -149,7 +149,7 @@ func (ap *ApContainerController) GetContainerStatus(ctx echo.Context) error {
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Status}
 //  @Router       /api/v1/ap/container/cell/status [get]
 func (ap *ApContainerController) GetCellStatus(ctx echo.Context) error {
-	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellStatus()
+	results, err := AP.GetApContainerService(ap.DbInfo, ap.InfluxDbClient, ap.CfClient).GetCellStatus(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get cell status.", err.Error())
 		return err
