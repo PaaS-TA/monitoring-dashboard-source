@@ -47,16 +47,16 @@ type (
 
 	AlarmSns struct {
 		ChannelId  uint      `json:"channelId"  gorm:"primaryKey;autoIncrement;not null;-:write"`
-		OriginType string    `json:"originType" gorm:"not null;default:all"`
-		SnsType    string    `json:"snsType"    gorm:"not null"`
-		SnsId      string    `json:"snsId"      gorm:"not null"`
-		Token      string    `json:"token"`
-		Expl       string    `json:"expl"       gorm:"not null"`
-		SnsSendYN  string    `json:"snsSendYN"  gorm:"not null;default:Y"`
-		RegDate    time.Time `json:"regDate"    gorm:"<-:create"`
-		RegUser    string    `json:"regUser"    gorm:"<-:create;default:system"`
-		ModiDate   time.Time `json:"modiDate"   gorm:"<-:update"`
-		ModiUser   string    `json:"modiUser"   gorm:"<-:update;default:system"`
+		OriginType string    `json:"originType" gorm:"not null;default:all" example:"all"`
+		SnsType    string    `json:"snsType"    gorm:"not null"             example:"telegram"`
+		SnsId      string    `json:"snsId"      gorm:"not null"             example:"paasta_123"`
+		Token      string    `json:"token"                                  example:"token_123"`
+		Expl       string    `json:"expl"       gorm:"not null"             example:"expl_test"`
+		SnsSendYN  string    `json:"snsSendYN"  gorm:"not null;default:Y"   example:"Y"`
+		RegDate    time.Time `json:"regDate"    gorm:"<-:create"                swaggerignore:"true"`
+		RegUser    string    `json:"regUser"    gorm:"<-:create;default:system" swaggerignore:"true"`
+		ModiDate   time.Time `json:"modiDate"   gorm:"<-:update"                swaggerignore:"true"`
+		ModiUser   string    `json:"modiUser"   gorm:"<-:update;default:system" swaggerignore:"true"`
 	}
 
 	AlarmActions struct {
