@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
 	Common "paasta-monitoring-api/dao/api/v1/common"
@@ -28,22 +29,24 @@ func GetApPaastaService(DbInfo *gorm.DB, InfluxDbClient models.InfluxDbClient) *
 	}
 }
 
-func (p *ApPaastaService) GetPaastaInfoList() ([]models.Paasta, error) {
+func (p *ApPaastaService) GetPaastaInfoList(ctx echo.Context) ([]models.Paasta, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 	results, err := dao.GetPaastaDao(p.DbInfo, p.InfluxDbClient).GetPaastaInfoList()
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return results, err
 	}
 
 	return results, nil
 }
 
-func (p *ApPaastaService) GetPaastaOverview(c echo.Context) (models.PaastaOverview, error) {
+func (p *ApPaastaService) GetPaastaOverview(ctx echo.Context) (models.PaastaOverview, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 	var paastaOverview models.PaastaOverview
 	var paastaRequest models.PaastaRequest
 	paastaSummary, err := p.GetPaastaSummary(paastaRequest)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return paastaOverview, err
 	}
 
@@ -66,6 +69,7 @@ func (p *ApPaastaService) GetPaastaOverview(c echo.Context) (models.PaastaOvervi
 
 	return paastaOverview, nil
 }
+
 
 func (p *ApPaastaService) GetPaastaSummary(paastaRequest models.PaastaRequest) ([]models.PaastaSummary, error) {
 	var results []models.PaastaSummary
