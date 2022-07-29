@@ -7,8 +7,8 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	"log"
 	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"net/url"
@@ -485,8 +485,7 @@ func FindStructFieldWithBlankValues(object interface{}) string {
 	return strings.Join(result, ",")
 }
 
-
-func RequestHttpGet(urlStr string, queryString string, token string) ([]byte, error){
+func RequestHttpGet(urlStr string, queryString string, token string) ([]byte, error) {
 	var transportOpt *http.Transport
 	transportOpt = &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -496,13 +495,13 @@ func RequestHttpGet(urlStr string, queryString string, token string) ([]byte, er
 
 	client := &http.Client{Transport: transportOpt}
 
-	queryString = url.PathEscape(queryString)   // URL encoding
-	httpRequest, err := http.NewRequest("GET", urlStr + "?" + queryString, nil)
+	queryString = url.PathEscape(queryString) // URL encoding
+	httpRequest, err := http.NewRequest("GET", urlStr+"?"+queryString, nil)
 	if err != nil {
 		log.Println("Unable to make GET request", err)
 	}
 	if len(token) > 0 {
-		httpRequest.Header.Add("Authorization", "Bearer " + token)
+		httpRequest.Header.Add("Authorization", "Bearer "+token)
 	}
 
 	httpResponse, httpErr := client.Do(httpRequest)
@@ -574,7 +573,6 @@ func SetStatus(params []models.StatusByResource) models.Status {
 
 	return response
 }
-
 
 func GetLogger(ctx echo.Context) *logrus.Entry {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
