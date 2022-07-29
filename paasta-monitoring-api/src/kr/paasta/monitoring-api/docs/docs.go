@@ -355,44 +355,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/alarm/target": {
-            "put": {
-                "description": "알람 타겟을 업데이트 한다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Common"
-                ],
-                "summary": "알람 타겟 업데이트하기",
-                "parameters": [
-                    {
-                        "description": "알람 타겟을 변경하기 위한 정보를 주입한다.",
-                        "name": "AlarmTargetRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/v1.AlarmTargetRequest"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/ap/alarm/sns": {
+        "/api/v1/alarm/sns": {
             "get": {
                 "description": "알람 받는 SNS 계정 정보를 가져온다.",
                 "consumes": [
@@ -402,9 +365,37 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받는 SNS 계정 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "all",
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "telegram",
+                        "description": "SNS Type",
+                        "name": "snsType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SNS Send YN",
+                        "name": "snsSendYn",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -435,17 +426,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받을 SNS 계정 수정하기",
                 "parameters": [
                     {
-                        "description": "수정할 SNS 계정 정보를 주입한다.",
-                        "name": "SnsAccountRequest",
+                        "description": "수정할 SNS 계정 정보(channelId)를  주입한다.",
+                        "name": "AlarmSns",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                            "$ref": "#/definitions/v1.AlarmSns"
                         }
                     }
                 ],
@@ -467,17 +458,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받을 SNS 계정 등록하기",
                 "parameters": [
                     {
                         "description": "알람 받을 SNS 계정 정보를 주입한다.",
-                        "name": "SnsAccountRequest",
+                        "name": "AlarmSns",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmSns"
+                            }
                         }
                     }
                 ],
@@ -499,17 +493,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받는 SNS 계정 삭제하기",
                 "parameters": [
                     {
-                        "description": "삭제할 SNS 계정을 정보(ChannelId)를  주입한다.",
-                        "name": "SnsAccountRequest",
+                        "description": "삭제할 SNS 계정 정보(channelId)를  주입한다.",
+                        "name": "AlarmSns",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                            "$ref": "#/definitions/v1.AlarmSns"
                         }
                     }
                 ],
@@ -523,7 +517,68 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/alarm/statistics/resource": {
+        "/api/v1/alarm/stats": {
+            "get": {
+                "description": "알람 통계 그래프를 그리기 위한 데이터를 가져온다.\n필수 인자를 제외한 옵션 인자는 중복하여 사용할 수 없다.\n즉 originType, resourceType을 각각 개별로 사용해야 한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 통계 그래프를 그리기 위한 데이터 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "d",
+                            "w",
+                            "m",
+                            "y"
+                        ],
+                        "type": "string",
+                        "description": "Period",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Resource Type",
+                        "name": "resourceType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/stats/resource": {
             "get": {
                 "description": "알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.",
                 "consumes": [
@@ -533,9 +588,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "d",
+                            "w",
+                            "m",
+                            "y"
+                        ],
+                        "type": "string",
+                        "description": "Period",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -546,9 +616,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/alarm/statistics/total": {
+        "/api/v1/alarm/stats/service": {
             "get": {
-                "description": "알람 통계 그래프를 그리기 위한 데이터를 가져온다.",
+                "description": "알람 통계 그래프(서비스별)를 그리기 위한 데이터를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -556,9 +626,61 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
-                "summary": "알람 통계 그래프를 그리기 위한 데이터 가져오기",
+                "summary": "알람 통계 그래프(서비스별)를 그리기 위한 데이터 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "d",
+                            "w",
+                            "m",
+                            "y"
+                        ],
+                        "type": "string",
+                        "description": "Period",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/target": {
+            "put": {
+                "description": "알람 타겟을 업데이트 한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 타겟 업데이트하기",
+                "parameters": [
+                    {
+                        "description": "알람 타겟을 변경하기 위한 정보를 주입한다.",
+                        "name": "AlarmTargetRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmTargetRequest"
+                            }
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1421,6 +1543,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Common"
+                ],
                 "summary": "로그 정보 가져오기",
                 "parameters": [
                     {
@@ -1849,34 +1974,28 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "expl": {
-                    "type": "string"
-                },
-                "modiDate": {
-                    "type": "string"
-                },
-                "modiUser": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "expl_test"
                 },
                 "originType": {
-                    "type": "string"
-                },
-                "regDate": {
-                    "type": "string"
-                },
-                "regUser": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "all"
                 },
                 "snsId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "paasta_123"
                 },
                 "snsSendYN": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Y"
                 },
                 "snsType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "telegram"
                 },
                 "token": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "token_123"
                 }
             }
         },
@@ -2471,29 +2590,6 @@ const docTemplate = `{
                 "refreshToken": {
                     "type": "string",
                     "example": "refreshToken"
-                }
-            }
-        },
-        "v1.SnsAccountRequest": {
-            "type": "object",
-            "properties": {
-                "expl": {
-                    "type": "string"
-                },
-                "originType": {
-                    "type": "string"
-                },
-                "snsId": {
-                    "type": "string"
-                },
-                "snsSendYN": {
-                    "type": "string"
-                },
-                "snsType": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
                 }
             }
         },

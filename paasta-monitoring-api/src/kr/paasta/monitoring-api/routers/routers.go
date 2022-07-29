@@ -26,16 +26,16 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	// Logger 설정 (HTTP requests)
 	/*
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "[${time_rfc3339}] method=${method}, uri=${uri}, status=${status}\n",
-	}))
+		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Format: "[${time_rfc3339}] method=${method}, uri=${uri}, status=${status}\n",
+		}))
 	*/
 
 	// Recover 설정 (recovers panics, prints stack trace)
 	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
-		LogLevel: log.ERROR,
+		LogLevel:          log.ERROR,
 		DisablePrintStack: true,
-		DisableStackAll: true,
+		DisableStackAll:   true,
 	}))
 
 	e.Use(middleware.RequestID())
@@ -45,7 +45,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 		LogStatus: true,
 		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
 			conn.Logger.WithFields(logrus.Fields{
-				"URI":   values.URI,
+				"URI":    values.URI,
 				"status": values.Status,
 			}).Info("request")
 			return nil
@@ -117,6 +117,7 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.PUT("/alarm/policy", alarmPolicy.UpdateAlarmPolicy)
 	v1.PUT("/alarm/target", alarmPolicy.UpdateAlarmTarget)
 	v1.GET("/alarm/stats", alarmStatistics.GetAlarmStatistics)
+	v1.GET("/alarm/stats/service", alarmStatistics.GetAlarmStatisticsService)
 	v1.GET("/alarm/stats/resource", alarmStatistics.GetAlarmStatisticsResource)
 	v1.POST("/alarm/action", alarmAction.CreateAlarmAction)
 	v1.GET("/alarm/action", alarmAction.GetAlarmAction)
@@ -191,8 +192,6 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 
 	return e
 }
-
-
 
 func ApiLogger(logger *zap.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {

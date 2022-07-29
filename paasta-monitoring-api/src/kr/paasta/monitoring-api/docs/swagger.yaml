@@ -96,24 +96,22 @@ definitions:
       channelId:
         type: integer
       expl:
-        type: string
-      modiDate:
-        type: string
-      modiUser:
+        example: expl_test
         type: string
       originType:
-        type: string
-      regDate:
-        type: string
-      regUser:
+        example: all
         type: string
       snsId:
+        example: paasta_123
         type: string
       snsSendYN:
+        example: "Y"
         type: string
       snsType:
+        example: telegram
         type: string
       token:
+        example: token_123
         type: string
     type: object
   v1.AlarmTargetRequest:
@@ -508,21 +506,6 @@ definitions:
     required:
     - refreshToken
     type: object
-  v1.SnsAccountRequest:
-    properties:
-      expl:
-        type: string
-      originType:
-        type: string
-      snsId:
-        type: string
-      snsSendYN:
-        type: string
-      snsType:
-        type: string
-      token:
-        type: string
-    type: object
   v1.Status:
     properties:
       critical:
@@ -848,6 +831,209 @@ paths:
       summary: 알람 정책 업데이트하기
       tags:
       - Common
+  /api/v1/alarm/sns:
+    delete:
+      consumes:
+      - application/json
+      description: 알람 받는 SNS 계정을 삭제한다.
+      parameters:
+      - description: 삭제할 SNS 계정 정보(channelId)를  주입한다.
+        in: body
+        name: AlarmSns
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmSns'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 받는 SNS 계정 삭제하기
+      tags:
+      - Common
+    get:
+      consumes:
+      - application/json
+      description: 알람 받는 SNS 계정 정보를 가져온다.
+      parameters:
+      - description: Origin Type
+        enum:
+        - all
+        - bos
+        - pas
+        - con
+        - ias
+        in: query
+        name: originType
+        type: string
+      - default: telegram
+        description: SNS Type
+        in: query
+        name: snsType
+        type: string
+      - description: SNS Send YN
+        in: query
+        name: snsSendYn
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.AlarmSns'
+              type: object
+      summary: 알람 받는 SNS 계정 가져오기
+      tags:
+      - Common
+    post:
+      consumes:
+      - application/json
+      description: 알람 받을 SNS 계정을 등록한다.
+      parameters:
+      - description: 알람 받을 SNS 계정 정보를 주입한다.
+        in: body
+        name: AlarmSns
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/v1.AlarmSns'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 받을 SNS 계정 등록하기
+      tags:
+      - Common
+    put:
+      consumes:
+      - application/json
+      description: 알람 받을 SNS 계정 정보를 수정한다.
+      parameters:
+      - description: 수정할 SNS 계정 정보(channelId)를  주입한다.
+        in: body
+        name: AlarmSns
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AlarmSns'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 받을 SNS 계정 수정하기
+      tags:
+      - Common
+  /api/v1/alarm/stats:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        알람 통계 그래프를 그리기 위한 데이터를 가져온다.
+        필수 인자를 제외한 옵션 인자는 중복하여 사용할 수 없다.
+        즉 originType, resourceType을 각각 개별로 사용해야 한다.
+      parameters:
+      - description: Period
+        enum:
+        - d
+        - w
+        - m
+        - "y"
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: Origin Type
+        enum:
+        - bos
+        - pas
+        - con
+        - ias
+        in: query
+        name: originType
+        type: string
+      - description: Resource Type
+        enum:
+        - cpu
+        - memory
+        - disk
+        in: query
+        name: resourceType
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 통계 그래프를 그리기 위한 데이터 가져오기
+      tags:
+      - Common
+  /api/v1/alarm/stats/resource:
+    get:
+      consumes:
+      - application/json
+      description: 알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.
+      parameters:
+      - description: Period
+        enum:
+        - d
+        - w
+        - m
+        - "y"
+        in: query
+        name: period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기
+      tags:
+      - Common
+  /api/v1/alarm/stats/service:
+    get:
+      consumes:
+      - application/json
+      description: 알람 통계 그래프(서비스별)를 그리기 위한 데이터를 가져온다.
+      parameters:
+      - description: Period
+        enum:
+        - d
+        - w
+        - m
+        - "y"
+        in: query
+        name: period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 알람 통계 그래프(서비스별)를 그리기 위한 데이터 가져오기
+      tags:
+      - Common
   /api/v1/alarm/target:
     put:
       consumes:
@@ -872,119 +1058,6 @@ paths:
       summary: 알람 타겟 업데이트하기
       tags:
       - Common
-  /api/v1/ap/alarm/sns:
-    delete:
-      consumes:
-      - application/json
-      description: 알람 받는 SNS 계정을 삭제한다.
-      parameters:
-      - description: 삭제할 SNS 계정을 정보(ChannelId)를  주입한다.
-        in: body
-        name: SnsAccountRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.SnsAccountRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람 받는 SNS 계정 삭제하기
-      tags:
-      - AP
-    get:
-      consumes:
-      - application/json
-      description: 알람 받는 SNS 계정 정보를 가져온다.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
-            - properties:
-                responseInfo:
-                  $ref: '#/definitions/v1.AlarmSns'
-              type: object
-      summary: 알람 받는 SNS 계정 가져오기
-      tags:
-      - AP
-    post:
-      consumes:
-      - application/json
-      description: 알람 받을 SNS 계정을 등록한다.
-      parameters:
-      - description: 알람 받을 SNS 계정 정보를 주입한다.
-        in: body
-        name: SnsAccountRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.SnsAccountRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람 받을 SNS 계정 등록하기
-      tags:
-      - AP
-    put:
-      consumes:
-      - application/json
-      description: 알람 받을 SNS 계정 정보를 수정한다.
-      parameters:
-      - description: 수정할 SNS 계정 정보를 주입한다.
-        in: body
-        name: SnsAccountRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.SnsAccountRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람 받을 SNS 계정 수정하기
-      tags:
-      - AP
-  /api/v1/ap/alarm/statistics/resource:
-    get:
-      consumes:
-      - application/json
-      description: 알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기
-      tags:
-      - AP
-  /api/v1/ap/alarm/statistics/total:
-    get:
-      consumes:
-      - application/json
-      description: 알람 통계 그래프를 그리기 위한 데이터를 가져온다.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/apiHelpers.BasicResponseForm'
-      summary: 알람 통계 그래프를 그리기 위한 데이터 가져오기
-      tags:
-      - AP
   /api/v1/ap/bosh/overview:
     get:
       consumes:
@@ -1555,6 +1628,8 @@ paths:
                   $ref: '#/definitions/v1.Logs'
               type: object
       summary: 로그 정보 가져오기
+      tags:
+      - Common
   /api/v1/paasta:
     get:
       consumes:

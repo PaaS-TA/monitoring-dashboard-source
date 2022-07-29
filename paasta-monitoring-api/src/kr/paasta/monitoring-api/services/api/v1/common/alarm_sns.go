@@ -13,17 +13,15 @@ import (
 	"time"
 )
 
-
 type AlarmSnsService struct {
 	DbInfo *gorm.DB
 }
 
 func GetAlarmSnsService(DbInfo *gorm.DB) *AlarmSnsService {
-	return &AlarmSnsService {
+	return &AlarmSnsService{
 		DbInfo: DbInfo,
 	}
 }
-
 
 func (service *AlarmSnsService) CreateAlarmSns(ctx echo.Context) (string, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
@@ -31,12 +29,12 @@ func (service *AlarmSnsService) CreateAlarmSns(ctx echo.Context) (string, error)
 	var params []models.AlarmSns
 	err := helpers.BindJsonAndCheckValid(ctx, &params)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the REQUEST JSON", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
 		return "", errors.New(models.ERR_PARAM_VALIDATION)
 	}
-	for _, param := range params {
-		param.RegUser = ctx.Get("userId").(string)
-		param.RegDate = time.Now()
+	for i, _ := range params {
+		params[i].RegUser = ctx.Get("userId").(string)
+		params[i].RegDate = time.Now()
 	}
 
 	errAction := common.GetAlarmSnsDao(service.DbInfo).CreateAlarmSns(params)
@@ -64,11 +62,10 @@ func (service *AlarmSnsService) GetAlarmSns(ctx echo.Context) ([]models.AlarmSns
 	return results, nil
 }
 
-
 func (service *AlarmSnsService) UpdateAlarmSns(ctx echo.Context) (string, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-	params := &models.AlarmSns {}
+	params := &models.AlarmSns{}
 	err := helpers.BindJsonAndCheckValid(ctx, &params)
 	if err != nil {
 		return "", errors.New(models.ERR_PARAM_VALIDATION)
@@ -83,7 +80,6 @@ func (service *AlarmSnsService) UpdateAlarmSns(ctx echo.Context) (string, error)
 	}
 	return "SUCCEEDED UPDATE SNS ACCOUNT!", nil
 }
-
 
 func (service *AlarmSnsService) DeleteAlarmSns(ctx echo.Context) (string, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
