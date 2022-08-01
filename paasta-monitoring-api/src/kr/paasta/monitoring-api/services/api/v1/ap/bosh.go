@@ -308,7 +308,7 @@ func (b *ApBoshService) GetBoshProcessByMemory(ctx echo.Context) ([]models.BoshP
 	var results []models.BoshProcess
 
 	for _, BoshInfo := range b.BoshInfoList {
-		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(BoshInfo.UUID)
+		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(ctx.QueryParam("uuid"))
 
 		if err != nil {
 			logger.Error(err)
