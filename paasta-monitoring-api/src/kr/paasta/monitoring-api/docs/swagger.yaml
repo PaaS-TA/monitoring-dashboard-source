@@ -1058,11 +1058,78 @@ paths:
       summary: 알람 타겟 업데이트하기
       tags:
       - Common
+  /api/v1/ap/bosh:
+    get:
+      consumes:
+      - application/json
+      description: BOSH 목록을 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.Bosh'
+              type: object
+      summary: BOSH 목록 가져오기
+      tags:
+      - AP
+  /api/v1/ap/bosh/chart/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: BOSH 차트 정보를 가져온다.
+      parameters:
+      - description: BOSH의 UUID를 주입한다.
+        example: 36dd3d08-5198-42b6-4130-d0c04479236f
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Default Time Range
+        example: 15m
+        in: query
+        name: defaultTimeRange
+        required: true
+        type: string
+      - description: Time Range From
+        in: query
+        name: timeRangeFrom
+        type: string
+      - description: Time Range To
+        in: query
+        name: timeRangeTo
+        type: string
+      - description: Group By
+        example: 1m
+        in: query
+        name: groupBy
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.BoshChart'
+              type: object
+      summary: BOSH 차트 정보 가져오기
+      tags:
+      - AP
   /api/v1/ap/bosh/overview:
     get:
       consumes:
       - application/json
-      description: Bosh Overview 정보를 가져온다.
+      description: BOSH Overview 정보를 가져온다.
       produces:
       - application/json
       responses:
@@ -1075,18 +1142,20 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.BoshOverview'
               type: object
-      summary: Bosh Overview 정보를 가져온다.
+      summary: BOSH Overview 정보 가져오기
       tags:
       - AP
   /api/v1/ap/bosh/process:
     get:
       consumes:
       - application/json
-      description: Bosh의 프로세스 목록을 가져온다.
+      description: BOSH 프로세스 목록을 가져온다.
       parameters:
-      - description: Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.
+      - description: BOSH의 UUID를 주입한다.
+        example: 36dd3d08-5198-42b6-4130-d0c04479236f
         in: query
         name: uuid
+        required: true
         type: string
       produces:
       - application/json
@@ -1100,14 +1169,14 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.BoshProcess'
               type: object
-      summary: Bosh의 프로세스 목록을 가져온다.
+      summary: BOSH 프로세스 목록 가져오기
       tags:
       - AP
   /api/v1/ap/bosh/summary:
     get:
       consumes:
       - application/json
-      description: Bosh Summary 정보를 가져온다.
+      description: BOSH Summary 정보를 가져온다.
       produces:
       - application/json
       responses:
@@ -1120,7 +1189,7 @@ paths:
                 responseInfo:
                   $ref: '#/definitions/v1.BoshSummary'
               type: object
-      summary: Bosh Summary 정보를 가져온다.
+      summary: BOSH Summary 정보 가져오기
       tags:
       - AP
   /api/v1/ap/container/app:
@@ -1540,61 +1609,19 @@ paths:
       summary: PaaS-TA Summary 정보를 가져온다.
       tags:
       - AP
-  /api/v1/bosh:
-    get:
-      consumes:
-      - application/json
-      description: Bosh의 목록을 가져온다.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
-            - properties:
-                responseInfo:
-                  $ref: '#/definitions/v1.Bosh'
-              type: object
-      summary: Bosh의 목록을 가져온다.
-      tags:
-      - AP
-  /api/v1/bosh/Chart:
-    get:
-      consumes:
-      - application/json
-      description: Bosh의 차트 정보를 가져온다.
-      parameters:
-      - description: Bosh의 차트 정보 조회시 Bosh ID를 주입한다.
-        in: query
-        name: id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
-            - properties:
-                responseInfo:
-                  $ref: '#/definitions/v1.BoshChart'
-              type: object
-      summary: Bosh의 차트 정보를 가져온다.
-      tags:
-      - AP
   /api/v1/log/{uuid}:
     get:
       consumes:
       - application/json
       description: |-
         로그 정보를 가져온다.
-        대상 날짜, 시작 시간, 종료 시간을 사용하는 조회와 현재를 기준으로 특정 기간 동안의 내용을 조회하는 파라미터는 중복 사용이 불가능하다.
+        특정기간(대상날짜, 시작시간, 종료시간 사용) 로그 조회와 최근기간 로그 조회 파라미터는 중복 사용이 불가능하다.
+        또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.
       parameters:
       - description: 로그 조회시 대상 VM의 UUID를 주입한다.
-        example: f1db5cd8-3e5b-4980-966f-9fa88d8d85fd
+        enum:
+        - 36dd3d08-5198-42b6-4130-d0c04479236f
+        - f1db5cd8-3e5b-4980-966f-9fa88d8d85fd
         in: path
         name: uuid
         required: true

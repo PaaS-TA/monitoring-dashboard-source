@@ -25,14 +25,13 @@ func GetBoshController(conn connections.Connections) *BoshController {
 }
 
 // GetBoshInfoList
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Bosh의 목록을 가져온다.
-//  @Description  Bosh의 목록을 가져온다.
+//  @Summary      BOSH 목록 가져오기
+//  @Description  BOSH 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Bosh}
-//  @Router       /api/v1/bosh [get]
+//  @Router       /api/v1/ap/bosh [get]
 func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
 	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshInfoList()
 	if err != nil {
@@ -44,10 +43,9 @@ func (b *BoshController) GetBoshInfoList(c echo.Context) (err error) {
 }
 
 // GetBoshOverview
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Bosh Overview 정보를 가져온다.
-//  @Description  Bosh Overview 정보를 가져온다.
+//  @Summary      BOSH Overview 정보 가져오기
+//  @Description  BOSH Overview 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshOverview}
@@ -63,10 +61,9 @@ func (b *BoshController) GetBoshOverview(c echo.Context) (err error) {
 }
 
 // GetBoshSummary
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Bosh Summary 정보를 가져온다.
-//  @Description  Bosh Summary 정보를 가져온다.
+//  @Summary      BOSH Summary 정보 가져오기
+//  @Description  BOSH Summary 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshSummary}
@@ -82,13 +79,12 @@ func (b *BoshController) GetBoshSummary(c echo.Context) (err error) {
 }
 
 // GetBoshProcessByMemory
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Bosh의 프로세스 목록을 가져온다.
-//  @Description  Bosh의 프로세스 목록을 가져온다.
+//  @Summary      BOSH 프로세스 목록 가져오기
+//  @Description  BOSH 프로세스 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid  query     string  false  "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다."
+//  @Param        uuid  query     string  true  "BOSH의 UUID를 주입한다."  example(36dd3d08-5198-42b6-4130-d0c04479236f)
 //  @Success      200   {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshProcess}
 //  @Router       /api/v1/ap/bosh/process [get]
 func (b *BoshController) GetBoshProcessByMemory(ctx echo.Context) (err error) {
@@ -103,15 +99,18 @@ func (b *BoshController) GetBoshProcessByMemory(ctx echo.Context) (err error) {
 }
 
 // GetBoshChart
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      Bosh의 차트 정보를 가져온다.
-//  @Description  Bosh의 차트 정보를 가져온다.
+//  @Summary      BOSH 차트 정보 가져오기
+//  @Description  BOSH 차트 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        id   query     string  false  "Bosh의 차트 정보 조회시 Bosh ID를 주입한다."
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
-//  @Router       /api/v1/bosh/Chart [get]
+//  @Param        uuid              path      string  true   "BOSH의 UUID를 주입한다."   example(36dd3d08-5198-42b6-4130-d0c04479236f)
+//  @Param        defaultTimeRange  query     string  true   "Default Time Range"  example(15m)
+//  @Param        timeRangeFrom     query     string  false  "Time Range From"
+//  @Param        timeRangeTo       query     string  false  "Time Range To"
+//  @Param        groupBy           query     string  true   "Group By"  example(1m)
+//  @Success      200               {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
+//  @Router       /api/v1/ap/bosh/chart/{uuid} [get]
 func (b *BoshController) GetBoshChart(ctx echo.Context) (err error) {
 	results, err := AP.GetApBoshService(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshChart(ctx)
 	if err != nil {

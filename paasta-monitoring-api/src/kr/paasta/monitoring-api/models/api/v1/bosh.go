@@ -84,14 +84,14 @@ type (
 	}
 
 	Bosh struct {
-		UUID       string `json:"uuid"`
-		Name       string `json:"name"`
-		Ip         string `json:"ip"`
-		Deployname string `json:"deployment"`
-		Address    string `json:"address"`
-		Username   string `json:"username"`
-		Password   string `json:"password"`
-		Client     *gogobosh.Client
+		UUID       string           `json:"uuid"`
+		Name       string           `json:"name"`
+		Ip         string           `json:"ip"`
+		Deployname string           `json:"deployment"`
+		Address    string           `json:"address"`
+		Username   string           `json:"username"`
+		Password   string           `json:"password"`
+		Client     *gogobosh.Client `json:"client"`
 	}
 
 	BoshProcess struct {

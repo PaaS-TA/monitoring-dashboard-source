@@ -682,9 +682,9 @@
                 }
             }
         },
-        "/api/v1/ap/bosh/overview": {
+        "/api/v1/ap/bosh": {
             "get": {
-                "description": "Bosh Overview 정보를 가져온다.",
+                "description": "BOSH 목록을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -694,7 +694,115 @@
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh Overview 정보를 가져온다.",
+                "summary": "BOSH 목록 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Bosh"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh/chart/{uuid}": {
+            "get": {
+                "description": "BOSH 차트 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "BOSH 차트 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "36dd3d08-5198-42b6-4130-d0c04479236f",
+                        "description": "BOSH의 UUID를 주입한다.",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time Range From",
+                        "name": "timeRangeFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time Range To",
+                        "name": "timeRangeTo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshChart"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh/overview": {
+            "get": {
+                "description": "BOSH Overview 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "BOSH Overview 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -719,7 +827,7 @@
         },
         "/api/v1/ap/bosh/process": {
             "get": {
-                "description": "Bosh의 프로세스 목록을 가져온다.",
+                "description": "BOSH 프로세스 목록을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -729,13 +837,15 @@
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh의 프로세스 목록을 가져온다.",
+                "summary": "BOSH 프로세스 목록 가져오기",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.",
+                        "example": "36dd3d08-5198-42b6-4130-d0c04479236f",
+                        "description": "BOSH의 UUID를 주입한다.",
                         "name": "uuid",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -762,7 +872,7 @@
         },
         "/api/v1/ap/bosh/summary": {
             "get": {
-                "description": "Bosh Summary 정보를 가져온다.",
+                "description": "BOSH Summary 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -772,7 +882,7 @@
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh Summary 정보를 가져온다.",
+                "summary": "BOSH Summary 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1447,87 +1557,9 @@
                 }
             }
         },
-        "/api/v1/bosh": {
-            "get": {
-                "description": "Bosh의 목록을 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "Bosh의 목록을 가져온다.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Bosh"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/bosh/Chart": {
-            "get": {
-                "description": "Bosh의 차트 정보를 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "Bosh의 차트 정보를 가져온다.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bosh의 차트 정보 조회시 Bosh ID를 주입한다.",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.BoshChart"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/log/{uuid}": {
             "get": {
-                "description": "로그 정보를 가져온다.\n대상 날짜, 시작 시간, 종료 시간을 사용하는 조회와 현재를 기준으로 특정 기간 동안의 내용을 조회하는 파라미터는 중복 사용이 불가능하다.",
+                "description": "로그 정보를 가져온다.\n특정기간(대상날짜, 시작시간, 종료시간 사용) 로그 조회와 최근기간 로그 조회 파라미터는 중복 사용이 불가능하다.\n또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1540,8 +1572,11 @@
                 "summary": "로그 정보 가져오기",
                 "parameters": [
                     {
+                        "enum": [
+                            "36dd3d08-5198-42b6-4130-d0c04479236f",
+                            "f1db5cd8-3e5b-4980-966f-9fa88d8d85fd"
+                        ],
                         "type": "string",
-                        "example": "f1db5cd8-3e5b-4980-966f-9fa88d8d85fd",
                         "description": "로그 조회시 대상 VM의 UUID를 주입한다.",
                         "name": "uuid",
                         "in": "path",
