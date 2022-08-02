@@ -751,27 +751,27 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "example": "15m",
-                        "description": "Default Time Range",
+                        "description": "기본 시간 범위를 주입한다.",
                         "name": "defaultTimeRange",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Time Range From",
+                        "description": "시작 시간을 주입한다.",
                         "name": "timeRangeFrom",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Time Range To",
+                        "description": "종료 시간을 주입한다.",
                         "name": "timeRangeTo",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "example": "1m",
-                        "description": "Group By",
+                        "description": "시간 단위를 주입한다.",
                         "name": "groupBy",
                         "in": "query",
                         "required": true
@@ -1453,6 +1453,115 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/ap/paasta": {
+            "get": {
+                "description": "PaaS-TA VM 목록을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "PaaS-TA VM 목록 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Paasta"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/paasta/chart/{uuid}": {
+            "get": {
+                "description": "PaaS-TA VM 별 차트 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "PaaS-TA VM 별 차트 정보 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "f1db5cd8-3e5b-4980-966f-9fa88d8d85fd",
+                            "644ce3f1-c758-42ae-8d74-8193e28839fe"
+                        ],
+                        "type": "string",
+                        "description": "PaaS-TA VM 별 차트 정보 조회시 VM UUID를 주입한다.",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "PaaS-TA VM 별 차트 정보 조회시 기본 시간 범위를 주입한다.",
+                        "name": "defaultTimeRange",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA VM 별 차트 정보 조회시 시작 시간을 주입한다.",
+                        "name": "timeRangeFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "PaaS-TA VM 별 차트 정보 조회시 종료 시간을 주입한다.",
+                        "name": "timeRangeTo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "PaaS-TA VM 별 차트 정보 조회시 시간 단위를 주입한다.",
+                        "name": "groupBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.PaastaChart"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/ap/paasta/overview": {
             "get": {
                 "description": "PaaS-TA Overview 정보를 가져온다.",
@@ -1465,7 +1574,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "PaaS-TA Overview 정보를 가져온다.",
+                "summary": "PaaS-TA Overview 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1490,7 +1599,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/paasta/process": {
             "get": {
-                "description": "PaaS-TA Core 별 프로세스 목록을 가져온다.",
+                "description": "PaaS-TA VM 별 프로세스 목록을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1500,10 +1609,11 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "PaaS-TA Core 별 프로세스 목록을 가져온다.",
+                "summary": "PaaS-TA VM 별 프로세스 목록 가져오기",
                 "parameters": [
                     {
                         "type": "string",
+                        "example": "f1db5cd8-3e5b-4980-966f-9fa88d8d85fd",
                         "description": "Paasta의 프로세스 목록 조회시 VM ID를 주입한다.",
                         "name": "uuid",
                         "in": "query"
@@ -1543,7 +1653,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "PaaS-TA Summary 정보를 가져온다.",
+                "summary": "PaaS-TA Summary 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1650,108 +1760,6 @@ const docTemplate = `{
                                     "properties": {
                                         "responseInfo": {
                                             "$ref": "#/definitions/v1.Logs"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/paasta": {
-            "get": {
-                "description": "PaaS-TA Core의 목록을 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "PaaS-TA Core의 목록을 가져온다.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Paasta"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/paasta/Chart": {
-            "get": {
-                "description": "PaaS-TA Core 별 차트 정보를 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "PaaS-TA Core 별 차트 정보를 가져온다.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "PaaS-TA Core 별 차트 정보 조회시 VM UUID를 주입한다.",
-                        "name": "uuid",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "PaaS-TA Core 별 차트 정보 조회시 기본 시간 범위 (defaultTimeRange=15m)를               주입한다.",
-                        "name": "defaultTimeRange",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "PaaS-TA Core 별 차트 정보 조회시 시간 범위 시작 (timeRangeFrom=2022-06-16T10:21:39)를  주입한다.",
-                        "name": "timeRangeFrom",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "PaaS-TA Core 별 차트 정보 조회시 시간 범위 종료 (timeRangeTo=2022-06-16T10:21:39)를    주입한다.",
-                        "name": "timeRangeTo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "PaaS-TA Core 별 차트 정보 조회시 그룹 (groupBy=1m)을                               주입한다.",
-                        "name": "groupBy",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.PaastaChart"
                                         }
                                     }
                                 }

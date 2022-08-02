@@ -104,11 +104,11 @@ func (b *BoshController) GetBoshProcessByMemory(ctx echo.Context) (err error) {
 //  @Description  BOSH 차트 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid              path      string  true   "BOSH의 UUID를 주입한다."   example(36dd3d08-5198-42b6-4130-d0c04479236f)
-//  @Param        defaultTimeRange  query     string  true   "Default Time Range"  example(15m)
-//  @Param        timeRangeFrom     query     string  false  "Time Range From"
-//  @Param        timeRangeTo       query     string  false  "Time Range To"
-//  @Param        groupBy           query     string  true   "Group By"  example(1m)
+//  @Param        uuid              path      string  true   "BOSH의 UUID를 주입한다."  example(36dd3d08-5198-42b6-4130-d0c04479236f)
+//  @Param        defaultTimeRange  query     string  true   "기본 시간 범위를 주입한다."    example(15m)
+//  @Param        timeRangeFrom     query     string  false  "시작 시간을 주입한다."
+//  @Param        timeRangeTo       query     string  false  "종료 시간을 주입한다."
+//  @Param        groupBy           query     string  true   "시간 단위를 주입한다."  example(1m)
 //  @Success      200               {object}  apiHelpers.BasicResponseForm{responseInfo=v1.BoshChart}
 //  @Router       /api/v1/ap/bosh/chart/{uuid} [get]
 func (b *BoshController) GetBoshChart(ctx echo.Context) (err error) {

@@ -25,14 +25,13 @@ func GetPaastaController(conn connections.Connections) *PaastaController {
 }
 
 // GetPaastaInfoList
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      PaaS-TA Core의 목록을 가져온다.
-//  @Description  PaaS-TA Core의 목록을 가져온다.
+//  @Summary      PaaS-TA VM 목록 가져오기
+//  @Description  PaaS-TA VM 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Paasta}
-//  @Router       /api/v1/paasta [get]
+//  @Router       /api/v1/ap/paasta [get]
 func (p *PaastaController) GetPaastaInfoList(ctx echo.Context) (err error) {
 	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaInfoList(ctx)
 	if err != nil {
@@ -44,95 +43,91 @@ func (p *PaastaController) GetPaastaInfoList(ctx echo.Context) (err error) {
 }
 
 // GetPaastaOverview
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      PaaS-TA Overview 정보를 가져온다.
+//  @Summary      PaaS-TA Overview 정보 가져오기
 //  @Description  PaaS-TA Overview 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaOverview}
 //  @Router       /api/v1/ap/paasta/overview [get]
-func (p *PaastaController) GetPaastaOverview(c echo.Context) (err error) {
-	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaOverview(c)
+func (p *PaastaController) GetPaastaOverview(ctx echo.Context) (err error) {
+	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaOverview(ctx)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Paasta Overview", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Paasta Overview", results)
 	return nil
 }
 
 // GetPaastaSummary
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      PaaS-TA Summary 정보를 가져온다.
+//  @Summary      PaaS-TA Summary 정보 가져오기
 //  @Description  PaaS-TA Summary 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaSummary}
 //  @Router       /api/v1/ap/paasta/summary [get]
-func (p *PaastaController) GetPaastaSummary(c echo.Context) (err error) {
+func (p *PaastaController) GetPaastaSummary(ctx echo.Context) (err error) {
 	var paastaRequest models.PaastaRequest
 	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaSummary(paastaRequest)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Bosh Summary", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Bosh Summary", results)
 	return nil
 }
 
 // GetPaastaProcessByMemory
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      PaaS-TA Core 별 프로세스 목록을 가져온다.
-//  @Description  PaaS-TA Core 별 프로세스 목록을 가져온다.
+//  @Summary      PaaS-TA VM 별 프로세스 목록 가져오기
+//  @Description  PaaS-TA VM 별 프로세스 목록을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid  query     string  false  "Paasta의 프로세스 목록 조회시 VM ID를 주입한다."
+//  @Param        uuid  query     string  false  "Paasta의 프로세스 목록 조회시 VM ID를 주입한다."  example(f1db5cd8-3e5b-4980-966f-9fa88d8d85fd)
 //  @Success      200   {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaProcess}
 //  @Router       /api/v1/ap/paasta/process [get]
-func (p *PaastaController) GetPaastaProcessByMemory(c echo.Context) (err error) {
+func (p *PaastaController) GetPaastaProcessByMemory(ctx echo.Context) (err error) {
 	var paastaProcess models.PaastaProcess
-	paastaProcess.UUID = c.QueryParam("uuid")
+	paastaProcess.UUID = ctx.QueryParam("uuid")
 
 	// Paasta Process 정보 조회
 	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaProcessByMemory(paastaProcess)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Paasta Process By Memory", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Paasta Process By Memory", results)
 	return nil
 }
 
 // GetPaastaChart
-//  * Annotations for Swagger *
 //  @tags         AP
-//  @Summary      PaaS-TA Core 별 차트 정보를 가져온다.
-//  @Description  PaaS-TA Core 별 차트 정보를 가져온다.
+//  @Summary      PaaS-TA VM 별 차트 정보 가져오기
+//  @Description  PaaS-TA VM 별 차트 정보를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid              query     string  false  "PaaS-TA Core 별 차트 정보 조회시 VM UUID를 주입한다."
-//  @Param        defaultTimeRange  query     string  false  "PaaS-TA Core 별 차트 정보 조회시 기본 시간 범위 (defaultTimeRange=15m)를               주입한다."
-//  @Param        timeRangeFrom     query     string  false  "PaaS-TA Core 별 차트 정보 조회시 시간 범위 시작 (timeRangeFrom=2022-06-16T10:21:39)를  주입한다."
-//  @Param        timeRangeTo       query     string  false  "PaaS-TA Core 별 차트 정보 조회시 시간 범위 종료 (timeRangeTo=2022-06-16T10:21:39)를    주입한다."
-//  @Param        groupBy           query     string  false  "PaaS-TA Core 별 차트 정보 조회시 그룹 (groupBy=1m)을                               주입한다."
+//  @Param        uuid              path      string  true   "PaaS-TA VM 별 차트 정보 조회시 VM UUID를 주입한다."   enums(f1db5cd8-3e5b-4980-966f-9fa88d8d85fd, 644ce3f1-c758-42ae-8d74-8193e28839fe)
+//  @Param        defaultTimeRange  query     string  false  "PaaS-TA VM 별 차트 정보 조회시 기본 시간 범위를 주입한다."  example(15m)
+//  @Param        timeRangeFrom     query     string  false  "PaaS-TA VM 별 차트 정보 조회시 시작 시간을 주입한다."
+//  @Param        timeRangeTo       query     string  false  "PaaS-TA VM 별 차트 정보 조회시 종료 시간을 주입한다."
+//  @Param        groupBy           query     string  false  "PaaS-TA VM 별 차트 정보 조회시 시간 단위를 주입한다."  example(1m)
 //  @Success      200               {object}  apiHelpers.BasicResponseForm{responseInfo=v1.PaastaChart}
-//  @Router       /api/v1/paasta/Chart [get]
-func (p *PaastaController) GetPaastaChart(c echo.Context) (err error) {
+//  @Router       /api/v1/ap/paasta/chart/{uuid} [get]
+func (p *PaastaController) GetPaastaChart(ctx echo.Context) (err error) {
 	var paastaChart models.PaastaChart
-	paastaChart.UUID = c.Param("uuid")
-	paastaChart.DefaultTimeRange = c.QueryParam("defaultTimeRange")
-	paastaChart.TimeRangeFrom = c.QueryParam("timeRangeFrom")
-	paastaChart.TimeRangeTo = c.QueryParam("timeRangeTo")
-	paastaChart.GroupBy = c.QueryParam("groupBy")
+	paastaChart.UUID = ctx.Param("uuid")
+	paastaChart.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	paastaChart.TimeRangeFrom = ctx.QueryParam("timeRangeFrom")
+	paastaChart.TimeRangeTo = ctx.QueryParam("timeRangeTo")
+	paastaChart.GroupBy = ctx.QueryParam("groupBy")
 
 	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaChart(paastaChart)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Paasta Chart", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Paasta Chart", results)
 	return nil
 }
