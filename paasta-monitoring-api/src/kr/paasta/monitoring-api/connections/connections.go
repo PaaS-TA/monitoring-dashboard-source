@@ -33,15 +33,13 @@ type Connections struct {
 	ZabbixSession     *zabbix.Session
 	Logger            *logrus.Logger
 	CfClient          *cfclient.Client
-	CaaS              models.CaaS
+	CP                models.CP
 	SaaS              models.SaaS
 }
 
-
-
 func SetupConnection(logger *logrus.Logger) Connections {
 	connection := Connections{
-		Env: setEnv(),
+		Env:    setEnv(),
 		Logger: logger,
 	}
 
@@ -60,7 +58,7 @@ func SetupConnection(logger *logrus.Logger) Connections {
 		case "PaaS":
 			connection.initPaasConfig(connection.Env)
 			connection.initInfluxDbConfig(connection.Env)
-		case "CaaS":
+		case "CP":
 			connection.initCaaSConfig()
 		case "IaaS":
 			connection.initOpenstackProvider()
@@ -71,7 +69,6 @@ func SetupConnection(logger *logrus.Logger) Connections {
 	}
 	return connection
 }
-
 
 /*
 	Read for environment variables including variables of system and program
@@ -85,7 +82,6 @@ func getEnv(envData []string, getKeyVal func(item string) (key, value string)) m
 	return envMap
 }
 
-
 func setEnv() map[string]interface{} {
 	envMap := getEnv(os.Environ(), func(item string) (key, value string) {
 		keyValueSplit := strings.Split(item, "=")
@@ -95,7 +91,6 @@ func setEnv() map[string]interface{} {
 	})
 	return envMap
 }
-
 
 func GetBoshInfoList(env map[string]interface{}) []models.Bosh {
 	// Bosh 설정
@@ -176,7 +171,6 @@ func (conn *Connections) initPaasConfig(env map[string]interface{}) {
 	}
 	conn.DbInfo = paasDBClient
 
-
 	// Cloud Foundry Client Initialize
 	config := &cfclient.Config{
 		ApiAddress:        env["paas_cf_client_api_address"].(string),
@@ -187,7 +181,6 @@ func (conn *Connections) initPaasConfig(env map[string]interface{}) {
 	cloudFoundryClient, _ := cfclient.NewClient(config)
 	conn.CfClient = cloudFoundryClient
 }
-
 
 func (conn *Connections) initInfluxDbConfig(env map[string]interface{}) {
 	httpClient, err := client.NewHTTPClient(client.HTTPConfig{
@@ -215,7 +208,6 @@ func (conn *Connections) initInfluxDbConfig(env map[string]interface{}) {
 	conn.InfluxDbClient = influxDbClient
 }
 
-
 func (conn *Connections) initOpenstackProvider() {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: conn.Env["openstack_identity_endpoint"].(string),
@@ -237,7 +229,6 @@ func (conn *Connections) initOpenstackProvider() {
 	//connections.RedisInfo.HSet(reqToken, "iaasToken", providerClient.TokenID)
 	conn.OpenstackProvider = providerClient
 }
-
 
 func (conn *Connections) initZabbixSession() {
 	zabbixHost := conn.Env["zabbix_host"].(string)
@@ -263,18 +254,16 @@ func (conn *Connections) initZabbixSession() {
 	conn.ZabbixSession = zabbixSession
 }
 
-
 func (conn *Connections) initCaaSConfig() {
-	caas := models.CaaS{
-		PromethusUrl      : conn.Env["prometheus_host"].(string),
-		PromethusRangeUrl : conn.Env["prometheus_host"].(string) + "/api/v1/query_range?query=",
-		K8sUrl            : conn.Env["kubernetes_host"].(string),
-		K8sAdminToken     : conn.Env["kubernetes_admin_token"].(string),
+	cp := models.CP{
+		PromethusUrl:      conn.Env["prometheus_host"].(string),
+		PromethusRangeUrl: conn.Env["prometheus_host"].(string) + "/api/v1/query_range?query=",
+		K8sUrl:            conn.Env["kubernetes_host"].(string),
+		K8sAdminToken:     conn.Env["kubernetes_admin_token"].(string),
 	}
 
-	conn.CaaS = caas
+	conn.CP = cp
 }
-
 
 func (conn *Connections) initSaaSConfig() {
 	saas := models.SaaS{

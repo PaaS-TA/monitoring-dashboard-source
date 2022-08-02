@@ -1,18 +1,18 @@
-package caas
+package cp
 
 import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	models "paasta-monitoring-api/models/api/v1"
-	service "paasta-monitoring-api/services/api/v1/caas"
+	service "paasta-monitoring-api/services/api/v1/cp"
 )
 
 type ClusterController struct {
-	CaaS models.CaaS
+	CaaS models.CP
 }
 
-func GetClusterController(config models.CaaS) *ClusterController{
+func GetClusterController(config models.CP) *ClusterController {
 	return &ClusterController{
 		CaaS: config,
 	}
@@ -30,7 +30,6 @@ func (controller *ClusterController) GetClusterAverage(ctx echo.Context) error {
 	return nil
 }
 
-
 func (controller *ClusterController) GetWorkNodeList(ctx echo.Context) error {
 	results, err := service.GetClusterService(controller.CaaS).GetWorkNodeList(ctx)
 	if err != nil {
@@ -41,7 +40,6 @@ func (controller *ClusterController) GetWorkNodeList(ctx echo.Context) error {
 	}
 	return nil
 }
-
 
 func (controller *ClusterController) GetWorkNode(ctx echo.Context) error {
 	results, err := service.GetClusterService(controller.CaaS).GetWorkNode(ctx)

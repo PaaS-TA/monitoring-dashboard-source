@@ -1,4 +1,4 @@
-package caas
+package cp
 
 import (
 	"fmt"
@@ -11,21 +11,20 @@ import (
 )
 
 type PodService struct {
-	CaaS models.CaaS
+	CaaS models.CP
 }
 
-func GetPodService(config models.CaaS) *PodService{
+func GetPodService(config models.CP) *PodService {
 	return &PodService{
 		CaaS: config,
 	}
 }
 
-
 func (service *PodService) GetPodStatus(ctx echo.Context) ([]map[string]interface{}, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
 	var resultList []map[string]interface{}
-	podStatusBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_POD_PHASE, "")
+	podStatusBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_POD_PHASE, "")
 	if err != nil {
 		logger.Error(err)
 		return nil, err
@@ -42,7 +41,6 @@ func (service *PodService) GetPodStatus(ctx echo.Context) ([]map[string]interfac
 
 	return resultList, nil
 }
-
 
 func (service *PodService) GetPodList() ([]map[string]interface{}, error) {
 	resultBytes, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_POD_LIST, "")
@@ -167,7 +165,6 @@ func (service *PodService) GetPodList() ([]map[string]interface{}, error) {
 	return podList, nil
 }
 
-
 func (service *PodService) GetPodDetailMetrics(pod string) ([]map[string]interface{}, error) {
 	var resultList []map[string]interface{}
 	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
@@ -239,7 +236,6 @@ func (service *PodService) GetPodDetailMetrics(pod string) ([]map[string]interfa
 
 	return resultList, nil
 }
-
 
 func (service *PodService) GetPodContainerList(pod string) ([]map[string]interface{}, error) {
 

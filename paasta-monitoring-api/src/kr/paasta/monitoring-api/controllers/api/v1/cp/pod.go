@@ -1,4 +1,4 @@
-package caas
+package cp
 
 import (
 	"github.com/labstack/echo/v4"
@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	models "paasta-monitoring-api/models/api/v1"
-	service "paasta-monitoring-api/services/api/v1/caas"
+	service "paasta-monitoring-api/services/api/v1/cp"
 )
 
 type PodController struct {
-	CaaS models.CaaS
+	CaaS models.CP
 }
 
-func GetPodController(config models.CaaS) *PodController{
+func GetPodController(config models.CP) *PodController {
 	return &PodController{
 		CaaS: config,
 	}
@@ -31,7 +31,6 @@ func (controller *PodController) GetPodStatus(ctx echo.Context) error {
 	return nil
 }
 
-
 func (controller *PodController) GetPodList(ctx echo.Context) error {
 	results, err := service.GetPodService(controller.CaaS).GetPodList()
 	if err != nil {
@@ -43,7 +42,6 @@ func (controller *PodController) GetPodList(ctx echo.Context) error {
 	}
 	return nil
 }
-
 
 func (controller *PodController) GetPodDetailMetrics(ctx echo.Context) error {
 	pod := ctx.QueryParam("pod")
@@ -57,7 +55,6 @@ func (controller *PodController) GetPodDetailMetrics(ctx echo.Context) error {
 	}
 	return nil
 }
-
 
 func (controller *PodController) GetPodContainerList(ctx echo.Context) error {
 	pod := ctx.QueryParam("pod")

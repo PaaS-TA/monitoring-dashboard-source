@@ -1,4 +1,4 @@
-package caas
+package cp
 
 import (
 	"github.com/labstack/echo/v4"
@@ -12,28 +12,26 @@ import (
 	"sync"
 )
 
-
 type WorkloadService struct {
-	CaaS models.CaaS
+	CaaS models.CP
 }
 
-func GetWorkloadService(config models.CaaS) *WorkloadService{
+func GetWorkloadService(config models.CP) *WorkloadService {
 	return &WorkloadService{
 		CaaS: config,
 	}
 }
 
-
 func (service *WorkloadService) GetWorkloadStatus(ctx echo.Context) ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
-	deploymentTotalResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_TOTAL, "")
+	deploymentTotalResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DEPLOYMENT_TOTAL, "")
 	deploymentTotal := gjson.Get(string(deploymentTotalResult), "data.result.0.value.1").String()
-	deploymentActiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_AVAILABLE, "")
+	deploymentActiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DEPLOYMENT_AVAILABLE, "")
 	deploymentActive := gjson.Get(string(deploymentActiveResult), "data.result.0.value.1").String()
-	deploymentInactiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_UNAVAILABLE, "")
+	deploymentInactiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DEPLOYMENT_UNAVAILABLE, "")
 	deploymentInactive := gjson.Get(string(deploymentInactiveResult), "data.result.0.value.1").String()
-	deploymentUpdatedResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_UPDATED, "")
+	deploymentUpdatedResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DEPLOYMENT_UPDATED, "")
 	deploymentUpdated := gjson.Get(string(deploymentUpdatedResult), "data.result.0.value.1").String()
 	deploymentMap := make(map[string]interface{})
 	deploymentMap["name"] = "Deployment"
@@ -42,13 +40,13 @@ func (service *WorkloadService) GetWorkloadStatus(ctx echo.Context) ([]map[strin
 	deploymentMap["unavailable"] = deploymentInactive
 	deploymentMap["updated"] = deploymentUpdated
 
-	statefulsetTotalResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_TOTAL, "")
+	statefulsetTotalResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_STATEFULSET_TOTAL, "")
 	statefulsetTotal := gjson.Get(string(statefulsetTotalResult), "data.result.0.value.1").String()
-	statefulsetActiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_AVAILABLE, "")
+	statefulsetActiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_STATEFULSET_AVAILABLE, "")
 	statefulsetActive := gjson.Get(string(statefulsetActiveResult), "data.result.0.value.1").String()
-	statefulsetInactiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_UNAVAILABLE, "")
+	statefulsetInactiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_STATEFULSET_UNAVAILABLE, "")
 	statefulsetInactive := gjson.Get(string(statefulsetInactiveResult), "data.result.0.value.1").String()
-	statefulsetUpdatedResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_STATEFULSET_UPDATED, "")
+	statefulsetUpdatedResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_STATEFULSET_UPDATED, "")
 	statefulsetUpdated := gjson.Get(string(statefulsetUpdatedResult), "data.result.0.value.1").String()
 	statefulsetMap := make(map[string]interface{})
 	statefulsetMap["name"] = "Stateful"
@@ -57,13 +55,13 @@ func (service *WorkloadService) GetWorkloadStatus(ctx echo.Context) ([]map[strin
 	statefulsetMap["unavailable"] = statefulsetInactive
 	statefulsetMap["updated"] = statefulsetUpdated
 
-	daemonsetReadyResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_READY, "")
+	daemonsetReadyResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DAEMONSET_READY, "")
 	daemonsetReady := gjson.Get(string(daemonsetReadyResult), "data.result.0.value.1").String()
-	daemonsetActiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_AVAILABLE, "")
+	daemonsetActiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DAEMONSET_AVAILABLE, "")
 	daemonsetActive := gjson.Get(string(daemonsetActiveResult), "data.result.0.value.1").String()
-	daemonsetInactiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_UNAVAILABLE, "")
+	daemonsetInactiveResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DAEMONSET_UNAVAILABLE, "")
 	daemonsetInactive := gjson.Get(string(daemonsetInactiveResult), "data.result.0.value.1").String()
-	daemonsetMisscheduleResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DAEMONSET_MISSCHEDULED, "")
+	daemonsetMisscheduleResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_DAEMONSET_MISSCHEDULED, "")
 	daemonsetMisschedule := gjson.Get(string(daemonsetMisscheduleResult), "data.result.0.value.1").String()
 	daemonsetMap := make(map[string]interface{})
 	daemonsetMap["name"] = "DaemonSet"
@@ -72,13 +70,13 @@ func (service *WorkloadService) GetWorkloadStatus(ctx echo.Context) ([]map[strin
 	daemonsetMap["unavailable"] = daemonsetInactive
 	daemonsetMap["misscheduled"] = daemonsetMisschedule
 
-	podcontainerReadyResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_READY, "")
+	podcontainerReadyResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_PODCONTAINER_READY, "")
 	podcontainerReady := gjson.Get(string(podcontainerReadyResult), "data.result.0.value.1").String()
-	podcontainerRunningResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_RUNNING, "")
+	podcontainerRunningResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_PODCONTAINER_RUNNING, "")
 	podcontainerRunning := gjson.Get(string(podcontainerRunningResult), "data.result.0.value.1").String()
-	podcontainerRestatsResult, _ := 	helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_RESTARTS, "")
+	podcontainerRestatsResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_PODCONTAINER_RESTARTS, "")
 	podcontainerRestarts := gjson.Get(string(podcontainerRestatsResult), "data.result.0.value.1").String()
-	podcontainerTerminateResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_PODCONTAINER_TERMINATE, "")
+	podcontainerTerminateResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_WORKLOAD_PODCONTAINER_TERMINATE, "")
 	podcontainerTerminate := gjson.Get(string(podcontainerTerminateResult), "data.result.0.value.1").String()
 	podcontainerMap := make(map[string]interface{})
 	podcontainerMap["name"] = "Pod"
@@ -95,7 +93,6 @@ func (service *WorkloadService) GetWorkloadStatus(ctx echo.Context) ([]map[strin
 	return result, nil
 }
 
-
 func (service *WorkloadService) GetWorkloadList() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
@@ -107,17 +104,17 @@ func (service *WorkloadService) GetWorkloadList() ([]map[string]interface{}, err
 	daemonsetMetric := make(map[string]interface{})
 
 	go func(url string, workLoadName string) {
-		deplomentMetric = getWorkloadMetrics(url + "/query", workLoadName)
+		deplomentMetric = getWorkloadMetrics(url+"/query", workLoadName)
 		defer waitGroup.Done()
 	}(service.CaaS.PromethusUrl, "deployment")
 
 	go func(url string, workLoadName string) {
-		statefulsetMetric = getWorkloadMetrics(url + "/query", workLoadName)
+		statefulsetMetric = getWorkloadMetrics(url+"/query", workLoadName)
 		defer waitGroup.Done()
 	}(service.CaaS.PromethusUrl, "statefulset")
 
 	go func(url string, workLoadName string) {
-		daemonsetMetric = getWorkloadMetrics(url + "/query", workLoadName)
+		daemonsetMetric = getWorkloadMetrics(url+"/query", workLoadName)
 		defer waitGroup.Done()
 	}(service.CaaS.PromethusUrl, "daemonset")
 
@@ -130,9 +127,9 @@ func (service *WorkloadService) GetWorkloadList() ([]map[string]interface{}, err
 	return result, nil
 }
 
-
 var metricTypes = [...]string{"cpu", "memory", "disk"}
 var metricValues = [len(metricTypes)]float64{}
+
 func (service *WorkloadService) GetWorkloadDetailMetrics(ctx echo.Context) ([]map[string]interface{}, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
@@ -200,7 +197,6 @@ func (service *WorkloadService) GetWorkloadDetailMetrics(ctx echo.Context) ([]ma
 	logger.Debug("result : %v\n", result)
 	return result, nil
 }
-
 
 func (service *WorkloadService) GetWorkloadContainerList(ctx echo.Context) ([]map[string]interface{}, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
@@ -334,7 +330,7 @@ func (service *WorkloadService) GetWorkloadContainerList(ctx echo.Context) ([]ma
 		for _, cpuUseMap := range cpuUseList {
 			if (strings.Compare(namespace, cpuUseMap["namespace"].(string)) == 0) &&
 				(strings.Compare(pod, cpuUseMap["pod"].(string)) == 0) &&
-					(strings.Compare(container, cpuUseMap["container"].(string)) == 0) {
+				(strings.Compare(container, cpuUseMap["container"].(string)) == 0) {
 				containerMap["cpu"] = cpuUseMap["value"].(float64)
 			}
 		}
@@ -369,7 +365,6 @@ func (service *WorkloadService) GetWorkloadContainerList(ctx echo.Context) ([]ma
 	}
 	return containerList, nil
 }
-
 
 func (service *WorkloadService) GetContainerMetrics(ctx echo.Context) ([]map[string]interface{}, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
@@ -455,7 +450,6 @@ func (service *WorkloadService) GetContainerMetrics(ctx echo.Context) ([]map[str
 	return resultList, nil
 }
 
-
 func (service *WorkloadService) GetContainerLog(ctx echo.Context) (string, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
@@ -472,7 +466,6 @@ func (service *WorkloadService) GetContainerLog(ctx echo.Context) (string, error
 	}
 	return string(resultBytes), nil
 }
-
 
 func getWorkloadMetrics(url string, workloadNameParam string) map[string]interface{} {
 	result := make(map[string]interface{})
@@ -544,5 +537,3 @@ func getWorkloadMetrics(url string, workloadNameParam string) map[string]interfa
 
 	return result
 }
-
-

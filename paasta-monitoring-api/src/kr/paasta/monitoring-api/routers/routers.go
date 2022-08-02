@@ -12,8 +12,8 @@ import (
 	"paasta-monitoring-api/connections"
 	apiControllerV1 "paasta-monitoring-api/controllers/api/v1"
 	AP "paasta-monitoring-api/controllers/api/v1/ap"
-	caas "paasta-monitoring-api/controllers/api/v1/caas"
 	commonModule "paasta-monitoring-api/controllers/api/v1/common"
+	CP "paasta-monitoring-api/controllers/api/v1/cp"
 	iaas "paasta-monitoring-api/controllers/api/v1/iaas"
 	saas "paasta-monitoring-api/controllers/api/v1/saas"
 	"paasta-monitoring-api/middlewares"
@@ -80,10 +80,10 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	openstackModule := iaas.GetOpenstackController(conn.OpenstackProvider)
 	zabbixModule := iaas.GetZabbixController(conn.ZabbixSession, conn.OpenstackProvider)
 
-	// CaaS
-	clusterModule := caas.GetClusterController(conn.CaaS)
-	worklaodModule := caas.GetWorkloadController(conn.CaaS)
-	podModule := caas.GetPodController(conn.CaaS)
+	// CP
+	clusterModule := CP.GetClusterController(conn.CP)
+	worklaodModule := CP.GetWorkloadController(conn.CP)
+	podModule := CP.GetPodController(conn.CP)
 
 	// SaaS
 	pinpointModule := saas.GetPinpointController(conn.SaaS)
@@ -167,20 +167,20 @@ func SetupRouter(conn connections.Connections) *echo.Echo {
 	v1.GET("/iaas/instance/disk/io/rate", zabbixModule.GetDiskIORate)
 	v1.GET("/iaas/instance/network/io/bytes", zabbixModule.GetNetworkIOBytes)
 
-	// CaaS
-	v1.GET("/caas/cluster/average/:type", clusterModule.GetClusterAverage)
-	v1.GET("/caas/cluster/worknodes", clusterModule.GetWorkNodeList)
-	v1.GET("/caas/cluster/worknode", clusterModule.GetWorkNode)
-	v1.GET("/caas/workload/status", worklaodModule.GetWorkloadStatus)
-	v1.GET("/caas/workload/list", worklaodModule.GetWorkloadList)
-	v1.GET("/caas/workload/metrics", worklaodModule.GetWorkloadDetailMetrics)
-	v1.GET("/caas/workload/container/list", worklaodModule.GetWorkloadContainerList)
-	v1.GET("/caas/workload/container/metrics", worklaodModule.GetContainerMetrics)
-	v1.GET("/caas/workload/container/log", worklaodModule.GetContainerLog)
-	v1.GET("/caas/pod/status", podModule.GetPodStatus)
-	v1.GET("/caas/pod/list", podModule.GetPodList)
-	v1.GET("/caas/pod/metrics", podModule.GetPodDetailMetrics)
-	v1.GET("/caas/pod/container/list", podModule.GetPodContainerList)
+	// CP
+	v1.GET("/cp/cluster/average/:type", clusterModule.GetClusterAverage)
+	v1.GET("/cp/cluster/worknodes", clusterModule.GetWorkNodeList)
+	v1.GET("/cp/cluster/worknode", clusterModule.GetWorkNode)
+	v1.GET("/cp/workload/status", worklaodModule.GetWorkloadStatus)
+	v1.GET("/cp/workload/list", worklaodModule.GetWorkloadList)
+	v1.GET("/cp/workload/metrics", worklaodModule.GetWorkloadDetailMetrics)
+	v1.GET("/cp/workload/container/list", worklaodModule.GetWorkloadContainerList)
+	v1.GET("/cp/workload/container/metrics", worklaodModule.GetContainerMetrics)
+	v1.GET("/cp/workload/container/log", worklaodModule.GetContainerLog)
+	v1.GET("/cp/pod/status", podModule.GetPodStatus)
+	v1.GET("/cp/pod/list", podModule.GetPodList)
+	v1.GET("/cp/pod/metrics", podModule.GetPodDetailMetrics)
+	v1.GET("/cp/pod/container/list", podModule.GetPodContainerList)
 
 	// SaaS
 	v1.GET("/saas/pinpoint/getAgentList", pinpointModule.GetAgentList)
