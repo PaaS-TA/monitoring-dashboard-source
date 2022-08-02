@@ -1,13 +1,11 @@
 package common
 
 import (
-	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"
-	"paasta-monitoring-api/helpers"
-	models "paasta-monitoring-api/models/api/v1"
 	common "paasta-monitoring-api/services/api/v1/common"
 )
 
@@ -21,45 +19,35 @@ func GetAlarmPolicyController(conn connections.Connections) *AlarmPolicyControll
 	}
 }
 
-
-// CreateAlarmSns
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      알람 받을 SNS 계정 등록하기
-//  @Description  알람 받을 SNS 계정을 등록한다.
+// CreateAlarmPolicy
+//  @tags         Common
+//  @Summary      알람 정책 생성하기
+//  @Description  알람 정책을 생성한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        SnsAccountRequest  body      v1.SnsAccountRequest  true  "알람 받을 SNS 계정 정보를 주입한다."
-//  @Success      200                 {object}  apiHelpers.BasicResponseForm
-//  @Router       /api/v1/ap/alarm/sns [post]
+//  @Param        AlarmPolicies  body      []v1.AlarmPolicies  true  "생성할 알람 정책 정보를 주입한다."
+//  @Success      200            {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/alarm/policy [post]
 func (controller *AlarmPolicyController) CreateAlarmPolicy(ctx echo.Context) error {
-	var request []models.AlarmPolicies
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).CreateAlarmPolicy(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the REQUEST JSON", err.Error())
-		return err
-	}
-	regUser := ctx.Get("userId").(string)
-
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).CreateAlarmPolicy(request, regUser)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to register sns account.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to create alarm policy.", err.Error())
 		return err
 	}
 
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to register sns account.", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to create alarm policy.", results)
 	return nil
 }
 
-
 // GetAlarmPolicy
-//  * Annotations for Swagger *
-//  @tags         AP
+//  @tags         Common
 //  @Summary      전체 알람 정책 가져오기
 //  @Description  전체 알람 정책을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmPolicies}
+//  @Param        originType  query     string  false  "Origin Type"  enums(bos, pas, con, ias)
+//  @Param        alarmType   query     string  false  "Alarm Type"   enums(cpu, memory, disk)
+//  @Success      200         {object}  apiHelpers.BasicResponseForm{responseInfo=v1.AlarmPolicies}
 //  @Router       /api/v1/alarm/policy [get]
 func (controller *AlarmPolicyController) GetAlarmPolicy(ctx echo.Context) error {
 	results, err := common.GetAlarmPolicyService(controller.DbInfo).GetAlarmPolicy(ctx)
@@ -73,24 +61,16 @@ func (controller *AlarmPolicyController) GetAlarmPolicy(ctx echo.Context) error 
 }
 
 // UpdateAlarmPolicy
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      전체 알람 정책 업데이트하기
-//  @Description  전체 알람 정책을 업데이트 한다.
+//  @tags         Common
+//  @Summary      알람 정책 업데이트하기
+//  @Description  알람 정책을 업데이트 한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        AlarmPolicyRequest  body      v1.AlarmPolicyRequest  true  "알람 정책을 변경하기 위한 정보를 주입한다."
+//  @Param        AlarmPolicyRequest  body      []v1.AlarmPolicyRequest  true  "알람 정책을 변경하기 위한 정보를 주입한다."
 //  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/policy [put]
 func (controller *AlarmPolicyController) UpdateAlarmPolicy(ctx echo.Context) error {
-	var request []models.AlarmPolicyRequest
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
-		return err
-	}
-
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmPolicy(ctx, request)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmPolicy(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm policy.", err.Error())
 		return err
@@ -101,24 +81,16 @@ func (controller *AlarmPolicyController) UpdateAlarmPolicy(ctx echo.Context) err
 }
 
 // UpdateAlarmTarget
-//  * Annotations for Swagger *
-//  @tags         AP
-//  @Summary      전체 알람 타겟 업데이트하기
-//  @Description  전체 알람 타겟을 업데이트 한다.
+//  @tags         Common
+//  @Summary      알람 타겟 업데이트하기
+//  @Description  알람 타겟을 업데이트 한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        AlarmTargetRequest  body      v1.AlarmPolicyRequest  true  "알람 타겟을 변경하기 위한 정보를 주입한다."
-//  @Success      200                {object}  apiHelpers.BasicResponseForm
+//  @Param        AlarmTargetRequest  body      []v1.AlarmTargetRequest  true  "알람 타겟을 변경하기 위한 정보를 주입한다."
+//  @Success      200                 {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/target [put]
 func (controller *AlarmPolicyController) UpdateAlarmTarget(ctx echo.Context) error {
-	var request []models.AlarmTargetRequest
-	err := helpers.BindJsonAndCheckValid(ctx, &request)
-	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
-		return err
-	}
-
-	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmTarget(request)
+	results, err := common.GetAlarmPolicyService(controller.DbInfo).UpdateAlarmTarget(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm target.", err.Error())
 		return err

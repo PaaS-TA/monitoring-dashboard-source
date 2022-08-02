@@ -2,6 +2,8 @@ package caas
 
 import (
 	"fmt"
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
@@ -19,11 +21,13 @@ func GetPodService(config models.CaaS) *PodService{
 }
 
 
-func (service *PodService) GetPodStatus() ([]map[string]interface{}, error) {
-	var resultList []map[string]interface{}
+func (service *PodService) GetPodStatus(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
+	var resultList []map[string]interface{}
 	podStatusBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_POD_PHASE, "")
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	podStatusArray := gjson.Get(string(podStatusBytes), "data.result")
@@ -38,6 +42,7 @@ func (service *PodService) GetPodStatus() ([]map[string]interface{}, error) {
 
 	return resultList, nil
 }
+
 
 func (service *PodService) GetPodList() ([]map[string]interface{}, error) {
 	resultBytes, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+models.PROMQL_POD_LIST, "")

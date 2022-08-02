@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/connections"
-	"paasta-monitoring-api/helpers"
 	"paasta-monitoring-api/models/api/v1"
 	v1service "paasta-monitoring-api/services/api/v1"
 )
@@ -60,18 +59,7 @@ func (a *UserController) GetUsers(c echo.Context) (err error) {
 
 
 func (controller *UserController) GetMember(ctx echo.Context) error {
-	userId := ctx.QueryParam("userId")
-	params := v1.MemberInfos {
-		UserId : userId,
-	}
-
-	validationErr := helpers.CheckValid(params)
-	if validationErr != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", validationErr.Error())
-		return validationErr
-	}
-
-	results, err := v1service.GetUserService(controller.DbInfo).GetMember(params)
+	results, err := v1service.GetUserService(controller.DbInfo).GetMember(ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm policy.", err.Error())
 		return err

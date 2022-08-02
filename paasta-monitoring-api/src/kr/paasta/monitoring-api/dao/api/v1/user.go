@@ -21,7 +21,7 @@ func GetUserDao(db *gorm.DB) *UserDao {
 func (u *UserDao) GetMember(params models.MemberInfos) ([]models.MemberInfos, error) {
 	var members []models.MemberInfos
 
-	result := u.db.Debug().Where(params).Find(&members)
+	result := u.db.Where(params).Find(&members)
 	if result.Error != nil {
 		log.Errorf(result.Error.Error())
 		return nil, result.Error

@@ -2,9 +2,13 @@ package common
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+	"net/http"
+	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"strconv"
 	"time"
@@ -14,20 +18,28 @@ type AlarmActionService struct {
 	DbInfo *gorm.DB
 }
 
-
 func GetAlarmActionService(DbInfo *gorm.DB) *AlarmActionService {
 	return &AlarmActionService{
 		DbInfo: DbInfo,
 	}
 }
 
+func (service *AlarmActionService) CreateAlarmAction(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-func (service *AlarmActionService) CreateAlarmAction(request models.AlarmActionRequest) (string, error) {
-	params := models.AlarmActions {
-		AlarmId : request.AlarmId,
+	var request models.AlarmActionRequest
+	err := helpers.BindJsonAndCheckValid(ctx, &request)
+	if err != nil {
+		logger.Error(err)
+		return "", err
+	}
+	request.RegUser = ctx.Get("userId").(string)
+
+	params := models.AlarmActions{
+		AlarmId:         request.AlarmId,
 		AlarmActionDesc: request.AlarmActionDesc,
-		RegDate: time.Now(),
-		RegUser: request.RegUser,
+		RegDate:         time.Now(),
+		RegUser:         request.RegUser,
 	}
 	alarmParams := models.Alarms{
 		Id: request.AlarmId,
@@ -46,11 +58,10 @@ func (service *AlarmActionService) CreateAlarmAction(request models.AlarmActionR
 	return "SUCCEEDED CREATE ALARM ACTION!", nil
 }
 
-
 func (service *AlarmActionService) GetAlarmAction(ctx echo.Context) ([]models.AlarmActions, error) {
 	alarmId, _ := strconv.Atoi(ctx.QueryParam("alarmId"))
 	params := models.AlarmActions{
-		AlarmId: alarmId,
+		AlarmId:         alarmId,
 		AlarmActionDesc: ctx.QueryParam("alarmActionDesc"),
 	}
 	results, err := common.GetAlarmActionDao(service.DbInfo).GetAlarmAction(params)
@@ -60,27 +71,46 @@ func (service *AlarmActionService) GetAlarmAction(ctx echo.Context) ([]models.Al
 	return results, nil
 }
 
+func (service *AlarmActionService) UpdateAlarmAction(ctx echo.Context) (string, *models.ApiError) {
 
-func (service *AlarmActionService) UpdateAlarmAction(request models.AlarmActionRequest) (string, error) {
-	params := models.AlarmActions {
-		Id : request.Id,
+	var request models.AlarmActionRequest
+	errValid := helpers.BindJsonAndCheckValid(ctx, &request)
+	if errValid != nil {
+		apiHelpers.Respond(ctx, http.StatusBadRequest, models.ERR_PARAM_VALIDATION, errValid.Error())
+		apiError := &models.ApiError{
+			OriginError: errValid,
+			Message:     errValid.Error(),
+		}
+		return "", apiError
+	}
+	params := models.AlarmActions{
+		Id:              request.Id,
 		AlarmActionDesc: request.AlarmActionDesc,
-		ModiDate: time.Now(),
-		ModiUser: request.RegUser,
+		ModiDate:        time.Now(),
+		ModiUser:        ctx.Get("userId").(string),
 	}
 
 	err := common.GetAlarmActionDao(service.DbInfo).UpdateAlarmAction(params)
 	if err != nil {
-		return "FAILED UPDATE ALARM ACTION!", err
+		return models.FAIL_UPD_ALARM_ACTION, err
 	}
-	return "SUCCEEDED UPDATE ALARM ACTION!", nil
+	return models.SUCC_UPD_ALARM_ACTION, nil
 }
 
+func (service *AlarmActionService) DeleteAlarmAction(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-func (service *AlarmActionService) DeleteAlarmAction(request models.AlarmActionRequest) (string, error) {
-	err := common.GetAlarmActionDao(service.DbInfo).DeleteAlarmAction(request)
+	var request models.AlarmActionRequest
+	err := helpers.BindJsonAndCheckValid(ctx, &request)
 	if err != nil {
-		return "FAILED DELETE ALARM ACTION!", err
+		logger.Error(err)
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
+		return "", err
+	}
+	errAction := common.GetAlarmActionDao(service.DbInfo).DeleteAlarmAction(request)
+	if errAction != nil {
+		logger.Error(errAction)
+		return "FAILED DELETE ALARM ACTION!", errAction
 	}
 	return "SUCCEEDED DELETE ALARM ACTION!", nil
 }

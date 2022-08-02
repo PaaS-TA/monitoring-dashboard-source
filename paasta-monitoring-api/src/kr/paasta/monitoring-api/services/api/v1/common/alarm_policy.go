@@ -1,9 +1,12 @@
 package common
 
 import (
-	"gorm.io/gorm"
+	"errors"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"paasta-monitoring-api/dao/api/v1/common"
+	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"time"
 )
@@ -18,36 +21,52 @@ func GetAlarmPolicyService(DbInfo *gorm.DB) *AlarmPolicyService {
 	}
 }
 
+func (service *AlarmPolicyService) CreateAlarmPolicy(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-func (service *AlarmPolicyService) CreateAlarmPolicy(params []models.AlarmPolicies, regUser string) (string, error) {
-	for _, param := range params {
-		param.RegUser = regUser
-		param.RegDate = time.Now()
+	var params []models.AlarmPolicies
+	errValid := helpers.BindJsonAndCheckValid(ctx, &params)
+	if errValid != nil {
+		logger.Error(errValid)
+		return "", errors.New("Invalid JSON provided, please check the request JSON")
+	}
+
+	for i, _ := range params {
+		params[i].RegUser = ctx.Get("userId").(string)
+		params[i].RegDate = time.Now()
 	}
 
 	err := common.GetAlarmPolicyDao(service.DbInfo).CreateAlarmPolicy(params)
 	if err != nil {
-		return "FAILED REGISTER SNS ACCOUNT!", err
+		return "FAILED CREATE ALARM POLICY!", err
 	}
-	return "SUCCEEDED REGISTER SNS ACCOUNT!", nil
+	return "SUCCEEDED CREATE ALARM POLICY!", nil
 }
 
-
-func (service *AlarmPolicyService) GetAlarmPolicy(c echo.Context) ([]models.AlarmPolicies, error) {
+func (service *AlarmPolicyService) GetAlarmPolicy(ctx echo.Context) ([]models.AlarmPolicies, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 	params := models.AlarmPolicies{
-		OriginType: c.QueryParam("originType"),
-		AlarmType:  c.QueryParam("alarmType"),
+		OriginType: ctx.QueryParam("originType"),
+		AlarmType:  ctx.QueryParam("alarmType"),
 	}
 
 	results, err := common.GetAlarmPolicyDao(service.DbInfo).GetAlarmPolicy(params)
 	if err != nil {
+		logger.Error(err)
 		return results, err
 	}
 	return results, nil
 }
 
+func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []models.AlarmPolicyRequest) (string, error) {
+	var params []models.AlarmPolicyRequest
+	err := helpers.BindJsonAndCheckValid(ctx, &params)
+	if err != nil {
+		logger.Error(err)
+		return "", errors.New(models.ERR_PARAM_VALIDATION)
+	}
 	for _, policyParam := range params {
 		param := models.AlarmPolicies{
 			OriginType:        policyParam.OriginType,
@@ -61,17 +80,27 @@ func (service *AlarmPolicyService) UpdateAlarmPolicy(ctx echo.Context, params []
 		}
 		err := common.GetAlarmPolicyDao(service.DbInfo).UpdateAlarmPolicy(param)
 		if err != nil {
+			logger.Error(err)
 			return "FAILED UPDATE POLICY!", err
 		}
 	}
 	return "SUCCEEDED UPDATE POLICY!", nil
 }
 
+func (service *AlarmPolicyService) UpdateAlarmTarget(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-func (service *AlarmPolicyService) UpdateAlarmTarget(request []models.AlarmTargetRequest) (string, error) {
-	for _, request := range request {
-		err := common.GetAlarmPolicyDao(service.DbInfo).UpdateAlarmTarget(request)
+	var params []models.AlarmTargetRequest
+	err := helpers.BindJsonAndCheckValid(ctx, &params)
+	if err != nil {
+		logger.Error(err)
+		return "", errors.New("Invalid JSON provided, please check the request JSON")
+	}
+
+	for _, param := range params {
+		err := common.GetAlarmPolicyDao(service.DbInfo).UpdateAlarmTarget(param)
 		if err != nil {
+			logger.Error(err)
 			return "FAILED UPDATE TARGET!", err
 		}
 	}

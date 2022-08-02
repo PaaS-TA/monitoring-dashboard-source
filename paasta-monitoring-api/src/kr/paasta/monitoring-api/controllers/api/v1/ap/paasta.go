@@ -33,13 +33,13 @@ func GetPaastaController(conn connections.Connections) *PaastaController {
 //  @Produce      json
 //  @Success      200  {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Paasta}
 //  @Router       /api/v1/paasta [get]
-func (p *PaastaController) GetPaastaInfoList(c echo.Context) (err error) {
-	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaInfoList()
+func (p *PaastaController) GetPaastaInfoList(ctx echo.Context) (err error) {
+	results, err := AP.GetApPaastaService(p.DbInfo, p.InfluxDbClient).GetPaastaInfoList(ctx)
 	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, err.Error(), nil)
+		apiHelpers.Respond(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return err
 	}
-	apiHelpers.Respond(c, http.StatusOK, "Success to get Paasta Info List", results)
+	apiHelpers.Respond(ctx, http.StatusOK, "Success to get Paasta Info List", results)
 	return nil
 }
 

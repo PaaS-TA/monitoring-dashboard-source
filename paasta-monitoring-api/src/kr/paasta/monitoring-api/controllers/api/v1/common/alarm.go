@@ -36,8 +36,8 @@ func (ap *AlarmController) GetAlarms(ctx echo.Context) error {
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get alarm status.", err.Error())
 		return err
+	} else {
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get alarms status.", results)
 	}
-
-	apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get alarms status.", results)
 	return nil
 }

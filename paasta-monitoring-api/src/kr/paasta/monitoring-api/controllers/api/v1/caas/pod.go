@@ -20,7 +20,7 @@ func GetPodController(config models.CaaS) *PodController{
 }
 
 func (controller *PodController) GetPodStatus(ctx echo.Context) error {
-	results, err := service.GetPodService(controller.CaaS).GetPodStatus()
+	results, err := service.GetPodService(controller.CaaS).GetPodStatus(ctx)
 	if err != nil {
 		log.Println(err.Error())
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Hypervisor statistics.", err.Error())

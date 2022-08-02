@@ -4,6 +4,7 @@ import (
 	"fmt"
 	client "github.com/influxdata/influxdb1-client/v2"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	dao "paasta-monitoring-api/dao/api/v1/ap"
 	Common "paasta-monitoring-api/dao/api/v1/common"
@@ -35,11 +36,13 @@ func (b *ApBoshService) GetBoshInfoList() ([]models.Bosh, error) {
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshOverview(c echo.Context) (models.BoshOverview, error) {
+func (b *ApBoshService) GetBoshOverview(ctx echo.Context) (models.BoshOverview, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var result models.BoshOverview
-	boshSummary, err := b.GetBoshSummary(c)
+	boshSummary, err := b.GetBoshSummary(ctx)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return result, err
 	}
 
@@ -63,7 +66,9 @@ func (b *ApBoshService) GetBoshOverview(c echo.Context) (models.BoshOverview, er
 	return result, nil
 }
 
-func (b *ApBoshService) GetBoshSummary(c echo.Context) ([]models.BoshSummary, error) {
+func (b *ApBoshService) GetBoshSummary(ctx echo.Context) ([]models.BoshSummary, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var results []models.BoshSummary
 	//var errs []models.ErrMessage
 	var resultsResponse map[string]interface{}
@@ -72,10 +77,9 @@ func (b *ApBoshService) GetBoshSummary(c echo.Context) ([]models.BoshSummary, er
 	var params models.AlarmPolicies
 	serverThresholds, err := Common.GetAlarmPolicyDao(b.DbInfo).GetAlarmPolicy(params)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 		return results, err
 	}
-	//fmt.Println(serverThresholds)
 
 	for _, boshInfo := range b.BoshInfoList {
 		var boshSummary models.BoshSummary
@@ -298,14 +302,16 @@ func (b *ApBoshService) GetBoshSummaryMetric(boshSummary models.BoshSummary) ([]
 	return cpuCore, cpuUsage, memTotal, memFree, diskTotal, diskUsage, diskDataTotal, diskDataUsage, nil
 }
 
-func (b *ApBoshService) GetBoshProcessByMemory() ([]models.BoshProcess, error) {
+func (b *ApBoshService) GetBoshProcessByMemory(ctx echo.Context) ([]models.BoshProcess, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var results []models.BoshProcess
 
 	for _, BoshInfo := range b.BoshInfoList {
-		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(BoshInfo.UUID)
+		resp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshProcessByMemory(ctx.QueryParam("uuid"))
 
 		if err != nil {
-			fmt.Println(err.Error())
+			logger.Error(err)
 			return results, err
 		} else {
 			valueList, _ := helpers.InfluxConverterToMap(resp)
@@ -356,111 +362,117 @@ func (b *ApBoshService) GetBoshProcessByMemory() ([]models.BoshProcess, error) {
 	return results, nil
 }
 
-func (b *ApBoshService) GetBoshChart(boshChart models.BoshChart) ([]models.BoshChart, error) {
+func (b *ApBoshService) GetBoshChart(ctx echo.Context) ([]models.BoshChart, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
+	var boshChart models.BoshChart
+	boshChart.UUID = ctx.Param("uuid")
+	boshChart.DefaultTimeRange = ctx.QueryParam("defaultTimeRange")
+	boshChart.TimeRangeFrom = ctx.QueryParam("timeRangeFrom")
+	boshChart.TimeRangeTo = ctx.QueryParam("timeRangeTo")
+	boshChart.GroupBy = ctx.QueryParam("groupBy")
+
 	var results []models.BoshChart
 
-	for _, boshInfo := range b.BoshInfoList {
-		boshChart.MetricName = models.MTR_CPU_CORE
-		cpuUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuUsageList(boshChart)
-		boshChart.MetricName = models.MTR_CPU_LOAD_1M
-		cpuLoad1MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
-		boshChart.MetricName = models.MTR_CPU_LOAD_5M
-		cpuLoad5MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
-		boshChart.MetricName = models.MTR_CPU_LOAD_15M
-		cpuLoad15MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
+	boshChart.MetricName = models.MTR_CPU_CORE
+	cpuUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuUsageList(boshChart)
+	boshChart.MetricName = models.MTR_CPU_LOAD_1M
+	cpuLoad1MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
+	boshChart.MetricName = models.MTR_CPU_LOAD_5M
+	cpuLoad5MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
+	boshChart.MetricName = models.MTR_CPU_LOAD_15M
+	cpuLoad15MResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshCpuLoadList(boshChart)
 
-		boshChart.MetricName = models.MTR_MEM_USAGE
-		memoryUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshMemoryUsageList(boshChart)
+	boshChart.MetricName = models.MTR_MEM_USAGE
+	memoryUsageResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshMemoryUsageList(boshChart)
 
-		boshChart.MetricName = models.MTR_DISK_USAGE
-		diskUsageRootResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskUsageList(boshChart)
-		boshChart.MetricName = models.MTR_DISK_DATA_USAGE
-		diskUsageVcapDataResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskUsageList(boshChart)
+	boshChart.MetricName = models.MTR_DISK_USAGE
+	diskUsageRootResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskUsageList(boshChart)
+	boshChart.MetricName = models.MTR_DISK_DATA_USAGE
+	diskUsageVcapDataResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskUsageList(boshChart)
 
-		boshChart.MetricName = "diskIOStats.\\/\\..*.readBytes"
-		diskIoRootReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
-		boshChart.MetricName = "diskIOStats.\\/\\..*.writeBytes"
-		diskIoRootWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
-		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.readBytes"
-		diskIoVcapReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
-		boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.writeBytes"
-		diskIoVcapWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
+	boshChart.MetricName = "diskIOStats.\\/\\..*.readBytes"
+	diskIoRootReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
+	boshChart.MetricName = "diskIOStats.\\/\\..*.writeBytes"
+	diskIoRootWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
+	boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.readBytes"
+	diskIoVcapReadByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
+	boshChart.MetricName = "diskIOStats.\\/var\\/vcap\\/data\\..*.writeBytes"
+	diskIoVcapWriteByteList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshDiskIoList(boshChart)
 
-		boshChart.MetricName = "networkIOStats.eth0.bytesSent"
-		networkByteSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkByteList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.bytesRecv"
-		networkByteRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkByteList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.packetSent"
-		networkPacketSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkPacketList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.packetRecv"
-		networkPacketRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkPacketList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.dropIn"
-		networkDropInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkDropList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.dropOut"
-		networkDropOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkDropList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.errIn"
-		networkErrorInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
-		boshChart.MetricName = "networkIOStats.eth0.errOut"
-		networkErrorOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
-		if err != nil {
-			fmt.Println(err.Error())
-			return results, err
-		}
-		fmt.Println(boshInfo)
-
-		cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResp, models.RESP_DATA_CPU_NAME)
-		cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResp, models.RESP_DATA_LOAD_1M_NAME)
-		cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResp, models.RESP_DATA_LOAD_5M_NAME)
-		cpuLoad15M, _ := helpers.InfluxConverterList(cpuLoad15MResp, models.RESP_DATA_LOAD_5M_NAME)
-		memoryUsage, _ := helpers.InfluxConverter4Usage(memoryUsageResp, models.MTR_MEM_USAGE)
-		diskRootUsage, _ := helpers.InfluxConverterList(diskUsageRootResp, models.MTR_MEM_USAGE)
-		diskVcapDataUsage, _ := helpers.InfluxConverterList(diskUsageVcapDataResp, models.MTR_MEM_USAGE)
-
-		diskIoRootReadByte, _ := helpers.InfluxConverterList(diskIoRootReadByteList, "/-read")
-		diskIoRootWriteByte, _ := helpers.InfluxConverterList(diskIoRootWriteByteList, "/-write")
-		diskIoVcapReadByte, _ := helpers.InfluxConverterList(diskIoVcapReadByteList, "data-read")
-		diskIoVcapWriteByte, _ := helpers.InfluxConverterList(diskIoVcapWriteByteList, "data-write")
-
-		networkByteSent, _ := helpers.InfluxConverterList(networkByteSentList, "sent")
-		networkByteRecv, _ := helpers.InfluxConverterList(networkByteRecvList, "recv")
-		networkPacketSent, _ := helpers.InfluxConverterList(networkPacketSentList, "in")
-		networkPacketRecv, _ := helpers.InfluxConverterList(networkPacketRecvList, "out")
-		networkDropIn, _ := helpers.InfluxConverterList(networkDropInResp, "in")
-		networkDropOut, _ := helpers.InfluxConverterList(networkDropOutResp, "out")
-		networkErrorIn, _ := helpers.InfluxConverterList(networkErrorInResp, "in")
-		networkErrorOut, _ := helpers.InfluxConverterList(networkErrorOutResp, "out")
-
-		MetricData := map[string]interface{}{
-			"cpuUsage":            cpuUsage,
-			"cpuLoad1M":           cpuLoad1M,
-			"cpuLoad5M":           cpuLoad5M,
-			"cpuLoad15M":          cpuLoad15M,
-			"memoryUsage":         memoryUsage,
-			"diskRootUsage":       diskRootUsage,
-			"diskVcapDataUsage":   diskVcapDataUsage,
-			"diskIoRootReadByte":  diskIoRootReadByte,
-			"diskIoRootWriteByte": diskIoRootWriteByte,
-			"diskIoVcapReadByte":  diskIoVcapReadByte,
-			"diskIoVcapWriteByte": diskIoVcapWriteByte,
-			"networkByteSent":     networkByteSent,
-			"networkByteRecv":     networkByteRecv,
-			"networkPacketSent":   networkPacketSent,
-			"networkPacketRecv":   networkPacketRecv,
-			"networkDropIn":       networkDropIn,
-			"networkDropOut":      networkDropOut,
-			"networkErrorIn":      networkErrorIn,
-			"networkErrorOut":     networkErrorOut,
-		}
-
-		var resultBoshChart models.BoshChart
-		resultBoshChart.UUID = boshChart.UUID
-		resultBoshChart.DefaultTimeRange = boshChart.DefaultTimeRange
-		resultBoshChart.TimeRangeFrom = boshChart.TimeRangeFrom
-		resultBoshChart.TimeRangeTo = boshChart.TimeRangeTo
-		resultBoshChart.GroupBy = boshChart.GroupBy
-		resultBoshChart.MetricData = MetricData
-		results = append(results, resultBoshChart)
+	boshChart.MetricName = "networkIOStats.eth0.bytesSent"
+	networkByteSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkByteList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.bytesRecv"
+	networkByteRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkByteList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.packetSent"
+	networkPacketSentList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkPacketList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.packetRecv"
+	networkPacketRecvList, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkPacketList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.dropIn"
+	networkDropInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkDropList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.dropOut"
+	networkDropOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkDropList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.errIn"
+	networkErrorInResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
+	boshChart.MetricName = "networkIOStats.eth0.errOut"
+	networkErrorOutResp, err := dao.GetBoshDao(b.DbInfo, b.InfluxDbClient, b.BoshInfoList).GetBoshNetworkErrorList(boshChart)
+	if err != nil {
+		logger.Error(err)
+		return results, err
 	}
+
+	cpuUsage, _ := helpers.InfluxConverterList(cpuUsageResp, models.RESP_DATA_CPU_NAME)
+	cpuLoad1M, _ := helpers.InfluxConverterList(cpuLoad1MResp, models.RESP_DATA_LOAD_1M_NAME)
+	cpuLoad5M, _ := helpers.InfluxConverterList(cpuLoad5MResp, models.RESP_DATA_LOAD_5M_NAME)
+	cpuLoad15M, _ := helpers.InfluxConverterList(cpuLoad15MResp, models.RESP_DATA_LOAD_5M_NAME)
+	memoryUsage, _ := helpers.InfluxConverter4Usage(memoryUsageResp, models.MTR_MEM_USAGE)
+	diskRootUsage, _ := helpers.InfluxConverterList(diskUsageRootResp, models.MTR_MEM_USAGE)
+	diskVcapDataUsage, _ := helpers.InfluxConverterList(diskUsageVcapDataResp, models.MTR_MEM_USAGE)
+
+	diskIoRootReadByte, _ := helpers.InfluxConverterList(diskIoRootReadByteList, "/-read")
+	diskIoRootWriteByte, _ := helpers.InfluxConverterList(diskIoRootWriteByteList, "/-write")
+	diskIoVcapReadByte, _ := helpers.InfluxConverterList(diskIoVcapReadByteList, "data-read")
+	diskIoVcapWriteByte, _ := helpers.InfluxConverterList(diskIoVcapWriteByteList, "data-write")
+
+	networkByteSent, _ := helpers.InfluxConverterList(networkByteSentList, "sent")
+	networkByteRecv, _ := helpers.InfluxConverterList(networkByteRecvList, "recv")
+	networkPacketSent, _ := helpers.InfluxConverterList(networkPacketSentList, "in")
+	networkPacketRecv, _ := helpers.InfluxConverterList(networkPacketRecvList, "out")
+	networkDropIn, _ := helpers.InfluxConverterList(networkDropInResp, "in")
+	networkDropOut, _ := helpers.InfluxConverterList(networkDropOutResp, "out")
+	networkErrorIn, _ := helpers.InfluxConverterList(networkErrorInResp, "in")
+	networkErrorOut, _ := helpers.InfluxConverterList(networkErrorOutResp, "out")
+
+	MetricData := map[string]interface{}{
+		"cpuUsage":            cpuUsage,
+		"cpuLoad1M":           cpuLoad1M,
+		"cpuLoad5M":           cpuLoad5M,
+		"cpuLoad15M":          cpuLoad15M,
+		"memoryUsage":         memoryUsage,
+		"diskRootUsage":       diskRootUsage,
+		"diskVcapDataUsage":   diskVcapDataUsage,
+		"diskIoRootReadByte":  diskIoRootReadByte,
+		"diskIoRootWriteByte": diskIoRootWriteByte,
+		"diskIoVcapReadByte":  diskIoVcapReadByte,
+		"diskIoVcapWriteByte": diskIoVcapWriteByte,
+		"networkByteSent":     networkByteSent,
+		"networkByteRecv":     networkByteRecv,
+		"networkPacketSent":   networkPacketSent,
+		"networkPacketRecv":   networkPacketRecv,
+		"networkDropIn":       networkDropIn,
+		"networkDropOut":      networkDropOut,
+		"networkErrorIn":      networkErrorIn,
+		"networkErrorOut":     networkErrorOut,
+	}
+
+	var resultBoshChart models.BoshChart
+	resultBoshChart.UUID = boshChart.UUID
+	resultBoshChart.DefaultTimeRange = boshChart.DefaultTimeRange
+	resultBoshChart.TimeRangeFrom = boshChart.TimeRangeFrom
+	resultBoshChart.TimeRangeTo = boshChart.TimeRangeTo
+	resultBoshChart.GroupBy = boshChart.GroupBy
+	resultBoshChart.MetricData = MetricData
+	results = append(results, resultBoshChart)
 
 	return results, nil
 }

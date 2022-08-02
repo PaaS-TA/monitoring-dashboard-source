@@ -1,6 +1,8 @@
 package caas
 
 import (
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"fmt"
 	"paasta-monitoring-api/helpers"
@@ -20,13 +22,16 @@ func GetClusterService(config models.CaaS) *ClusterService{
 	}
 }
 
-func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
+func (service *ClusterService) GetClusterAverage(ctx echo.Context) (map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
+	result := make(map[string]interface{})
+	typeParam := ctx.Param("type")
 	switch typeParam {
 	case "pod":
 		podUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_POD_USAGE, "")
 		if err != nil {
+			logger.Error(err)
 			return nil, err
 		}
 		podUsage := gjson.Get(string(podUsageBytes), "data.result.0.value.1")
@@ -37,6 +42,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 	case "cpu":
 		cpuUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_CPU_USAGE, "")
 		if err != nil {
+			logger.Error(err)
 			return nil, err
 		}
 		cpuUsage := gjson.Get(string(cpuUsageBytes), "data.result.0.value.1")
@@ -47,6 +53,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 	case "disk" :
 		diskUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_DISK_USAGE, "")
 		if err != nil {
+			logger.Error(err)
 			return nil, err
 		}
 		diskUsage := gjson.Get(string(diskUsageBytes), "data.result.0.value.1")
@@ -57,6 +64,7 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 	case "memory" :
 		memoryUsageBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_MEMORY_USAGE, "")
 		if err != nil {
+			logger.Error(err)
 			return nil, err
 		}
 		memoryUsage := gjson.Get(string(memoryUsageBytes), "data.result.0.value.1")
@@ -69,9 +77,10 @@ func (service *ClusterService) GetClusterAverage(typeParam string) (map[string]i
 }
 
 
-func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, error) {
-	var result []map[string]interface{}
+func (service *ClusterService) GetWorkNodeList(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
+	var result []map[string]interface{}
 	nameListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_NAME_LIST, "")
 	memoryListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USAGE, "")
 	memoryUseListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_MEMORY_USE, "")
@@ -80,6 +89,7 @@ func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, erro
 	diskUseListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_DISK_USE, "")
 	conditionListBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query", "query="+models.PROMQL_WORKNODE_CONDITION, "")
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -144,8 +154,13 @@ func (service *ClusterService) GetWorkNodeList() ([]map[string]interface{}, erro
 }
 
 
-func (service *ClusterService) GetWorkNode(nodeName string, instanceName string) ([]map[string]interface{}, error){
+func (service *ClusterService) GetWorkNode(ctx echo.Context) ([]map[string]interface{}, error){
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
+
 	var result []map[string]interface{}
+
+	nodeName := ctx.QueryParam("nodename")
+	instanceName := ctx.QueryParam("instance")
 	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
 
 	// 1.podUsage (input:nodeName)
@@ -159,18 +174,22 @@ func (service *ClusterService) GetWorkNode(nodeName string, instanceName string)
 
 	podSeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqPodUsage, "")
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	cpuSeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqCpuUsage, "")
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	memorySeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqMemoryUsage, "")
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	diskSeriesBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl + "/query_range", "query="+pqDiskUsage, "")
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -240,20 +259,12 @@ func (service *ClusterService) GetWorkNode(nodeName string, instanceName string)
 }
 
 
-func getUnixTimeFromTo(interval int64) (string, string) {
+func GetPromqlFromToParameter(interval int64, timeStep string) string {
 	currentTime := time.Now().Unix()
 	previousTime := currentTime - interval
+	start := strconv.FormatInt(previousTime, 10)
+	end := strconv.FormatInt(currentTime, 10)
 
-	pTime := strconv.FormatInt(previousTime, 10)
-	cTime := strconv.FormatInt(currentTime, 10)
-
-	return pTime, cTime
-}
-
-
-func GetPromqlFromToParameter(interval int64, timeStep string) string {
-	fromTime, toTime := getUnixTimeFromTo(interval)
-
-	parameter := "&start=" + fromTime + "&end=" + toTime + "&step=" + timeStep
+	parameter := "&start=" + start + "&end=" + end + "&step=" + timeStep
 	return parameter
 }

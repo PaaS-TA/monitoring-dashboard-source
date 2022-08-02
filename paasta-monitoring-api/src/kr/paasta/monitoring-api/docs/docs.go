@@ -143,11 +143,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "신규 작성할 알람 정보를 주입한다.",
-                        "name": "AlarmActionRequest",
+                        "name": "AlarmActions",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.AlarmActionRequest"
+                            "$ref": "#/definitions/v1.AlarmActions"
                         }
                     }
                 ],
@@ -235,9 +235,34 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "전체 알람 정책 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Alarm Type",
+                        "name": "alarmType",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -260,7 +285,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "전체 알람 정책을 업데이트 한다.",
+                "description": "알람 정책을 업데이트 한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -268,9 +293,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
-                "summary": "전체 알람 정책 업데이트하기",
+                "summary": "알람 정책 업데이트하기",
                 "parameters": [
                     {
                         "description": "알람 정책을 변경하기 위한 정보를 주입한다.",
@@ -278,7 +303,10 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                            }
                         }
                     }
                 ],
@@ -290,11 +318,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/v1/alarm/target": {
-            "put": {
-                "description": "전체 알람 타겟을 업데이트 한다.",
+            },
+            "post": {
+                "description": "알람 정책을 생성한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -302,17 +328,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
-                "summary": "전체 알람 타겟 업데이트하기",
+                "summary": "알람 정책 생성하기",
                 "parameters": [
                     {
-                        "description": "알람 타겟을 변경하기 위한 정보를 주입한다.",
-                        "name": "AlarmTargetRequest",
+                        "description": "생성할 알람 정책 정보를 주입한다.",
+                        "name": "AlarmPolicies",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.AlarmPolicyRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmPolicies"
+                            }
                         }
                     }
                 ],
@@ -326,7 +355,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/alarm/sns": {
+        "/api/v1/alarm/sns": {
             "get": {
                 "description": "알람 받는 SNS 계정 정보를 가져온다.",
                 "consumes": [
@@ -336,9 +365,37 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받는 SNS 계정 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "all",
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "telegram",
+                        "description": "SNS Type",
+                        "name": "snsType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SNS Send YN",
+                        "name": "snsSendYn",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -369,17 +426,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받을 SNS 계정 수정하기",
                 "parameters": [
                     {
-                        "description": "수정할 SNS 계정 정보를 주입한다.",
-                        "name": "SnsAccountRequest",
+                        "description": "수정할 SNS 계정 정보(channelId)를  주입한다.",
+                        "name": "AlarmSns",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                            "$ref": "#/definitions/v1.AlarmSns"
                         }
                     }
                 ],
@@ -401,17 +458,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받을 SNS 계정 등록하기",
                 "parameters": [
                     {
                         "description": "알람 받을 SNS 계정 정보를 주입한다.",
-                        "name": "SnsAccountRequest",
+                        "name": "AlarmSns",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmSns"
+                            }
                         }
                     }
                 ],
@@ -433,17 +493,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 받는 SNS 계정 삭제하기",
                 "parameters": [
                     {
-                        "description": "삭제할 SNS 계정을 정보(ChannelId)를  주입한다.",
-                        "name": "SnsAccountRequest",
+                        "description": "삭제할 SNS 계정 정보(channelId)를  주입한다.",
+                        "name": "AlarmSns",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.SnsAccountRequest"
+                            "$ref": "#/definitions/v1.AlarmSns"
                         }
                     }
                 ],
@@ -457,7 +517,68 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/alarm/statistics/resource": {
+        "/api/v1/alarm/stats": {
+            "get": {
+                "description": "알람 통계 그래프를 그리기 위한 데이터를 가져온다.\n필수 인자를 제외한 옵션 인자는 중복하여 사용할 수 없다.\n즉 originType, resourceType을 각각 개별로 사용해야 한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 통계 그래프를 그리기 위한 데이터 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "d",
+                            "w",
+                            "m",
+                            "y"
+                        ],
+                        "type": "string",
+                        "description": "Period",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "bos",
+                            "pas",
+                            "con",
+                            "ias"
+                        ],
+                        "type": "string",
+                        "description": "Origin Type",
+                        "name": "originType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Resource Type",
+                        "name": "resourceType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/stats/resource": {
             "get": {
                 "description": "알람 통계 그래프(자원별)를 그리기 위한 데이터를 가져온다.",
                 "consumes": [
@@ -467,9 +588,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
+                    "Common"
                 ],
                 "summary": "알람 통계 그래프(자원별)를 그리기 위한 데이터 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "d",
+                            "w",
+                            "m",
+                            "y"
+                        ],
+                        "type": "string",
+                        "description": "Period",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -480,9 +616,84 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ap/alarm/statistics/total": {
+        "/api/v1/alarm/stats/service": {
             "get": {
-                "description": "알람 통계 그래프를 그리기 위한 데이터를 가져온다.",
+                "description": "알람 통계 그래프(서비스별)를 그리기 위한 데이터를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 통계 그래프(서비스별)를 그리기 위한 데이터 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "d",
+                            "w",
+                            "m",
+                            "y"
+                        ],
+                        "type": "string",
+                        "description": "Period",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alarm/target": {
+            "put": {
+                "description": "알람 타겟을 업데이트 한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "알람 타겟 업데이트하기",
+                "parameters": [
+                    {
+                        "description": "알람 타겟을 변경하기 위한 정보를 주입한다.",
+                        "name": "AlarmTargetRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.AlarmTargetRequest"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh": {
+            "get": {
+                "description": "BOSH 목록을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -492,12 +703,97 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "알람 통계 그래프를 그리기 위한 데이터 가져오기",
+                "summary": "BOSH 목록 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.Bosh"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ap/bosh/chart/{uuid}": {
+            "get": {
+                "description": "BOSH 차트 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AP"
+                ],
+                "summary": "BOSH 차트 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "36dd3d08-5198-42b6-4130-d0c04479236f",
+                        "description": "BOSH의 UUID를 주입한다.",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "15m",
+                        "description": "Default Time Range",
+                        "name": "defaultTimeRange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time Range From",
+                        "name": "timeRangeFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time Range To",
+                        "name": "timeRangeTo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "Group By",
+                        "name": "groupBy",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.BoshChart"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -505,7 +801,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/bosh/overview": {
             "get": {
-                "description": "Bosh Overview 정보를 가져온다.",
+                "description": "BOSH Overview 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -515,7 +811,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh Overview 정보를 가져온다.",
+                "summary": "BOSH Overview 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -540,7 +836,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/bosh/process": {
             "get": {
-                "description": "Bosh의 프로세스 목록을 가져온다.",
+                "description": "BOSH 프로세스 목록을 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -550,13 +846,15 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh의 프로세스 목록을 가져온다.",
+                "summary": "BOSH 프로세스 목록 가져오기",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Bosh의 프로세스 목록 조회시 Bosh ID를 주입한다.",
+                        "example": "36dd3d08-5198-42b6-4130-d0c04479236f",
+                        "description": "BOSH의 UUID를 주입한다.",
                         "name": "uuid",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -583,7 +881,7 @@ const docTemplate = `{
         },
         "/api/v1/ap/bosh/summary": {
             "get": {
-                "description": "Bosh Summary 정보를 가져온다.",
+                "description": "BOSH Summary 정보를 가져온다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -593,7 +891,7 @@ const docTemplate = `{
                 "tags": [
                     "AP"
                 ],
-                "summary": "Bosh Summary 정보를 가져온다.",
+                "summary": "BOSH Summary 정보 가져오기",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1268,9 +1566,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/bosh": {
+        "/api/v1/log/{uuid}": {
             "get": {
-                "description": "Bosh의 목록을 가져온다.",
+                "description": "로그 정보를 가져온다.\n특정기간(대상날짜, 시작시간, 종료시간 사용) 로그 조회와 최근기간 로그 조회 파라미터는 중복 사용이 불가능하다.\n또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1278,118 +1576,63 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "AP"
-                ],
-                "summary": "Bosh의 목록을 가져온다.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.Bosh"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/bosh/Chart": {
-            "get": {
-                "description": "Bosh의 차트 정보를 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AP"
-                ],
-                "summary": "Bosh의 차트 정보를 가져온다.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bosh의 차트 정보 조회시 Bosh ID를 주입한다.",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.BoshChart"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/log": {
-            "get": {
-                "description": "로그 정보를 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
+                    "Common"
                 ],
                 "summary": "로그 정보 가져오기",
                 "parameters": [
                     {
+                        "enum": [
+                            "36dd3d08-5198-42b6-4130-d0c04479236f",
+                            "f1db5cd8-3e5b-4980-966f-9fa88d8d85fd"
+                        ],
                         "type": "string",
-                        "description": "PaaS-TA Core 별 로그 정보 조회시 VM UUID를 주입한다.",
+                        "description": "로그 조회시 대상 VM의 UUID를 주입한다.",
                         "name": "uuid",
-                        "in": "query"
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "bosh",
+                            "cf"
+                        ],
+                        "type": "string",
+                        "description": "로그 정보를 조회하고자 하는 타입을 지정한다.",
+                        "name": "logType",
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "description": "PaaS-TA Core 별 로그 정보 조회시 키워드 (keyword)를      주입한다.",
+                        "description": "로그 조회시 특정 내용을 포함하는 키워드 검색이 필요할 경우 사용한다.",
                         "name": "keyword",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "PaaS-TA Core 별 로그 정보 조회시 대상날짜 (targetDate)를  주입한다.",
+                        "example": "2022-07-28",
+                        "description": "로그 정보를 조회하고자 하는 대상 날짜를 주입한다.",
                         "name": "targetDate",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "PaaS-TA Core 별 로그 정보 조회시 시작시간 (startTime)를   주입한다.",
+                        "example": "09:00:00",
+                        "description": "로그 정보를 조회하고자 하는 시작 시간를 주입한다.",
                         "name": "startTime",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "PaaS-TA Core 별 로그 정보 조회시 종료시간 (endTime)를     주입한다.",
+                        "example": "18:00:00",
+                        "description": "로그 정보를 조회하고자 하는 종료 시간를 주입한다.",
                         "name": "endTime",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "PaaS-TA Core 별 로그 정보 조회시 조회기간 (period)를      주입한다.",
+                        "example": "10s",
+                        "description": "로그 정보 조회시 현재를 기준으로 특정 기간 동안의 내용을 조회한다.",
                         "name": "period",
                         "in": "query"
                     }
@@ -1682,13 +1925,29 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "alarmActionDesc": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Modify From Swagger Web"
                 },
                 "alarmId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 115
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "v1.AlarmActions": {
+            "type": "object",
+            "properties": {
+                "alarmActionDesc": {
+                    "type": "string",
+                    "example": "Creat From Swagger Web"
+                },
+                "alarmId": {
+                    "type": "integer",
+                    "example": 115
                 }
             }
         },
@@ -1696,40 +1955,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "alarmType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cpu"
                 },
                 "comment": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Init From Swagger Web"
                 },
                 "criticalThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 99
                 },
                 "id": {
                     "type": "integer"
                 },
                 "measureTime": {
-                    "type": "integer"
-                },
-                "modiDate": {
-                    "type": "string"
-                },
-                "modiUser": {
-                    "type": "string"
+                    "type": "integer",
+                    "example": 600
                 },
                 "originType": {
-                    "type": "string"
-                },
-                "regDate": {
-                    "type": "string"
-                },
-                "regUser": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bos"
                 },
                 "repeatTime": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 10
                 },
                 "warningThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 88
                 }
             }
         },
@@ -1740,22 +1994,28 @@ const docTemplate = `{
             ],
             "properties": {
                 "alarmType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cpu"
                 },
                 "criticalThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 89
                 },
                 "measureTime": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 600
                 },
                 "originType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bos"
                 },
                 "repeatTime": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 10
                 },
                 "warningThreshold": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 88
                 }
             }
         },
@@ -1766,34 +2026,48 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "expl": {
-                    "type": "string"
-                },
-                "modiDate": {
-                    "type": "string"
-                },
-                "modiUser": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "expl_test"
                 },
                 "originType": {
-                    "type": "string"
-                },
-                "regDate": {
-                    "type": "string"
-                },
-                "regUser": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "all"
                 },
                 "snsId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "paasta_123"
                 },
                 "snsSendYN": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Y"
                 },
                 "snsType": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "telegram"
                 },
                 "token": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "token_123"
+                }
+            }
+        },
+        "v1.AlarmTargetRequest": {
+            "type": "object",
+            "required": [
+                "originType"
+            ],
+            "properties": {
+                "mailAddress": {
+                    "type": "string",
+                    "example": "paasta-admin@paasta.org"
+                },
+                "mailSendYN": {
+                    "type": "string",
+                    "example": "N"
+                },
+                "originType": {
+                    "type": "string",
+                    "example": "bos"
                 }
             }
         },
@@ -2368,29 +2642,6 @@ const docTemplate = `{
                 "refreshToken": {
                     "type": "string",
                     "example": "refreshToken"
-                }
-            }
-        },
-        "v1.SnsAccountRequest": {
-            "type": "object",
-            "properties": {
-                "expl": {
-                    "type": "string"
-                },
-                "originType": {
-                    "type": "string"
-                },
-                "snsId": {
-                    "type": "string"
-                },
-                "snsSendYN": {
-                    "type": "string"
-                },
-                "snsType": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
                 }
             }
         },

@@ -16,7 +16,6 @@ func GetAlarmActionDao(DbInfo *gorm.DB) *AlarmActionDao {
 	}
 }
 
-
 func (dao *AlarmActionDao) CreateAlarmAction(params models.AlarmActions) error {
 	results := dao.DbInfo.Debug().Create(&params)
 
@@ -27,7 +26,6 @@ func (dao *AlarmActionDao) CreateAlarmAction(params models.AlarmActions) error {
 
 	return nil
 }
-
 
 func (dao *AlarmActionDao) GetAlarmAction(params models.AlarmActions) ([]models.AlarmActions, error) {
 	var response []models.AlarmActions
@@ -41,21 +39,21 @@ func (dao *AlarmActionDao) GetAlarmAction(params models.AlarmActions) ([]models.
 	return response, nil
 }
 
-
-func (dao *AlarmActionDao) UpdateAlarmAction(params models.AlarmActions) error {
+func (dao *AlarmActionDao) UpdateAlarmAction(params models.AlarmActions) *models.ApiError {
 	results := dao.DbInfo.Debug().Model(&params).Where("id = ?", params.Id).Updates(&params)
 
 	if results.Error != nil {
-		fmt.Println(results.Error)
-		return results.Error
+		return &models.ApiError{
+			OriginError: results.Error,
+			Message:     results.Error.Error(),
+		}
 	}
 
 	return nil
 }
 
-
 func (dao *AlarmActionDao) DeleteAlarmAction(params models.AlarmActionRequest) error {
-	results := dao.DbInfo.Debug().Model(&params).Where("id = ?", params.Id).Delete(&params)
+	results := dao.DbInfo.Debug().Table("alarm_actions").Where("id = ?", params.Id).Delete(&params)
 
 	if results.Error != nil {
 		fmt.Println(results.Error)

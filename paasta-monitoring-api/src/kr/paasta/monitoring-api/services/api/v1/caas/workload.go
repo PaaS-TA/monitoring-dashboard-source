@@ -1,8 +1,9 @@
 package caas
 
 import (
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
-	"log"
 	"paasta-monitoring-api/helpers"
 	models "paasta-monitoring-api/models/api/v1"
 	"runtime"
@@ -23,7 +24,7 @@ func GetWorkloadService(config models.CaaS) *WorkloadService{
 }
 
 
-func (service *WorkloadService) GetWorkloadStatus() ([]map[string]interface{}, error) {
+func (service *WorkloadService) GetWorkloadStatus(ctx echo.Context) ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 
 	deploymentTotalResult, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query=" + models.PROMQL_WORKLOAD_DEPLOYMENT_TOTAL, "")
@@ -132,14 +133,21 @@ func (service *WorkloadService) GetWorkloadList() ([]map[string]interface{}, err
 
 var metricTypes = [...]string{"cpu", "memory", "disk"}
 var metricValues = [len(metricTypes)]float64{}
-func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) ([]map[string]interface{}, error) {
-	var result []map[string]interface{}
+func (service *WorkloadService) GetWorkloadDetailMetrics(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
 	runtime.GOMAXPROCS(5)
+
+	var result []map[string]interface{}
+	workloadParam := ctx.QueryParam("workload")
 	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
 
 	promqlWorkloadList := "count(kube_" + workloadParam + "_metadata_generation)by(namespace," + workloadParam + ")"
-	workloadsByte, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlWorkloadList, "") // Retrieve workload list per type
+	workloadsByte, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlWorkloadList, "") // Retrieve workload list per type
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 	workloadArray := gjson.Get(string(workloadsByte), "data.result")
 
 	// cpu, memory, disk 배열 루프
@@ -189,16 +197,22 @@ func (service *WorkloadService) GetWorkloadDetailMetrics(workloadParam string) (
 		result = append(result, seriesMap)
 
 	}
-	log.Printf("result : %v\n", result)
+	logger.Debug("result : %v\n", result)
 	return result, nil
 }
 
 
-func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) ([]map[string]interface{}, error) {
-	var containerList []map[string]interface{}
+func (service *WorkloadService) GetWorkloadContainerList(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
+	var containerList []map[string]interface{}
+	workloadParam := ctx.QueryParam("workload")
 	promqlWorkloadList := "count(kube_" + workloadParam + "_metadata_generation)by(namespace," + workloadParam + ")"
-	workloadsByte, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlWorkloadList, "") // Retrieve workload list per type
+	workloadsByte, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlWorkloadList, "") // Retrieve workload list per type
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 	workloadArray := gjson.Get(string(workloadsByte), "data.result")
 
 	var waitGroup sync.WaitGroup
@@ -226,7 +240,11 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 
 	var cpuUseList []map[string]interface{}
 	promqlCpuUse := "sum(container_cpu_usage_seconds_total{container!='POD',image!=''})by(namespace,pod,container)"
-	cpuUseByte, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlCpuUse, "") // Retrieve container list in workload
+	cpuUseByte, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query", "query="+promqlCpuUse, "") // Retrieve container list in workload
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 	cpuUseArray := gjson.Get(string(cpuUseByte), "data.result")
 	for _, item := range cpuUseArray.Array() {
 		cpuUseMap := make(map[string]interface{})
@@ -353,16 +371,24 @@ func (service *WorkloadService) GetWorkloadContainerList(workloadParam string) (
 }
 
 
-func (service *WorkloadService) GetContainerMetrics(namespace string, container string, pod string) ([]map[string]interface{}, error) {
-	var resultList []map[string]interface{}
+func (service *WorkloadService) GetContainerMetrics(ctx echo.Context) ([]map[string]interface{}, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
+	var resultList []map[string]interface{}
+	namespace := ctx.QueryParam("namespace")
+	container := ctx.QueryParam("container")
+	pod := ctx.QueryParam("pod")
 	fromToTimeParmameter := GetPromqlFromToParameter(3600, "600")
 	pqCpuUsage := "sum(container_cpu_usage_seconds_total{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
 	pqMemoryUsage := "sum(container_memory_working_set_bytes{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
 	pqDiskUsage := "sum(container_fs_usage_bytes{container!='POD',image!='',container='" + container + "',namespace='" + namespace + "',pod='" + pod + "'})" + fromToTimeParmameter
 
 	// CPU
-	metricsBytes, _ := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query_range", "query="+pqCpuUsage, "") // Retrieve workload's metric data
+	metricsBytes, err := helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query_range", "query="+pqCpuUsage, "") // Retrieve workload's metric data
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 	metricsResult := gjson.Get(string(metricsBytes), "data.result.0.values")
 	var seriesDataArr []map[string]interface{}
 	for _, item := range metricsResult.Array() {
@@ -382,7 +408,11 @@ func (service *WorkloadService) GetContainerMetrics(namespace string, container 
 	seriesDataArr = nil
 
 	// Memory
-	metricsBytes, _ = helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query_range", "query="+pqMemoryUsage, "") // Retrieve workload's metric data
+	metricsBytes, err = helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query_range", "query="+pqMemoryUsage, "") // Retrieve workload's metric data
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 	metricsResult = gjson.Get(string(metricsBytes), "data.result.0.values")
 	for _, item := range metricsResult.Array() {
 		timestamp := item.Get("0").String()
@@ -401,7 +431,11 @@ func (service *WorkloadService) GetContainerMetrics(namespace string, container 
 	seriesDataArr = nil
 
 	// Disk
-	metricsBytes, _ = helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query_range", "query="+pqDiskUsage, "") // Retrieve workload's metric data
+	metricsBytes, err = helpers.RequestHttpGet(service.CaaS.PromethusUrl+"/query_range", "query="+pqDiskUsage, "") // Retrieve workload's metric data
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 	metricsResult = gjson.Get(string(metricsBytes), "data.result.0.values")
 	for _, item := range metricsResult.Array() {
 		timestamp := item.Get("0").String()
@@ -422,20 +456,22 @@ func (service *WorkloadService) GetContainerMetrics(namespace string, container 
 }
 
 
+func (service *WorkloadService) GetContainerLog(ctx echo.Context) (string, error) {
+	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
-func (service *WorkloadService) GetContainerLog(namespace string, container string, pod string) (string, error) {
+	namespace := ctx.QueryParam("namespace")
+	container := ctx.QueryParam("container")
+	pod := ctx.QueryParam("pod")
+
 	k8sLogUrl := "namespaces/" + namespace + "/pods/" + pod + "/log"
 	queryParam := "container=" + container + "&tailLines=100"
 	resultBytes, err := helpers.RequestHttpGet(service.CaaS.K8sUrl+k8sLogUrl, queryParam, service.CaaS.K8sAdminToken)
 	if err != nil {
+		logger.Error(err)
 		return "", err
 	}
 	return string(resultBytes), nil
 }
-
-
-
-
 
 
 func getWorkloadMetrics(url string, workloadNameParam string) map[string]interface{} {
