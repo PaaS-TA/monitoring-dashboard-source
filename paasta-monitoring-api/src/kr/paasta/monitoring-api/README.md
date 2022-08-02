@@ -24,14 +24,14 @@
 ### Swagger Annotations Example Form
 ```go
 // CreateToken
-//  @Summary      [테스트] 토큰 생성하기
-//  @Description  [테스트] 토큰 정보를 생성한다.
+//  @Summary      토큰 생성하기
+//  @Description  토큰 정보를 생성한다.
 //  @Accept       json
 //  @Produce      json
 //  @Param        UserInfo  body      CreateToken  true  "Insert UserInfo"
 //  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [post]
-func (a *TokenController) CreateToken(c echo.Context) (err error) {
+func (a *TokenController) CreateToken(ctx echo.Context) (err error) {
     ...
 }
 ```
