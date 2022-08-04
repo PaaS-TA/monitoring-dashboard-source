@@ -2057,6 +2057,168 @@ paths:
       summary: 오픈스택 하이퍼바이저 통계 가져오기
       tags:
       - IaaS
+  /api/v1/iaas/instance/cpu/load/average:
+    get:
+      consumes:
+      - application/json
+      description: 자빅스를 통해 모니터링되는 CPU Load Average 사용량 정보를 가져온다.
+      parameters:
+      - description: 인스턴스 아이디 정보를 주입한다.
+        example: 44b801fd-018d-45ff-87bf-cefa3c4b404f
+        in: query
+        name: instance_id
+        required: true
+        type: string
+      - description: 호스트 정보를 주입한다.
+        example: "null"
+        in: query
+        name: host
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 자빅스를 통해 모니터링되는 CPU Load Average 정보 가져오기
+      tags:
+      - IaaS
+  /api/v1/iaas/instance/cpu/usage:
+    get:
+      consumes:
+      - application/json
+      description: 자빅스를 통해 모니터링되는 CPU 사용량 정보를 가져온다.
+      parameters:
+      - description: 인스턴스 아이디 정보를 주입한다.
+        example: 44b801fd-018d-45ff-87bf-cefa3c4b404f
+        in: query
+        name: instance_id
+        required: true
+        type: string
+      - description: 호스트 정보를 주입한다.
+        example: "null"
+        in: query
+        name: host
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 자빅스를 통해 모니터링되는 CPU 사용량 정보 가져오기
+      tags:
+      - IaaS
+  /api/v1/iaas/instance/disk/io/rate:
+    get:
+      consumes:
+      - application/json
+      description: 자빅스를 통해 모니터링되는 Disk IO Rate 정보를 가져온다.
+      parameters:
+      - description: 인스턴스 아이디 정보를 주입한다.
+        example: 44b801fd-018d-45ff-87bf-cefa3c4b404f
+        in: query
+        name: instance_id
+        required: true
+        type: string
+      - description: 호스트 정보를 주입한다.
+        example: "null"
+        in: query
+        name: host
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 자빅스를 통해 모니터링되는 Disk IO Rate 정보 가져오기
+      tags:
+      - IaaS
+  /api/v1/iaas/instance/disk/usage:
+    get:
+      consumes:
+      - application/json
+      description: 자빅스를 통해 모니터링되는 Disk 사용량 정보를 가져온다.
+      parameters:
+      - description: 인스턴스 아이디 정보를 주입한다.
+        example: 44b801fd-018d-45ff-87bf-cefa3c4b404f
+        in: query
+        name: instance_id
+        required: true
+        type: string
+      - description: 호스트 정보를 주입한다.
+        example: "null"
+        in: query
+        name: host
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 자빅스를 통해 모니터링되는 Disk 사용량 정보 가져오기
+      tags:
+      - IaaS
+  /api/v1/iaas/instance/memory/usage:
+    get:
+      consumes:
+      - application/json
+      description: 자빅스를 통해 모니터링되는 Memory 사용량 정보를 가져온다.
+      parameters:
+      - description: 인스턴스 아이디 정보를 주입한다.
+        example: 44b801fd-018d-45ff-87bf-cefa3c4b404f
+        in: query
+        name: instance_id
+        required: true
+        type: string
+      - description: 호스트 정보를 주입한다.
+        example: "null"
+        in: query
+        name: host
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 자빅스를 통해 모니터링되는 Memory 사용량 정보 가져오기
+      tags:
+      - IaaS
+  /api/v1/iaas/instance/network/io/bytes:
+    get:
+      consumes:
+      - application/json
+      description: 자빅스를 통해 모니터링되는 Network IO Bytes 정보를 가져온다.
+      parameters:
+      - description: 인스턴스 아이디 정보를 주입한다.
+        example: 44b801fd-018d-45ff-87bf-cefa3c4b404f
+        in: query
+        name: instance_id
+        required: true
+        type: string
+      - description: 호스트 정보를 주입한다.
+        example: "null"
+        in: query
+        name: host
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 자빅스를 통해 모니터링되는 Network IO Bytes 정보 가져오기
+      tags:
+      - IaaS
   /api/v1/iaas/instance/usage/list:
     get:
       consumes:

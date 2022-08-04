@@ -22,6 +22,16 @@ func GetZabbixController(zabbixSession *zabbix.Session, openstackProvider *gophe
 	}
 }
 
+// GetCpuUsage
+//  @tags         IaaS
+//  @Summary      자빅스를 통해 모니터링되는 CPU 사용량 정보 가져오기
+//  @Description  자빅스를 통해 모니터링되는 CPU 사용량 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        instance_id  query     string  true   "인스턴스 아이디 정보를 주입한다."  example(44b801fd-018d-45ff-87bf-cefa3c4b404f)
+//  @Param        host         query     string  false  "호스트 정보를 주입한다."       example(null)
+//  @Success      200          {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/iaas/instance/cpu/usage [get]
 func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuUsage(ctx)
 	if err != nil {
@@ -33,9 +43,16 @@ func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 	return nil
 }
 
-/**
-메모리 사용률 차트 데이터를 불러옴
-*/
+// GetMemoryUsage
+//  @tags         IaaS
+//  @Summary      자빅스를 통해 모니터링되는 Memory 사용량 정보 가져오기
+//  @Description  자빅스를 통해 모니터링되는 Memory 사용량 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        instance_id  query     string  true   "인스턴스 아이디 정보를 주입한다."  example(44b801fd-018d-45ff-87bf-cefa3c4b404f)
+//  @Param        host         query     string  false  "호스트 정보를 주입한다."       example(null)
+//  @Success      200          {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/iaas/instance/memory/usage [get]
 func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetMemoryUsage(ctx)
 	if err != nil {
@@ -48,9 +65,16 @@ func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 	return nil
 }
 
-/**
-디스크 사용률 차트 데이터를 불러옴
-*/
+// GetDiskUsage
+//  @tags         IaaS
+//  @Summary      자빅스를 통해 모니터링되는 Disk 사용량 정보 가져오기
+//  @Description  자빅스를 통해 모니터링되는 Disk 사용량 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        instance_id  query     string  true   "인스턴스 아이디 정보를 주입한다."  example(44b801fd-018d-45ff-87bf-cefa3c4b404f)
+//  @Param        host         query     string  false  "호스트 정보를 주입한다."       example(null)
+//  @Success      200          {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/iaas/instance/disk/usage [get]
 func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskUsage(ctx)
 	if err != nil {
@@ -62,9 +86,16 @@ func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
 	return nil
 }
 
-/**
-CPU Load Average 차트 데이터를 불러옴 (1분 단위, 5분 단위, 15분 단위)
-*/
+// GetCpuLoadAverage
+//  @tags         IaaS
+//  @Summary      자빅스를 통해 모니터링되는 CPU Load Average 정보 가져오기
+//  @Description  자빅스를 통해 모니터링되는 CPU Load Average 사용량 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        instance_id  query     string  true   "인스턴스 아이디 정보를 주입한다."  example(44b801fd-018d-45ff-87bf-cefa3c4b404f)
+//  @Param        host         query     string  false  "호스트 정보를 주입한다."       example(null)
+//  @Success      200          {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/iaas/instance/cpu/load/average [get]
 func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 	resultInterval1m, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(ctx, 1)
 	resultInterval5m, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetCpuLoadAverage(ctx, 5)
@@ -97,6 +128,16 @@ func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 	return nil
 }
 
+// GetDiskIORate
+//  @tags         IaaS
+//  @Summary      자빅스를 통해 모니터링되는 Disk IO Rate 정보 가져오기
+//  @Description  자빅스를 통해 모니터링되는 Disk IO Rate 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        instance_id  query     string  true   "인스턴스 아이디 정보를 주입한다."  example(44b801fd-018d-45ff-87bf-cefa3c4b404f)
+//  @Param        host         query     string  false  "호스트 정보를 주입한다."       example(null)
+//  @Success      200          {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/iaas/instance/disk/io/rate [get]
 func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskIORate(ctx)
 	if err != nil {
@@ -108,6 +149,16 @@ func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
 	return nil
 }
 
+// GetNetworkIOBytes
+//  @tags         IaaS
+//  @Summary      자빅스를 통해 모니터링되는 Network IO Bytes 정보 가져오기
+//  @Description  자빅스를 통해 모니터링되는 Network IO Bytes 정보를 가져온다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        instance_id  query     string  true   "인스턴스 아이디 정보를 주입한다."  example(44b801fd-018d-45ff-87bf-cefa3c4b404f)
+//  @Param        host         query     string  false  "호스트 정보를 주입한다."       example(null)
+//  @Success      200          {object}  apiHelpers.BasicResponseForm
+//  @Router       /api/v1/iaas/instance/network/io/bytes [get]
 func (controller *ZabbixController) GetNetworkIOBytes(ctx echo.Context) error {
 	resultReceivedBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitReceived(ctx)
 	resultSentBytes, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetNetworkBitSent(ctx)
