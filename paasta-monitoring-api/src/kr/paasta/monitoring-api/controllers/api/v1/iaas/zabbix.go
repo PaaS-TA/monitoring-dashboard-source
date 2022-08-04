@@ -38,7 +38,7 @@ func (controller *ZabbixController) GetCpuUsage(ctx echo.Context) error {
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", result)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get CPU Usage.", result)
 	}
 	return nil
 }
@@ -57,10 +57,10 @@ func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetMemoryUsage(ctx)
 	if err != nil {
 		log.Println(err.Error())
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Memory Usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", result)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Memory Usage.", result)
 	}
 	return nil
 }
@@ -78,10 +78,10 @@ func (controller *ZabbixController) GetMemoryUsage(ctx echo.Context) error {
 func (controller *ZabbixController) GetDiskUsage(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskUsage(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Disk Usage.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", result)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Disk Usage.", result)
 	}
 	return nil
 }
@@ -120,10 +120,10 @@ func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 	resultList[2] = resultMapInterval15m
 
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU Load Average.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get CPU Load Average.", resultList)
 	}
 	return nil
 }
@@ -141,10 +141,10 @@ func (controller *ZabbixController) GetCpuLoadAverage(ctx echo.Context) error {
 func (controller *ZabbixController) GetDiskIORate(ctx echo.Context) error {
 	result, err := service.GetZabbixService(controller.ZabbixSession, controller.OpenstackProvider).GetDiskIORate(ctx)
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Disk IO Rate.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", result)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Disk IO Rate.", result)
 	}
 	return nil
 }
@@ -177,10 +177,10 @@ func (controller *ZabbixController) GetNetworkIOBytes(ctx echo.Context) error {
 	resultList[1] = resultMapSentBytes
 
 	if err != nil {
-		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get CPU usage.", err.Error())
+		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to get Network IO Bytes.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, "", resultList)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to get Network IO Bytes.", resultList)
 	}
 	return nil
 }
