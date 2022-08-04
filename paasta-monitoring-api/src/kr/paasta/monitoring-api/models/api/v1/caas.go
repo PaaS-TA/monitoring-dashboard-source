@@ -4,7 +4,7 @@ const (
 	PROMQL_POD_USAGE    = "sum(kube_pod_info)/sum(sum(kube_node_status_allocatable{resource='pods'})by(node))*100"
 	PROMQL_CPU_USAGE    = "avg(instance:node_cpu:ratio)*100"
 	PROMQL_DISK_USAGE   = "(sum(node_filesystem_size_bytes)-sum(node_filesystem_free_bytes))/sum(node_filesystem_size_bytes)*100"
-	PROMQL_MEMORY_USAGE = "(sum(node_memory_MemTotal_bytes)-sum(node_memory_MemFree_bytes+node_memory_Buffers_bytes+node_memory_Cached_bytes))/sum(node_memory_MemTotal_bytes)*100"
+	PROMQL_MEMORY_USAGE = "(sum(node_memory_MemTotal_bytes)-sum(node_memory_MemFree_bytes)-sum(node_memory_Buffers_bytes)-sum(node_memory_Cached_bytes))/sum(node_memory_MemTotal_bytes)*100"
 
 	PROMQL_WORKNODE_NAME_LIST = "count(node_uname_info)by(instance,nodename,namespace)"
 	//PROMQL_WORKNODE_NAME_LIST2   = "kube_node_created"
