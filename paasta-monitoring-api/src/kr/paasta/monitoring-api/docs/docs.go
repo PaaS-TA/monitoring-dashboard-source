@@ -1776,6 +1776,118 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/cp/pod/container/list": {
+            "get": {
+                "description": "쿠버네티스 파드 컨테이너 리스트를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 파드 컨테이너 리스트 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "prometheus-kube-prometheus-stack-1648-prometheus-0",
+                        "description": "파드명을 주입한다.",
+                        "name": "pod",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cp/pod/list": {
+            "get": {
+                "description": "쿠버네티스 파드 리스트를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 파드 리스트 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cp/pod/metrics": {
+            "get": {
+                "description": "쿠버네티스 파드 상세 메트릭 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 파드 상세 메트릭 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "prometheus-kube-prometheus-stack-1648-prometheus-0",
+                        "description": "파드명을 주입한다.",
+                        "name": "pod",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cp/pod/status": {
+            "get": {
+                "description": "쿠버네티스 파드 상태 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 파드 상태 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/log/{uuid}": {
             "get": {
                 "description": "로그 정보를 가져온다.\n특정기간(대상날짜, 시작시간, 종료시간 사용) 로그 조회와 최근기간 로그 조회 파라미터는 중복 사용이 불가능하다.\n또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.",
