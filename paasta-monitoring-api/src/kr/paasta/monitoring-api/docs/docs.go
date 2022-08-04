@@ -1676,6 +1676,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/cp/cluster/average/{type}": {
+            "get": {
+                "description": "쿠버네티스 클러스터 리소스 사용 평균을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 클러스터 리소스 사용 평균 가져오기",
+                "parameters": [
+                    {
+                        "enum": [
+                            "pod",
+                            "cpu",
+                            "memory",
+                            "disk"
+                        ],
+                        "type": "string",
+                        "description": "Type 정보를 주입한다.",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cp/cluster/worknode": {
+            "get": {
+                "description": "쿠버네티스 클러스터 노드 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 클러스터 노드 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "ip-10-0-0-20",
+                        "description": "파라미터에 대한 Pod 관련 메트릭 정보를 반환한다.",
+                        "name": "nodename",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10.0.0.20:9100",
+                        "description": "파라미터에 대햔 CPU, Memory, Disk 관련 메트릭 정보를 반환한다.",
+                        "name": "instance",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cp/cluster/worknodes": {
+            "get": {
+                "description": "쿠버네티스 클러스터 전체 노드 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CP"
+                ],
+                "summary": "쿠버네티스 클러스터 전체 노드 정보 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/log/{uuid}": {
             "get": {
                 "description": "로그 정보를 가져온다.\n특정기간(대상날짜, 시작시간, 종료시간 사용) 로그 조회와 최근기간 로그 조회 파라미터는 중복 사용이 불가능하다.\n또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.",

@@ -1677,6 +1677,73 @@ paths:
       summary: PaaS-TA Summary 정보 가져오기
       tags:
       - AP
+  /api/v1/cp/cluster/average/{type}:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 클러스터 리소스 사용 평균을 가져온다.
+      parameters:
+      - description: Type 정보를 주입한다.
+        enum:
+        - pod
+        - cpu
+        - memory
+        - disk
+        in: path
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 클러스터 리소스 사용 평균 가져오기
+      tags:
+      - CP
+  /api/v1/cp/cluster/worknode:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 클러스터 노드 정보를 가져온다.
+      parameters:
+      - description: 파라미터에 대한 Pod 관련 메트릭 정보를 반환한다.
+        example: ip-10-0-0-20
+        in: query
+        name: nodename
+        type: string
+      - description: 파라미터에 대햔 CPU, Memory, Disk 관련 메트릭 정보를 반환한다.
+        example: 10.0.0.20:9100
+        in: query
+        name: instance
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 클러스터 노드 정보 가져오기
+      tags:
+      - CP
+  /api/v1/cp/cluster/worknodes:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 클러스터 전체 노드 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 클러스터 전체 노드 정보 가져오기
+      tags:
+      - CP
   /api/v1/log/{uuid}:
     get:
       consumes:
