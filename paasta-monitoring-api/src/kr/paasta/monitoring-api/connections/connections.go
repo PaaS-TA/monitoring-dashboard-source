@@ -58,7 +58,7 @@ func SetupConnection(logger *logrus.Logger) Connections {
 		case "PaaS":
 			connection.initPaasConfig(connection.Env)
 			connection.initInfluxDbConfig(connection.Env)
-		case "CP":
+		case "CaaS":
 			connection.initCaaSConfig()
 		case "IaaS":
 			connection.initOpenstackProvider()
