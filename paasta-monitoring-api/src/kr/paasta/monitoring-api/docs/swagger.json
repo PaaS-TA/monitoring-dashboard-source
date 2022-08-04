@@ -2096,6 +2096,113 @@
                 }
             }
         },
+        "/api/v1/iaas/hypervisor/list": {
+            "get": {
+                "description": "오픈스택 하이퍼바이저 리스트를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IaaS"
+                ],
+                "summary": "오픈스택 하이퍼바이저 리스트 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/iaas/hypervisor/stats": {
+            "get": {
+                "description": "오픈스택 하이퍼바이저 통계를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IaaS"
+                ],
+                "summary": "오픈스택 하이퍼바이저 통계 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/iaas/instance/usage/list": {
+            "get": {
+                "description": "오픈스택 프로젝트 사용량을 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IaaS"
+                ],
+                "summary": "오픈스택 프로젝트 사용량 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/usage.TenantUsage"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/iaas/project/list": {
+            "get": {
+                "description": "오픈스택 프로젝트 리스트를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IaaS"
+                ],
+                "summary": "오픈스택 프로젝트 리스트 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/log/{uuid}": {
             "get": {
                 "description": "로그 정보를 가져온다.\n특정기간(대상날짜, 시작시간, 종료시간 사용) 로그 조회와 최근기간 로그 조회 파라미터는 중복 사용이 불가능하다.\n또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.",
@@ -2346,6 +2453,83 @@
             "properties": {
                 "doppler_logging_endpoint": {
                     "type": "string"
+                }
+            }
+        },
+        "usage.ServerUsage": {
+            "type": "object",
+            "properties": {
+                "flavor": {
+                    "description": "Flavor is the display name of a flavor",
+                    "type": "string"
+                },
+                "hours": {
+                    "description": "Hours is the duration that the server exists in hours",
+                    "type": "number"
+                },
+                "instance_id": {
+                    "description": "InstanceID is the UUID of the instance",
+                    "type": "string"
+                },
+                "local_gb": {
+                    "description": "LocalGB is the sum of the root disk size of the server and the ephemeral disk size of it (in GiB)",
+                    "type": "integer"
+                },
+                "memory_mb": {
+                    "description": "MemoryMB is the memory size of the server (in MB)",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name is the name assigned to the server when it was created",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "State is the VM power state",
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "description": "TenantID is the UUID of the tenant in a multi-tenancy cloud",
+                    "type": "string"
+                },
+                "uptime": {
+                    "description": "Uptime is the uptime of the server in seconds",
+                    "type": "integer"
+                },
+                "vcpus": {
+                    "description": "VCPUs is the number of virtual CPUs that the server uses",
+                    "type": "integer"
+                }
+            }
+        },
+        "usage.TenantUsage": {
+            "type": "object",
+            "properties": {
+                "server_usages": {
+                    "description": "ServerUsages is an array of ServerUsage maps",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/usage.ServerUsage"
+                    }
+                },
+                "tenant_id": {
+                    "description": "TenantID is the ID of the tenant whose usage is being reported on",
+                    "type": "string"
+                },
+                "total_hours": {
+                    "description": "TotalHours is the total duration that servers exist (in hours)",
+                    "type": "number"
+                },
+                "total_local_gb_usage": {
+                    "description": "TotalLocalGBUsage multiplies the server disk size (in GiB) by hours the server exists, and then adding that all together for each server",
+                    "type": "number"
+                },
+                "total_memory_mb_usage": {
+                    "description": "TotalMemoryMBUsage multiplies the server memory size (in MB) by hours the server exists, and then adding that all together for each server",
+                    "type": "number"
+                },
+                "total_vcpus_usage": {
+                    "description": "TotalVCPUsUsage multiplies the number of virtual CPUs of the server by hours the server exists, and then adding that all together for each server",
+                    "type": "number"
                 }
             }
         },
