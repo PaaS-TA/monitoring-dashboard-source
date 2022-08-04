@@ -16,9 +16,8 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/groups"
 )
 
-
 type OpenstackService struct {
-	Provider  *gophercloud.ProviderClient
+	Provider *gophercloud.ProviderClient
 }
 
 func GetOpenstackService(provider *gophercloud.ProviderClient) *OpenstackService {
@@ -61,7 +60,6 @@ func (service *OpenstackService) GetHypervisorStatistics(ctx echo.Context) (map[
 	return result, err
 }
 
-
 func (service *OpenstackService) GetHypervisorList(ctx echo.Context) ([]interface{}, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
@@ -83,7 +81,6 @@ func (service *OpenstackService) GetHypervisorList(ctx echo.Context) ([]interfac
 	return hypervisorList, err
 }
 
-
 func (service *OpenstackService) GetProjectList(ctx echo.Context) ([]interface{}, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
@@ -102,7 +99,7 @@ func (service *OpenstackService) GetProjectList(ctx echo.Context) ([]interface{}
 	resultBody := resultPages.GetBody()
 	list := resultBody.(map[string][]interface{})["projects"]
 
-	for _, item := range(list) {
+	for _, item := range list {
 		itemMap := item.(map[string]interface{})
 
 		projectId := itemMap["id"].(string)
@@ -151,7 +148,6 @@ func (service *OpenstackService) GetProjectList(ctx echo.Context) ([]interface{}
 
 		//service.retrieveSingleProjectUsage(projectId)   // TODO 호출해도 조회안됨...
 
-
 		/*
 			var listOpts servers.ListOpts
 			listOpts.TenantID = projectId
@@ -169,13 +165,6 @@ func (service *OpenstackService) GetProjectList(ctx echo.Context) ([]interface{}
 
 func (service *OpenstackService) RetrieveTenantUsage(ctx echo.Context) ([]usage.TenantUsage, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
-
-	serverParams := make(map[string]interface{}, 0)
-	serverParams["allTenants"] = true
-	tenantIdParam := ctx.Param("tenantId")
-	if tenantIdParam != "" {
-		serverParams["tenantId"] = tenantIdParam
-	}
 
 	computeClient, _ := utils.GetComputeClient(service.Provider, "")
 	allTenantsOpts := usage.AllTenantsOpts{
@@ -216,7 +205,6 @@ func (service *OpenstackService) RetrieveTenantUsage(ctx echo.Context) ([]usage.
 
 	return usageList, err
 }
-
 
 func (service *OpenstackService) GetHostIpAddress(instanceId string) string {
 	var ipAddress string
