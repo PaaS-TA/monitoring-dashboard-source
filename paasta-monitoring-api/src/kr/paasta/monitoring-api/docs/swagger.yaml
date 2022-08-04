@@ -1818,6 +1818,153 @@ paths:
       summary: 쿠버네티스 파드 상태 정보 가져오기
       tags:
       - CP
+  /api/v1/cp/workload/container/list:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 워크로드 컨테이너 리스트를 가져온다.
+      parameters:
+      - description: 워크로드명을 주입한다.
+        enum:
+        - deployment
+        - statefulset
+        - daemonset
+        in: query
+        name: workload
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 워크로드 컨테이너 리스트 가져오기
+      tags:
+      - CP
+  /api/v1/cp/workload/container/log:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 컨테이너 로그를 가져온다.
+      parameters:
+      - description: 네임스페이스명을 주입한다.
+        example: kube-system
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 컨테이너명을 주입한다.
+        example: kube-proxy
+        in: query
+        name: container
+        required: true
+        type: string
+      - description: 파드명을 주입한다.
+        example: kube-proxy-v47r9
+        in: query
+        name: pod
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 컨테이너 로그 가져오기
+      tags:
+      - CP
+  /api/v1/cp/workload/container/metrics:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 컨테이너 메트릭 정보를 가져온다.
+      parameters:
+      - description: 네임스페이스명을 주입한다.
+        example: kube-system
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 컨테이너명을 주입한다.
+        example: kube-proxy
+        in: query
+        name: container
+        required: true
+        type: string
+      - description: 파드명을 주입한다.
+        example: kube-proxy-v47r9
+        in: query
+        name: pod
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 컨테이너 메트릭 정보 가져오기
+      tags:
+      - CP
+  /api/v1/cp/workload/list:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 워크로드 리스트를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 워크로드 리스트 가져오기
+      tags:
+      - CP
+  /api/v1/cp/workload/metrics:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 워크로드 상세 메트릭 정보를 가져온다.
+      parameters:
+      - description: 워크로드명을 주입한다.
+        enum:
+        - deployment
+        - statefulset
+        - daemonset
+        in: query
+        name: workload
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 워크로드 상세 메트릭 정보 가져오기
+      tags:
+      - CP
+  /api/v1/cp/workload/status:
+    get:
+      consumes:
+      - application/json
+      description: 쿠버네티스 워크로드 상태 정보를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 쿠버네티스 워크로드 상태 정보 가져오기
+      tags:
+      - CP
   /api/v1/log/{uuid}:
     get:
       consumes:
