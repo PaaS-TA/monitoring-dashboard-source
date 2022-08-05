@@ -43,9 +43,9 @@ func (controller *PinpointController) GetAgentList(ctx echo.Context) error {
 //  @Description  핀포인트 모니터링 에이전트 통계를 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        chartType  path      string  true  "차트 타입을 주입한다."                    enums(cpuLoad, jvmGc, activeTrace, responseTime)
-//  @Param        agentId    query     string  true  "에이전트 아이디를 주입한다."                 example(3149075187)
-//  @Param        period     query     string  true  "현재를 조회하고 싶은 기간을 주입한다. 단위는 분(m),  시(h),  일(d)  단위를  사용한다."        example(1m)
+//  @Param        chartType  path      string  true  "차트 타입을 주입한다."                         enums(cpuLoad, jvmGc, activeTrace, responseTime)
+//  @Param        agentId    query     string  true  "에이전트 아이디를 주입한다."                      example(3149075187)
+//  @Param        period     query     string  true  "현재를 기준으로 조회하고 싶은 기간을 주입한다. 단위는 분(m),  시(h),  일(d)  단위를  사용한다."        example(1m)
 //  @Success      200        {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/saas/pinpoint/{chartType}/getAgentStat [get]
 func (controller *PinpointController) GetAgentStat(ctx echo.Context) error {

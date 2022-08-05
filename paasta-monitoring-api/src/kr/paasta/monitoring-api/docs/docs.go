@@ -2585,6 +2585,93 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/saas/app/status": {
+            "get": {
+                "description": "애플리케이션(핀포인트 에이전트) 스테이터스를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SaaS"
+                ],
+                "summary": "애플리케이션(핀포인트 에이전트) 스테이터스 가져오기",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/saas/app/usage": {
+            "get": {
+                "description": "애플리케이션(핀포인트 에이전트) 통합 사용량 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SaaS"
+                ],
+                "summary": "애플리케이션(핀포인트 에이전트) 통합 사용량 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "현재를 기준으로 조회하고 싶은 기간을 주입한다. 단위는 분(m),  시(h),  일(d)  단위를  사용한다.",
+                        "name": "period",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/saas/app/usage/list": {
+            "get": {
+                "description": "애플리케이션(핀포인트 에이전트) 개별 사용량 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SaaS"
+                ],
+                "summary": "애플리케이션(핀포인트 에이전트) 개별 사용량 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "1m",
+                        "description": "현재를 기준으로 조회하고 싶은 기간을 주입한다. 단위는 분(m),  시(h),  일(d)  단위를  사용한다.",
+                        "name": "period",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/saas/pinpoint/getAgentList": {
             "get": {
                 "description": "핀포인트 모니터링 에이전트 리스트를 가져온다.",
@@ -2632,21 +2719,24 @@ const docTemplate = `{
                         "type": "string",
                         "description": "차트 타입을 주입한다.",
                         "name": "chartType",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "example": "3149075187",
                         "description": "에이전트 아이디를 주입한다.",
                         "name": "agentId",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "example": "1m",
-                        "description": "현재를 조회하고 싶은 기간을 주입한다. 단위는 분(m), 시(h), 일(d) 단위를 사용한다.",
+                        "description": "현재를 기준으로 조회하고 싶은 기간을 주입한다. 단위는 분(m),  시(h),  일(d)  단위를  사용한다.",
                         "name": "period",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
