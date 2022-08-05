@@ -2545,6 +2545,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/members": {
+            "get": {
+                "description": "전체 또는 단일 유저 정보를 가져온다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "전체 또는 단일 유저 정보 가져오기",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "단일 사용자 정보 조회시 유저명을 주입한다.",
+                        "name": "userId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.MemberInfos"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/token": {
             "put": {
                 "description": "토큰 정보를 리프레시한다.",
@@ -2558,7 +2598,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "토큰을 리프레시하기 위한 토큰 정보를 제공한다.",
-                        "name": "TokenDetails",
+                        "name": "RefreshToken",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -2599,11 +2639,54 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "토큰을 생성하기 위해 필요한 유저 정보를 제공한다.",
-                        "name": "UserInfo",
+                        "name": "CreateToken",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/v1.CreateToken"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "responseInfo": {
+                                            "$ref": "#/definitions/v1.TokenDetails"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/token2": {
+            "post": {
+                "description": "토큰 정보를 생성한다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "토큰 생성하기",
+                "parameters": [
+                    {
+                        "description": "토큰을 생성하기 위해 필요한 유저 정보를 제공한다.",
+                        "name": "TokenParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.TokenParam"
                         }
                     }
                 ],
@@ -3308,6 +3391,56 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.MemberInfos": {
+            "type": "object",
+            "properties": {
+                "caasUserId": {
+                    "type": "string"
+                },
+                "caasUserPw": {
+                    "type": "string"
+                },
+                "caasUserUseYn": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "iaasUserId": {
+                    "type": "string"
+                },
+                "iaasUserPw": {
+                    "type": "string"
+                },
+                "iaasUserUseYn": {
+                    "type": "string"
+                },
+                "paasUserId": {
+                    "type": "string"
+                },
+                "paasUserPw": {
+                    "type": "string"
+                },
+                "paasUserUseYn": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userEmail": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userNm": {
+                    "type": "string"
+                },
+                "userPw": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.Overview": {
             "type": "object",
             "properties": {
@@ -3543,6 +3676,33 @@ const docTemplate = `{
                 },
                 "rtExpires": {
                     "type": "integer"
+                }
+            }
+        },
+        "v1.TokenParam": {
+            "type": "object",
+            "required": [
+                "iaasPasswd",
+                "iaasUserId",
+                "passwd",
+                "userId"
+            ],
+            "properties": {
+                "iaasPasswd": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "iaasUserId": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "passwd": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "userId": {
+                    "type": "string",
+                    "example": "username"
                 }
             }
         },

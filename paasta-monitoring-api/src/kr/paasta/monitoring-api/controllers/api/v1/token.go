@@ -25,13 +25,12 @@ func GetTokenController(conn connections.Connections) *TokenController {
 }
 
 // CreateToken
-//  * Annotations for Swagger *
 //  @Summary      토큰 생성하기
 //  @Description  토큰 정보를 생성한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        UserInfo  body      CreateToken  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
-//  @Success      200       {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
+//  @Param        CreateToken  body      CreateToken  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
+//  @Success      200          {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [post]
 func (a *TokenController) CreateToken(c echo.Context) (err error) {
 	var userRequest v1.CreateToken                       // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
@@ -53,6 +52,14 @@ func (a *TokenController) CreateToken(c echo.Context) (err error) {
 	return nil
 }
 
+// CreateAccessToken
+//  @Summary      토큰 생성하기
+//  @Description  토큰 정보를 생성한다.
+//  @Accept       json
+//  @Produce      json
+//  @Param        TokenParam  body      TokenParam  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
+//  @Success      200         {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
+//  @Router       /api/v1/token2 [post]
 func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
 	var params v1.TokenParam
 	err := helpers.BindJsonAndCheckValid(ctx, &params)
@@ -73,12 +80,11 @@ func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
 }
 
 // RefreshToken
-//  * Annotations for Swagger *
 //  @Summary      토큰 리프레시하기
 //  @Description  토큰 정보를 리프레시한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        TokenDetails  body      RefreshToken  true  "토큰을 리프레시하기 위한 토큰 정보를 제공한다."
+//  @Param        RefreshToken  body      RefreshToken  true  "토큰을 리프레시하기 위한 토큰 정보를 제공한다."
 //  @Success      200           {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
 //  @Router       /api/v1/token [put]
 func (a *TokenController) RefreshToken(c echo.Context) (err error) {

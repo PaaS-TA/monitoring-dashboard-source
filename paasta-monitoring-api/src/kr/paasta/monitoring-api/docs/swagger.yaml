@@ -438,6 +438,39 @@ definitions:
       uuid:
         type: string
     type: object
+  v1.MemberInfos:
+    properties:
+      caasUserId:
+        type: string
+      caasUserPw:
+        type: string
+      caasUserUseYn:
+        type: string
+      createdAt:
+        type: string
+      iaasUserId:
+        type: string
+      iaasUserPw:
+        type: string
+      iaasUserUseYn:
+        type: string
+      paasUserId:
+        type: string
+      paasUserPw:
+        type: string
+      paasUserUseYn:
+        type: string
+      updatedAt:
+        type: string
+      userEmail:
+        type: string
+      userId:
+        type: string
+      userNm:
+        type: string
+      userPw:
+        type: string
+    type: object
   v1.Overview:
     properties:
       zoneInfo:
@@ -593,6 +626,26 @@ definitions:
         type: string
       rtExpires:
         type: integer
+    type: object
+  v1.TokenParam:
+    properties:
+      iaasPasswd:
+        example: password
+        type: string
+      iaasUserId:
+        example: password
+        type: string
+      passwd:
+        example: password
+        type: string
+      userId:
+        example: username
+        type: string
+    required:
+    - iaasPasswd
+    - iaasUserId
+    - passwd
+    - userId
     type: object
   v1.UserInfo:
     properties:
@@ -2320,6 +2373,29 @@ paths:
       summary: 로그 정보 가져오기
       tags:
       - Common
+  /api/v1/members:
+    get:
+      consumes:
+      - application/json
+      description: 전체 또는 단일 유저 정보를 가져온다.
+      parameters:
+      - description: 단일 사용자 정보 조회시 유저명을 주입한다.
+        in: query
+        name: userId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.MemberInfos'
+              type: object
+      summary: 전체 또는 단일 유저 정보 가져오기
   /api/v1/token:
     post:
       consumes:
@@ -2328,7 +2404,7 @@ paths:
       parameters:
       - description: 토큰을 생성하기 위해 필요한 유저 정보를 제공한다.
         in: body
-        name: UserInfo
+        name: CreateToken
         required: true
         schema:
           $ref: '#/definitions/v1.CreateToken'
@@ -2352,7 +2428,7 @@ paths:
       parameters:
       - description: 토큰을 리프레시하기 위한 토큰 정보를 제공한다.
         in: body
-        name: TokenDetails
+        name: RefreshToken
         required: true
         schema:
           $ref: '#/definitions/v1.RefreshToken'
@@ -2369,6 +2445,31 @@ paths:
                   $ref: '#/definitions/v1.TokenDetails'
               type: object
       summary: 토큰 리프레시하기
+  /api/v1/token2:
+    post:
+      consumes:
+      - application/json
+      description: 토큰 정보를 생성한다.
+      parameters:
+      - description: 토큰을 생성하기 위해 필요한 유저 정보를 제공한다.
+        in: body
+        name: TokenParam
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TokenParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
+            - properties:
+                responseInfo:
+                  $ref: '#/definitions/v1.TokenDetails'
+              type: object
+      summary: 토큰 생성하기
   /api/v1/users:
     get:
       consumes:
