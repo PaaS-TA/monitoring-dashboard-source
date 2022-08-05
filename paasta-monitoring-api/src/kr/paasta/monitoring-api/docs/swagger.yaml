@@ -2396,6 +2396,56 @@ paths:
                   $ref: '#/definitions/v1.MemberInfos'
               type: object
       summary: 전체 또는 단일 유저 정보 가져오기
+  /api/v1/saas/pinpoint/{chartType}/getAgentStat:
+    get:
+      consumes:
+      - application/json
+      description: 핀포인트 모니터링 에이전트 통계를 가져온다.
+      parameters:
+      - description: 차트 타입을 주입한다.
+        enum:
+        - cpuLoad
+        - jvmGc
+        - activeTrace
+        - responseTime
+        in: path
+        name: chartType
+        type: string
+      - description: 에이전트 아이디를 주입한다.
+        example: "3149075187"
+        in: query
+        name: agentId
+        type: string
+      - description: 현재를 조회하고 싶은 기간을 주입한다. 단위는 분(m), 시(h), 일(d) 단위를 사용한다.
+        example: 1m
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 핀포인트 모니터링 에이전트 통계 가져오기
+      tags:
+      - SaaS
+  /api/v1/saas/pinpoint/getAgentList:
+    get:
+      consumes:
+      - application/json
+      description: 핀포인트 모니터링 에이전트 리스트를 가져온다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apiHelpers.BasicResponseForm'
+      summary: 핀포인트 모니터링 에이전트 리스트 가져오기
+      tags:
+      - SaaS
   /api/v1/token:
     post:
       consumes:
