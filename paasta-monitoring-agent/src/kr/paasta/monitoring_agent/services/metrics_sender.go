@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	influxdb "github.com/influxdata/influxdb/client/v2"
+	influxdb "github.com/influxdata/influxdb1-client/v2"  // For InfluxDB 1.x
+	_"github.com/influxdata/influxdb-client-go/v2"        // For InfluxDB 2.x
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -87,12 +88,14 @@ func (f *MetricSender) SendMetricsToInfluxDb(stopChan <-chan bool) error {
 	}()
 
 	for {
-		// Make influxDB client
-		//c, err := influxdb.NewUDPClient(influxdb.UDPConfig{
+
+
 		c, err = influxdb.NewUDPClient(influxdb.UDPConfig{
 			Addr: f.influx.InfluxUrl,
 			//PayloadSize: 4096,
 		})
+
+
 		if err != nil {
 			f.logger.Error("#metrics_sender.SendMetricsToInfluxDb  : There is an error during creating influxdb client:", err)
 		} else {
@@ -167,6 +170,15 @@ func (f *MetricSender) CollectSave(c influxdb.Client) error {
 	// ========= Processes Status ========
 	//======================================================================
 	f.emitProcessMetrics(bp)
+	for _, point := range bp.Points() {
+
+		field, _ := point.Fields()
+		f.logger.Info("batch point :" + point.Name())
+		f.logger.Info("batch point :" + point.String())
+		f.logger.Info("batch point :", field)
+	}
+
+
 
 	// Write the batch
 	err = c.Write(bp)
@@ -206,6 +218,8 @@ func (f *MetricSender) makePoint(name string, value float64) *influxdb.Point {
  Description: VM - CPU Info metrics
 */
 func (f *MetricSender) emitCpuMetrics(bp influxdb.BatchPoints) {
+	f.logger.Info("emitCpuMetrics")
+
 	numCpu := runtime.NumCPU()
 	duration := time.Duration(1) * time.Second
 	c, err := cpu.Percent(duration, true)
@@ -270,6 +284,8 @@ func (f *MetricSender) emitCpuMetrics(bp influxdb.BatchPoints) {
  Description: VM - Memory Info metrics
 */
 func (f *MetricSender) emitMemMetrics(bp influxdb.BatchPoints) {
+	f.logger.Info("emitMemMetrics")
+
 	m, err := mem.VirtualMemory()
 	if err != nil {
 		f.logger.Error("MemStats: failed to get Memory Info: %v", err)
@@ -293,6 +309,8 @@ func (f *MetricSender) emitMemMetrics(bp influxdb.BatchPoints) {
  Description: VM - Disk Info metrics
 */
 func (f *MetricSender) emitDiskMetrics(bp influxdb.BatchPoints) {
+	f.logger.Info("emitDiskMetrics")
+
 	if runtime.GOOS == "windows" {
 		var pathKey []string
 		diskios, _ := disk.IOCounters()
@@ -383,6 +401,8 @@ func (f *MetricSender) emitDiskMetrics(bp influxdb.BatchPoints) {
  Description: VM - Network Info metrics
 */
 func (f *MetricSender) emitNetworkMetrics(bp influxdb.BatchPoints) {
+	f.logger.Info("emitNetworkMetrics")
+
 	nifs, err := net.Interfaces()
 	if err != nil {
 		f.logger.Error("getting network interface info error %v", err)
@@ -419,7 +439,10 @@ func (f *MetricSender) emitNetworkMetrics(bp influxdb.BatchPoints) {
  Description: VM - Process Info metrics
 */
 func (f *MetricSender) emitProcessMetrics(bp influxdb.BatchPoints) {
+	f.logger.Info("emitProcessMetrics")
+
 	procs, err := process.Pids()
+	f.logger.Info("emitProcessMetrics > Founded process count : " + strconv.Itoa(len(procs)), nil)
 	if err != nil {
 		f.logger.Error("getting processes error %v", err)
 		//return err
@@ -428,11 +451,14 @@ func (f *MetricSender) emitProcessMetrics(bp influxdb.BatchPoints) {
 	pStatArray := make([]processStat, 0)
 
 	for _, value := range procs {
+		f.logger.Info("emitProcessMetrics > Looping process about " + strconv.Itoa(int(value)), nil)
 		p, err := process.NewProcess(value)
 		if err != nil {
+			f.logger.Info("emitProcessMetrics > getting single process info error : " + err.Error())
 			f.logger.Error("getting single process info error %v", err)
 			//return err
 		} else {
+			f.logger.Info("emitProcessMetrics > prcess info : " + p.String())
 			var pStat processStat
 			ct, _ := p.CreateTime()
 			sTimestamp := strconv.FormatInt(ct, 10)
@@ -494,6 +520,9 @@ func (f *MetricSender) emitProcessMetrics(bp influxdb.BatchPoints) {
 			"mem_usage":  ps.memUsage,
 			"start_time": startTime,
 		}
+
+		f.logger.Info("emitProcessMetrics > InfluxDB info : "+ f.influx.ProcessMeasurement, nil)
+		f.logger.Info("emitProcessMetrics > prcess info : ", fields)
 
 		mkPoint, err := influxdb.NewPoint(f.influx.ProcessMeasurement, tags, fields)
 		if err != nil {
