@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/lager"
-	influxdb "github.com/influxdata/influxdb1-client/v2"  // For InfluxDB 1.x
-	_"github.com/influxdata/influxdb-client-go/v2"        // For InfluxDB 2.x
+	_ "github.com/influxdata/influxdb-client-go/v2"      // For InfluxDB 2.x
+	influxdb "github.com/influxdata/influxdb1-client/v2" // For InfluxDB 1.x
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
