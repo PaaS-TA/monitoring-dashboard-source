@@ -11,10 +11,10 @@
 - Network : Byte received, sended / Drop in, out / Error in, out
 - Process : Process name / Process id / Process's memory usage 
 
-## 3. 수집하는 항목
-- Metric 원천데이터는 gopsutil 라이브러리를 활용하여 수집
-- 수집한 metric 데이터는 InfluxDB에 적재
-- InfluxDB는 version 1.x 기준
+## 3. 동작 방식
+- Metric 원천데이터는 gopsutil 라이브러리를 활용하여 수집함.
+- 수집한 metric 데이터는 InfluxDB에 적재됨.
 
 ## 4. 유의사항
+- paasta-monitoring-agent는 InfluxDB version 1.x 기준으로만 동작 가능.
 - 차후 InfluxDB를 version 2.x로 업그레이드 하게되면 influx-go-client 라이브러리도 교체해야 함.
