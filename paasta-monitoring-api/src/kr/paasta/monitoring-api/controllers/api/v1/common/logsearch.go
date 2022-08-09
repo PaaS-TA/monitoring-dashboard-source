@@ -32,7 +32,7 @@ func GetLogSearchController(conn connections.Connections) *LogSearchController {
 //  @Description  또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        uuid        path      string  true   "로그 조회시 대상 VM의 UUID를 주입한다."  enums(36dd3d08-5198-42b6-4130-d0c04479236f, f1db5cd8-3e5b-4980-966f-9fa88d8d85fd)
+//  @Param        uuid        path      string  true   "로그 조회시 대상 VM의 UUID를 주입한다."  example(36dd3d08-5198-42b6-4130-d0c04479236f)
 //  @Param        logType     query     string  true   "로그 정보를 조회하고자 하는 타입을 지정한다."  enums(bosh, cf)
 //  @Param        keyword     query     string  false  "로그 조회시 특정 내용을 포함하는 키워드 검색이 필요할 경우 사용한다."
 //  @Param        targetDate  query     string  false  "로그 정보를 조회하고자 하는 대상 날짜를 주입한다."            example(2022-07-28)

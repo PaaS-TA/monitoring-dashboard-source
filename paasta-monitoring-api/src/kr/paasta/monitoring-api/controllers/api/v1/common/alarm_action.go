@@ -20,7 +20,6 @@ func GetAlarmActionController(conn connections.Connections) *AlarmActionControll
 	}
 }
 
-
 // CreateAlarmAction
 //  @Tags         Common
 //  @Summary      알람 조치 내용 신규 작성하기
@@ -41,14 +40,13 @@ func (controller *AlarmActionController) CreateAlarmAction(ctx echo.Context) err
 	return nil
 }
 
-
 // GetAlarmAction
 //  @Tags         Common
 //  @Summary      알람 조치 내용 가져오기
 //  @Description  알람에 대한 조치 내용을 가져온다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        alarmId          query     int     false  "Alarm ID"
+//  @Param        alarmId          query     int     false  "Alarm ID"  example(115)
 //  @Param        alarmActionDesc  query     string  false  "Alarm Action Desc"
 //  @Success      200              {object}  apiHelpers.BasicResponseForm
 //  @Router       /api/v1/alarm/action [get]
@@ -62,7 +60,6 @@ func (controller *AlarmActionController) GetAlarmAction(ctx echo.Context) error 
 	}
 	return nil
 }
-
 
 // UpdateAlarmAction
 //  @Tags         Common
@@ -79,11 +76,10 @@ func (controller *AlarmActionController) UpdateAlarmAction(ctx echo.Context) err
 		apiHelpers.Respond(ctx, http.StatusBadRequest, "Failed to update alarm action.", err.Error())
 		return err
 	} else {
-		apiHelpers.Respond(ctx, http.StatusOK, results, nil)
+		apiHelpers.Respond(ctx, http.StatusOK, "Succeeded to update alarm action.", results)
 	}
 	return nil
 }
-
 
 // DeleteAlarmAction
 //  @Tags         Common

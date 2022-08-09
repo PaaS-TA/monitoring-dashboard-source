@@ -107,7 +107,7 @@ type (
 
 	AlarmActionRequest struct {
 		Id              int    `json:"id"              example:"1"`
-		AlarmId         int    `json:"alarmId"         example:"115"`
+		AlarmId         int    `json:"alarmId" swaggerignore:"true"`
 		AlarmActionDesc string `json:"alarmActionDesc" example:"Modify From Swagger Web"`
 		RegUser         string `json:"regUser" swaggerignore:"true"`
 	}

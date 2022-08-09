@@ -88,9 +88,6 @@ definitions:
       alarmActionDesc:
         example: Modify From Swagger Web
         type: string
-      alarmId:
-        example: 115
-        type: integer
       id:
         example: 1
         type: integer
@@ -746,6 +743,7 @@ paths:
         - cpu
         - memory
         - disk
+        - fail
         in: query
         name: alarmType
         type: string
@@ -753,6 +751,7 @@ paths:
         enum:
         - warning
         - critical
+        - fail
         in: query
         name: level
         type: string
@@ -803,6 +802,7 @@ paths:
       description: 알람에 대한 조치 내용을 가져온다.
       parameters:
       - description: Alarm ID
+        example: 115
         in: query
         name: alarmId
         type: integer
@@ -2319,9 +2319,7 @@ paths:
         또한 특정기간 로그 조회 또는 최근기간 로그 조회를 위한 파라미터가 반드시 하나는 사용되어야 한다.
       parameters:
       - description: 로그 조회시 대상 VM의 UUID를 주입한다.
-        enum:
-        - 36dd3d08-5198-42b6-4130-d0c04479236f
-        - f1db5cd8-3e5b-4980-966f-9fa88d8d85fd
+        example: 36dd3d08-5198-42b6-4130-d0c04479236f
         in: path
         name: uuid
         required: true

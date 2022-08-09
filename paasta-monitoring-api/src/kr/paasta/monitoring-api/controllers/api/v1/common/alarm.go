@@ -26,8 +26,8 @@ func GetAlarmController(conn connections.Connections) *AlarmController {
 //  @Accept       json
 //  @Produce      json
 //  @Param        originType     query     string  false  "Origin Type"  enums(bos, pas, con, ias)
-//  @Param        alarmType      query     string  false  "Alarm Type"   enums(cpu, memory, disk)
-//  @Param        level          query     string  false  "Level"        enums(warning, critical)
+//  @Param        alarmType      query     string  false  "Alarm Type"   enums(cpu, memory, disk, fail)
+//  @Param        level          query     string  false  "Level"        enums(warning, critical, fail)
 //  @Param        resolveStatus  query     string  false  "Resolve Status"
 //  @Success      200            {object}  apiHelpers.BasicResponseForm{responseInfo=v1.Alarms}
 //  @Router       /api/v1/alarm [get]

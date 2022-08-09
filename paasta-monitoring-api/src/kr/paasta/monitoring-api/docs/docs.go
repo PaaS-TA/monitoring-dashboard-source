@@ -46,7 +46,8 @@ const docTemplate = `{
                         "enum": [
                             "cpu",
                             "memory",
-                            "disk"
+                            "disk",
+                            "fail"
                         ],
                         "type": "string",
                         "description": "Alarm Type",
@@ -56,7 +57,8 @@ const docTemplate = `{
                     {
                         "enum": [
                             "warning",
-                            "critical"
+                            "critical",
+                            "fail"
                         ],
                         "type": "string",
                         "description": "Level",
@@ -108,6 +110,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "example": 115,
                         "description": "Alarm ID",
                         "name": "alarmId",
                         "in": "query"
@@ -2467,11 +2470,8 @@ const docTemplate = `{
                 "summary": "로그 정보 가져오기",
                 "parameters": [
                     {
-                        "enum": [
-                            "36dd3d08-5198-42b6-4130-d0c04479236f",
-                            "f1db5cd8-3e5b-4980-966f-9fa88d8d85fd"
-                        ],
                         "type": "string",
+                        "example": "36dd3d08-5198-42b6-4130-d0c04479236f",
                         "description": "로그 조회시 대상 VM의 UUID를 주입한다.",
                         "name": "uuid",
                         "in": "path",
@@ -3035,10 +3035,6 @@ const docTemplate = `{
                 "alarmActionDesc": {
                     "type": "string",
                     "example": "Modify From Swagger Web"
-                },
-                "alarmId": {
-                    "type": "integer",
-                    "example": 115
                 },
                 "id": {
                     "type": "integer",
