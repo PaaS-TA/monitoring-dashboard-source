@@ -29,38 +29,10 @@ func GetTokenController(conn connections.Connections) *TokenController {
 //  @Description  토큰 정보를 생성한다.
 //  @Accept       json
 //  @Produce      json
-//  @Param        CreateToken  body      CreateToken  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
-//  @Success      200          {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
-//  @Router       /api/v1/token [post]
-func (a *TokenController) CreateToken(c echo.Context) (err error) {
-	var userRequest v1.CreateToken                       // 클라이언트의 리퀘스트 정보를 저장할 변수 선언
-	err = helpers.BindJsonAndCheckValid(c, &userRequest) // 클라이언트의 리퀘스트 정보의 바인딩 & 유효성 결과를 반환
-	if err != nil {
-		apiHelpers.Respond(c, http.StatusBadRequest, "Invalid JSON provided, please check the request JSON", err.Error())
-		return err
-	}
-
-	// Authentication의 CreateToken 발급을 호출한다.
-	tokenDetails, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateToken(userRequest, c)
-	if err != nil {
-		apiHelpers.Respond(c, http.StatusInternalServerError, "Cannot create token", err.Error())
-		return err
-	}
-
-	// TokenDetails로 토근 정보를 전달한다. (AccessToken, RefreshToken, AccessUuid, RefreshUuid, AtExpires, RtExpires)
-	apiHelpers.Respond(c, http.StatusOK, "Success to create token", tokenDetails)
-	return nil
-}
-
-// CreateAccessToken
-//  @Summary      토큰 생성하기
-//  @Description  토큰 정보를 생성한다.
-//  @Accept       json
-//  @Produce      json
 //  @Param        TokenParam  body      TokenParam  true  "토큰을 생성하기 위해 필요한 유저 정보를 제공한다."
 //  @Success      200         {object}  apiHelpers.BasicResponseForm{responseInfo=TokenDetails}
-//  @Router       /api/v1/token2 [post]
-func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
+//  @Router       /api/v1/token [post]
+func (a *TokenController) CreateToken(ctx echo.Context) error {
 	var params v1.TokenParam
 	err := helpers.BindJsonAndCheckValid(ctx, &params)
 	if err != nil {
@@ -68,7 +40,7 @@ func (a *TokenController) CreateAccessToken(ctx echo.Context) error {
 		return err
 	}
 
-	tokenMap, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateAccessToken(params, ctx)
+	tokenMap, err := v1service.GetTokenService(a.DbInfo, a.RedisInfo).CreateToken(params, ctx)
 	if err != nil {
 		apiHelpers.Respond(ctx, http.StatusInternalServerError, "Cannot create token", err.Error())
 		return err

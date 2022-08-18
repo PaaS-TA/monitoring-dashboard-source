@@ -1,10 +1,9 @@
 package v1service
 
 import (
-	"fmt"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"paasta-monitoring-api/apiHelpers"
 	"paasta-monitoring-api/helpers"
@@ -24,13 +23,12 @@ func GetUserService(db *gorm.DB) *UserService {
 	}
 }
 
-
 func (service *UserService) GetMember(ctx echo.Context) ([]v1.MemberInfos, error) {
 	logger := ctx.Request().Context().Value("LOG").(*logrus.Entry)
 
 	userId := ctx.QueryParam("userId")
-	params := v1.MemberInfos {
-		UserId : userId,
+	params := v1.MemberInfos{
+		UserId: userId,
 	}
 
 	validationErr := helpers.CheckValid(params)
@@ -45,23 +43,4 @@ func (service *UserService) GetMember(ctx echo.Context) ([]v1.MemberInfos, error
 		return nil, err
 	}
 	return members, nil
-}
-
-
-func (h *UserService) GetUsers(request v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
-	users, err := dao.GetUserDao(h.db).GetUsers(request, c)
-	if err != nil {
-		fmt.Println(err.Error())
-		return users, err
-	}
-	return users, nil
-}
-
-func (h *UserService) GetUser(request v1.UserInfo, c echo.Context) ([]v1.UserInfo, error) {
-	users, err := dao.GetUserDao(h.db).GetUser(request, c)
-	if err != nil {
-		fmt.Println(err.Error())
-		return users, err
-	}
-	return users, nil
 }

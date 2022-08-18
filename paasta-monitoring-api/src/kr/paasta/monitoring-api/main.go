@@ -19,11 +19,11 @@ import (
 // @tag.name         AP
 // @tag.description  Application Platform API (Based on Cloud Foundry)
 // @tag.name         CP
-// @tag.description  Container Platform API (Based on Kubernetes)
+// @tag.description  Container Platform API (Based on Kubernetes/Prometheus)
 // @tag.name         SaaS
 // @tag.description  Application Performance Monitoring API (Based on Pinpoint)
 // @tag.name         IaaS
-// @tag.description  Infrastructure Monitoring API (Based on Openstack/Zabbix)
+// @tag.description  Infrastructure Monitoring API (Based on Openstack/Zabbix) - Only can use it, when you use IaaS option
 func main() {
 	logger := logrus.New()
 	logger.SetFormatter(&nested.Formatter{

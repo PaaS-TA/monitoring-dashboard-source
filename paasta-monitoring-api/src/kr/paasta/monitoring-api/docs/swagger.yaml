@@ -405,18 +405,6 @@ definitions:
           $ref: '#/definitions/v1.Container'
         type: array
     type: object
-  v1.CreateToken:
-    properties:
-      password:
-        example: password
-        type: string
-      username:
-        example: username
-        type: string
-    required:
-    - password
-    - username
-    type: object
   v1.Logs:
     properties:
       endTime:
@@ -643,68 +631,6 @@ definitions:
     - iaasUserId
     - passwd
     - userId
-    type: object
-  v1.UserInfo:
-    properties:
-      authC1:
-        type: string
-      authC2:
-        type: string
-      authI1:
-        type: string
-      authI2:
-        type: string
-      authP1:
-        type: string
-      authP2:
-        type: string
-      caasToken:
-        type: string
-      caasUserId:
-        type: string
-      caasUserPw:
-        type: string
-      caasUserUseYn:
-        type: string
-      iaasToken:
-        type: string
-      iaasUserId:
-        type: string
-      iaasUserPw:
-        type: string
-      iaasUserUseYn:
-        type: string
-      paasAdminYn:
-        type: string
-      paasToken:
-        type: string
-      paasUserId:
-        type: string
-      paasUserPw:
-        type: string
-      paasUserUseYn:
-        type: string
-      password:
-        type: string
-      sysType:
-        type: string
-      token:
-        type: string
-      userAuth:
-        type: string
-      userEmail:
-        type: string
-      userId:
-        type: string
-      userNm:
-        type: string
-      userPw:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
     type: object
   v1.ZoneInfo:
     properties:
@@ -2512,10 +2438,10 @@ paths:
       parameters:
       - description: 토큰을 생성하기 위해 필요한 유저 정보를 제공한다.
         in: body
-        name: CreateToken
+        name: TokenParam
         required: true
         schema:
-          $ref: '#/definitions/v1.CreateToken'
+          $ref: '#/definitions/v1.TokenParam'
       produces:
       - application/json
       responses:
@@ -2553,63 +2479,16 @@ paths:
                   $ref: '#/definitions/v1.TokenDetails'
               type: object
       summary: 토큰 리프레시하기
-  /api/v1/token2:
-    post:
-      consumes:
-      - application/json
-      description: 토큰 정보를 생성한다.
-      parameters:
-      - description: 토큰을 생성하기 위해 필요한 유저 정보를 제공한다.
-        in: body
-        name: TokenParam
-        required: true
-        schema:
-          $ref: '#/definitions/v1.TokenParam'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
-            - properties:
-                responseInfo:
-                  $ref: '#/definitions/v1.TokenDetails'
-              type: object
-      summary: 토큰 생성하기
-  /api/v1/users:
-    get:
-      consumes:
-      - application/json
-      description: 전체 또는 단일 유저 정보를 가져온다.
-      parameters:
-      - description: 단일 사용자 정보 조회시 유저명을 주입한다.
-        in: query
-        name: username
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/apiHelpers.BasicResponseForm'
-            - properties:
-                responseInfo:
-                  $ref: '#/definitions/v1.UserInfo'
-              type: object
-      summary: 전체 또는 단일 유저 정보 가져오기
 swagger: "2.0"
 tags:
 - description: Common Module API (Alarm & Log)
   name: Common
 - description: Application Platform API (Based on Cloud Foundry)
   name: AP
-- description: Container Platform API (Based on Kubernetes)
+- description: Container Platform API (Based on Kubernetes/Prometheus)
   name: CP
 - description: Application Performance Monitoring API (Based on Pinpoint)
   name: SaaS
-- description: Infrastructure Monitoring API (Based on Openstack/Zabbix)
+- description: Infrastructure Monitoring API (Based on Openstack/Zabbix) - Only can
+    use it, when you use IaaS option
   name: IaaS

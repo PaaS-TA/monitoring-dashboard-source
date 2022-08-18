@@ -2803,49 +2803,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "토큰을 생성하기 위해 필요한 유저 정보를 제공한다.",
-                        "name": "CreateToken",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.CreateToken"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.TokenDetails"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/token2": {
-            "post": {
-                "description": "토큰 정보를 생성한다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "토큰 생성하기",
-                "parameters": [
-                    {
-                        "description": "토큰을 생성하기 위해 필요한 유저 정보를 제공한다.",
                         "name": "TokenParam",
                         "in": "body",
                         "required": true,
@@ -2867,46 +2824,6 @@ const docTemplate = `{
                                     "properties": {
                                         "responseInfo": {
                                             "$ref": "#/definitions/v1.TokenDetails"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/users": {
-            "get": {
-                "description": "전체 또는 단일 유저 정보를 가져온다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "전체 또는 단일 유저 정보 가져오기",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "단일 사용자 정보 조회시 유저명을 주입한다.",
-                        "name": "username",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apiHelpers.BasicResponseForm"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "responseInfo": {
-                                            "$ref": "#/definitions/v1.UserInfo"
                                         }
                                     }
                                 }
@@ -3507,23 +3424,6 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.CreateToken": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "type": "string",
-                    "example": "password"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "username"
-                }
-            }
-        },
         "v1.Logs": {
             "type": "object",
             "properties": {
@@ -3866,99 +3766,6 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UserInfo": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "authC1": {
-                    "type": "string"
-                },
-                "authC2": {
-                    "type": "string"
-                },
-                "authI1": {
-                    "type": "string"
-                },
-                "authI2": {
-                    "type": "string"
-                },
-                "authP1": {
-                    "type": "string"
-                },
-                "authP2": {
-                    "type": "string"
-                },
-                "caasToken": {
-                    "type": "string"
-                },
-                "caasUserId": {
-                    "type": "string"
-                },
-                "caasUserPw": {
-                    "type": "string"
-                },
-                "caasUserUseYn": {
-                    "type": "string"
-                },
-                "iaasToken": {
-                    "type": "string"
-                },
-                "iaasUserId": {
-                    "type": "string"
-                },
-                "iaasUserPw": {
-                    "type": "string"
-                },
-                "iaasUserUseYn": {
-                    "type": "string"
-                },
-                "paasAdminYn": {
-                    "type": "string"
-                },
-                "paasToken": {
-                    "type": "string"
-                },
-                "paasUserId": {
-                    "type": "string"
-                },
-                "paasUserPw": {
-                    "type": "string"
-                },
-                "paasUserUseYn": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "sysType": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "userAuth": {
-                    "type": "string"
-                },
-                "userEmail": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                },
-                "userNm": {
-                    "type": "string"
-                },
-                "userPw": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "v1.ZoneInfo": {
             "type": "object",
             "properties": {
@@ -3987,7 +3794,7 @@ const docTemplate = `{
             "name": "AP"
         },
         {
-            "description": "Container Platform API (Based on Kubernetes)",
+            "description": "Container Platform API (Based on Kubernetes/Prometheus)",
             "name": "CP"
         },
         {
@@ -3995,7 +3802,7 @@ const docTemplate = `{
             "name": "SaaS"
         },
         {
-            "description": "Infrastructure Monitoring API (Based on Openstack/Zabbix)",
+            "description": "Infrastructure Monitoring API (Based on Openstack/Zabbix) - Only can use it, when you use IaaS option",
             "name": "IaaS"
         }
     ]
