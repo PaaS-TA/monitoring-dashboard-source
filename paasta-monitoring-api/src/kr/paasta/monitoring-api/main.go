@@ -13,7 +13,6 @@ import (
 //Execution starts from main function
 // @title            Monitoring Dashboard API
 // @version          5.8.0
-// @host             localhost:8395
 // @tag.name         Common
 // @tag.description  Common Module API (Alarm & Log)
 // @tag.name         AP

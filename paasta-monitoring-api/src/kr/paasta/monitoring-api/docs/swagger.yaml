@@ -643,7 +643,6 @@ definitions:
       zoneName:
         type: string
     type: object
-host: localhost:8395
 info:
   contact: {}
   title: Monitoring Dashboard API

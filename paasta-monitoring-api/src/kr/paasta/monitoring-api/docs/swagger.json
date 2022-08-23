@@ -5,7 +5,6 @@
         "contact": {},
         "version": "5.8.0"
     },
-    "host": "localhost:8395",
     "paths": {
         "/api/v1/alarm": {
             "get": {
