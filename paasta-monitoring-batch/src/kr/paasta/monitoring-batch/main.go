@@ -1,23 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"io"
 	"os"
-	"path/filepath"
+	"fmt"
 	"time"
 	"bufio"
 	"strings"
-	"io"
-	"os/signal"
 	"syscall"
 	"strconv"
-	"github.com/tedsuo/ifrit/grouper"
+	"os/signal"
+	"path/filepath"
+
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/sigmon"
-	"kr/paasta/monitoring-batch/service"
-	"kr/paasta/monitoring-batch/util"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/handler"
+	"github.com/tedsuo/ifrit/grouper"
+
+	"monitoring-batch/util"
+	"monitoring-batch/model"
+	"monitoring-batch/handler"
+	"monitoring-batch/service"
 )
 
 type Config map[string]string

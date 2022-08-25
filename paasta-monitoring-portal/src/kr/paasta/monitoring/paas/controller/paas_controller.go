@@ -4,9 +4,9 @@ import (
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/service"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/service"
+	"monitoring-portal/paas/util"
 	"net/http"
 	"strconv"
 )

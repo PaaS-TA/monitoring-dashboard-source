@@ -3,9 +3,9 @@ package dao
 import (
 	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
+	"monitoring-batch/model"
+	"monitoring-batch/model/base"
+	"monitoring-batch/util"
 )
 
 type AutoScalerDaoStruct struct {

@@ -3,8 +3,8 @@ package dao
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/util"
 	"strconv"
 )
 

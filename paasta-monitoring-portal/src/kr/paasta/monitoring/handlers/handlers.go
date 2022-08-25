@@ -1,11 +1,11 @@
 package handlers
 
 import (
-    "github.com/cavaliercoder/go-zabbix"
-    "io"
-    "net/http"
-    "strings"
-    "time"
+	"io"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
+	"net/http"
+	"strings"
+	"time"
 
     "github.com/cloudfoundry-community/gogobosh"
     "github.com/go-redis/redis"
@@ -15,17 +15,17 @@ import (
     "github.com/jinzhu/gorm"
     "github.com/tedsuo/rata"
 
-    caasContoller "kr/paasta/monitoring/caas/controller"
-    "kr/paasta/monitoring/common/controller"
-    iaasContoller "kr/paasta/monitoring/iaas_new/controller"
-    paasContoller "kr/paasta/monitoring/paas/controller"
-    pm "kr/paasta/monitoring/paas/model"
-    saasContoller "kr/paasta/monitoring/saas/controller"
+	caasContoller "monitoring-portal/caas/controller"
+	"monitoring-portal/common/controller"
+	iaasContoller "monitoring-portal/iaas_new/controller"
+	paasContoller "monitoring-portal/paas/controller"
+	pm "monitoring-portal/paas/model"
+	saasContoller "monitoring-portal/saas/controller"
 
-    "kr/paasta/monitoring/routes"
-    "kr/paasta/monitoring/utils"
+    "monitoring-portal/routes"
+    "monitoring-portal/utils"
 
-    "kr/paasta/monitoring/iaas_new/model"
+	"monitoring-portal/iaas_new/model"
 )
 
 func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,

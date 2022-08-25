@@ -146,16 +146,24 @@
 			<!-- // Container -->
 			
 			<div id="chartWrap">
-				<div class="chart on">
+				<div class="chart on top">
 					<h4><span class="chartTitle"></span></h4>
-					<ul class="one">
-						<li>
-							<h5>Workloads Usage</h5>
-							<div id="nodeChart" class="gaugeChart"></div>
+					<ul>
+						<li class="liList-03">
+							<h5>CPU Usage</h5>
+							<div id="cpuChart"></div>
+						</li>
+						<li class="liList-03">
+							<h5>Memory Usage</h5>
+							<div id="memoryChart"></div>
+						</li>
+						<li class="liList-03">
+							<h5>Disk Usage</h5>
+							<div id="diskChart"></div>
 						</li>
 					</ul>
-					<h5>Workloads Container list</h5>
-					<div class="tableList">
+					<h5 class="h5">Workloads Container list</h5>
+					<div class="tableList height">
 						<table style="table-layout: fixed">
 							<caption>Workloads Container list</caption>
 							<thead>
@@ -179,8 +187,10 @@
 					<div class="logWrap">
 						<div class="log on">
 							<h4>LOG</h4>
-							<div id="logChart" class="logChart"></div>
-							<pre id="logText"></pre>
+							<div id="cpuLogChart" class="logdiv"></div>
+							<div id="memoryLogChart" class="logdiv"></div>
+							<div id="diskLogChart" class="logdiv"></div>
+							<pre id="logText" class="logPre"></pre>
 							<a href="javascript:void(0);" class="logClosed"></a>
 						</div>
 					</div>
@@ -390,8 +400,21 @@
 					nodeInfo(data){
 						document.getElementById('chartWrap').classList.toggle('on', true);
 
+						let cpuArr = [];
+						let memoryArr = [];
+						let diskArr = [];
+
+						cpuArr.push(data[0]);
+						memoryArr.push(data[1]);
+						diskArr.push(data[2]);
+
 						setTimeout(() => {
-							fnComm.detailChart(data, '#nodeChart');
+							fnComm.detailChart(cpuArr, '#cpuChart');
+
+							fnComm.detailChart(memoryArr, '#memoryChart');
+
+							fnComm.detailChart(diskArr, '#diskChart');
+
 						},500);
 					},
 
@@ -452,8 +475,20 @@
 					containerChart(data) {
 						document.querySelector('.logWrap').classList.toggle('on', true);
 
+						let cpuArr = [];
+						let memoryArr = [];
+						let diskArr = [];
+
+						cpuArr.push(data[0]);
+						memoryArr.push(data[1]);
+						diskArr.push(data[2]);
+
 						setTimeout(() => {
-							fnComm.detailChart(data, '#logChart');
+							fnComm.detailChart(cpuArr, '#cpuLogChart');
+
+							fnComm.detailChart(memoryArr, '#memoryLogChart');
+
+							fnComm.detailChart(diskArr, '#diskLogChart');
 						},500);
 					},
 

@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"github.com/cavaliercoder/go-zabbix"
 	"github.com/elastic/go-elasticsearch/v7"
-	controller2 "kr/paasta/monitoring/iaas_new/controller"
+	controller2 "monitoring-portal/iaas_new/controller"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 
-	paasContoller "kr/paasta/monitoring/paas/controller"
+	paasContoller "monitoring-portal/paas/controller"
 	"strings"
 
 	//"github.com/cloudfoundry-community/go-cfclient"
@@ -17,13 +17,13 @@ import (
 	"github.com/rackspace/gophercloud"
 	"github.com/tedsuo/rata"
 	"io"
-	"kr/paasta/monitoring/common/controller"
+	"monitoring-portal/common/controller"
 
-	"kr/paasta/monitoring/iaas_new/model"
-	pm "kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/routes"
-	saasContoller "kr/paasta/monitoring/saas/controller"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/model"
+	pm "monitoring-portal/paas/model"
+	"monitoring-portal/routes"
+	saasContoller "monitoring-portal/saas/controller"
+	"monitoring-portal/utils"
 	"net/http"
 	"time"
 )

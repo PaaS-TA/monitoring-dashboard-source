@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"kr/paasta/monitoring/caas/model"
+	"monitoring-portal/caas/model"
 	"net/http"
 	"strconv"
 	"strings"

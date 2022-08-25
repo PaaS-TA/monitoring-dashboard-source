@@ -1,45 +1,16 @@
 package dao
 
 import (
+	"caas-monitoring-batch/model"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/thoas/go-funk"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/util"
-	"log"
-	"os"
 	"strconv"
 )
 
 var dbType string
 var connectionString string
 
-func init() {
-	// 기본적인 프로퍼티 설정 정보 읽어오기
-	config, err := util.ReadConfig(`config.ini`)
-	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
-	}
-
-	dbType = config["monitoring.db.type"]
-	dbName := config["monitoring.db.dbname"]
-	userName := config["monitoring.db.username"]
-	userPassword := config["monitoring.db.password"]
-	host := config["monitoring.db.host"]
-	port := config["monitoring.db.port"]
-
-	connectionString = fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s", userName, userPassword, "tcp", host, port, dbName, "")
-}
-
-func GetdbAccessObj() *gorm.DB {
-	dbAccessObj, paasDbErr := gorm.Open(dbType, connectionString+"?charset=utf8&parseTime=true")
-	if paasDbErr != nil {
-		fmt.Println("err::", paasDbErr)
-		return nil
-	}
-	return dbAccessObj
-}
 
 func CreateTable(dbClient *gorm.DB) {
 	dbClient.Debug().AutoMigrate(&model.BatchAlarmInfo{}, &model.BatchAlarmExecution{}, &model.BatchAlarmReceiver{}, &model.BatchAlarmSns{}, &model.BatchAlarmExecutionResolve{})

@@ -3,9 +3,9 @@ package notify
 import (
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"kr/paasta/monitoring-batch/util"
 	"log"
 	"os"
+	"saas-monitoring-batch/util"
 )
 
 var config map[string]string

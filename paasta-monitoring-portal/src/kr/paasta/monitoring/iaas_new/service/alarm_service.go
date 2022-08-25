@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/iaas_new/dao"
-	"kr/paasta/monitoring/paas/model"
+	"monitoring-portal/iaas_new/dao"
+	"monitoring-portal/paas/model"
 )
 
 type AlarmService struct {

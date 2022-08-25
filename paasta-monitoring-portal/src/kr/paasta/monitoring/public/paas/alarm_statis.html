@@ -62,7 +62,7 @@
 						</div>
 						<div class="listBtns">
 							<a href="javascript:window.print();" class="print">출력</a>
-							<a href="javascript:void(0);" class="excel">엑셀 다운로드</a>
+							<!--<a href="javascript:void(0);" class="excel">엑셀 다운로드</a>-->
 						</div>
 					</fieldset>
 					<!-- // Overview -->
@@ -220,7 +220,6 @@
 					switch (alarm.days){
 						case 'd':
 							detailTime = ['time','22:00','23:00','24:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
-
 							
 							alarm.prday.setDate(alarm.prday.getDate()-(alarm.step-1));
 							
@@ -285,6 +284,11 @@
 						cnt = idx;
 					});
 
+					c3.chart.internal.fn.categoryName = function (i) {
+						var config = this.config, categoryIndex = Math.ceil(i);
+						return i < config.axis_x_categories.length ? config.axis_x_categories[categoryIndex] : i;
+					};
+
 					var chart = c3.generate({
 						bindto: target,
 						data: {
@@ -300,13 +304,14 @@
 								type: 'category',
 								localtime: false,
 								tick: {
-									count: 2,
-								}
+									count : 5,
+								},
 							},
 							y: {
 								tick: {
 									count: 2,
-								}
+								},
+								padding: {top: 0, bottom: 0}
 							},
 						},
 					});

@@ -3,12 +3,10 @@ package model
 import (
 	"errors"
 	"github.com/cihub/seelog"
-	"time"
-	"unicode"
-	//"github.com/alexedwards/scs"
-	"github.com/alexedwards/scs"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/rackspace/gophercloud"
+	"time"
+	"unicode"
 )
 
 const (
@@ -193,9 +191,6 @@ func isInt(s string) bool {
 	}
 	return true
 }
-
-//var SessionManager scs.Manager // = scs.NewCookieManager("u46IpCV9y5Vlur8YvODJEhgOY8m9JVE4")
-var SessionManager *scs.SessionManager = scs.New()
 
 func (bm DetailReq) MetricRequestValidate(req DetailReq) error {
 
