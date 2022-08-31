@@ -347,7 +347,7 @@
 			chartObjectArr.forEach((chartObj, idx) => {
 				chartObj.unload()
 				chartObj.flush();
-				chartObj.destroy();
+				delete chartObj;
 				chartObjectArr.splice(idx, 1);
 			});
 		}, false);
@@ -358,7 +358,7 @@
 			loader : document.getElementById("loadWrap"),
 			init() {
 				// Alarm Count
-				//fnComm.alarmCount('iaas');
+				fnComm.alarmCount('paas');
 
 				project.loader.style.display = "flex";
 
@@ -580,8 +580,13 @@
 				item.data.forEach(data => {
 					if(idx === 0){
 						var timeStamp = new Date((data.Clock)*1000);
+						timeStamp.setHours(timeStamp.getHours()+9);
 
-						detailTime.push(('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2));
+						let utcFullYear = timeStamp.getUTCFullYear();
+						let utcMonth = timeStamp.getUTCMonth()+1;
+						let utcDate = timeStamp.getUTCDate();
+
+						detailTime.push(utcFullYear + '-' + utcMonth + '-' + utcDate + ' ' + ('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2));
 					};
 
 					detailData[idx].push(Number(Math.ceil(data.Value)));
@@ -590,6 +595,7 @@
 						yPos = Math.ceil(data.Value);
 				});
 
+				detailData[idx].splice(10);
 				cnt = idx;
 			});
 
@@ -633,7 +639,7 @@
 				bindto: target,
 				data: {
 					x: 'time',
-					xFormat: '%H:%M',
+					xFormat: '%Y-%m-%d %H:%M',
 					columns: dataType,
 					labels: false,
 					type: 'spline',
@@ -646,20 +652,30 @@
 						type: 'timeseries',
 						localtime: false,
 						tick: {
-							count: 2,
-						}
+							count: 3,
+							format: '%H:%M'
+						},
 					},
 					y: {
 						max: yPos,
 						min: 0,
 						tick: {
 							count: 5,
-						}
+						},
+						padding: {top: 0, bottom: 0}
 					}
 				},
 				point: {
-					show: false
-				}
+					show: true
+				},
+				grid: {
+					x: {
+						lines: [{value: detailTime[5], class:'dash-line'}]
+					},
+					y: {
+						//show: true
+					}
+				},
 			});
 			chartObjectArr.push(chart);
 		}

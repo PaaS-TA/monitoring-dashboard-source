@@ -3,15 +3,14 @@ package service
 import (
 	"fmt"
 	"time"
-	//"github.com/cloudfoundry-community/go-cfclient"
-	"kr/paasta/monitoring-batch/dao"
-	"kr/paasta/monitoring-batch/model"
-	"kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
-	"strconv"
 	"sync"
-	//"github.com/cloudfoundry-community/go-cfclient"
-	md "kr/paasta/monitoring-batch/model"
+	"strconv"
+
+	"monitoring-batch/dao"
+	"monitoring-batch/util"
+	"monitoring-batch/model"
+	"monitoring-batch/model/base"
+
 )
 
 type AutoScalerStruct struct {
@@ -104,7 +103,7 @@ func (a *AutoScalerStruct) requestAutoScale(target model.AutoScaleTarget) {
 
 	fmt.Printf("====== AutoScaler.go / AutoScale() - Request cf AutoScaling ( guid : %v, instances : %v\n", target.AppGuid, target.InstanceCnt)
 
-	var aur md.ScaleProcess
+	var aur model.ScaleProcess
 	aur.Instances, _ = strconv.Atoi(target.InstanceCnt)
 
 	updateResp, updateErr := util.UpdateApp(a.b.CfConfig, a.b.CfClientToken, target.AppGuid, aur)

@@ -1,14 +1,13 @@
 package test
 
 import (
-	"github.com/cavaliercoder/go-zabbix"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"github.com/elastic/go-elasticsearch/v7"
 	controller2 "kr/paasta/monitoring/iaas_new/controller"
 
 	paasContoller "kr/paasta/monitoring/paas/controller"
 	"strings"
 
-	//"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry-community/gogobosh"
 	"github.com/go-redis/redis"
 	monascagopher "github.com/gophercloud/gophercloud"

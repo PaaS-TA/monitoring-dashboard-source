@@ -5,8 +5,8 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
-	"kr/paasta/iaas-monitoring-batch/config"
-	"kr/paasta/iaas-monitoring-batch/model/base"
+	"iaas-monitoring-batch/config"
+	"iaas-monitoring-batch/model/base"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -16,18 +16,18 @@ import (
 	"sync"
 	"time"
 
-	"zabbix-client/common"
-	"zabbix-client/host"
-	"zabbix-client/hostgroup"
-	"zabbix-client/item"
+	"iaas-monitoring-batch/zabbix-client/common"
+	"iaas-monitoring-batch/zabbix-client/host"
+	"iaas-monitoring-batch/zabbix-client/hostgroup"
+	"iaas-monitoring-batch/zabbix-client/item"
 
-	"github.com/cavaliercoder/go-zabbix"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	"iaas-monitoring-batch/zabbix-client/lib/go-zabbix"
 
-	"kr/paasta/iaas-monitoring-batch/dao"
-	"kr/paasta/iaas-monitoring-batch/model"
-	"kr/paasta/iaas-monitoring-batch/util"
+	"iaas-monitoring-batch/dao"
+	"iaas-monitoring-batch/model"
+	"iaas-monitoring-batch/util"
 )
 
 type AlarmService struct {

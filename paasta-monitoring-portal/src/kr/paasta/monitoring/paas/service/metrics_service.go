@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/paas/dao"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/paas/dao"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/util"
 	"strconv"
 )
 

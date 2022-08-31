@@ -5,8 +5,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/cavaliercoder/go-zabbix"
 	"github.com/cihub/seelog"
+	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"net"
 	"time"
 

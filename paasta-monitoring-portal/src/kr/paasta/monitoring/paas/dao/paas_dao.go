@@ -5,8 +5,8 @@ import (
 	"github.com/cihub/seelog"
 	"github.com/influxdata/influxdb1-client/v2"
 	"github.com/jinzhu/gorm"
-	"kr/paasta/monitoring/paas/model"
-	"kr/paasta/monitoring/paas/util"
+	"monitoring-portal/paas/model"
+	"monitoring-portal/paas/util"
 	"strings"
 )
 

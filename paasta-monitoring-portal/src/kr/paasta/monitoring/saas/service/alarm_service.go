@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/thoas/go-funk"
-	"kr/paasta/monitoring/saas/dao"
-	"kr/paasta/monitoring/saas/model"
+	"monitoring-portal/saas/dao"
+	"monitoring-portal/saas/model"
 	"strconv"
 	"strings"
 )

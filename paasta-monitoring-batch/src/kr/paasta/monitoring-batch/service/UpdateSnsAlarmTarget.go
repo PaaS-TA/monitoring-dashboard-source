@@ -2,12 +2,12 @@ package service
 
 import (
 	"fmt"
-	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"kr/paasta/monitoring-batch/dao"
-	mod "kr/paasta/monitoring-batch/model"
-	cb "kr/paasta/monitoring-batch/model/base"
-	"kr/paasta/monitoring-batch/util"
 	"sync"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"monitoring-batch/dao"
+	"monitoring-batch/util"
+	mod "monitoring-batch/model"
+	cb "monitoring-batch/model/base"
 )
 
 func UpdateSnsAlarmTarget(f *BackendServices) {

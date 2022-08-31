@@ -18,6 +18,7 @@ func ReadConfig(filename string) (Config, error) {
 		return config, nil
 	}
 	file, err := os.Open(filename)
+
 	if err != nil {
 		return nil, err
 	}

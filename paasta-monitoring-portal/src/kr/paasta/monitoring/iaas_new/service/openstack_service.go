@@ -12,8 +12,8 @@ import (
 	_ "github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/groups"
 	client "github.com/influxdata/influxdb1-client/v2"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/utils"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/utils"
 )
 
 type OpenstackService struct {

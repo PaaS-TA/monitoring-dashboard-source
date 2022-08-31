@@ -1,23 +1,21 @@
 package controller
 
 import (
-	cm "kr/paasta/monitoring/common/model"
-	"kr/paasta/monitoring/common/service"
-	"strings"
 
-	//"github.com/cloudfoundry-community/go-cfclient"
-	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis"
-	"kr/paasta/monitoring/iaas_new/model"
-	"kr/paasta/monitoring/utils"
-	"net/http"
-	//"github.com/cloudfoundry-community/go-cfclient"
 	"errors"
+	"strings"
+	"net/http"
+	"encoding/json"
+
+	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
-	pm "kr/paasta/monitoring/paas/model"
-	ua "kr/paasta/monitoring/utils"
-	//"strings"
+	"monitoring-portal/utils"
+	"monitoring-portal/iaas_new/model"
+	"monitoring-portal/common/service"
+	pm "monitoring-portal/paas/model"
+	cm "monitoring-portal/common/model"
+
 )
 
 //Compute Node Controller
@@ -396,7 +394,7 @@ func (s *MemberController) MemberCheckPaaS(w http.ResponseWriter, r *http.Reques
 	var apiRequest cm.UserInfo
 	_ = json.NewDecoder(r.Body).Decode(&apiRequest)
 	s.CfConfig.Type = "PAAS"
-	_, err := ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
+	_, err := utils.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
 
 	if err != nil {
 		fmt.Println("uaa token::", err.Error())
@@ -436,7 +434,7 @@ func (s *MemberController) MemberCheckCaaS(w http.ResponseWriter, r *http.Reques
 	s.CfConfig.Type = "CAAS"
 	//resultBroker = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).CaasServiceCheck(apiRequest, reqCsrfToken, s.CfConfig)
 	if resultBroker == "adm" {
-		_, err := ua.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
+		_, err := utils.GetUaaToken(apiRequest, reqCsrfToken, s.CfConfig, s.RdClient)
 
 		if err != nil {
 			fmt.Println("uaa token::", err.Error())

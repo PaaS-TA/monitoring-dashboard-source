@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"kr/paasta/iaas-monitoring-batch/config"
 	"os"
+	"fmt"
 	"sync"
 	"time"
-
 	"github.com/tedsuo/ifrit"
-
-	"kr/paasta/iaas-monitoring-batch/service"
+	"iaas-monitoring-batch/config"
+	"iaas-monitoring-batch/service"
 )
 
 type Runner struct {

@@ -11,7 +11,7 @@
 
 		<!-- Wrap -->
 		<div id="wrap">
-			
+
 			<!-- Header -->
 			<header>
 				<h1><a href="index.html" title="Monitoring"><img src="../resources/img/logo_56x56.png" alt="Monitoring" ></a></h1>
@@ -22,7 +22,7 @@
 					<li class="SaaS"><a href="../saas/index.html">SaaS</a></li>
 					<li class="IaaS"><a href="../iaas/index.html">IaaS</a></li>
 				</ul>
-				
+
 				<!-- Navigation -->
 				<nav>
 					<ul>
@@ -40,7 +40,7 @@
 					</ul>
 				</nav>
 				<!-- // Navigation -->
-				
+
 			</header>
 			<!-- // Header -->
 
@@ -162,32 +162,40 @@
 				<!-- // Contents -->
 			</div>
 			<!-- // Container -->
-			
+
 			<!-- // Chart Layer -->
 			<div id="chartWrap">
-				<div class="chart on">
+				<div class="chart on top">
 					<h4><span class="chartTitle"></span></h4>
-					<ul class="one">
-						<li>
+					<ul>
+						<li class="liList-03">
 							<h5>Pod Usage</h5>
-							<div id="nodeChart" class="gaugeChart"></div>
+							<div id="cpuChart"></div>
+						</li>
+						<li class="liList-03">
+							<h5>Pod Usage</h5>
+							<div id="memoryChart"></div>
+						</li>
+						<li class="liList-03">
+							<h5>Pod Usage</h5>
+							<div id="diskChart"></div>
 						</li>
 					</ul>
-					<h5>Pod Container list</h5>
-					<div class="tableList">
+					<h5 class="h5">Pod Container list</h5>
+					<div class="tableList height">
 						<table style="table-layout: fixed">
 							<caption>Workloads Container list</caption>
 							<thead>
-								<tr>
-									<th width="21%">Container Name</th>
-									<th width="14%">Name Space</th>
-									<th width="24%">podName</th>
-									<th width="8%">CPU<br>(ms)</th>
-									<th width="8%">Memory<br>(MB)</th>
-									<th width="8%">Disk<br>(GB)</th>
-									<th width="8%">CPU<br>Usage</th>
-									<th width="8%">Memory<br>Usage</th>
-								</tr>
+							<tr>
+								<th width="21%">Container Name</th>
+								<th width="14%">Name Space</th>
+								<th width="24%">podName</th>
+								<th width="8%">CPU<br>(ms)</th>
+								<th width="8%">Memory<br>(MB)</th>
+								<th width="8%">Disk<br>(GB)</th>
+								<th width="8%">CPU<br>Usage</th>
+								<th width="8%">Memory<br>Usage</th>
+							</tr>
 							</thead>
 							<tbody id="containerlist">
 							</tbody>
@@ -198,8 +206,10 @@
 					<div class="logWrap">
 						<div class="log on">
 							<h4>LOG</h4>
-							<div id="logChart" class="logChart"></div>
-							<pre id="logText"></pre>
+							<div id="cpuLogChart" class="logdiv"></div>
+							<div id="memoryLogChart" class="logdiv"></div>
+							<div id="diskLogChart" class="logdiv"></div>
+							<pre id="logText" class="logPre"></pre>
 							<a href="javascript:void(0);" class="logClosed"></a>
 						</div>
 					</div>
@@ -210,7 +220,7 @@
 			<!-- // Chart Layer -->
 
 		</div>
-		<!-- // Wrap -->
+<!-- // Wrap -->
 
 		<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
 		<script type="text/javascript" src="../resources/js/c3.min.js"></script>
@@ -222,11 +232,11 @@
 
 					init() {
 						// Alarm Count
-					fnComm.alarmCount('caas');
-						
+						fnComm.alarmCount('caas');
+
 						// Pod Status 데이터로드
 						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/podStat', pod.podStatus);
-						
+
 						// Pod Summary List 데이터로드
 						fnComm.loadData('GET', fnComm.url + 'caas/monitoring/podList', pod.podSummary);
 					},
@@ -251,43 +261,43 @@
 						// MemoryUsage: "9.54"
 						// Name: "deployment"
 						//////////////////////////////////////////////////////////////////////
-						
+
 						var target = document.getElementById('podList');
-						
+
 						fnComm.removeHtml(target);
 
 						data.forEach(value => {
 							var html = `<div class="normal">
-								<div>
-									<strong>${value.PodName}</strong>
-								</div>
-								<div>
-									<dl class="color1" title="CPU">
-										<dt>C</dt>
-										<dd>${value.Cpu} ms</dd>
-									</dl>
-									<dl class="color2" title="Memory">
-										<dt>M</dt>
-										<dd>${value.Memory} MB</dd>
-									</dl>
-									<dl class="color3" title="Disk">
-										<dt>D</dt>
-										<dd>${value.Disk} GB</dd>
-									</dl>
-									<dl>
-										<dt>CPU Usage</dt>
-										<dd>${value.CpuUsage} %</dd>
-									</dl>
-									<dl>
-										<dt>Memory Usage</dt>
-										<dd>${value.MemoryUsage} %</dd>
-									</dl>
-								</div>
-								<div class="summaryBtn" data-name="${value.PodName}">
-									<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
-								</div>
-							</div>`
-	
+										<div>
+											<strong>${value.PodName}</strong>
+										</div>
+										<div>
+											<dl class="color1" title="CPU">
+												<dt>C</dt>
+												<dd>${value.Cpu} ms</dd>
+											</dl>
+											<dl class="color2" title="Memory">
+												<dt>M</dt>
+												<dd>${value.Memory} MB</dd>
+											</dl>
+											<dl class="color3" title="Disk">
+												<dt>D</dt>
+												<dd>${value.Disk} GB</dd>
+											</dl>
+											<dl>
+												<dt>CPU Usage</dt>
+												<dd>${value.CpuUsage} %</dd>
+											</dl>
+											<dl>
+												<dt>Memory Usage</dt>
+												<dd>${value.MemoryUsage} %</dd>
+											</dl>
+										</div>
+										<div class="summaryBtn" data-name="${value.PodName}">
+											<a href="javascript:void(0);" class="chart"><img src="../resources/img/btn_chart.png" alt="Chart"><span>Chart</span></a>
+										</div>
+									</div>`
+
 							fnComm.appendHtml(target, html, 'div');
 						});
 
@@ -301,22 +311,22 @@
 								} else {
 									var elmName = e.target.parentNode.parentNode.getAttribute('data-name');
 								};
-								
+
 								document.querySelector('.chartTitle').innerHTML = elmName;
 
 								// Workloads Detail Chart 데이터로드
 								fnComm.loadData('GET', fnComm.url + `caas/monitoring/podGraph?PodName=${elmName}`, pod.nodeInfo);
-							
+
 								// Workloads Container list 데이터로드
 								fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiList?PodName=${elmName}`, pod.containerlist);
 							}, false);
 						};
-							
+
 						// Chart Close Event
 						document.querySelector('.chartClosed').addEventListener('click', (e) => {
 							document.getElementById('chartWrap').classList.toggle('on', false);
 						}, false);
-							
+
 						// LOG Close Event
 						document.querySelector('.logClosed').addEventListener('click', (e) => {
 							document.querySelector('.logWrap').classList.toggle('on', false);
@@ -326,8 +336,20 @@
 					nodeInfo(data){
 						document.getElementById('chartWrap').classList.toggle('on', true);
 
+						let cpuArr = [];
+						let memoryArr = [];
+						let diskArr = [];
+
+						cpuArr.push(data[0]);
+						memoryArr.push(data[1]);
+						diskArr.push(data[2]);
+
 						setTimeout(() => {
-							fnComm.detailChart(data, '#nodeChart');
+							fnComm.detailChart(data, '#cpuChart');
+
+							fnComm.detailChart(data, '#memoryChart');
+
+							fnComm.detailChart(data, '#diskChart');
 						},500);
 					},
 
@@ -340,23 +362,23 @@
 						// MemoryUsage: "2.24"
 						// NameSpace: "kube-system"
 						// PodName: "fluentd-gcp-scaler-7b895cbc89-rzqbq"
-						
+
 						var target = document.getElementById('containerlist');
-						
+
 						fnComm.removeHtml(target);
 
 						data.forEach(value => {
 							var html = `<tr>
-								<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
-								<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
-								<td class="left" title="${value.PodName}">${value.PodName}</td>
-								<td>${value.Cpu}</td>
-								<td>${value.Memory}</td>
-								<td>${value.Disk}</td>
-								<td>${value.CpuUsage}</td>
-								<td>${value.MemoryUsage}</td>
-							</tr>`;
-							
+										<td class="left" title="${value.ContainerName}" data-sp="${value.NameSpace}" data-po="${value.PodName}"><a href="javascript:void(0);" class="link contName">${value.ContainerName}</a></td>
+										<td class="left" title="${value.NameSpace}">${value.NameSpace}</td>
+										<td class="left" title="${value.PodName}">${value.PodName}</td>
+										<td>${value.Cpu}</td>
+										<td>${value.Memory}</td>
+										<td>${value.Disk}</td>
+										<td>${value.CpuUsage}</td>
+										<td>${value.MemoryUsage}</td>
+									</tr>`;
+
 							fnComm.appendHtml(target, html, 'tbody');
 						});
 
@@ -368,10 +390,10 @@
 								var containerName = e.target.parentNode.getAttribute('title');
 								var nameSpace = e.target.parentNode.getAttribute('data-sp');
 								var podName = e.target.parentNode.getAttribute('data-po');
-							
+
 								// Container Chart 데이터로드
 								fnComm.loadData('GET', fnComm.url + `caas/monitoring/containerGraph?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, pod.containerChart);
-								
+
 								// Container Log 데이터로드
 								fnComm.loadData('GET', fnComm.url + `caas/monitoring/contiInfoLog?ContainerName=${containerName}&NameSpace=${nameSpace}&PodName=${podName}`, pod.containerLog);
 							}, false);
@@ -381,8 +403,20 @@
 					containerChart(data) {
 						document.querySelector('.logWrap').classList.toggle('on', true);
 
+						let cpuArr = [];
+						let memoryArr = [];
+						let diskArr = [];
+
+						cpuArr.push(data[0]);
+						memoryArr.push(data[1]);
+						diskArr.push(data[2]);
+
 						setTimeout(() => {
-							fnComm.detailChart(data, '#logChart');
+							fnComm.detailChart(cpuArr, '#cpuLogChart');
+
+							fnComm.detailChart(memoryArr, '#memoryLogChart');
+
+							fnComm.detailChart(diskArr, '#diskLogChart');
 						},500);
 					},
 
@@ -390,7 +424,7 @@
 						document.getElementById('logText').innerHTML = data;
 					},
 				}
-	
+
 				pod.init();
 			};
 		</script>
