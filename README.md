@@ -67,7 +67,7 @@
 1. 개요
 2. 선행 요소
 3. 개발환경 설정
-4. 모듈 및 패키지 단위 디렉터리별 명세 가이드
+4. 모듈/패키지 단위 디렉터리별 명세 가이드
 
 
 ## 1. 개요
@@ -118,23 +118,36 @@
 ![](images/goland_05.png)
 
 
-## 3. 모듈 및 패키지 단위 디렉터리별 명세 가이드
-### 3.1. 모듈 및 패키지
+## 3. 모듈/패키지 단위 디렉터리별 명세 가이드
+### 3.1. 모듈/패키지
 #### ┃ Agent Modules
-　**![](images/folder.png) paasta-agents** ― AP의 diego-cell VM에 생성되는 컨테이너 환경의 메트릭 정보를 수집/전송하는 에이전트  
-　**![](images/folder.png) paasta-monitoring-agent** ― BOSH를 포함하여 AP를 구성하는 VM 단위 환경의 메트릭 정보를 수집/전송하는 에이전트
+　 **![](images/folder.png) paasta-agents**  
+　　: AP의 diego-cell VM에 생성되는 컨테이너 환경의 메트릭 정보를 수집/전송하는 에이전트
+
+　 **![](images/folder.png) paasta-monitoring-agent**  
+　　: BOSH를 포함하여 AP를 구성하는 VM 단위 환경의 메트릭 정보를 수집/전송하는 에이전트
 
 #### ┃ Batch Modules
-　**![](images/folder.png) paasta-monitoring-batch** ― AP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈  
-　**![](images/folder.png) paasta-caas-monitoring-batch** ― CP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈  
-　**![](images/folder.png) paasta-saas-monitoring-batch** ― 애플리케이션 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈  
-　**![](images/folder.png) paasta-iaas-monitoring-batch** ― 인프라 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
+　 **![](images/folder.png) paasta-monitoring-batch**  
+　　: AP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
+
+　 **![](images/folder.png) paasta-caas-monitoring-batch**  
+　　: CP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
+
+　 **![](images/folder.png) paasta-saas-monitoring-batch**  
+　　: 애플리케이션 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
+
+　 **![](images/folder.png) paasta-iaas-monitoring-batch**  
+　　: 인프라 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
 
 #### ┃ Interface Modules
-　**![](images/folder.png) paasta-monitoring-api** ― PaaS-TA 모니터링 플랫폼에서 지원하는 모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반으로 작성된 API 가이더  
-　**![](images/folder.png) paasta-monitoring-portal** ― PaaS-TA 모니터링 플랫폼에서 지원하는 모니터링 관련 기능 및 각종 정보와 수치를 시각화한 웹 브라우저 기반 화면을 제공하는 웹 애플리케이션
+　 **![](images/folder.png) paasta-monitoring-api**  
+　　: PaaS-TA 모니터링 플랫폼의 모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반으로 작성된 API 가이더
 
-### 3.2. 모듈 및 패키지 하위 디렉터리 (작성중)
+　 **![](images/folder.png) paasta-monitoring-portal**  
+　　: PaaS-TA 모니터링 플랫폼의 모니터링 관련 기능 및 각종 정보와 수치를 시각화한 웹 브라우저 기반 화면을 제공하는 웹 애플리케이션
+
+### 3.2. 모듈/패키지 하위 디렉터리 (작성중)
 #### ┃ Agent Modules
 　**![](images/folder.png) paasta-agents**  
 　├ ![](images/folder2.png) cadvisor  
@@ -209,7 +222,6 @@
 　　├ ![](images/folder2.png) saas  
 　　├ ![](images/folder2.png) utils  
 　　└ ![](images/folder2.png) zabbix-client
-
 
 
 ![](images/warning.png)
