@@ -85,13 +85,13 @@
 ### 3.1. GoLand 설치
 다음 경로를 통해 JetBrains 사에서 제공하는 30일간 사용 가능한 Goland IDE 설치 파일을 다운로드 받을 수 있다. 설치 파일 다운로드 후 설치 마법사의 안내에 따라 설치를 완료한다.
 
-**[![](images/download.png) GoLand IDE Download](https://www.jetbrains.com/go/download/#section=windows)**
+**[![](images/goland.png) GoLand IDE Download](https://www.jetbrains.com/go/download/#section=windows)**
 
 
 ### 3.2. GoLand 설정
 본 내용은 **PaaS-TA Monitoring Web (Portal)** 애플리케이션 개발환경 설정을 예시로 작성하였다. 아래 원격 저장소를 통해 애플리케이션 개발에 필요한 소스코드 전체를 다운로드 받을 수 있다.
 
-**[![](images/github.png) PaaS-TA/monitoring-dashboard-source](https://github.com/PaaS-TA/monitoring-dashboard-source)**
+**[![](images/github.png) PaaS-TA/monitoring-dashboard-source Download](https://github.com/PaaS-TA/monitoring-dashboard-source)**
 
 **PaaS-TA Monitoring Web (Portal)** 개발을 위해 GoLand를 실행한 후 다운로드 받은 패키지 구조 중 `paasta-monitoring-portal` 디렉터리를 프로젝트로 연다.
 
@@ -119,47 +119,18 @@
 
 
 ## 3. 모듈/패키지 단위 디렉터리별 명세 가이드
-### 3.1. 모듈/패키지
-#### ┃ Agent Modules
-　 **![](images/folder.png) paasta-agents**  
-　　: AP의 diego-cell VM에 생성되는 컨테이너 환경의 메트릭 정보를 수집/전송하는 에이전트
-
-　 **![](images/folder.png) paasta-monitoring-agent**  
-　　: BOSH를 포함하여 AP를 구성하는 VM 단위 환경의 메트릭 정보를 수집/전송하는 에이전트
-
-#### ┃ Batch Modules
-　 **![](images/folder.png) paasta-monitoring-batch**  
-　　: AP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
-
-　 **![](images/folder.png) paasta-caas-monitoring-batch**  
-　　: CP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
-
-　 **![](images/folder.png) paasta-saas-monitoring-batch**  
-　　: 애플리케이션 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
-
-　 **![](images/folder.png) paasta-iaas-monitoring-batch**  
-　　: 인프라 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
-
-#### ┃ Interface Modules
-　 **![](images/folder.png) paasta-monitoring-api**  
-　　: PaaS-TA 모니터링 플랫폼의 모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반으로 작성된 API 가이더
-
-　 **![](images/folder.png) paasta-monitoring-portal**  
-　　: PaaS-TA 모니터링 플랫폼의 모니터링 관련 기능 및 각종 정보와 수치를 시각화한 웹 브라우저 기반 화면을 제공하는 웹 애플리케이션
-
-### 3.2. 모듈/패키지 하위 디렉터리 (작성중)
-#### ┃ Agent Modules
-　**![](images/folder.png) paasta-agents**  
+### ┃ Agent Modules
+　**![](images/folder.png) paasta-agents** ― AP diego-cell VM 기반 컨테이너 환경(Garden-runC)의 메트릭 정보를 수집/전송하는 에이전트  
 　├ ![](images/folder2.png) cadvisor  
 　└ ![](images/folder2.png) rep
 
-　**![](images/folder.png) paasta-monitoring-agent**  
+　**![](images/folder.png) paasta-monitoring-agent** ― BOSH 포함, AP를 구성하는 VM 기반 환경의 메트릭 정보를 수집/전송하는 에이전트  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring_agent  
 　　├ ![](images/folder2.png) handler  
 　　└ ![](images/folder2.png) services
 
-#### ┃ Batch Modules
-　**![](images/folder.png) paasta-monitoring-batch**  
+### ┃ Batch Modules
+　**![](images/folder.png) paasta-monitoring-batch** ― AP 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) alarm  
 　　├ ![](images/folder2.png) dao  
@@ -168,16 +139,16 @@
 　　├ ![](images/folder2.png) service  
 　　└ ![](images/folder2.png) util
   
-　**![](images/folder.png) paasta-caas-monitoring-batch**  
+　**![](images/folder.png) paasta-caas-monitoring-batch** ― CP 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
-　　├ ![](images/folder2.png) cass  
+　　├ ![](images/folder2.png) caas  
 　　├ ![](images/folder2.png) config  
 　　├ ![](images/folder2.png) dao  
 　　├ ![](images/folder2.png) model  
 　　├ ![](images/folder2.png) notify  
 　　└ ![](images/folder2.png) util
 
-　**![](images/folder.png) paasta-saas-monitoring-batch**  
+　**![](images/folder.png) paasta-saas-monitoring-batch** ― 애플리케이션 시스템 메트릭에 대한 주기적 조회/분석 후 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) dao  
 　　├ ![](images/folder2.png) model  
@@ -185,7 +156,7 @@
 　　├ ![](images/folder2.png) saas  
 　　└ ![](images/folder2.png) util
 
-　**![](images/folder.png) paasta-iaas-monitoring-batch**  
+　**![](images/folder.png) paasta-iaas-monitoring-batch** ― 인프라 시스템 메트릭에 대한 주기적 조회/분석 후 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/iaas-monitoring-batch  
 　　├ ![](images/folder2.png) config  
 　　├ ![](images/folder2.png) dao  
@@ -195,8 +166,8 @@
 　　└ ![](images/folder2.png) zabbix-client
 
 
-#### ┃ Interface Modules
-　**![](images/folder.png) paasta-monitoring-api**  
+### ┃ Interface Modules
+　**![](images/folder.png) paasta-monitoring-api** ― 모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반 API 가이더  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-api  
 　　├ ![](images/folder2.png) apiHelpers  
 　　├ ![](images/folder2.png) connections  
@@ -209,7 +180,7 @@
 　　├ ![](images/folder2.png) routers  
 　　└ ![](images/folder2.png) services
 
-　**![](images/folder.png) paasta-monitoring-portal**  
+　**![](images/folder.png) paasta-monitoring-portal** ― 모니터링 관련 각종 정보와 수치를 시각화한 웹 기반 GUI를 제공하는 웹 애플리케이션  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring  
 　　├ ![](images/folder2.png) caas  
 　　├ ![](images/folder2.png) common  
