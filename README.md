@@ -67,15 +67,15 @@
 1. 개요
 2. 선행 요소
 3. 개발환경 설정
-4. 모듈 또는 패키지 단위 디렉터리별 명세 가이드
+4. 모듈 및 패키지 단위 디렉터리별 명세 가이드
 
 
 ## 1. 개요
-이 문서는 본 저장소를 이용하여 로컬 개발환경을 설정하고, 모듈 또는 패키지 단위 소스코드 레벨의 하위 디렉터리별 설명을 명세한 가이드를 제공하기 위해 작성되었다.
+이 문서는 본 저장소를 이용하여 로컬 개발환경을 구성하고, 모듈 및 패키지 단위 소스코드 레벨의 하위 디렉터리별 설명을 명세한 가이드를 제공하기 위해 작성되었다.
 
 
 ## 2. 선행 요소
-본 저장소를 통해 공개된 모듈 또는 패키지 단위의 실행 프로그램은 개발환경 설정시에 애플리케이션을 실행하는데 필요한 다른 주변 애플리케이션의 연결 정보 또는 접속 정보 등을 제공해야 한다. 따라서 개발환경 설정 전에 PaaS-TA 플랫폼(AP), 컨테이너 플랫폼(CP), 모니터링 플랫폼(Monitoring Dashboard)의 배포가 선행될 수 있도록 해야 한다. 각 플랫폼의 설치는 [공식 가이드](https://github.com/PaaS-TA/Guide)의 설치 가이드를 참고할 수 있다.
+본 저장소를 통해 공개된 모듈 또는 패키지 단위의 실행 프로그램의 일부는 개발환경 설정시에 애플리케이션을 실행하는데 필요한 다른 주변 애플리케이션(DB 등)과의 선행적 연결 수립이 요구되기도 한다. 따라서 개발환경 설정에 앞서 PaaS-TA 애플리케이션 플랫폼(AP), 컨테이너 플랫폼(CP), 모니터링 플랫폼(Monitoring Dashboard)의 배포가 선행될 수 있도록 해야 한다. 각 플랫폼의 설치는 [공식 가이드](https://github.com/PaaS-TA/Guide)의 설치 가이드를 참고할 수 있다.
 
 
 ## 3. 개발환경 설정
@@ -85,31 +85,31 @@
 ### 3.1. GoLand 설치
 다음 경로를 통해 JetBrains 사에서 제공하는 30일간 사용 가능한 Goland IDE 설치 파일을 다운로드 받을 수 있다. 설치 파일 다운로드 후 설치 마법사의 안내에 따라 설치를 완료한다.
 
-**[![](images/download.png) GoLand Download](https://www.jetbrains.com/go/download/#section=windows)**
+**[![](images/download.png) GoLand IDE Download](https://www.jetbrains.com/go/download/#section=windows)**
 
 
 ### 3.2. GoLand 설정
-본 내용은 **PaaS-TA Monitoring Web (Portal)** 애플리케이션 개발환경 설정을 예시로 작성하였다. 아래 경로를 통해 애플리케이션 개발에 필요한 소스코드 전체를 다운로드 받을 수 있다.
+본 내용은 **PaaS-TA Monitoring Web (Portal)** 애플리케이션 개발환경 설정을 예시로 작성하였다. 아래 원격 저장소를 통해 애플리케이션 개발에 필요한 소스코드 전체를 다운로드 받을 수 있다.
 
 **[![](images/github.png) PaaS-TA/monitoring-dashboard-source](https://github.com/PaaS-TA/monitoring-dashboard-source)**
 
-**PaaS-TA Monitoring Web (Portal)** 개발을 위해 GoLand를 실행한 후 다운로드 받은 패키지 구조 중 `paasta-monitoring-portal` 디렉터리를 연다.
+**PaaS-TA Monitoring Web (Portal)** 개발을 위해 GoLand를 실행한 후 다운로드 받은 패키지 구조 중 `paasta-monitoring-portal` 디렉터리를 프로젝트로 연다.
 
 ![](images/goland_01.png)
 
-`config.ini` 파일 내에 '2. 선행 요소'에서 언급했던 주변 애플리케이션의 연결 정보 또는 접속 정보를 알맞게 입력한다.
+`config.ini` 파일에 '2. 선행 요소'에서 언급했던 주변 실행 환경의 연결 정보 또는 접속 정보를 알맞게 입력한다.
 
 ![](images/goland_02.png)
 
-상단 메뉴 바의 **[실행]** > **[구성 편집]** 메뉴를 선택한다. **[실행/디버그 구성]** 창의 설정을 다음을 참고해 설정한다.
+상단 메뉴 바의 **[실행]** > **[구성 편집]** 메뉴를 선택한다. 이어서 **[실행/디버그 구성]** 창의 설정을 다음을 참고해 설정한다.
 
-ㆍ실행 종류: 파일  
-ㆍ파일: `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring\main.go`  
-ㆍ작업 디렉터리: `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring`
+ㆍ**실행 종류** : 파일  
+ㆍ**파일** : `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring\main.go`  
+ㆍ**작업 디렉터리** : `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring`
 
 ![](images/goland_03.png)
 
-우측 상단의 실행 버튼(Shift + F10)을 눌러 프로그램을 실행한다. 정상적으로 실행되면 IDE 하단의 실행 로그에 'Monit Application Started'라는 메세지가 노출된다.
+우측 상단의 실행 버튼(Shift + F10)을 눌러 프로그램을 실행한다. 정상적으로 실행되면 IDE 하단의 실행 로그에 'Monit Application Started'라는 메시지가 노출된다.
 
 ![](images/goland_04.png)
 
@@ -118,7 +118,98 @@
 ![](images/goland_05.png)
 
 
-## 3. 모듈 또는 패키지 단위 디렉터리별 명세 가이드
-**(작성중...)**
+## 3. 모듈 및 패키지 단위 디렉터리별 명세 가이드
+### 3.1. 모듈 및 패키지
+#### ┃ Agent Modules
+　**![](images/folder.png) paasta-agents** ― AP의 diego-cell VM에 생성되는 컨테이너 환경의 메트릭 정보를 수집/전송하는 에이전트  
+　**![](images/folder.png) paasta-monitoring-agent** ― BOSH를 포함하여 AP를 구성하는 VM 단위 환경의 메트릭 정보를 수집/전송하는 에이전트
+
+#### ┃ Batch Modules
+　**![](images/folder.png) paasta-monitoring-batch** ― AP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-caas-monitoring-batch** ― CP 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-saas-monitoring-batch** ― 애플리케이션 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-iaas-monitoring-batch** ― 인프라 레벨의 시스템 메트릭에 대해 주기적으로 조회/분석하고 관리자에게 알람을 전송하는 배치 모듈
+
+#### ┃ Interface Modules
+　**![](images/folder.png) paasta-monitoring-api** ― PaaS-TA 모니터링 플랫폼에서 지원하는 모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반으로 작성된 API 가이더  
+　**![](images/folder.png) paasta-monitoring-portal** ― PaaS-TA 모니터링 플랫폼에서 지원하는 모니터링 관련 기능 및 각종 정보와 수치를 시각화한 웹 브라우저 기반 화면을 제공하는 웹 애플리케이션
+
+### 3.2. 모듈 및 패키지 하위 디렉터리 (작성중)
+#### ┃ Agent Modules
+　**![](images/folder.png) paasta-agents**  
+　├ ![](images/folder2.png) cadvisor  
+　└ ![](images/folder2.png) rep
+
+　**![](images/folder.png) paasta-monitoring-agent**  
+　└ ![](images/folder2.png) src/kr/paasta/monitoring_agent  
+　　├ ![](images/folder2.png) handler  
+　　└ ![](images/folder2.png) services
+
+#### ┃ Batch Modules
+　**![](images/folder.png) paasta-monitoring-batch**  
+　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
+　　├ ![](images/folder2.png) alarm  
+　　├ ![](images/folder2.png) dao  
+　　├ ![](images/folder2.png) handler  
+　　├ ![](images/folder2.png) model  
+　　├ ![](images/folder2.png) service  
+　　└ ![](images/folder2.png) util
+  
+　**![](images/folder.png) paasta-caas-monitoring-batch**  
+　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
+　　├ ![](images/folder2.png) cass  
+　　├ ![](images/folder2.png) config  
+　　├ ![](images/folder2.png) dao  
+　　├ ![](images/folder2.png) model  
+　　├ ![](images/folder2.png) notify  
+　　└ ![](images/folder2.png) util
+
+　**![](images/folder.png) paasta-saas-monitoring-batch**  
+　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
+　　├ ![](images/folder2.png) dao  
+　　├ ![](images/folder2.png) model  
+　　├ ![](images/folder2.png) notify  
+　　├ ![](images/folder2.png) saas  
+　　└ ![](images/folder2.png) util
+
+　**![](images/folder.png) paasta-iaas-monitoring-batch**  
+　└ ![](images/folder2.png) src/kr/paasta/iaas-monitoring-batch  
+　　├ ![](images/folder2.png) config  
+　　├ ![](images/folder2.png) dao  
+　　├ ![](images/folder2.png) model  
+　　├ ![](images/folder2.png) service  
+　　├ ![](images/folder2.png) util  
+　　└ ![](images/folder2.png) zabbix-client
+
+
+#### ┃ Interface Modules
+　**![](images/folder.png) paasta-monitoring-api**  
+　└ ![](images/folder2.png) src/kr/paasta/monitoring-api  
+　　├ ![](images/folder2.png) apiHelpers  
+　　├ ![](images/folder2.png) connections  
+　　├ ![](images/folder2.png) controllers  
+　　├ ![](images/folder2.png) dao  
+　　├ ![](images/folder2.png) docs  
+　　├ ![](images/folder2.png) helpers  
+　　├ ![](images/folder2.png) middlewares  
+　　├ ![](images/folder2.png) models  
+　　├ ![](images/folder2.png) routers  
+　　└ ![](images/folder2.png) services
+
+　**![](images/folder.png) paasta-monitoring-portal**  
+　└ ![](images/folder2.png) src/kr/paasta/monitoring  
+　　├ ![](images/folder2.png) caas  
+　　├ ![](images/folder2.png) common  
+　　├ ![](images/folder2.png) handlers  
+　　├ ![](images/folder2.png) iaas_new  
+　　├ ![](images/folder2.png) openstack-client  
+　　├ ![](images/folder2.png) paas  
+　　├ ![](images/folder2.png) public  
+　　├ ![](images/folder2.png) routes  
+　　├ ![](images/folder2.png) saas  
+　　├ ![](images/folder2.png) utils  
+　　└ ![](images/folder2.png) zabbix-client
+
+
 
 ![](images/warning.png)
