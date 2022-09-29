@@ -120,17 +120,20 @@
 
 ## 3. 모듈/패키지 단위 디렉터리별 명세 가이드
 ### ┃ Agent Modules
-　**![](images/folder.png) paasta-agents** ― AP diego-cell VM 기반 컨테이너 환경(Garden-runC)의 메트릭 정보를 수집/전송하는 에이전트  
+　**![](images/folder.png) paasta-agents**  
+　   🢒    AP diego-cell VM 기반 컨테이너 환경(Garden-runC)의 메트릭 정보를 수집/전송하는 에이전트  
 　├ ![](images/folder2.png) cadvisor  
 　└ ![](images/folder2.png) rep
 
-　**![](images/folder.png) paasta-monitoring-agent** ― BOSH 포함, AP를 구성하는 VM 기반 환경의 메트릭 정보를 수집/전송하는 에이전트  
+　**![](images/folder.png) paasta-monitoring-agent**  
+　   🢒    BOSH를 포함해 AP를 구성하는 VM 기반 환경의 메트릭 정보를 수집/전송하는 에이전트  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring_agent  
 　　├ ![](images/folder2.png) handler  
 　　└ ![](images/folder2.png) services
 
 ### ┃ Batch Modules
-　**![](images/folder.png) paasta-monitoring-batch** ― AP 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-monitoring-batch**  
+　   🢒    AP 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) alarm  
 　　├ ![](images/folder2.png) dao  
@@ -139,7 +142,8 @@
 　　├ ![](images/folder2.png) service  
 　　└ ![](images/folder2.png) util
   
-　**![](images/folder.png) paasta-caas-monitoring-batch** ― CP 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-caas-monitoring-batch**  
+　   🢒    CP 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) caas  
 　　├ ![](images/folder2.png) config  
@@ -148,7 +152,8 @@
 　　├ ![](images/folder2.png) notify  
 　　└ ![](images/folder2.png) util
 
-　**![](images/folder.png) paasta-saas-monitoring-batch** ― 애플리케이션 시스템 메트릭에 대한 주기적 조회/분석 후 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-saas-monitoring-batch**  
+　   🢒    애플리케이션 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) dao  
 　　├ ![](images/folder2.png) model  
@@ -156,7 +161,8 @@
 　　├ ![](images/folder2.png) saas  
 　　└ ![](images/folder2.png) util
 
-　**![](images/folder.png) paasta-iaas-monitoring-batch** ― 인프라 시스템 메트릭에 대한 주기적 조회/분석 후 알람을 전송하는 배치 모듈  
+　**![](images/folder.png) paasta-iaas-monitoring-batch**  
+　   🢒    인프라 시스템 메트릭에 대한 주기적 조회/분석 후 조건에 따라 알람을 전송하는 배치 모듈  
 　└ ![](images/folder2.png) src/kr/paasta/iaas-monitoring-batch  
 　　├ ![](images/folder2.png) config  
 　　├ ![](images/folder2.png) dao  
@@ -167,7 +173,8 @@
 
 
 ### ┃ Interface Modules
-　**![](images/folder.png) paasta-monitoring-api** ― 모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반 API 가이더  
+　**![](images/folder.png) paasta-monitoring-api**  
+　   🢒    모니터링 관련 기능을 통합 제공하는 API 모듈 및 Swagger 기반 API 가이더  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-api  
 　　├ ![](images/folder2.png) apiHelpers  
 　　├ ![](images/folder2.png) connections  
@@ -180,7 +187,8 @@
 　　├ ![](images/folder2.png) routers  
 　　└ ![](images/folder2.png) services
 
-　**![](images/folder.png) paasta-monitoring-portal** ― 모니터링 관련 각종 정보와 수치를 시각화한 웹 기반 GUI를 제공하는 웹 애플리케이션  
+　**![](images/folder.png) paasta-monitoring-portal**  
+　   🢒    모니터링 관련 각종 정보와 수치를 시각화한 웹 기반 GUI를 제공하는 웹 애플리케이션  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring  
 　　├ ![](images/folder2.png) caas  
 　　├ ![](images/folder2.png) common  
