@@ -118,7 +118,7 @@
 ![](images/goland_05.png)
 
 
-## 3. 모듈/패키지 단위 및 디렉터리별 명세
+## 4. 모듈/패키지 단위 및 디렉터리별 명세
 ### ┃ Agent Modules
 　**![](images/folder.png) paasta-agents** ― _AP diego-cell VM 기반 컨테이너 환경(Garden-runC)의 메트릭 정보를 수집/전송하는 에이전트_  
 　├ ![](images/folder2.png) cadvisor  
