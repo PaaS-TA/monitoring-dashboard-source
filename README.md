@@ -66,8 +66,8 @@
 # PaaS-TA monitoring-dashboard-source
 1. 개요
 2. 선행 요소
-3. 개발환경 설정
-4. 모듈/패키지 단위 디렉터리별 명세
+3. 애플리케이션 개발환경 설정
+4. 모듈/패키지 단위 및 디렉터리별 명세
 
 
 ## 1. 개요
@@ -78,7 +78,7 @@
 본 저장소를 통해 공개된 모듈 또는 패키지 단위의 실행 프로그램의 일부는 개발환경 설정시에 애플리케이션을 실행하는데 필요한 다른 주변 애플리케이션(DB 등)과의 선행적 연결 수립이 요구되기도 한다. 따라서 개발환경 설정에 앞서 PaaS-TA 애플리케이션 플랫폼(AP), 컨테이너 플랫폼(CP), 모니터링 플랫폼(Monitoring Dashboard)의 배포가 선행될 수 있도록 해야 한다. 각 플랫폼의 설치는 [공식 가이드](https://github.com/PaaS-TA/Guide)의 설치 가이드를 참고할 수 있다.
 
 
-## 3. 개발환경 설정
+## 3. 애플리케이션 개발환경 설정
 본 문서의 개발환경은 윈도우 운영체제를 기준으로 하고 있으며 애플리케이션 개발을 위한 IDE로는 GoLand를 사용하고 있다. 다음 내용을 통해 로컬 개발환경을 설정하는 방법을 참고할 수 있다.
 
 
@@ -103,9 +103,9 @@
 
 상단 메뉴 바의 **[실행]** > **[구성 편집]** 메뉴를 선택한다. 이어서 **[실행/디버그 구성]** 창의 설정을 다음을 참고해 설정한다.
 
-ㆍ**실행 종류** : 파일  
-ㆍ**파일** : `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring\main.go`  
-ㆍ**작업 디렉터리** : `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring`
+ㆍ **[실행 종류]** : 파일  
+ㆍ **[파일]** : `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring\main.go`  
+ㆍ **[작업 디렉터리]** : `...\monitoring-dashboard-source\paasta-monitoring-portal\src\kr\paasta\monitoring`
 
 ![](images/goland_03.png)
 
@@ -118,7 +118,7 @@
 ![](images/goland_05.png)
 
 
-## 3. 모듈/패키지 단위 디렉터리별 명세
+## 3. 모듈/패키지 단위 및 디렉터리별 명세
 ### ┃ Agent Modules
 　**![](images/folder.png) paasta-agents** ― _AP diego-cell VM 기반 컨테이너 환경(Garden-runC)의 메트릭 정보를 수집/전송하는 에이전트_  
 　├ ![](images/folder2.png) cadvisor  
@@ -193,6 +193,3 @@
 　　├ ![](images/folder2.png) saas  
 　　├ ![](images/folder2.png) utils  
 　　└ ![](images/folder2.png) zabbix-client
-
-
-![](images/warning.png)
