@@ -130,7 +130,7 @@
 　　└ ![](images/folder2.png) services
 
 ### ┃ Batch Modules
-　**![](images/folder.png) paasta-monitoring-batch** ― _AP 시스템 메트릭 조건에 따라 알람을 전송하는 배치 모듈_  
+　**![](images/folder.png) paasta-monitoring-batch** ― _AP 시스템 메트릭 조건에 따라 알람을 전송하는 배치 모듈_  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) alarm  
 　　├ ![](images/folder2.png) dao  
@@ -139,7 +139,7 @@
 　　├ ![](images/folder2.png) service  
 　　└ ![](images/folder2.png) util
   
-　**![](images/folder.png) paasta-caas-monitoring-batch** ― _CP 시스템 메트릭 조건에 따라 알람을 전송하는 배치 모듈_  
+　**![](images/folder.png) paasta-caas-monitoring-batch** ― _CP 시스템 메트릭 조건에 따라 알람을 전송하는 배치 모듈_  
 　└ ![](images/folder2.png) src/kr/paasta/monitoring-batch  
 　　├ ![](images/folder2.png) caas  
 　　├ ![](images/folder2.png) config  
