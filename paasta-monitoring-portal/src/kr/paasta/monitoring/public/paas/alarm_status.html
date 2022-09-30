@@ -367,7 +367,7 @@
 
 				event(){
 					document.querySelector('.search').addEventListener('click', (e) => {
-						fnComm.loadData('GET', `${fnComm.url}paas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
+						fnComm.loadData('GET', `${fnComm.url}iaas/alarm/statuses?pageItems=1000&pageIndex=1&originType=${document.getElementById('type1').value}&alarmType=${document.getElementById('type2').value}&resolveStatus=${document.getElementById('type4').value}&level=${document.getElementById('type3').value}&searchDateFrom=${document.getElementById('date1').value}&searchDateTo=${document.getElementById('date2').value}`, alarm.alarmStatus);
 					}, false);
 				},
 			}
@@ -379,12 +379,12 @@
 		function hisChange(target){
 			var actionPush = `{"alarmActionDesc":"${target.parentNode.previousSibling.previousSibling.querySelector('input').value}"}`;
 
-			fnComm.saveData('PATCH', `${fnComm.url}paas/alarm/action/${target.getAttribute('data-id')}`, actionPush);
+			fnComm.saveData('PATCH', `${fnComm.url}iaas/alarm/action/${target.getAttribute('data-id')}`, actionPush);
 		}
 		
 		// 히스토리 삭제
 		function hisDelete(target){
-			fnComm.saveData('DELETE', `${fnComm.url}paas/alarm/action/${target.getAttribute('data-id')}`);
+			fnComm.saveData('DELETE', `${fnComm.url}iaas/alarm/action/${target.getAttribute('data-id')}`);
 		};
 	</script>
 </html>
