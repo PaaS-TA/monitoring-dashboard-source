@@ -6,6 +6,8 @@
 		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
 		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
 		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/jquery.orgchart.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/diagram_style.css" />
 	</head>
 	<body>
 
@@ -138,7 +140,10 @@
 					-->
 						<a href="javascript:void(0);" class="close">close</a>
 					</div>
-
+					<article>
+						<h4>PaaS App Overview</h4>
+						<div id="diagramContainer"></div>
+					</article>
 					<article class="zoneWrap">
 						<h4>
 							<span>Zone-Containers View</span>
@@ -205,7 +210,10 @@
 			</div>
 		</div>
 	</body>
-	
+
+	<script type="text/javascript" src="../resources/js/utils.js"></script>
+	<script type="text/javascript" src="../resources/js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="../resources/js/jquery.orgchart.min.js"></script>
 	<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
 	<script type="text/javascript" src="../resources/js/c3.min.js"></script>
 	<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
@@ -419,6 +427,23 @@
 			}
 
 			main.init();
+
+			Utils.requestHttp(`${fnComm.url}paas/diagram`, 'GET', null, null).then(function(data){
+				console.log(data);
+
+				var options = {
+					'data' : data,
+					'nodeContent' : 'title',
+					'direction' : 't2b',
+					'pan' : true,
+					'zoom' : true,
+					'verticalLevel' : 4,
+					'parentNodeSymbol' : ''
+				};
+				var dc = $("#diagramContainer").orgchart(options);
+				$('.orgchart').addClass('noncollapsable');
+			});
+
 		};
 	</script>
 </html>

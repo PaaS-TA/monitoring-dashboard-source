@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/cloudfoundry-community/go-cfclient"
 	commonModel "monitoring-portal/common/model"
 	"monitoring-portal/zabbix-client/lib/go-zabbix"
 	"net/http"
@@ -78,6 +79,7 @@ func main() {
 	var paaSInfluxServerClient client.Client
 	var databases bm.Databases
 	var boshClient *gogobosh.Client
+	var cfClient *cfclient.Client
 
 	// config.ini 파일에서 MySQL 접속정보를 추출
 	dbConnInfo := config.InitDBConnectionConfig(configMap)
@@ -130,7 +132,7 @@ func main() {
 	}
 
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_PAAS) {
-		paaSInfluxServerClient, databases, boshClient, err = getPaasClients(configMap)
+		paaSInfluxServerClient, databases, cfClient, boshClient, err = getPaasClients(configMap)
 		if err != nil {
 			logger.Error(err)
 			os.Exit(-1)
@@ -143,14 +145,14 @@ func main() {
 	if strings.Contains(sysType, utils.SYS_TYPE_ALL) || strings.Contains(sysType, utils.SYS_TYPE_IAAS) {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
 			iaasDbAccessObj, paasDbAccessObj, iaasClient.AuthOpts, databases,
-			rdClient, sysType, boshClient, cfConfig, zabbixSession)
+			rdClient, sysType, boshClient, cfConfig, zabbixSession, cfClient)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			logger.Error(err)
 		}
 	} else {
 		handler = handlers.NewHandler(openstackProvider, iaaSInfluxServerClient, paaSInfluxServerClient,
 			iaasDbAccessObj, paasDbAccessObj, iaasClient.AuthOpts, databases,
-			rdClient, sysType, boshClient, cfConfig, zabbixSession)
+			rdClient, sysType, boshClient, cfConfig, zabbixSession, cfClient)
 		if err := http.ListenAndServe(fmt.Sprintf(":%v", apiPort), handler); err != nil {
 			logger.Error(err)
 		}
@@ -163,7 +165,7 @@ func main() {
 //	dbClient.Debug().AutoMigrate(&MemberInfo{})
 //}
 
-func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Client, databases bm.Databases, boshClient *gogobosh.Client, err error) {
+func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Client, databases bm.Databases, cfClient *cfclient.Client, boshClient *gogobosh.Client, err error) {
 
 	// InfluxDB
 	paasUrl, _ := config["paas.metric.db.url"]
@@ -192,13 +194,17 @@ func getPaasClients(config map[string]string) (paaSInfluxServerClient client.Cli
 	databases.PaastaDatabase = paastaDatabase
 	databases.ContainerDatabase = containerDatabase
 	databases.LoggingDatabase = loggingMeasurement
+
 	// Cloud Foundry Client
-	//cfProvider = cfclient.Config{
-	//	ApiAddress: config["paas.cf.client.apiaddress"],
-	//	//Username:     "admin",
-	//	//Password:     "admin",
-	//	SkipSslValidation: true,
-	//}
+	cfProvider := &cfclient.Config{
+		ApiAddress: config["paas.cf.client.apiaddress"],
+		Username:     "admin",
+		Password:     "admin",
+		SkipSslValidation: true,
+	}
+	cfClient, _ = cfclient.NewClient(cfProvider)
+
+
 
 	// BOSH Client Config
 	boshConfig := &gogobosh.Config{

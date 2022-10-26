@@ -29,7 +29,7 @@ func HttpWrap(handler http.Handler, rdClient *redis.Client, openstack_provider m
 		}
 
 		// token Pass
-		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/monitoring/podList") {
+		if r.RequestURI != "/v2/login" && r.RequestURI != "/v2/logout" && !strings.Contains(r.RequestURI, "/v2/member/join") && r.RequestURI != "/v2/ping" && r.RequestURI != "/" && !strings.Contains(r.RequestURI, "/public/") && !strings.Contains(r.RequestURI, "/v2/paas/app/") && !strings.Contains(r.RequestURI, "/v2/caas/monitoring/podList") && !strings.Contains(r.RequestURI, "/v2/paas/diagram") {
 			if !strings.Contains(r.RequestURI, "favicon.ico") {
 				Logger.Info("Request URI :: ", r.RequestURI)
 			}

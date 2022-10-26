@@ -222,6 +222,8 @@ const (
     IAAS_GET_CPU_LOAD_AVERAGE = "IAAS_GET_CPU_LOAD_AVERAGE"
     IAAS_GET_DISK_IO_RATE     = "IAAS_GET_DISK_IO_RATE"
     IAAS_GET_NETWORK_IO_BTYES = "IAAS_GET_NETWORK_IO_BTYES"
+
+    PAAS_DIAGRAM = "PAAS_DIAGRAM"
 )
 
 var Routes = rata.Routes{
@@ -353,6 +355,8 @@ var PaasRoutes = rata.Routes{
     {Path: "/v2/paas/app/alarm/list", Method: "GET", Name: PAAS_APP_ALARM_LIST},
     {Path: "/v2/paas/app/policy/:guid", Method: "DELETE", Name: PAAS_APP_POLICY_DELETE},
     {Path: "/v2/paas/all/overview", Method: "GET", Name: PAAS_PAAS_ALL_OVERVIEW},
+
+    {Path: "/v2/paas/diagram", Method: "GET", Name: PAAS_DIAGRAM},
 }
 
 var CaasRoutes = rata.Routes{
