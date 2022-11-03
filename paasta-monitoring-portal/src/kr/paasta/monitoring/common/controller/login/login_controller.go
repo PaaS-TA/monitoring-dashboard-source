@@ -1,8 +1,10 @@
-package controller
+package login
 
 import (
 	"encoding/json"
 	"errors"
+	"monitoring-portal/common/service/login"
+
 	//"github.com/cloudfoundry-community/go-cfclient"
 	monascagopher "github.com/gophercloud/gophercloud"
 	"github.com/monasca/golang-monascaclient/monascaclient"
@@ -11,7 +13,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
 	cm "monitoring-portal/common/model"
-	"monitoring-portal/common/service"
 	"monitoring-portal/iaas_new/model"
 	pm "monitoring-portal/paas/model"
 	"monitoring-portal/utils"
@@ -108,7 +109,7 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		var loginErr model.ErrMessage
 
 		// check saas,caas
-		userInfo, _, err = services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest, reqCsrfToken, s.CfConfig)
+		userInfo, _, err = login.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).Login(apiRequest, reqCsrfToken, s.CfConfig)
 		loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 		//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -128,7 +129,7 @@ func (s *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		} else {
 			model.MonitLogger.Debug(userInfo)
 
-			services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
+			login.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
 			userInfo.SysType = s.sysType
 			utils.RenderJsonResponse(userInfo, w)
 			return
@@ -165,7 +166,7 @@ func loginValidate(apiRequest cm.UserInfo) error {
 
 func (s *LoginController) Join(w http.ResponseWriter, r *http.Request) {
 
-	services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
+	login.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
 	//if s.sysType == utils.SYS_TYPE_IAAS{
 	//	services.GetIaasLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType)
 	//}else if s.sysType == utils.SYS_TYPE_PAAS{

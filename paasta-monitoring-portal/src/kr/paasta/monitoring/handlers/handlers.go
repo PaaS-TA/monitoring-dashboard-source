@@ -3,10 +3,12 @@ package handlers
 import (
     "github.com/cloudfoundry-community/go-cfclient"
     "io"
-	"monitoring-portal/zabbix-client/lib/go-zabbix"
-	"net/http"
-	"strings"
-	"time"
+    "monitoring-portal/common/controller/login"
+    "monitoring-portal/common/controller/member"
+    "monitoring-portal/zabbix-client/lib/go-zabbix"
+    "net/http"
+    "strings"
+    "time"
 
     "github.com/cloudfoundry-community/gogobosh"
     "github.com/go-redis/redis"
@@ -16,17 +18,16 @@ import (
     "github.com/jinzhu/gorm"
     "github.com/tedsuo/rata"
 
-	caasContoller "monitoring-portal/caas/controller"
-	"monitoring-portal/common/controller"
-	iaasContoller "monitoring-portal/iaas_new/controller"
-	paasContoller "monitoring-portal/paas/controller"
-	pm "monitoring-portal/paas/model"
-	saasContoller "monitoring-portal/saas/controller"
+    caasContoller "monitoring-portal/caas/controller"
+    iaasContoller "monitoring-portal/iaas_new/controller"
+    paasContoller "monitoring-portal/paas/controller"
+    pm "monitoring-portal/paas/model"
+    saasContoller "monitoring-portal/saas/controller"
 
     "monitoring-portal/routes"
     "monitoring-portal/utils"
 
-	"monitoring-portal/iaas_new/model"
+    "monitoring-portal/iaas_new/model"
 )
 
 func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
@@ -34,14 +35,14 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
     zabbixSession *zabbix.Session, cfClient *cfclient.Client) http.Handler {
 
     //Controller선언
-    var loginController *controller.LoginController
-    var memberController *controller.MemberController
+    var loginController *login.LoginController
+    var memberController *member.MemberController
 
     // SaaS Metrics
     var applicationController *saasContoller.SaasController
 
-    loginController = controller.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
-    memberController = controller.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
+    loginController = login.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
+    memberController = member.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
 
     var caasMetricsController *caasContoller.MetricController
 

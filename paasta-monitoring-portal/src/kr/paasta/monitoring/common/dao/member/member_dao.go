@@ -1,4 +1,4 @@
-package dao
+package member
 
 import (
 	"fmt"

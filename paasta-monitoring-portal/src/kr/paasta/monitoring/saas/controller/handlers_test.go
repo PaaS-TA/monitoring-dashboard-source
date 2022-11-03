@@ -2,6 +2,8 @@ package controller
 
 import (
 	"fmt"
+	"monitoring-portal/common/controller/login"
+	"monitoring-portal/common/controller/member"
 	"strings"
 
 	"github.com/cloudfoundry-community/gogobosh"
@@ -15,7 +17,6 @@ import (
 	"github.com/tedsuo/rata"
 	"gopkg.in/olivere/elastic.v3"
 	"io"
-	"monitoring-portal/common/controller"
 	"monitoring-portal/iaas_new/model"
 	pm "monitoring-portal/paas/model"
 	"monitoring-portal/routes"
@@ -29,14 +30,14 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig) http.Handler {
 
 	//Controller선언
-	var loginController *controller.LoginController
-	var memberController *controller.MemberController
+	var loginController *login.LoginController
+	var memberController *member.MemberController
 
 	// SaaS Metrics
 	var applicationController *SaasController
 
-	loginController = controller.NewLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType, cfConfig)
-	memberController = controller.NewMemberController(openstack_provider, paasTxn, rdClient, sysType, cfConfig)
+	loginController = login.NewLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType, cfConfig)
+	memberController = member.NewMemberController(openstack_provider, paasTxn, rdClient, sysType, cfConfig)
 
 	var saasActions rata.Handlers
 	// add SAAS

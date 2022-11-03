@@ -1,22 +1,23 @@
-package services
+package login
 
 import (
 	"fmt"
-	"time"
+	"monitoring-portal/common/dao/login"
+	"monitoring-portal/common/service/member"
 	"strings"
+	"time"
 
-	//"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/jinzhu/gorm"
 	"github.com/go-redis/redis"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
+	//"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/jinzhu/gorm"
 
-	"monitoring-portal/utils"
-	"monitoring-portal/common/dao"
-	"monitoring-portal/iaas_new/model"
-	"monitoring-portal/iaas_new/integration"
-	paasModel "monitoring-portal/paas/model"
 	commonModel "monitoring-portal/common/model"
+	"monitoring-portal/iaas_new/integration"
+	"monitoring-portal/iaas_new/model"
+	paasModel "monitoring-portal/paas/model"
+	"monitoring-portal/utils"
 )
 
 type LoginService struct {
@@ -63,7 +64,7 @@ func (n *LoginService) Logout(provider *gophercloud.ProviderClient, reqCsrfToken
 
 func (n *LoginService) Login(req commonModel.UserInfo, reqCsrfToken string, cfConfig paasModel.CFConfig) (userInfo commonModel.UserInfo, provider *gophercloud.ProviderClient, err error) {
 
-	result, _, dbErr := dao.GetLoginDao(n.txn).GetLoginMemberInfo(req, n.txn)  // 회원 정보 조회
+	result, _, dbErr := login.GetLoginDao(n.txn).GetLoginMemberInfo(req, n.txn) // 회원 정보 조회
 	resultString := ""
 	if dbErr != nil {
 		if strings.Contains(dbErr.Error(), "record not found") {
@@ -180,7 +181,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *commonModel.UserInfo, reqCsrfT
 			tokenRequest.IaasUserId = userInfo.IaasUserId
 			tokenRequest.IaasUserPw = userInfo.IaasUserPw
 
-			result := GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
+			result := member.GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).GetIaasToken(tokenRequest, reqCsrfToken)
 			model.MonitLogger.Debug(result)
 
 			if result != "" {
@@ -192,7 +193,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *commonModel.UserInfo, reqCsrfT
 		} else {
 			strcd1 = "F"
 			strcd2 = "F"
-			GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
+			member.GetIaasMemberService(s.openstackProvider, s.txn, s.RdClient).DeleteIaasToken(reqCsrfToken)
 		}
 	}
 	if strings.Contains(s.sysType, utils.SYS_TYPE_PAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
@@ -219,7 +220,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *commonModel.UserInfo, reqCsrfT
 		} else {
 			strcd3 = "F"
 			strcd4 = "F"
-			GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
+			member.GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
 	}
 	if strings.Contains(s.sysType, utils.SYS_TYPE_CAAS) || strings.Contains(s.sysType, utils.SYS_TYPE_ALL) {
@@ -246,7 +247,7 @@ func (s *LoginService) SetUserInfoCache(userInfo *commonModel.UserInfo, reqCsrfT
 		} else {
 			strcd5 = "F"
 			strcd6 = "F"
-			GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
+			member.GetPaasMemberService(s.txn, s.RdClient).DeletePaasToken(reqCsrfToken)
 		}
 	}
 
