@@ -1,0 +1,818 @@
+@charset "UTF-8";
+
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+*, :before, :after {margin:0; padding:0; border:0; font-style:normal; vertical-align:top; box-sizing:border-box; -moz-box-sizing:border-box; -webkit-box-sizing:border-box; outline:none;}
+
+html {-webkit-font-smoothing:antialiased;}
+table {width:100%; border-collapse:collapse; border-spacing:0;}
+th, td {vertical-align:middle; word-break:break-word; white-space:nowrap;}
+ul, ol, dl {list-style:none; word-break:keep-all; word-break:break-word;}
+hr {display:none;}
+caption, figcaption, legend {overflow:hidden; position:absolute; z-index:-1; height:0; visibility:hidden;}
+
+h1, h2, h3, h4, h5, h6, strong {font-weight:500;}
+
+a {color:#333; text-decoration:none;}
+a:hover, a:focus {text-decoration:none;}
+
+button {padding:0; border:0; cursor:pointer; background:none; vertical-align:middle; appearance:none; font-family:"Noto Sans KR", "맑은 고딕", sans-serif; color:#747474; outline:none;}
+
+select {appearance:none; color:#747474; font-family:"Noto Sans KR", "맑은 고딕", sans-serif; min-width:120px; height:36px; padding-left:7px; padding-right:40px; font-size:16px; line-height:34px; vertical-align:top; background-color:#fff; border:1px solid #d1d1d1;}
+select:focus {border:1px solid #000;}
+select:disabled {background-color:#f2f2f2; color:#999;}
+select::-ms-expand {display:none;}
+
+select {min-width:120px; height:36px; padding-left:7px; padding-right:40px; font-size:16px; line-height:34px; vertical-align:top; background-color:#fff; border:1px solid #d1d1d1;}
+
+input {margin:0; padding:0; font-family:inherit; font-size:inherit; color:#333; line-height:17px; vertical-align:top; -webkit-appearance:none; border-radius:0; outline:none;}
+input[type="text"],
+input[type="password"],
+input[type="tel"],
+input[type="file"] {height:36px; padding:0 10px; font-size:16px; font-weight:100; line-height:34px; background-color:#fff; border:1px solid #d1d1d1; box-sizing:border-box; -webkit-appearance:none; border-radius:0;}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="file"]:focus {border-bottom:1px solid #f576c3;}
+input[type="text"]:disabled,
+input[type="text"][readonly],
+input[type="password"]:disabled,
+input[type="password"][readonly],
+input[type="tel"]:disabled,
+input[type="tel"][readonly],
+input[type="file"]:disabled,
+input[type="file"][readonly] {background-color:#f2f2f2; color:#999;}
+
+input[type="radio"] {position:absolute; z-index:-1; visibility:hidden; width:18px; height:18px;}
+
+input[type="checkbox"] {position:absolute; z-index:-1; visibility:hidden; width:18px; height:18px;}
+
+input[type="checkbox"] + label {position:relative; display:inline-block; overflow:hidden; width:18px; height:18px; text-indent:-9999em; border:1px solid #ccc; vertical-align:middle; cursor:pointer;}
+input[type="checkbox"]:checked + label {border:1px solid #40cecd;}
+input[type="checkbox"]:checked + label:after {content:''; position:absolute; top:0; left:5px; width:6px; height:12px; border-right:2px solid #40cecd; border-bottom:2px solid #40cecd; transform:rotate(45deg);}
+
+input[type="radio"] + label {position:relative; display:inline-block; overflow:hidden; height:18px; padding-left:22px;  color:#444; font-size:14px; line-height:18px; vertical-align:middle; cursor:pointer;}
+input[type="radio"] + label:after {content:''; position:absolute; left:0; top:0; width:18px; height:18px; text-indent:-9999em; border:1px solid #ccc; border-radius:9px;}
+input[type="radio"]:checked + label {color:#000;}
+input[type="radio"]:checked + label:after {border:1px solid #000;}
+input[type="radio"]:checked + label:before {content:''; position:absolute; left:4px; top:4px; width:10px; height:10px; text-indent:-9999em; background:#000; border-radius:6px;}
+
+input[type="radio"].noText + label {position:relative; display:inline-block; overflow:hidden; width:18px; height:18px; text-indent:-9999em; border:1px solid #ccc; vertical-align:middle; cursor:pointer;}
+input[type="radio"].noText:checked + label {border:1px solid #40cecd;}
+input[type="radio"].noText:checked + label:after {content:''; position:absolute; top:0; left:5px; width:6px; height:12px; border-right:2px solid #40cecd; border-bottom:2px solid #40cecd; transform:rotate(45deg);}
+
+textarea {-webkit-appearance:none; border-radius:0; border:1px solid #d1d1d1; color:#222; font-weight:300; background:#fff; padding:15px 10px; font-family:"Noto Sans KR", "맑은 고딕", sans-serif; font-size:16px; width:100%; min-height:80px; box-sizing:border-box; resize:none;}
+
+::placeholder {color:#a1a2a6; font-weight:100; opacity:1;}
+:-ms-input-placeholder {color:#a1a2a6; font-weight:100;}
+::-ms-input-placeholder {color:#a1a2a6; font-weight:100;}
+
+/*input[type=time]::-webkit-datetime-edit-ampm-field {display:none;}*/
+
+body {font-family:"Noto Sans KR", "맑은 고딕", sans-serif; font-weight:300; font-size:16px; color:#222; line-height:normal; -webkit-text-size-adjust:100%; -moz-text-size-adjust:100%; -ms-text-size-adjust:100%;}
+
+#wrap {position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; overflow-x:auto; min-width:1580px;}
+
+/* 요소 숨김 */
+.blind {overflow:hidden; position:absolute; z-index:-1; height:0; visibility:hidden;}
+
+header {position:absolute; top:0; left:0; z-index:100; width:90px; height:100%; border-right:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1); transition:.3s;}
+header:hover {width:150px;}
+header h1 {overflow:hidden; margin-bottom:100px; text-align:center;}
+header h1 img {margin-top:10px;}
+
+header .global {position:absolute; top:0; left:200px; width:600px;}
+header .global li {display:none; width:120px; text-align:center;}
+header .global li a {display:block; height:72px; color:#333; font-size:18px; line-height:72px; white-space:nowrap; transition:.5s;}
+header .global li a:hover {color:#fff; background:#45b1ff;}
+
+header nav {text-align:center;}
+header nav > ul {display:inline-block; width:100%;}
+header nav > ul > li {position:relative; height:90px;}
+header nav > ul > li > a {position:relative; float:left; width:90px; height:90px; color:#222; font-size:24px; font-weight:400; line-height:89px; text-align:center; letter-spacing:1px;}
+header nav > ul > li > a span {display:none; position:absolute; overflow:hidden; font-size:16px; font-weight:300; white-space:nowrap;}
+header nav > ul > li > a em {display:inline-block; overflow:hidden; width:90px; height:90px; font-size:16px; font-weight:300;}
+header nav > ul > li > a:hover,
+header nav > ul > li > a.on {color:#45b1ff;}
+header:hover nav > ul > li > a span {display:inline-block;}
+header nav > ul > li > a:hover em img,
+header nav > ul > li > a.on em img {margin-left:-90px;}
+header nav > ul > li:hover ul {z-index:1; left:0px; opacity:1;}
+header nav ul li ul {position:absolute; top:70px; left:-120px; z-index:-1; width:120px; padding:10px; border:1px solid #222; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.2); opacity:0; transition:.5s;}
+header nav ul li ul li a {display:block; height:26px; padding-left:15px; color:#222; font-size:14px; text-align:left; line-height:26px;}
+header nav ul li ul li.on a, header nav ul li ul li a:hover {color:#fff; background:#45b1ff;}
+
+#container {position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; display:flex; min-width:1580px; padding-left:90px; background:#fafafa;}
+
+.contentsLeft {position:relative; overflow-y:auto; flex:1; width:450px; padding:20px 30px; border-right:1px solid #eee;}
+.contentsLeft h3 {margin-top:90px; font-size:24px; color:#ccc; font-weight:400; text-align:center;}
+.contentsLeft h4 {margin-top:60px; font-size:26px; color:#333; font-weight:100; line-height:60px; text-align:center;}
+.contentsLeft h4 span {position:relative; display:inline-block; margin-left:15px; padding-left:15px; height:60px; color:#f576c3; text-align:center; text-transform:uppercase;}
+.contentsLeft h4 span:after {content:'|'; position:absolute; top:0; left:0; font-size:14px; color:#ddd; line-height:60px;}
+.contentsLeft h4 {display:inline-block; width:100%; height:60px; font-size:26px; font-weight:100; line-height:60px;}
+.contentsLeft h4 strong {color:#40cecd; font-size:26px; font-weight:300;}
+.contentsLeft h4 input[type=checkbox] {float:right; visibility:hidden;}
+.contentsLeft h4 input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:70px; height:30px; margin-top:15px; padding:0 10px; font-size:14px; line-height:30px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition:.5s;}
+.contentsLeft h4 input[type=checkbox] + label:before {content:'ON'; position:absolute; top:0; left:-90px; z-index:1; width:140px; height:30px; color:#fff; font-weight:400; border:0;}
+.contentsLeft h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius:12px; transition:.5s;}
+.contentsLeft h4 input[type=checkbox]:checked + label {text-indent:102px; background:#f576c3;}
+.contentsLeft h4 input[type=checkbox]:checked + label:after {border:0;left:43px;}
+.contentsLeft h5 {color:#cccccc; text-align: center; padding-top: 20px; margin-bottom: -30px;}
+.contentsLeft .center {text-align:center;}
+.contentsLeft .chartView {width:100%; height:120px;}
+.contentsLeft .gaugeChart {width:100%; height:140px; margin-top:30px;}
+.contentsLeft .donutChart {overflow:hidden;}
+.contentsLeft .donutChart > div {float:left; width:50%; height:240px; margin-top:60px;}
+.contentsLeft .donutChart > div strong {display:block; height:40px; font-size:16px; font-weight:100; text-align:center;}
+.contentsLeft .donutChart > div div {height:200px;}
+.contentsLeft .topList {width:100%;}
+.contentsLeft .topList > div {display:flex; align-items:center; width:100%; margin-top:10px; padding:10px; background:#fff; box-shadow:2px 2px 5px rgba(150,150,150,.1);}
+.contentsLeft .topList > div strong {display:inline-block; width:40px; height:40px; margin-right:10px; color:#aaa; font-size:26px; font-weight:100; text-align:center; line-height:40px; border-right:1px solid #eee;}
+.contentsLeft .topList > div:first-child strong {color:#777; font-weight:300;}
+.contentsLeft .topList > div div {flex:1;}
+.contentsLeft .topList > div div dl {float:left;}
+.contentsLeft .topList > div div dl dt {float:left; padding-left:10px;}
+.contentsLeft .topList > div div dl dd {float:left; padding:0 10px 0 5px; color:#222; font-size:14px; line-height:20px;}
+.contentsLeft .topList > div div .time {float:left; width:100%; height:20px; margin-bottom:7px;}
+.contentsLeft .topList > div div .pid {width:25%;}
+.contentsLeft .topList > div div .process {width:50%;}
+.contentsLeft .topList > div div .memory {width:25%;}
+.contentsLeft .insList {overflow:hidden;}
+.contentsLeft .insList dl {float:left; width:50%; line-height:24px;}
+.contentsLeft .insList dl:nth-child(even) {padding-right:15px;}
+.contentsLeft .insList dl:nth-child(odd) {padding-left:15px;}
+.contentsLeft .insList dl dt {float:left; font-size:14px;}
+.contentsLeft .insList dl dd {float:right; font-size:14px;}
+.contentsLeft .cellCollection {display:inline-block; width:100%;}
+.contentsLeft .cellCollection p {padding:50px 0; color:#666; font-size:32px; font-weight:200; text-align:center;}
+.contentsLeft .cellCollection > dl {display:inline-block; width:100%; margin-top:5px; background:#fff; box-shadow:2px 2px 5px rgba(200,200,200,.2);}
+.contentsLeft .cellCollection > dl:first-child {margin-top:0;}
+.contentsLeft .cellCollection > dl > dt {float:left; width:30%; height:50px; padding:5px 15px; line-height:38px;}
+.contentsLeft .cellCollection > dl > dd {float:left; width:70%; min-height:50px; padding:10px 15px 5px;}
+.contentsLeft .cellCollection a {position:relative; display:inline-block; width:24px; height:24px; margin:4px; background:#ddd;}
+.contentsLeft .cellCollection a:after {content:''; position:absolute; top:0; left:0; width:24px; height:24px; color:#fff; font-size:14px; font-weight:100; text-align:center; line-height:23px;}
+.contentsLeft .cellCollection a.running {background:#55c554;}
+.contentsLeft .cellCollection a.running:after {content:'R';}
+.contentsLeft .cellCollection a.warning {background:#fba602;}
+.contentsLeft .cellCollection a.warning:after {content:'W';}
+.contentsLeft .cellCollection a.critical {background:#e91a61;}
+.contentsLeft .cellCollection a.critical:after {content:'C';}
+.contentsLeft .cellCollection a.fail {background:#c048c8;}
+.contentsLeft .cellCollection a.fail:after {content:'F';}
+.contentsLeft .cellCollection a div {position:absolute; bottom:35px; left:0; z-index:-1; color:#222; width:160px; padding:10px; border:1px solid #222; background:#fff; opacity:0; transition:.5s;}
+.contentsLeft .cellCollection a:hover div {opacity:1; z-index:1; box-shadow:2px 2px 5px rgba(0,0,0,.3);}
+.contentsLeft .cellCollection a div:after {content:''; position:absolute; bottom:-6px; left:5px; width:10px; height:10px; border-bottom:1px solid #222; border-right:1px solid #222; background:#fff; transform:rotate(45deg)}
+.contentsLeft .cellCollection a div dl {overflow:hidden; width:140px;}
+.contentsLeft .cellCollection a div dl dt {float:left; width:40px; color:#333; font-size:12px; font-weight:400; text-align:left; line-height:18px; white-space:nowrap;}
+.contentsLeft .cellCollection a div dl dd {float:left; width:100px; color:#666; font-size:12px; text-align:left; line-height:18px; white-space:nowrap;}
+.contentsLeft .statusNum {overflow:hidden;}
+.contentsLeft .statusNum li {margin-top:30px; text-align:center;}
+.contentsLeft .statusNum li.fail {color:#c048c8;}
+.contentsLeft .statusNum li.running {color:#55c554;}
+.contentsLeft .statusNum li.pending {color:#e91a61;}
+.contentsLeft .statusNum li.susseed {color:#45b1ff;}
+.contentsLeft .statusNum li.unknown {color:#999;}
+.contentsLeft .statusNum li h6 {display:inline-block; width:60px; font-size:50px; color:#999; font-weight:100; line-height:80px;}
+.contentsLeft .statusNum li strong {display:inline-block; width:160px; font-size:80px; font-weight:100; line-height:80px; text-align:right;}
+
+
+#contents {position:relative; overflow:hidden; overflow-y:scroll; flex:2; padding:70px 30px 30px; background:#fff; box-shadow:0px -5px 10px rgba(0,0,0,.1);}
+.alarmPolicy #contents {flex:.5;}
+.alarmStatus #contents {flex:3.5;}
+.gaugeWrap #contents {flex:3;}
+.donutWrap #contents {flex:1.5;}
+
+#contents .timePop {z-index:-1; opacity:0; position:absolute; top:20px; left:30px; width:420px; border:1px solid #222; background:#fff; box-shadow:1px 1px 5px rgba(0,0,0,.3); transition:.5s;}
+#contents .timePop.on {opacity:1; z-index:102;}
+#contents .timePop h4 {height:60px; padding-left:15px; color:#222; font-size:20px; font-weight:100; line-height:60px; border-bottom:1px solid #ddd;}
+#contents .timePop > a.close {position:absolute; top:18px; right:19px; overflow:hidden; width:24px; height:24px; text-indent:-9999em; transform:rotate(45deg);}
+#contents .timePop > a.close:before {content:''; position:absolute; top:0; left:11px; width:1px; height:24px; background:#222;}
+#contents .timePop > a.close:after {content:''; position:absolute; top:11px; left:0; width:24px; height:1px; background:#222;}
+#contents .timePop .timer {overflow:hidden;}
+#contents .timePop .timer > div {overflow:hidden; padding:15px;}
+#contents .timePop .timer > div label {float:left; width:33%; margin-bottom:15px;}
+#contents .timePop .refresh {overflow:hidden; padding:15px;}
+#contents .timePop .btnWrap {padding-top:10px;}
+
+#contents nav {position:fixed; top:0; right:0; z-index:50; width:100%; padding:10px 30px; background:#fff; border-bottom:2px solid #eee;}
+#contents nav > a {float:left; display:none;}
+#contents nav ul {float:right;}
+#contents nav ul li {position:relative; float:left; margin-left:50px;}
+#contents nav ul li:first-child {margin-left:0;}
+#contents nav ul li > a {position:relative; display:block;}
+#contents nav ul li a.alarmView img {float:left; display:none;}
+#contents nav ul li a.alarmView img:first-child {display:block;}
+#contents nav ul li a.alarmView.on img {float:left; display:block;}
+#contents nav ul li a.alarmView.on img:first-child {display:none;}
+#contents nav ul li a.alarmView span {display:none; float:left; width:24px; height:24px; margin-top:12px; color:#fff; font-size:14px; text-align:center; line-height:23px; background:#f4256c; border-radius:10px;}
+#contents nav ul li a.alarmView.on span {display:block;}
+#contents nav ul li.outBtn img {float:left;}
+#contents nav ul li.outBtn div {float:left; padding-top:3px;}
+#contents nav ul li.outBtn strong {display:block; color:#999; font-size:16px;}
+#contents nav ul li.outBtn span {display:block; color:#999; font-size:12px;}
+#contents nav ul li .logout span {position:absolute; top:0; right:0; z-index:99; width:60px; padding:7px; font-size:12px; color:#f4256c; text-align:center; border:1px solid #f4256c; background:#fff; opacity:0; transition:.5s;}
+#contents nav ul li .logout:hover span {opacity:1;}
+
+#contents article {position:relative; margin-top:30px;}
+#contents article h4 {display:inline-block; width:100%; height:60px; margin-top:30px; font-size:26px; font-weight:100; line-height:60px;}
+#contents article h4:first-child {margin-top:0;}
+#contents article h4 strong {color:#40cecd; font-size:26px; font-weight:300;}
+#contents article h4 input[type=checkbox] {float:right; visibility:hidden;}
+#contents article h4 input[type=checkbox] + label {position:relative; float:right; overflow:hidden; width:70px; height:30px; margin-top:16px; padding:0 10px; font-size:16px; line-height:30px; text-indent:22px; border:0; background:#ddd; border-radius:20px; transition:.5s;}
+#contents article h4 input[type=checkbox] + label:before {content:'ON'; position:absolute; top:0; left:-90px; z-index:1; width:140px; height:30px; color:#fff; font-weight:400; border:0;}
+#contents article h4 input[type=checkbox] + label:after {content:''; position:absolute; top:3px; left:3px; z-index:2; overflow:hidden; width:24px; height:24px; border:0; background:#fff; border-radius:12px; transition:.5s;}
+#contents article h4 input[type=checkbox]:checked + label {text-indent:102px; background:#f576c3;}
+#contents article h4 input[type=checkbox]:checked + label:after {border:0;left:43px;}
+#contents article h5 {display:inline-block; width:100%; height:40px;font-size:16px; font-weight:100; line-height:40px;}
+
+#alertPop {position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; width:100%; height:100%; background:rgba(255,255,255,.8);}
+#alertPop > div {position:absolute; top:50%; left:50%; width:460px; min-height:181px; margin-left:-230px; margin-top:-100px; text-align:center; border:1px solid #eee; background:#fff; box-shadow:0px 5px 10px rgba(0,0,0,.1);}
+#alertPop div h3 {height:50px; padding:0 25px; color:#f4256c; font-size:28px; font-weight:200; line-height:50px; border-bottom:1px solid #eee;}
+#alertPop div p {padding:25px; color:#666; font-size:20px; font-weight:100;}
+#alertPop div div {overflow:hidden;}
+#alertPop div div button {width:100%; height:50px; color:#fff; font-size:18px; font-weight:100; background:#333;}
+#alertPop div div button:hover {background:#f4256c;}
+
+.popWrap {display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:200; background:rgba(0,0,0,.4);}
+.popWrap .status {position:absolute; top:15%; left:50%; width:1200px; margin-left:-600px; padding:0 20px 20px; background:#fff;}
+.popWrap h4 {display:inline-block; width:100%; height:60px; padding:0 20px; font-size:26px; font-weight:100; line-height:60px; border-bottom:1px solid #e0e0e0;}
+.popWrap .status > a.close {position:absolute; top:18px; right:19px; overflow:hidden; width:24px; height:24px; text-indent:-9999em; transform:rotate(45deg);}
+.popWrap .status > a.close:before {content:''; position:absolute; top:0; left:11px; width:1px; height:24px; background:#222;}
+.popWrap .status > a.close:after {content:''; position:absolute; top:11px; left:0; width:24px; height:1px; background:#222;}
+
+.overview {overflow:hidden; display:flex; width:100%; margin-top:30px; background:#fff;}
+.overview > div {position:relative; flex:1; height:120px;}
+.overview > div:after {content:''; position:absolute; top:70px; left:0; z-index:1; width:100%; height:2px; background:linear-gradient(to right, #43be42, #43be42 80%, #f6a200 100%);}
+.overview > div span {position:relative; z-index:2; float:left; width:240px; padding-left:50px; padding-right:10px; color:#ccc; font-size:40px; line-height:136px; text-align:right; background:#fff;}
+.overview > div strong {position:relative; z-index:2; float:left; min-width:100px; padding:0 20px; color:#43be42; font-size:50px; line-height:136px; text-align:center; background:#fff;}
+.overview ul {overflow:hidden;}
+.overview ul li {position:relative; float:left; width:200px; height:120px; padding:20px 0; text-align:center;}
+.overview ul li a {display:block; height:80px;}
+.overview ul li span {position:relative; z-index:3; display:block; height:25px; color:#999; font-size:16px; line-height:20px;}
+.overview ul li strong {position:relative; z-index:2; padding:0 15px; color:#43be42; font-size:42px; line-height:50px; background:#fff;}
+.overview ul li.warning strong {color:#f6a200;}
+.overview ul li.warning:after {content:''; position:absolute; top:70px; left:0; z-index:1; width:100%; height:2px; background:linear-gradient(to right,#f6a200 70%, #f4256c 100%);}
+.overview ul li.critical strong {color:#f4256c;}
+.overview ul li.critical:after {content:''; position:absolute; top:70px; left:0; z-index:1; width:100%; height:2px; background:linear-gradient(to right,#f4256c 70%, #c048c8 100%);}
+.overview ul li.failed strong {color:#c048c8;}
+.overview ul li.failed:after {content:''; position:absolute; top:70px; left:0; z-index:1; width:100%; height:2px; background:linear-gradient(to right,#c048c8 70%, #999 100%);}
+.overview ul li.total strong {color:#999;}
+.overview ul li.total:after {content:''; position:absolute; top:70px; left:0; z-index:1; width:100%; height:2px; background:#999;}
+.overview + .paasView,
+.overview + .contView {margin-top:1px;}
+
+.tab {overflow:hidden; width:100%; border-bottom:1px solid #e0e0e0;}
+.tab.style01 ul {float:left;}
+.tab.style01 ul li {float:left;}
+.tab.style01 ul li a {display:block; height:60px; padding:0 35px; font-size:20px; line-height:60px;}
+.tab.style01 ul li.on a {color:#fff; background:#40cecd;}
+.tab.style01 div {float:right;}
+.tab.style01 div a {float:left; height:60px; padding:0 35px; font-size:20px; line-height:60px; color:#fff; background:#333;}
+.tab.style01 div a.overview {position:relative; margin-top:0; padding-left:50px;}
+.tab.style01 div a.overview:before {content:''; position:absolute; top:23px; left:20px; width:16px; height:16px; border-top:2px solid #fff; border-bottom:2px solid #fff;}
+.tab.style01 div a.overview:after {content:''; position:absolute; top:30px; left:20px; width:16px; height:2px; border-top:2px solid #fff;}
+
+.paging {display:none; overflow:hidden; padding:25px 0; text-align:center;}
+.paging.on {display:block;}
+.paging > a {display:none; width:30px; height:30px; border:1px solid #ddd;}
+.paging.over > a {display:inline-block;}
+.paging span {display:none; overflow:hidden; max-width:300px; height:30px;}
+.paging.on span {display:inline-block;}
+.paging span a {display:none; width:30px; height:30px; border:1px solid #ddd;}
+.paging span a.view {display:inline-block;}
+.paging span a.on, .paging span a:hover {color:#fff; border:1px solid #40cecd; background:#40cecd;}
+
+.summaryList {position:relative;}
+.summaryList > div {position:relative; margin-top:15px; padding:15px; min-height:100px; transition:.5s;}
+.summaryList > div:hover,
+.summaryList > div.on {box-shadow:3px 3px 10px rgba(0,0,0,.1);}
+.summaryList > div:first-child {margin-top:0;}
+.summaryList > div:before {content:''; position:absolute; top:18px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
+.summaryList > div.running:before {content:'R'; background:#55c554;}
+.summaryList > div.warning:before {content:'W'; background:#fba602;}
+.summaryList > div.critical:before {content:'C'; background:#e91a61;}
+.summaryList > div.fail:before {content:'F'; background:#c048c8;}
+.summaryList > div.normal:before {content:'N'; background:#ddd;}
+.summaryList > div.TRUE:before {content:'T'; background:#55c554;}
+.summaryList > div.FALSE:before {content:'F'; background:#e91a61;}
+.summaryList > div.up:before {content:'U'; background:#55c554;}
+.summaryList > div.down:before {content:'D'; background:#ddd;}
+.summaryList > div > span {position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px; text-transform:uppercase;}
+.summaryList > div > span.running {background:#55c554;}
+.summaryList > div > span.warning {background:#fba602;}
+.summaryList > div > span.critical {background:#e91a61;}
+.summaryList > div > span.fail {background:#c048c8;}
+.summaryList > div > span.normal {background:#ddd;}
+.summaryList > div div {overflow:hidden; padding-left:80px; line-height:24px;}
+.summaryList > div div:first-child {margin-bottom:10px;}
+.summaryList > div div strong {float:left; margin-right:30px; font-size:22px; font-weight:300; line-height:28px;}
+.summaryList > div div em {float:left; margin-right:30px; color:#222; font-size:18px; font-weight:100; line-height:inherit;}
+.summaryList > div div dl {float:left; margin-right:15px;}
+.summaryList > div div dl dt {float:left; color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.summaryList > div div dl.color1 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#e91a61; border-radius:12px;}
+.summaryList > div div dl.color1 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color2 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#55c554; border-radius:12px;}
+.summaryList > div div dl.color2 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color3 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#4868a3; border-radius:12px;}
+.summaryList > div div dl.color3 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color4 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#ff46d1; border-radius:12px;}
+.summaryList > div div dl.color4 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color5 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#f6a200; border-radius:12px;}
+.summaryList > div div dl.color5 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color6 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#702cee; border-radius:12px;}
+.summaryList > div div dl.color6 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl.color7 dt {width:24px; height:24px; color:#fff; font-weight:500; line-height:24px; text-align:center; background:#666; border-radius:12px;}
+.summaryList > div div dl.color7 dd {width:auto; max-width:110px; margin-right: 10px; text-overflow: ellipsis; overflow:hidden; white-space: nowrap;}
+.summaryList > div div dl dd {float:left; padding-left:7px; color:#222; font-size:14px; line-height:inherit;}
+
+.summaryList > div div dl.running dt,
+.summaryList > div div dl.running dd {color:#55c554;}
+.summaryList > div div dl.warning dt,
+.summaryList > div div dl.warning dd {color:#fba602;}
+.summaryList > div div dl.critical dt,
+.summaryList > div div dl.critical dd {color:#e91a61;}
+.summaryList > div div dl.fail dt,
+.summaryList > div div dl.fail dd {color:#c048c8;}
+
+.summaryList .summaryBtn {position:absolute; top:15px; right:15px;}
+.summaryList .summaryBtn a {float:left; overflow:hidden; width:60px; height:60px; margin-left:5px; color:#fff; font-size:12px; text-align:center; letter-spacing:1px; opacity:.5; transition:.3s;}
+.summaryList .summaryBtn a:hover {opacity:1;}
+.summaryList .summaryBtn a span {display:block; line-height:18px;}
+.summaryList .summaryBtn a.process {background:#656872}
+.summaryList .summaryBtn a.chart {background:#ed7161}
+.summaryList .summaryBtn a.log {background:#80c2b8}
+
+.projectList {position:relative;}
+.projectList > div {position:relative; margin-top:15px; padding:15px; min-height:100px; border:1px solid #fafafa; cursor:pointer; transition:.5s;}
+.projectList > div:hover,
+.projectList > div.on {border:1px solid #fba602; background-color:#fff; box-shadow:3px 3px 10px rgba(0,0,0,.1);}
+.projectList > div:before {content:''; position:absolute; top:18px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
+.projectList > div.true:before {content:'T'; background:#55c554;}
+.projectList > div.false:before {content:'F'; background:#e91a61;}
+.projectList > div > div {overflow:hidden; padding-left:80px; line-height:24px;}
+.projectList > div > div:first-child {margin-bottom:10px;}
+.projectList > div > div strong {float:left; width:88%; overflow:hidden; font-size:18px; color:#222; font-weight:300; line-height:24px;}
+.projectList > div > div em {float:left; width:20%; margin-left:5%; color:#999; font-size:14px; font-weight:300; line-height:inherit;}
+.projectList > div > div dl {float:left; margin-left:15px;}
+.projectList > div > div dl:first-child {margin-left:0;}
+.projectList > div > div dl dt {float:left;color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.projectList > div > div dl dd {float:left; margin-left:10px; padding:0 10px; color:#666; font-size:14px; line-height:inherit; background:#f7f7f7;}
+
+.tableList {border-spacing:5px; border-top:2px solid #ddd;}
+.tableList thead tr th {min-height:60px; padding:10px 5px; font-size:18px; font-weight:200; line-height:22px; border-bottom:2px solid #ddd;}
+.tableList tbody tr td {min-height:60px; padding:10px 5px; font-size:16px; color:#666; text-align:center; border-bottom:1px solid #eee; transition:.5s; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+.tableList tbody tr:hover td {background:#f9f9f9;}
+.tableList tbody tr td:hover {background:#fff8ea;}
+.tableList tbody tr td a.link {display:inline-block; height:22px; padding-right:30px; font-weight:400; line-height:20px; background:url(../img/icon_link.png) no-repeat 100% 50%;}
+.tableList tbody tr td.left {text-align:left;}
+
+
+.statusSearch {overflow:hidden; padding-top:20px; text-align:center;}
+.statusSearch select {width:80%; margin-top:15px;}
+.statusSearch span {display:inline-block; width:80%; margin-top:15px; color:#999; font-size:18px; line-height:40px;}
+.statusSearch span:first-of-type {margin-top:50px;}
+.statusSearch input[type=date] {width:80%; height:36px; font-size:18px; text-align:center; border-bottom:1px solid #d1d1d1; background:transparent;}
+.statusSearch input[type=date]:focus {border-bottom:1px solid #f576c3;}
+
+.statusList {position:relative;}
+.statusList > div {position:relative; margin-top:15px; padding:15px; min-height:100px; transition:.5s;}
+.statusList > div.none {font-size:28px; padding:100px 15px;}
+.statusList > div:hover,
+.statusList > div.on {box-shadow:3px 3px 10px rgba(0,0,0,.1);}
+.statusList > div:first-child {margin-top:0;}
+.statusList > div:before {content:''; position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px;}
+.statusList > div.running:before {content:'R'; background:#55c554;}
+.statusList > div.warning:before {content:'W'; background:#fba602;}
+.statusList > div.critical:before {content:'C'; background:#e91a61;}
+.statusList > div.fail:before {content:'F'; background:#c048c8;}
+.statusList > div.normal:before {content:'N'; background:#ddd;}
+.statusList > div > span {position:absolute; top:15px; left:15px; width:60px; height:60px; color:#fff; font-size:28px; font-weight:400; text-align:center; line-height:60px; text-transform:uppercase;}
+.statusList > div > span.running {background:#55c554;}
+.statusList > div > span.warning {background:#fba602;}
+.statusList > div > span.critical {background:#e91a61;}
+.statusList > div > span.fail {background:#c048c8;}
+.statusList > div > span.normal {background:#ddd;}
+.statusList > div > div {overflow:hidden; padding-left:80px; line-height:24px;}
+.statusList > div > div:first-child {margin-bottom:10px;}
+.statusList > div > div strong {float:left; width:88%; overflow:hidden; font-size:18px; color:#222; font-weight:300; line-height:24px;}
+.statusList > div > div em {float:left; width:20%; margin-left:5%; color:#999; font-size:14px; font-weight:300; line-height:inherit;}
+.statusList > div > div dl {float:left; margin-right:15px;}
+.statusList > div > div dl dt {float:left;color:#222; font-size:14px; font-weight:400; line-height:inherit;}
+.statusList > div > div dl dd {float:left; margin-left:10px; padding:0 10px; color:#666; font-size:14px; line-height:inherit; background:#f7f7f7;}
+.statusList > div > div.receipt {height:0; padding-left:0; overflow:hidden; transition:.3s;}
+.statusList > div > div.receipt.on {height:140px;}
+.statusList > div > div.receipt textarea {width:100%; height:100px; padding:10px; color:#666; font-size:14px; line-height:24px; border:1px solid #f0f0f0;}
+.statusList > div > div.receipt button {float:right; width:50%; height:40px; color:#fff; font-size:14px; font-weight:300; text-align:center; line-height:40px; letter-spacing:1px; background:#333;}
+.statusList > div > div.receipt button:first-child {float:left; background:#999;}
+.statusList > div .historyWrap {margin-top:15px; overflow:hidden;}
+.statusList > div .historyWrap li {overflow:hidden; padding:5px 0; border-top:1px solid #f0f0f0;}
+.statusList > div .historyWrap li p {float:left; width:85%; color:#333; font-size:14px; line-height:20px;}
+.statusList > div .historyWrap li p strong {float:left; width:7%; color:#333; font-size:14px; line-height:20px; text-align:center;}
+.statusList > div .historyWrap li p strong.ing {color:#c048c8; border:1px solid #c048c8;}
+.statusList > div .historyWrap li p strong.end {color:#82BE38; border:1px solid #82BE38;}
+.statusList > div .historyWrap li p input {float:left; width:78%; height:20px; padding:0 0 0 10px; overflow:hidden; font-size:14px; line-height:20px; text-overflow:ellipsis; white-space:nowrap; border:0;}
+.statusList > div .historyWrap li p em {float:right; font-size:12px; color:#999;}
+.statusList > div .historyWrap li div {float:right;}
+.statusList > div .historyWrap li div button {float:left; width:55px; height:20px; color:#fff; font-size:12px; line-height:20px; background:#d45959;}
+.statusList > div .historyWrap li div button:first-child {margin-right:3px; background:#82BE38;}
+
+.statusList > div div dl.running dt,
+.statusList > div div dl.running dd {color:#55c554;}
+.statusList > div div dl.warning dt,
+.statusList > div div dl.warning dd {color:#fba602;}
+.statusList > div div dl.critical dt,
+.statusList > div div dl.critical dd {color:#e91a61;}
+.statusList > div div dl.fail dt,
+.statusList > div div dl.fail dd {color:#c048c8;}
+
+.statusList .summaryBtn {position:absolute; top:15px; right:15px;}
+.statusList .summaryBtn a {float:left; overflow:hidden; width:60px; height:60px; margin-left:5px; color:#fff; font-size:12px; text-align:center; letter-spacing:1px; opacity:.5; transition:.3s;}
+.statusList .summaryBtn a:hover {opacity:1;}
+.statusList .summaryBtn a span {display:block; line-height:18px;}
+.statusList .summaryBtn a.process {background:#656872;}
+.statusList .summaryBtn a.chart {background:#ed7161;}
+.statusList .summaryBtn a.log {background:#80c2b8;}
+
+.ovChart {height:250px;}
+
+.statusBlock {overflow:hidden;}
+.statusBlock > div {float:left; width:25%;}
+.statusBlock > div:nth-child(2n+1) {margin-left:0;}
+.statusBlock > div h5 {text-align:center;}
+.statusBlock > div ul {overflow:hidden; padding-top:5px;}
+.statusBlock > div ul li {float:left; width:25%; text-align:center;}
+.statusBlock > div ul li.bg1 {color:#656872;}
+.statusBlock > div ul li.bg2 {color:#fba602;}
+.statusBlock > div ul li.bg3 {color:#45b1ff;}
+.statusBlock > div ul li.bg4 {color:#e91a61;}
+.statusBlock > div ul li span {display:block; font-size:12px; font-weight:100;}
+.statusBlock > div ul li strong {display:block; height:44px; font-size:30px; font-weight:100; line-height:44px;}
+
+/**********************************/
+
+#chartWrap {position:fixed; top:0; right:-100%; z-index:999; width:100%; min-width:1400px; height:100%; padding-top:50px; background:rgba(255,255,255,.8); transition:.5s;}
+#chartWrap.on {right:0;}
+#chartWrap h4 span {display:block; height:70px; color:#222; font-size:28px; font-weight:100; text-align:center; line-height:70px; border-bottom:1px solid #eee;}
+#chartWrap .chart {display:none; position:absolute; top:50%; left:50%; overflow:hidden; width:1280px; height:770px; margin-left:-640px; margin-top:-385px; padding:0 60px 60px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1);}
+#chartWrap .chart.top {top: 55%;}
+#chartWrap .chart.on {display:block;}
+#chartWrap .chart > ul {display:inline-block; width:100%;}
+#chartWrap .chart > li {float:left; width:30%; margin-left:4%; margin-top:25px;}
+#chartWrap .chart > li:nth-child(3n+1) {margin-left:0;}
+#chartWrap .chart > ul.one > li {float:none; width:100%; margin-left:0; margin-top:25px;}
+#chartWrap .chart > ul.one > li:nth-child(3n+1) {margin-left:0%;}
+#chartWrap .chart > ul.one > li:nth-child(4n+1) {margin-left:0;}
+#chartWrap .chart > ul.four > li {float:left; width:22%; margin-left:3%; margin-top:25px;}
+#chartWrap .chart > ul.four > li:nth-child(3n+1) {margin-left:3%;}
+#chartWrap .chart > ul.four > li:nth-child(4n+1) {margin-left:0;}
+#chartWrap .chart li h5 {margin:0; color:#666; font-size:20px; font-weight:200; text-align:center; line-height:34px;}
+#chartWrap .chart > li div {width:100%; height:180px; padding-right:15px;}
+#chartWrap .chart > ul.one > li div {height:230px;}
+#chartWrap .chart > ul > li div svg {overflow:visible !important; height: 200px; width: 400px;}
+#chartWrap .chartClosed {position:absolute; top:20px; right:20px; width:70px; height:70px;}
+#chartWrap .chartClosed:before {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(45deg);}
+#chartWrap .chartClosed:after {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(-45deg);}
+
+#chartWrap > div .ulList {list-style: none; padding-left: 100px; }
+#chartWrap > div ul .liList-02 {width: 50%; float: left; }
+#chartWrap > div ul .liList-03 {list-style: none; float: left; width: 33%; }
+
+#chartWrap .chart h5 {height:40px; padding-left:15px; margin:30px 0 10px; color:#222; font-size:20px; font-weight:100; text-align:center; line-height:40px;}
+#chartWrap .chart .h5 {margin:10px 0 10px;}
+#chartWrap .chart .title {height:40px; padding-left:15px; color:#222; font-size:20px; font-weight:100; text-align:center; line-height:40px; padding-right: 100px;}
+
+#chartWrap .chart .tableList {height:200px; overflow-y:scroll; overflow-x:hidden;}
+#chartWrap .chart .height {height:350px;}
+
+#chartWrap .chart.gauge {display:block;}
+#chartWrap .chart.gauge li {width:22%; margin-top:40px;}
+#chartWrap .chart.gauge li:nth-child(3n+1) {margin-left:4%;}
+#chartWrap .chart.gauge li:nth-child(4n+1) {margin-left:0;}
+#chartWrap .chart.gauge li .gaugeChart {width:auto; padding-right:0; margin:0 10px 50px;}
+
+#chartWrap .logs {overflow:hidden; min-width:1280px; height:800px; padding:10px 60px 60px; background:rgba(255,255,255,.9);}
+#chartWrap .chart.on + .logs {display:none;}
+#chartWrap .logs fieldset {position:relative; width:1000px; margin:25px auto 0;}
+#chartWrap .logs fieldset > div {overflow:hidden; margin-top:15px;}
+#chartWrap .logs fieldset > div:first-child {margin-top:0;}
+#chartWrap .logs fieldset div label,
+#chartWrap .logs fieldset div input,
+#chartWrap .logs fieldset div em,
+#chartWrap .logs fieldset div a,
+#chartWrap .logs fieldset div button {float:left;}
+#chartWrap .logs fieldset div label {width:90px; height:34px; color:#000; font-size:14px; font-weight:100; line-height:34px;}
+#chartWrap .logs fieldset div input {height:34px; color:#333; font-size:20px; text-align:left; font-weight:300; line-height:34px; border-color:#666; border-width:0 0 1px 0; background:transparent;}
+#chartWrap .logs fieldset div input[type=time] {text-align:center;}
+#chartWrap .logs fieldset div input:focus {border-color:#f576c3; border-width:0 0 1px 0;}
+#chartWrap .logs fieldset div em {display:inline-block; width:30px; text-align:center; line-height:34px;}
+#chartWrap .logs fieldset div button {height:34px; width:100px; font-size:12px; color:#666; line-height:32px; border:1px solid #ddd;}
+#chartWrap .logs fieldset div button:hover {color:#f576c3;border:1px solid #f576c3;}
+#chartWrap .logs fieldset .logSearch {position:absolute; top:0; right:0; width:83px; height:83px; font-size:14px; color:#fff; font-weight:300; background:#222;}
+#chartWrap .logs fieldset .logSearch:hover {background:#f576c3;}
+#chartWrap .preText {width:1000px; margin:40px auto 0; overflow:hidden; overflow-y:scroll; height:500px; padding:30px; font-family:'Courier New'; color:#fff; font-weight:300; line-height:24px; border:1px solid #eee; background:#333; white-space:pre-wrap;}
+#chartWrap .preText li {margin-bottom:30px;}
+
+#chartWrap .logWrap {position:absolute; top:100px; right:-100%; width:1000px; height:600px; padding:0 60px 60px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1); transition:.5s;}
+#chartWrap .logWrap.on {right:30px;}
+#chartWrap .logWrap .logdiv {height: 180px; width: 32%; float:left;}
+#chartWrap .logWrap .logPre {float:left; height: 250px; margin-top: 30px;}
+#chartWrap .logWrap h4 {height:70px; margin-bottom:30px; color:#222; font-size:28px; font-weight:100; text-align:center; line-height:70px; border-bottom:1px solid #eee;}
+#chartWrap .logWrap .logChart {display:inline-block; width:100%; height:200px; margin-bottom:30px}
+#chartWrap .logWrap .logChart svg {overflow:visible !important;}
+
+#chartWrap .logWrap pre {height:250px; overflow:hidden; overflow-y:scroll; padding:20px; line-height:25px; white-space:pre-wrap; background:#eee;}
+#chartWrap .logWrap .logClosed {position:absolute; top:10px; right:10px; width:40px; height:40px;}
+#chartWrap .logWrap .logClosed:before {content:''; position:absolute; top:0; left:20px; width:1px; height:40px; border-left:1px solid #000; transform:rotate(45deg);}
+#chartWrap .logWrap .logClosed:after {content:''; position:absolute; top:0; left:20px; width:1px; height:40px; border-left:1px solid #000; transform:rotate(-45deg);}
+
+#pinWrap {position:fixed; top:0; right:-100%; z-index:999; width:100%; min-width:1600px; height:100%; min-height:700px; padding-top:20px; background:rgba(255,255,255,.8); transition:.5s;}
+#pinWrap.on {right:0;}
+#pinWrap > div {position:absolute; top:50%; left:50%; width:1400px; height:90%; margin:-25% 0 0 -700px; border:1px solid #eee; border-top:0; background:rgba(255,255,255,.9); box-shadow:5px 5px 10px rgba(0,0,0,.1);}
+#pinWrap iframe {position:absolute; top:0; left:0; width:100%; height:100%;}
+#pinWrap .chartClosed {position:absolute; top:20px; right:20px; width:70px; height:70px;}
+#pinWrap .chartClosed:before {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(45deg);}
+#pinWrap .chartClosed:after {content:''; position:absolute; top:0; left:35px; width:1px; height:70px; border-left:1px solid #000; transform:rotate(-45deg);}
+
+.more {overflow:hidden; padding:25px 0; text-align:center;}
+.more a {position:relative; display:inline-block; height:36px; padding:0 50px 0 35px; color:#fff; font-size:18px; line-height:36px; background:#00a1a1;}
+.more a:after {content:''; position:absolute; top:9px; right:20px; width:12px; height:12px; border-bottom:1px solid #fff; border-right:1px solid #fff; transform:rotate(45deg);}
+
+/* BTN */
+.btnWrap {overflow:hidden; padding:35px 0;}
+.btnWrap.center {text-align:center;}
+.btnWrap {text-align:center;}
+.btnWrap button {display:inline-block; height:50px; padding:0 50px; color:#fff; font-size:20px; font-weight:300; line-height:50px; background:#333;}
+.btnWrap button.save {background:#f576c3;}
+.btnWrap button.coml {background:#4868a3;}
+
+/* BOARD SEARCH */
+.listSearch {overflow:hidden; width:80%; margin:0 auto;}
+.alarmPolicy .listSearch {position:absolute; right:30px; width:200px; margin-top:-47px;}
+.listSearch input[type=text],
+.listSearch select {width:100%; margin-bottom:10px;}
+.listSearch input[type=text]:disabled {width:100%; height:40px; padding:0; color:#222; font-size:18px; text-align:center; font-weight:300; line-height:40px; letter-spacing:1px; border:0; border-bottom:1px solid #222; background:transparent;}
+.listSearch .date {overflow:hidden; width:100%; height:50px; margin-bottom:5px; color:#222; font-size:24px; font-weight:100; line-height:50px; background:#fff; transition:.5s;}
+.listSearch .date:first-child {margin-left:0;}
+.listSearch .date.on,
+.listSearch .date:hover {color:#fff; background:#f576c3;}
+.listSearch .ar {position:relative; float:right; overflow:hidden; width:49%; height:50px; margin-bottom:25px; color:#222; font-size:24px; font-weight:100; background:#fff;}
+.listSearch .ar:hover {background:#666;}
+.listSearch .ar:after {content:''; position:absolute; top:15px; left:38%; width:20px; height:20px; border-top:1px solid #222; border-right:1px solid #222; transform:rotate(45deg); transition:.5s;}
+.listSearch .ar.left {float:left;}
+.listSearch .ar.left:after {left:46%; border-top:1px solid #222; border-left:1px solid #222; border-right:0; transform:rotate(-45deg);}
+.listSearch .ar:hover:after {border-top:1px solid #fff; border-right:1px solid #fff;}
+.listSearch .ar.left:hover:after {border-top:1px solid #fff; border-left:1px solid #fff; border-right:0;}
+
+.listBtns {overflow:hidden; width:80%; margin:0 auto; padding-top:100px;}
+.listBtns a {float:left; width:50%; height:60px; padding:0 35px; font-size:20px; line-height:60px; color:#fff; border-left:1px solid #fafafa; background:#999; transition:.5s;}
+.listBtns a:hover {background:#333;}
+.listBtns .receipt {padding:0 35px 0 50px;}
+.listBtns .receipt:before {content:''; position:absolute; top:23px; left:27px; width:2px; height:16px; border-left:2px solid #fff;}
+.listBtns .receipt:after {content:''; position:absolute; top:30px; left:20px; width:16px; height:2px; border-top:2px solid #fff;}
+.listBtns .search {width:100%;}
+.listBtns .print {width:100%;}
+.listBtns .excel {width:100%; margin-top:5px;}
+
+/* Bosh Chart */
+.boshChart {overflow:hidden; padding-bottom:40px;}
+.boshChart .list {overflow:hidden; display:flex; width:100%; flex-wrap:wrap; justify-content:center;}
+.boshChart .list li {width:30%; height:250px; margin-left:2%; margin-top:40px;}
+.boshChart .list li:nth-child(3n+1) {margin-left:0;}
+.boshChart .list li h5 {height:30px; font-size:17px; font-weight:100; text-align:center; line-height:30px;}
+.boshChart .list.static li {overflow:hidden; width:100%; height:auto; margin-top:0; margin-left:0; padding:40px 0 30px;; border-top:1px solid #e0e0e0}
+.boshChart .list.static li:first-child {border-top:0;}
+.boshChart .list.static li h5 {float:left; width:100%; margin-bottom:15px; font-size:30px;}
+.boshChart .list.static li > div {float:right; width:60%;}
+.boshChart .list.static li > div:first-of-type {float:left; width:40%; display:flex; padding:0 40px 0 20px;}
+.boshChart .list.static li > div dl {flex:1; padding-top:30px; text-align:center;}
+.boshChart .list.static li > div dl dt {color:#222; font-size:20px; font-weight:500;}
+.boshChart .list.static li > .total dl dd {color:#ccc; font-size:80px; font-weight:300;}
+.boshChart .list.static li > .total dl.warning dt {color:#fba602;}
+.boshChart .list.static li > .total dl.warning dd {color:#fba602;}
+.boshChart .list.static li > .total dl.critical dt {color:#e91a61;}
+.boshChart .list.static li > .total dl.critical dd {color:#e91a61;}
+.boshChart .list.static li > .double dl dt {margin-bottom:15px;}
+.boshChart .list.static li > .double dl dd {width:80%; height:50px; margin:0 auto; color:#ccc; font-size:20px; font-weight:300; line-height:50px;}
+.boshChart .list.static li > .double dl dd:first-of-type {border-bottom:1px solid #e0e0e0;}
+.boshChart .list.static li > .double dl dd span {display:inline-block; width:65px; font-size:16px; text-align:right;}
+.boshChart .list.static li > .double dl dd strong {display:inline-block; width:30px; font-size:20px; text-align:right;}
+.boshChart .list.static li > .double dl dd.warning.on {color:#fba602;}
+.boshChart .list.static li > .double dl dd.critical.on {color:#e91a61;}
+
+.running {color:#55c554;}
+.warning {color:#fba602;}
+.critical {color:#e91a61;}
+.fail {color:#c048c8;}
+
+.alarmPolicy .contentsLeft h4 {text-align:left;}
+.alarmPolicy .contentsLeft h4:first-child {margin-top:90px;}
+/* Alarm History */
+.alarmHistory {display:none;}
+.alarmHistory ul {overflow:hidden;}
+.alarmHistory ul li {overflow:hidden; line-height:50px; border-bottom:1px solid #e7e7e7}
+.alarmHistory ul li span {float:left; width:17%; height:50px; padding-left:40px; font-size:14px; background:#f9f9f9;}
+.alarmHistory ul li input {float:left; overflow:hidden; width:60%; height:50px; padding:0 40px; color:#000; font-size:18px; text-overflow:ellipsis; white-space:nowrap; border:0;}
+.alarmHistory ul li div {float:right; width:23%; height:50px;}
+.alarmHistory ul li div button {float:left; width:50%; color:#fff; line-height:50px; background:#999;}
+.alarmHistory ul li div button.update {background:#1acb66;}
+.alarmHistory ul li div button.delete {background:#db396e;}
+.alarmHistory > div {overflow:hidden;}
+.alarmHistory > div h4 {margin-bottom:25px;}
+.alarmHistory > div textarea {width:96%; height:120px; margin:0 2%;}
+
+/* Alarm Policy */
+.alarmPolicy h4 .slider {position:relative; float:right; width:480px; height:5px; margin-top:29px; margin-right:75px;}
+.alarmPolicy h4 .slider:after {content:''; position:absolute; left:0; top:0; z-index:1; overflow:hidden; width:496px; height:5px; background:#e9ecf1;}
+.alarmPolicy h4 .slider div {position:absolute; left:0; top:0; z-index:2; height:5px; background:#5e6983;}
+.alarmPolicy h4 .slider div:before {content:''; position:absolute; right:-13px; top:-23px; width:10px; height:10px; background:#5e6983; transform:rotate(45deg);}
+.alarmPolicy h4 .slider span {position:absolute; top:-42px; z-index:2; width:50px; height:24px; color:#fff; font-size:14px; line-height:24px;}
+.alarmPolicy h4 .slider span:before {content:''; position:absolute; top:0; left:-18px; z-index:-1; overflow:hidden; width:50px; height:24px; background:#5e6983; border-radius:7px;}
+.alarmPolicy h4 .slider span:after {content:''; position:absolute; top:36px; left:0; width:17px; height:17px;border:4px solid #40cecd; background:#fff; cursor:pointer; border-radius:9px;}
+.alarmPolicy h4 .slider .min {position:absolute; left:-45px; top:-6px; font-size:16px; line-height:16px;}
+.alarmPolicy h4 .slider .max {position:absolute; right:-70px; top:-6px; font-size:16px; line-height:16px;}
+.alarmPolicy .alarmSetting {width:100%;}
+.alarmPolicy .alarmSetting dl {overflow:hidden; padding:20px 30px; margin-top:10px; background:#fefefe; box-shadow:2px 2px 5px rgba(200,200,200,.3);}
+.alarmPolicy .alarmSetting dl:first-child {margin-top:0;}
+.alarmPolicy .alarmSetting dl dt {float:left; width:13%; height:36px;  color:#333; font-size:20px; font-weight:100; line-height:32px;}
+.alarmPolicy .alarmSetting dl dd {float:left; width:23%; height:36px; margin-left:6%;}
+.alarmPolicy .alarmSetting dl dd input {width:27%; font-size:20px; color:#000; font-weight:300; text-align:center; border:0; border-bottom:1px solid #000; background:transparent;}
+.alarmPolicy .alarmSetting dl dd input:focus {border-bottom:1px solid #f576c3;}
+.alarmPolicy .alarmSetting dl dd strong {display:inline-block; padding-right:10px; font-size:16px; font-weight:100; text-align:right; line-height:32px;}
+.alarmPolicy .alarmSetting dl dd span {display:inline-block; padding:0 10px; color:#333; font-size:14px; font-weight:100; line-height:32px;}
+
+.alarmPolicy fieldset {display:inline-block; width:100%; padding-top:30px;}
+.alarmPolicy fieldset input {float:left; width:37%; border:0; border-bottom:1px solid #333; background:transparent;}
+.alarmPolicy fieldset em {float:left; margin:0 10px; color:#bbb;}
+.alarmPolicy fieldset select {float:right; width:20%;}
+
+.alarmPolicy .inputRange {float:right; width:70%;}
+.alarmPolicy input[type=range] {float:left; -webkit-appearance:none; width:85%; height:10px; border-radius:5px; margin-top:27px;}
+.alarmPolicy  input[type=range]:focus {outline:none;}
+
+.alarmPolicy input[type=range]::-webkit-slider-runnable-track {width:100%; height:10px; cursor:pointer; background:#ccc; border-radius:5px;}
+.alarmPolicy input[type=range]::-webkit-slider-thumb {border:1px solid #f576c3; height:20px; width:20px; background:#ffffff; cursor:pointer; -webkit-appearance:none; border-radius:10px; margin-top:-5px;}
+
+.alarmPolicy input[type=range]::-moz-range-track {width:100%; height:5px; cursor:pointer; background:#ccc;}
+.alarmPolicy input[type=range]::-moz-range-thumb {border:1px solid #f576c3; height:15px; width:10px; background:#ffffff; cursor:pointer;}
+
+.alarmPolicy input[type=range]::-ms-track {width:100%; height:5px; cursor:pointer; background:transparent; border-color:transparent; color:transparent;}
+.alarmPolicy input[type=range]::-ms-fill-lower {background:#ccc;}
+.alarmPolicy input[type=range]::-ms-fill-upper {background:#ccc;}
+.alarmPolicy input[type=range]::-ms-thumb {margin-top:1px; border:1px solid #f576c3; height:5px; width:10px; background:#ffffff; cursor:pointer;}
+
+.alarmPolicy input[type=range] + input {float:right; width:10%; margin-top:14px; text-align:center;}
+
+
+.alarmStatistics {overflow:hidden;}
+.alarmStatistics .chart {width:100%; height:190px; margin-top:30px;}
+
+.push .snsBot {padding:30px 0;}
+.push .snsBot .snsWrap {margin-top:40px;}
+.push .snsBot #snsList {margin-top:0px;}
+.push .snsBot p {margin-bottom:15px; font-size:15px; color:#ed1b59;}
+.push .snsBot .list {overflow:hidden;}
+.push .snsBot .list span {float:left; height:36px; font-size:22px; text-align:center; font-weight:100; line-height:34px;}
+.push .snsBot .list span:before {content:'# '; color:#ccc; font-size:24px; font-weight:400;}
+.push .snsBot .list em {float:right; height:36px; font-size:18px; color:#999; text-align:center; font-weight:100; line-height:34px;}
+.push .snsBot #snsList {display:none;}
+.push .snsBot #snsList button {width:100%; height:36px; margin-top:25px; color:#fff; font-size:14px; text-align:center; font-weight:100; line-height:34px; background:#db396e}
+.push .snsBot fieldset {display:inline-block; width:100%;}
+.push .snsBot fieldset select {float:left; width:48%; margin-bottom:10px}
+.push .snsBot fieldset input {float:right; width:48%; margin-bottom:10px}
+.push .snsBot fieldset input:nth-child(3) {float:left;}
+.push .snsBot fieldset button {width:100%; height:36px; margin-top:25px; color:#fff; font-size:18px; text-align:center; font-weight:100; line-height:34px; background:#39db7e}
+
+
+.loginWrap {position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; overflow:hidden; background:#fff;}
+.loginWrap:after {content:''; position:absolute; top:-50%; left:-49%; z-index:1; width:100%; height:200%; background:#f6f7fc; border-radius:0 100% 100% 0; box-shadow:inset 0 0 30px rgba(0,0,0,.1);}
+.loginWrap > div {position:absolute; top:50%; left:50%; z-index:2; overflow:hidden; width:300px; margin:-220px 0 0 -150px;}
+.loginWrap > div h1 {position:relative; padding-top:80px; color:#424f70; text-align:center;}
+.loginWrap > div h1:before {content:''; position:absolute; top:0; left:50%; width:70px; height:70px; margin-left:-35px; border:16px solid #fff; background:#f576c3; border-radius:100%; box-shadow:0 0 10px rgba(0,0,0,.1);}
+.loginWrap > div h1:after {content:''; position:absolute; top:22px; left:50%; width:26px; height:26px; margin-left:-13px; background:#fff; border-radius:100%;}
+.loginWrap > div p {margin-bottom:30px; color:#424f70; font-size:12px; text-align:center;}
+.loginWrap > div fieldset {overflow:hidden;}
+.loginWrap > div fieldset div {margin-top:20px; text-align:center;}
+.loginWrap > div fieldset div:first-child {margin-top:0;}
+.loginWrap > div fieldset div label {display:block; color:#666; font-size:11px; text-align:center;}
+.loginWrap > div fieldset div input {width:100%; height:40px; color:#000; font-size:18px; text-align:center; line-height:65px; letter-spacing:1px; border:0; border-bottom:1px solid #666; background:transparent;}
+.loginWrap > div fieldset div input:focus {border:0; border-bottom:1px solid #f576c3;}
+.loginWrap > div fieldset div.btn {margin-top:40px; text-align:center;}
+.loginWrap > div fieldset div #loginBtn {width:80%; height:50px; color:#666; font-size:18px; text-align:center; line-height:50px; background:#fff; border-radius:25px; box-shadow:2px 2px 5px rgba(100,100,100,.1);}
+.loginWrap > div fieldset div #loginBtn:hover {color:#f576c3;}
+.loginWrap > div fieldset div #join {color:#f576c3; font-size:14px; text-decoration:underline;}
+
+.loginWrap > div.join {width:1220px; margin:-300px 0 0 -610px; text-align:center;}
+.loginWrap > div.join fieldset {position:relative; display:inline-block; overflow:visible; width:300px; padding:0 50px; text-align:center;}
+.loginWrap > div.join fieldset.hide {display:none;}
+.loginWrap > div.join fieldset .uck {position:absolute; top:10px; left:60px; width:30px; height:30px;}
+.loginWrap > div.join fieldset .uck + label {position:absolute; top:10px; left:70px; width:30px; height:30px; border:0;}
+.loginWrap > div.join fieldset .uck + label:after {content:''; position:absolute; top:3px; left:10px; width:12px; height:20px; border-right:4px solid #ccc; border-bottom:4px solid #ccc; transform:rotate(45deg);}
+.loginWrap > div.join fieldset .uck:checked + label:after {border-right:4px solid #f576c3; border-bottom:4px solid #f576c3;}
+.loginWrap > div.join fieldset .uck:checked + label + h4 {color:#f576c3;}
+.loginWrap > div.join fieldset h4 {font-size:32px; font-weight:100; text-align:center;}
+.loginWrap > div.join fieldset .certif .idc {height:30px; margin:0 0 25px; color:#e91a61;}
+.loginWrap > div.join fieldset .certif .idc.on {color:#55c554;}
+.loginWrap > div.join fieldset .certification {width:150px; height:34px; margin:0 5px; color:#fff; font-size:14px; line-height:34px; background:#999; border-radius:17px; box-shadow:2px 2px 5px rgba(100,100,100,.2); transition:.5s;}
+.loginWrap > div.join fieldset .certification:hover {color:#666; background:#fff; border-radius:5px; box-shadow:2px 2px 5px rgba(100,100,100,.8);}
+.loginWrap > div.join fieldset .certification.off {opacity:.1;}
+.loginWrap > div.join fieldset > .btns {display:inline-block; width:100%; padding:35px 0 10px; text-align:right;}
+.loginWrap > div.join fieldset > .btns button {float:left; width:95px; height:50px; color:#666; font-size:18px; line-height:50px; background:#fff; border-radius:25px; box-shadow:2px 2px 5px rgba(100,100,100,.2); transition:.5s;}
+.loginWrap > div.join fieldset > .btns button:hover {border-radius:15px; box-shadow:2px 2px 5px rgba(100,100,100,.8);}
+.loginWrap > div.join fieldset > .btns button.save {margin-left:10px; color:#fff; background:#f576c3;}
+
+.zoneWrap h4 span {float:left; height:60px; margin-right:25px;}
+.zoneWrap h4 select {float:right; margin-top:15px;}
+.zoneWrap h4 div {float:right;}
+.zoneWrap h4 div span:before {content:' ㆍ ' }
+.zoneWrap h4 div span {font-size:20px; margin-left:30px;}
+.zoneWrap h4 div span strong {font-size:20px !important; margin-left:15px; font-weight:800;}
+.zoneWrap h4 div span.run strong {color:#45b1ff !important;}
+.zoneWrap h4 div span.war strong {color:#fba602 !important;}
+.zoneWrap h4 div span.cri strong {color:#e91a61 !important;}
+.zoneWrap h4 div span.bak strong {color:#333 !important;}
+.zoneWrap .cellList {display:inline-block; width:100%; min-height:200px;}
+.zoneWrap .cellList > dl {display:inline-block; width:100%; margin-top:15px; border-bottom:1px solid #eee;}
+.zoneWrap .cellList > dl:first-child {margin-top:0;  border-top:1px solid #eee;}
+.zoneWrap .cellList > dl > dt {float:left; width:20%; height:50px; padding:5px 15px; line-height:38px;}
+.zoneWrap .cellList > dl > dd {float:left; width:80%; min-height:50px; padding:10px 15px 5px;}
+.zoneWrap .cellList > dl > dd > a {position:relative; display:inline-block; width:24px; height:24px; margin:4px; background:#ddd;}
+.zoneWrap .cellList > dl > dd > a:after {content:''; position:absolute; top:0; left:0; width:24px; height:24px; color:#fff; font-size:14px; font-weight:100; text-align:center; line-height:23px;}
+.zoneWrap .cellList > dl > dd > a.running {background:#55c554;}
+.zoneWrap .cellList > dl > dd > a.running:after {content:'R';}
+.zoneWrap .cellList > dl > dd > a.warning {background:#fba602;}
+.zoneWrap .cellList > dl > dd > a.warning:after {content:'W';}
+.zoneWrap .cellList > dl > dd > a.critical {background:#e91a61;}
+.zoneWrap .cellList > dl > dd > a.critical:after {content:'C';}
+.zoneWrap .cellList > dl > dd > a.fail {background:#c048c8;}
+.zoneWrap .cellList > dl > dd > a.fail:after {content:'F';}
+.zoneWrap .cellList > dl > dd a .flag {position:absolute; bottom:35px; left:0; z-index:-1; color:#222; width:160px; padding:10px; border:1px solid #222; background:#fff; opacity:0; transition:.5s;}
+.zoneWrap .cellList > dl > dd a:hover .flag {opacity:1; z-index:1; box-shadow:2px 2px 5px rgba(0,0,0,.3);}
+.zoneWrap .cellList > dl > dd a .flag:after {content:''; position:absolute; bottom:-6px; left:5px; width:10px; height:10px; border-bottom:1px solid #222; border-right:1px solid #222; background:#fff; transform:rotate(45deg)}
+.zoneWrap .cellList > dl > dd a .flag dl {overflow:hidden; width:140px;}
+.zoneWrap .cellList > dl > dd a .flag dl dt {float:left; width:40px; color:#333; font-size:12px; font-weight:400; text-align:left; line-height:18px; white-space:nowrap;}
+.zoneWrap .cellList > dl > dd a .flag dl dd {float:left; width:100px; color:#666; font-size:12px; text-align:left; line-height:18px; white-space:nowrap;}
+
+.zoneWrap .nodeList {overflow:hidden; min-height:200px;}
+.zoneWrap .nodeList > dl {float:left; width:49%; margin-top:10px; padding:10px; border:1px solid #eee;}
+.zoneWrap .nodeList > dl.admin {padding:10px; border:1px solid #55c554;}
+.zoneWrap .nodeList > dl.demo {padding:10px; border:1px solid #ccc;}
+.zoneWrap .nodeList > dl:nth-child(even) {margin-left:2%;}
+.zoneWrap .nodeList > dl > dt {position:relative; overflow:hidden; margin-bottom:10px; padding-left:55px; color:#000; font-size:26px; font-weight:400; line-height:40px; background:#f5f5f5;}
+.zoneWrap .nodeList > dl.admin > dt,
+.zoneWrap .nodeList > dl.demo > dt {padding-left:15px;}
+.zoneWrap .nodeList > dl > dt:after {content:''; position:absolute; top:0; left:0; width:40px; height:40px; color:#fff; font-size:24px; font-weight:100; text-align:center; line-height:40px;}
+.zoneWrap .nodeList > dl.running > dt:after {content:'R'; background:#55c554;}
+.zoneWrap .nodeList > dl.warning > dt:after {content:'W'; background:#fba602;}
+.zoneWrap .nodeList > dl.critical > dt:after {content:'C'; background:#e91a61;}
+.zoneWrap .nodeList > dl.fail > dt:after {content:'F'; background:#c048c8;}
+.zoneWrap .nodeList > dl > dt span {float:right; padding-right:20px; font-size:16px; font-weight:200;}
+.zoneWrap .nodeList > dl > dd ul {overflow:hidden; display:flex; justify-content:space-between;}
+.zoneWrap .nodeList > dl > dd ul li {padding-left:10px; font-size:14px; border-left:8px solid #000;}
+.zoneWrap .nodeList > dl > dd ul li:nth-child(1) {color:#fba602; border-color:#fba602;}
+.zoneWrap .nodeList > dl > dd ul li:nth-child(2) {color:#ed1b59; border-color:#ed1b59;}
+.zoneWrap .nodeList > dl > dd ul li:nth-child(3) {padding-right:10px; color:#55c554; border-color:#55c554;}
+.zoneWrap .nodeList > dl > dd ul.project li {padding-left:0; color:#333; border-left:0;}
+.zoneWrap .nodeList > dl > dd ul.project li dl {display:flex; flex-direction:column; justify-content:center; text-align:center;}
+.zoneWrap .nodeList > dl > dd ul.project li dl dt {margin-bottom:5px;}
+.zoneWrap .nodeList > dl > dd ul.project li dl dd {padding:3px 10px; border:1px solid #55c554; border-radius:5px;}
+.zoneWrap .nodeList > dl.demo > dd ul.project li dl dd {border:1px solid #ccc;}
+
+#contents article.alarmWrap h4 {border-bottom:0;}
+.alarmList {overflow:hidden;}
+.alarmList li {float:left; width:32%; margin-left:1%; margin-bottom:20px; border:1px solid #eee; cursor:pointer; transition:.5s;}
+.alarmList li.none {width:100%; height:300px; text-align:center; line-height:300px;}
+.alarmList li:nth-child(3n+1) {margin-left:0;}
+.alarmList li:hover {border:1px solid #000; box-shadow:2px 2px 5px rgba(0,0,0,.3);}
+.alarmList li h6 {position:relative; height:30px; color:#333;}
+.alarmList li h6:before {display:inline-block; width:30px; height:30px; color:#fff; font-size:14px; text-align:center; line-height:30px;}
+.alarmList li h6 span {padding-left:10px; font-size:14px; font-weight:300; line-height:30px;}
+.alarmList li.running h6:before {content:'R'; background:#55c554;}
+.alarmList li.warning h6:before {content:'W'; background:#fba602;}
+.alarmList li.critical h6:before {content:'C'; background:#e91a61;}
+.alarmList li.fail h6:before {content:'F'; background:#c048c8;}
+.alarmList li dl {overflow:hidden; margin-bottom:5px;}
+.alarmList li dl:first-of-type {margin-top:5px; margin-bottom:0;}
+.alarmList li dl dt {position:relative; float:left; width:28%; height:26px; padding-left:43px; color:#999; font-size:13px; line-height:26px;}
+.alarmList li dl dd {float:left; overflow:hidden; width:70%; height:26px; color:#333; font-size:13px; line-height:26px; white-space:nowrap; text-overflow:ellipsis;}
+
+.alarmBox {margin-top:15px; text-align:center;}
+.alarmBox input {width:76%; text-align:center;}
+.alarmBox span {display:block; height:34px; padding:5px 0; color:#999; line-height:22px;}
+
+
+/********************************** loader ******************************************/
+#loadWrap {position:fixed; top:0; left:0; z-index:99999; width:100%; height:100%; background:rgba(0,0,0,.3); display:flex; justify-content:center; align-items:center; display:none;}
+#loadWrap .loader {width:8vmax; height:8vmax; border-right:4px solid #ffffff; border-radius:100%; animation:spinRight 800ms linear infinite;}
+#loadWrap .loader:before,
+#loadWrap .loader:after {content:''; width:6vmax; height:6vmax; display:block; position:absolute; top:calc(50% - 3vmax); left:calc(50% - 3vmax); border-left:3px solid #ffffff; border-radius:100%; animation:spinLeft 800ms linear infinite;}
+#loadWrap .loader:after {width:4vmax; height:4vmax; top:calc(50% - 2vmax); left:calc(50% - 2vmax); border:0; border-right:2px solid #ffffff; animation:none;}
+
+@keyframes spinLeft {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(720deg);}
+  }
+  
+  @keyframes spinRight {
+    from {transform:rotate(360deg);}
+    to {transform:rotate(0deg);}
+  }
