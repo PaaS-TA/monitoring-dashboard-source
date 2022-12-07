@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Google App Engine Flexible Environment - Golang Websockets Chat</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="../resources/css/c3.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="../resources/css/layout_custom.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 13px Helvetica, Arial;
+        }
+
+        form {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        form input {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+
+        form button {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages li {
+            padding: 5px 10px;
+        }
+
+        #messages li:nth-child(odd) {
+            background: #dedede;
+        }
+
+        #messages li:last-child {
+            background: #aea;
+        }
+
+        section {
+            background-color: #eee;
+            border: 3px dashed #888;
+            border-radius: 10px;
+            margin: 30px;
+            margin-bottom: 80px;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>gorilla websocket test</h1>
+<div>
+    <ul class="chart">
+        <li>
+            <h5>CPU Usage</h5>
+            <div id="cpuUsageChart"></div>
+        </li>
+    </ul>
+</div>
+<form id="chat-form">
+    <input type="text" id="chat-text" autocomplete="off" placeholder="Enter some text...">
+    <button type="submit">Send</button>
+</form>
+
+<section>
+    <ul id="messages"></ul>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="../resources/js/d3-5.4.0.min.js"></script>
+<script type="text/javascript" src="../resources/js/c3.min.js"></script>
+<script type="text/javascript" src="../resources/js/fn-1.0.js"></script>
+<script>
+    /*전역*/
+    let dataArray = [];
+
+    $(function () {
+        var scheme = window.location.protocol == "https:" ? 'wss://' : 'ws://';
+
+        var webSocketUri = scheme
+            + window.location.hostname
+            + (location.port ? ':' + location.port : '')
+            + '/ws';
+
+        function log(text, label) {
+            label = label || 'Status';
+            $('#messages').append(`<li> <strong>${label}</strong>: ${text}`);
+        }
+
+        var websocket = new WebSocket(webSocketUri);
+        websocket.onopen = function () {
+            log('Connected');
+        };
+        websocket.onclose = function () {
+            log('Closed');
+        };
+        websocket.onmessage = function (e) {
+            //log(e.data, 'Message received')
+            console.log("ㅎㅇ");
+            detailChart(e.data, '#cpuUsageChart')
+        };
+        websocket.onerror = function (e) {
+            log('Error (see console)');
+            console.log(e);
+        };
+        $('#chat-form').submit(function (e) {
+            e.preventDefault();
+            var data = $('#chat-text').val();
+            if (data) {
+                websocket.send(data);
+                window.scrollTo(0, document.body.scrollHeight)
+                $('#chat-text').val('');
+            }
+        });
+    });
+
+    function detailChart(data, target) {
+        let cnt = 0;
+        let yPos = 9;
+        let xPosArr = [];
+        let xPos = 0;
+        let detailTime = [];
+        let detailData = [];
+        let chartColor;
+        let xPosDiv;
+        let sizeHeightDiv;
+        let sizeWidthDiv;
+        let jsonArray = [];
+
+        jsonArray = JSON.parse(data);
+        console.log('jsonArray : ' + JSON.stringify(jsonArray));
+
+        /*let temp = JSON.parse(data)
+        console.log('data : ' + JSON.stringify(temp));*/
+
+        detailTime.push('time');
+
+        detailData[0] = [jsonArray[0].type];
+            jsonArray.forEach((load, idx) => {
+
+                let parsingTime = Number(load.time)
+                let parsingUsage = Number(load.usage)
+
+                var timeStamp = new Date((parsingTime)*1000);
+
+                timeStamp.setHours(timeStamp.getHours()+9);
+
+                let utcFullYear = timeStamp.getUTCFullYear();
+                let utcMonth = timeStamp.getUTCMonth()+1;
+                let utcDate = timeStamp.getUTCDate();
+
+                detailTime.push(utcFullYear + '-' + utcMonth + '-' + utcDate + ' ' + ('0' + timeStamp.getUTCHours()).slice(-2) + ':' + ('0' + timeStamp.getUTCMinutes()).slice(-2) + ':' + ('0' + timeStamp.getUTCSeconds()).slice(-2));
+                xPosArr.push(Number(parsingUsage));
+
+                detailData[0].push(Number(Math.ceil(parsingUsage)));
+
+                if(yPos < Number(parsingUsage))
+                    yPos = Math.ceil(parsingUsage);
+            });
+
+        yPos = Math.ceil((yPos / 10)) * 10;
+        xPos = Math.floor((Math.min.apply(null, xPosArr) / 10))* 10;
+
+        var dataType = [];
+        dataType.push(detailTime);
+
+        dataType.push(detailData[0]);
+
+        switch (target){
+            case '#cpuUsageChart':
+                chartColor = ['#ff015a', '#fc6604', '#fcce34', '#cc86cc'];
+                break;
+        };
+
+        switch (target){
+            case '#cpuUsageChart':
+                xPosDiv = 0;
+                sizeHeightDiv = 0;
+                sizeWidthDiv = 0;
+                break;
+        };
+
+        console.log("여기냐설마 : " + dataType);
+
+        var xGridline = [];
+        var chart = c3.generate({
+            bindto: target,
+            data: {
+                x: 'time',
+                xFormat: '%Y-%m-%d %H:%M:%S',
+                columns: dataType,
+                labels: false,
+                type: 'spline',
+            },
+            color: {
+                pattern: chartColor
+            },
+            axis: {
+                x: {
+                    type: 'timeseries',
+                    localtime: true,
+                    tick: {
+                        count: 3,
+                        format: '%H:%M'
+                    },
+                },
+                y: {
+                    max: yPos,
+                    min: xPosDiv,
+                    tick: {
+                        count: 5,
+                    },
+                    padding: {top: 0, bottom: 0}
+                }
+            },
+            point: {
+                show: true
+            },
+            grid: {
+                x: {
+                    lines: function() {
+                        for(var i =1; detailTime.length > i; i++) {
+                            if(i % 4 === 0) {
+                                xGridline.push({value: detailTime[i], class:'dash-line'})
+                            }
+                        }
+                        return xGridline;
+                    },
+                },
+                y: {
+                    //show: true
+                }
+            },
+            padding: {
+                right:20
+            },
+            size: {
+                height: sizeHeightDiv,
+                width: sizeWidthDiv
+            }
+        });
+    }
+</script>
+</body>
+
+</html>
