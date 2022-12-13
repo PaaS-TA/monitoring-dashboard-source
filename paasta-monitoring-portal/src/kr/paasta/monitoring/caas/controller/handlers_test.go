@@ -2,6 +2,8 @@ package controller
 
 import (
 	"github.com/elastic/go-elasticsearch/v7"
+	"monitoring-portal/common/controller/login"
+	"monitoring-portal/common/controller/member"
 	controller2 "monitoring-portal/iaas_new/controller"
 	"monitoring-portal/zabbix-client/lib/go-zabbix"
 
@@ -17,8 +19,6 @@ import (
 	"github.com/rackspace/gophercloud"
 	"github.com/tedsuo/rata"
 	"io"
-	"monitoring-portal/common/controller"
-
 	"monitoring-portal/iaas_new/model"
 	pm "monitoring-portal/paas/model"
 	"monitoring-portal/routes"
@@ -34,14 +34,14 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
 	zabbixSession *zabbix.Session) http.Handler {
 
 	//Controller선언
-	var loginController *controller.LoginController
-	var memberController *controller.MemberController
+	var loginController *login.LoginController
+	var memberController *member.MemberController
 
 	// SaaS Metrics
 	var applicationController *saasContoller.SaasController
 
-	loginController = controller.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
-	memberController = controller.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
+	loginController = login.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
+	memberController = member.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
 
 	var caasMetricsController *MetricController
 

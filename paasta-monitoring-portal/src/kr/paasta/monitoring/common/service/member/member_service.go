@@ -1,4 +1,4 @@
-package services
+package member
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
-	"monitoring-portal/common/dao"
+	"monitoring-portal/common/dao/member"
 	cm "monitoring-portal/common/model"
 	"monitoring-portal/iaas_new/model"
 	pm "monitoring-portal/paas/model"
@@ -72,7 +72,7 @@ func (n MemberService) MemberJoinInfo() (val string) {
 
 func (n MemberService) MemberJoinSave(req cm.UserInfo) error {
 
-	dbErr := dao.GetMemberDao(n.txn).MemberJoinSave(req, n.txn)
+	dbErr := member.GetMemberDao(n.txn).MemberJoinSave(req, n.txn)
 
 	if dbErr != nil {
 		return dbErr
@@ -166,7 +166,7 @@ func (n MemberService) MemberJoinSave(req cm.UserInfo) error {
 
 func (n MemberService) MemberInfoCheck(req cm.UserInfo) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
 
-	result, _, dbErr := dao.GetMemberDao(n.txn).MemberInfoCheck(req, n.txn)
+	result, _, dbErr := member.GetMemberDao(n.txn).MemberInfoCheck(req, n.txn)
 
 	if dbErr != nil {
 		return result, provider, dbErr
@@ -177,7 +177,7 @@ func (n MemberService) MemberInfoCheck(req cm.UserInfo) (userInfo cm.UserInfo, p
 
 func (n MemberService) MemberInfoView(req cm.UserInfo) (userInfo cm.UserInfo, provider *gophercloud.ProviderClient, err error) {
 	fmt.Println("MemberInfoView service req.userid", req.UserId)
-	result, _, dbErr := dao.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
+	result, _, dbErr := member.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
 
 	if dbErr != nil {
 		return result, provider, dbErr
@@ -190,13 +190,13 @@ func (n MemberService) MemberInfoUpdate(req cm.UserInfo) (userInfo cm.UserInfo, 
 
 	var nullInfo cm.UserInfo
 
-	_, dbErr := dao.GetMemberDao(n.txn).MemberInfoUpdate(req, n.txn)
+	_, dbErr := member.GetMemberDao(n.txn).MemberInfoUpdate(req, n.txn)
 
 	if dbErr != nil {
 		return nullInfo, provider, dbErr
 	}
 
-	result, _, dbErr := dao.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
+	result, _, dbErr := member.GetMemberDao(n.txn).MemberInfoView(req, n.txn)
 
 	if dbErr != nil {
 		return nullInfo, provider, dbErr
@@ -207,7 +207,7 @@ func (n MemberService) MemberInfoUpdate(req cm.UserInfo) (userInfo cm.UserInfo, 
 
 func (n MemberService) MemberInfoDelete(req cm.UserInfo) (cnt int, err error) {
 
-	result, dbErr := dao.GetMemberDao(n.txn).MemberInfoDelete(req, n.txn)
+	result, dbErr := member.GetMemberDao(n.txn).MemberInfoDelete(req, n.txn)
 
 	if dbErr != nil {
 		return result, dbErr
@@ -306,16 +306,16 @@ func (n MemberService) CaasServiceCheck(apiRequest cm.UserInfo, reqCsrfToken str
 
 
 func (n MemberService) MemberJoinCheckDuplicationIaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
-	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationIaasId(req, n.txn)
+	return member.GetMemberDao(n.txn).MemberJoinCheckDuplicationIaasId(req, n.txn)
 }
 
 func (n MemberService) MemberJoinCheckDuplicationPaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
-	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationPaasId(req, n.txn)
+	return member.GetMemberDao(n.txn).MemberJoinCheckDuplicationPaasId(req, n.txn)
 }
 
 
 func (n MemberService) MemberJoinCheckDuplicationCaasId(req cm.UserInfo) (userInfo cm.UserInfo, err error) {
-	return dao.GetMemberDao(n.txn).MemberJoinCheckDuplicationCaasId(req, n.txn)
+	return member.GetMemberDao(n.txn).MemberJoinCheckDuplicationCaasId(req, n.txn)
 }
 
 func (n MemberService) DeleteIaasToken(reqCsrfToken string) {

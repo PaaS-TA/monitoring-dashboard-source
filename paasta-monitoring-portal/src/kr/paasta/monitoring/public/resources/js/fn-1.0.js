@@ -776,6 +776,5 @@ const fnComm = {
 		}
 		return elapsed;
 
-
 	}
 };

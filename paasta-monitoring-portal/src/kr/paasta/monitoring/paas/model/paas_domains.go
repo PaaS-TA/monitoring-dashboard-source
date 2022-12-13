@@ -193,6 +193,13 @@ type (
 	Usage struct {
 		Usage string `json:"name"`
 	}
+
+	Diagram struct {
+		Id string            `json:"id"`
+		Name string          `json:"name"`
+		Title string         `json:"title"`
+		Children []Diagram   `json:"children"`
+	}
 )
 
 // Default Parent State: "running"

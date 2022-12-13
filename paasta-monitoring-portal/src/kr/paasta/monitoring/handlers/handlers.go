@@ -1,11 +1,14 @@
 package handlers
 
 import (
-	"io"
-	"monitoring-portal/zabbix-client/lib/go-zabbix"
-	"net/http"
-	"strings"
-	"time"
+    "github.com/cloudfoundry-community/go-cfclient"
+    "io"
+    "monitoring-portal/common/controller/login"
+    "monitoring-portal/common/controller/member"
+    "monitoring-portal/zabbix-client/lib/go-zabbix"
+    "net/http"
+    "strings"
+    "time"
 
     "github.com/cloudfoundry-community/gogobosh"
     "github.com/go-redis/redis"
@@ -15,32 +18,31 @@ import (
     "github.com/jinzhu/gorm"
     "github.com/tedsuo/rata"
 
-	caasContoller "monitoring-portal/caas/controller"
-	"monitoring-portal/common/controller"
-	iaasContoller "monitoring-portal/iaas_new/controller"
-	paasContoller "monitoring-portal/paas/controller"
-	pm "monitoring-portal/paas/model"
-	saasContoller "monitoring-portal/saas/controller"
+    caasContoller "monitoring-portal/caas/controller"
+    iaasContoller "monitoring-portal/iaas_new/controller"
+    paasContoller "monitoring-portal/paas/controller"
+    pm "monitoring-portal/paas/model"
+    saasContoller "monitoring-portal/saas/controller"
 
     "monitoring-portal/routes"
     "monitoring-portal/utils"
 
-	"monitoring-portal/iaas_new/model"
+    "monitoring-portal/iaas_new/model"
 )
 
 func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient client.Client, paasInfluxClient client.Client,
     iaasTxn *gorm.DB, paasTxn *gorm.DB, auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig,
-    zabbixSession *zabbix.Session) http.Handler {
+    zabbixSession *zabbix.Session, cfClient *cfclient.Client) http.Handler {
 
     //Controller선언
-    var loginController *controller.LoginController
-    var memberController *controller.MemberController
+    var loginController *login.LoginController
+    var memberController *member.MemberController
 
     // SaaS Metrics
     var applicationController *saasContoller.SaasController
 
-    loginController = controller.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
-    memberController = controller.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
+    loginController = login.NewLoginController(openstackProvider, auth, paasTxn, rdClient, sysType, cfConfig)
+    memberController = member.NewMemberController(openstackProvider, paasTxn, rdClient, sysType, cfConfig)
 
     var caasMetricsController *caasContoller.MetricController
 
@@ -103,6 +105,7 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
     var boshStatusController *paasContoller.BoshStatusService
     var paasController *paasContoller.PaasController
     var appController *paasContoller.AppController
+    var cloudfoundryController *paasContoller.CloudFoundryController
 
     var logsearchController *paasContoller.LogsearchController
 
@@ -116,6 +119,8 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
         paasController = paasContoller.GetPaasController(paasTxn, paasInfluxClient, databases, boshClient)
         appController = paasContoller.GetAppController(paasTxn)
         logsearchController = paasContoller.GetLogsearchController(paasInfluxClient, databases) // 2022.03.04 - 로깅 고도화
+
+        cloudfoundryController = paasContoller.GetCloudFoundryController(cfClient)   // CloudFoundry 추가
 
         paasActions = rata.Handlers{
             routes.MEMBER_JOIN_CHECK_DUPLICATION_PAAS_ID: route(memberController.MemberJoinCheckDuplicationPaasId),
@@ -236,6 +241,8 @@ func NewHandler(openstackProvider model.OpenstackProvider, iaasInfluxClient clie
             routes.PAAS_LOG_SEARCH: route(logsearchController.GetLogData), // url : v2/paas/log/recent
 
             //routes.PAAS_LOG_RECENT:   route(paasLogController.GetDefaultRecentLog),   // deprecated..
+
+            routes.PAAS_DIAGRAM: route(cloudfoundryController.GetPaasDiagram),
 
         }
     }

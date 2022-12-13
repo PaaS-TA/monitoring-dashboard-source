@@ -2,6 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"monitoring-portal/common/controller/login"
+	"monitoring-portal/common/controller/member"
+
 	//"github.com/cloudfoundry-community/go-cfclient"
 	"strings"
 
@@ -19,7 +22,6 @@ import (
 	"gopkg.in/olivere/elastic.v3"
 	"io"
 	caasContoller "monitoring-portal/caas/controller"
-	"monitoring-portal/common/controller"
 	iaasContoller "monitoring-portal/iaas_new/controller"
 	"monitoring-portal/iaas_new/model"
 	//paasContoller "kr/paasta/monitoring/paas/controller"
@@ -37,14 +39,14 @@ func NewHandler(openstack_provider model.OpenstackProvider, iaasInfluxClient cli
 	auth monascagopher.AuthOptions, databases pm.Databases, rdClient *redis.Client, sysType string, boshClient *gogobosh.Client, cfConfig pm.CFConfig) http.Handler {
 
 	//Controller선언
-	var loginController *controller.LoginController
-	var memberController *controller.MemberController
+	var loginController *login.LoginController
+	var memberController *member.MemberController
 
 	// SaaS Metrics
 	var applicationController *saasContoller.SaasController
 
-	loginController = controller.NewLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType, cfConfig)
-	memberController = controller.NewMemberController(openstack_provider, paasTxn, rdClient, sysType, cfConfig)
+	loginController = login.NewLoginController(openstack_provider, monsClient, auth, paasTxn, rdClient, sysType, cfConfig)
+	memberController = member.NewMemberController(openstack_provider, paasTxn, rdClient, sysType, cfConfig)
 
 	var mainController *iaasContoller.OpenstackServices
 	var computeController *iaasContoller.OpenstackComputeNode

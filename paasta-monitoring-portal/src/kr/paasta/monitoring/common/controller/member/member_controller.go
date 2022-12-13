@@ -1,21 +1,20 @@
-package controller
+package member
 
 import (
-
-	"fmt"
-	"errors"
-	"strings"
-	"net/http"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"monitoring-portal/common/service/login"
+	"monitoring-portal/common/service/member"
+	"net/http"
+	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
-	"monitoring-portal/utils"
-	"monitoring-portal/iaas_new/model"
-	"monitoring-portal/common/service"
-	pm "monitoring-portal/paas/model"
 	cm "monitoring-portal/common/model"
-
+	"monitoring-portal/iaas_new/model"
+	pm "monitoring-portal/paas/model"
+	"monitoring-portal/utils"
 )
 
 //Compute Node Controller
@@ -109,7 +108,7 @@ func (s *MemberController) MemberJoinSave(w http.ResponseWriter, r *http.Request
 		//	return
 		//}
 
-		err := services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinSave(apiRequest)
+		err := member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinSave(apiRequest)
 		loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 		//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -165,7 +164,7 @@ func (s *MemberController) MemberAuthCheck(w http.ResponseWriter, r *http.Reques
 	var userInfo cm.UserInfo
 	var err error
 
-	userInfo, _, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoView(apiRequest)
+	userInfo, _, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoView(apiRequest)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
 	//	userInfo, _, err = services.GetIaasMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoView(apiRequest)
@@ -179,7 +178,7 @@ func (s *MemberController) MemberAuthCheck(w http.ResponseWriter, r *http.Reques
 		utils.ErrRenderJsonResponse(err, w)
 	} else {
 		//캐쉬 정보 생성
-		services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
+		login.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
 		userInfo.SysType = s.sysType
 		utils.RenderJsonResponse(userInfo, w)
 	}
@@ -196,7 +195,7 @@ func (s *MemberController) MemberCheckId(w http.ResponseWriter, r *http.Request)
 	var loginErr model.ErrMessage
 	var err error
 
-	userInfo, _, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoCheck(apiRequest)
+	userInfo, _, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoCheck(apiRequest)
 	loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -228,7 +227,7 @@ func (s *MemberController) MemberCheckEmail(w http.ResponseWriter, r *http.Reque
 	var loginErr model.ErrMessage
 	var err error
 
-	userInfo, _, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoCheck(apiRequest)
+	userInfo, _, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoCheck(apiRequest)
 	loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -258,7 +257,7 @@ func (s *MemberController) MemberJoinCheckDuplicationIaasId(w http.ResponseWrite
 	var loginErr model.ErrMessage
 	var err error
 
-	userInfo, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinCheckDuplicationIaasId(apiRequest)
+	userInfo, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinCheckDuplicationIaasId(apiRequest)
 	loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -287,7 +286,7 @@ func (s *MemberController) MemberJoinCheckDuplicationPaasId(w http.ResponseWrite
 	var loginErr model.ErrMessage
 	var err error
 
-	userInfo, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinCheckDuplicationPaasId(apiRequest)
+	userInfo, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinCheckDuplicationPaasId(apiRequest)
 	loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -345,7 +344,7 @@ func (s *MemberController) MemberJoinCheckDuplicationCaasId(w http.ResponseWrite
 	var loginErr model.ErrMessage
 	var err error
 
-	userInfo, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinCheckDuplicationCaasId(apiRequest)
+	userInfo, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberJoinCheckDuplicationCaasId(apiRequest)
 	loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -373,7 +372,7 @@ func (s *MemberController) MemberCheckIaaS(w http.ResponseWriter, r *http.Reques
 	var apiRequest cm.UserInfo
 	_ = json.NewDecoder(r.Body).Decode(&apiRequest)
 
-	result = services.GetIaasMemberService(s.OpenstackProvider, s.txn, s.RdClient).GetIaasToken(apiRequest, reqCsrfToken)
+	result = member.GetIaasMemberService(s.OpenstackProvider, s.txn, s.RdClient).GetIaasToken(apiRequest, reqCsrfToken)
 
 	//if s.sysType == utils.SYS_TYPE_IAAS{
 	//	result = services.GetIaasMemberService(s.OpenstackProvider,s.txn, s.RdClient).GetIaasToken( apiRequest, reqCsrfToken)
@@ -472,7 +471,7 @@ func (s *MemberController) MemberInfoView(w http.ResponseWriter, r *http.Request
 		var loginErr model.ErrMessage
 		var err error
 
-		userInfo, _, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoView(apiRequest)
+		userInfo, _, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoView(apiRequest)
 		loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 		//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -510,7 +509,7 @@ func (s *MemberController) MemberInfoUpdate(w http.ResponseWriter, r *http.Reque
 		var loginErr model.ErrMessage
 		var err error
 
-		userInfo, _, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoUpdate(apiRequest)
+		userInfo, _, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoUpdate(apiRequest)
 		loginErr = utils.GetError().GetCheckErrorMessage(err)
 
 		//if s.sysType == utils.SYS_TYPE_IAAS{
@@ -530,7 +529,7 @@ func (s *MemberController) MemberInfoUpdate(w http.ResponseWriter, r *http.Reque
 		}
 
 		//회원정보 수정후 변경된 정보를 캐쉬에 넣기위해 캐쉬 정보 생성
-		services.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
+		login.GetLoginService(s.OpenstackProvider, s.txn, s.RdClient, s.sysType).SetUserInfoCache(&userInfo, reqCsrfToken, s.CfConfig)
 
 		userInfo.SysType = s.sysType
 
@@ -548,7 +547,7 @@ func (s *MemberController) MemberInfoDelete(w http.ResponseWriter, r *http.Reque
 	var loginErr model.ErrMessage
 	var err error
 
-	cnt, err = services.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoDelete(apiRequest)
+	cnt, err = member.GetMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoDelete(apiRequest)
 	loginErr = utils.GetError().GetCheckErrorMessage(err)
 	//if s.sysType == utils.SYS_TYPE_IAAS{
 	//	cnt, err = services.GetIaasMemberService(s.OpenstackProvider, s.txn, s.RdClient).MemberInfoDelete(apiRequest)
