@@ -8,6 +8,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gorilla/websocket"
+	influxClient "github.com/influxdata/influxdb1-client/v2"
 	"log"
 	"net/http"
 	"paasta-websocket/model"
@@ -30,8 +31,10 @@ type Client struct {
 	WebsocketClint *websocket.Conn
 	ZabbixSession *zabbix.Session
 	OpenstackProvider *gophercloud.ProviderClient
+	InfluxDBClient influxClient.Client
 	MessageType int
 	Message chan interface{}
+	Command chan string
 }
 
 
@@ -90,6 +93,19 @@ func (c *Client) initThirdPartySession() {
 		log.Println(zabbixErr)
 	}
 	c.ZabbixSession = zabbixSession
+
+	paasUrl, _ := config["paas.metric.db.url"]
+	paasuserName, _ := config["paas.metric.db.username"]
+	paasPassword, _ := config["paas.metric.db.password"]
+
+	influxDbClient, err := influxClient.NewHTTPClient(influxClient.HTTPConfig{
+		Addr:               paasUrl,
+		Username:           paasuserName,
+		Password:           paasPassword,
+		InsecureSkipVerify: true,
+	})
+	c.InfluxDBClient = influxDbClient
+
 }
 
 
@@ -104,8 +120,6 @@ func handler(client *Client, w http.ResponseWriter, r *http.Request) {
 	}
 	client.WebsocketClint = ws
 	client.initThirdPartySession()
-
-
 
 	wg.Add(2)  // Set sub goroutine count
 	go client.readMessage(r)
@@ -135,13 +149,15 @@ func (c *Client) readMessage(r *http.Request) {
 			clientQueue.Pop(param.ClientId)
 			c.WebsocketClint.Close()
 		} else {
-
+			c.Command <- param.Command
 			switch param.Command {
 			case "initialize":
 				log.Println("[system] readMessage() initialize command")
 				clientId := uuid.New().String()
 				clientQueue.Push(clientId, c)
 				log.Printf("[system] initialize new client : %s\n", clientId)
+				c.Message <- clientId
+				clientQueue.PrintQueueList()
 
 			case "cpuUsage":
 				log.Println("[system] readMessage() cpuUsage command")
@@ -159,8 +175,20 @@ func (c *Client) readMessage(r *http.Request) {
 
 					log.Printf("result : %v\n", resultList)
 					c.Message <- resultList
+				} else if param.Category == "paas" {
+					var params model.MetricsRequest
+					params.ServiceName = param.ExtraParam["guid"].(string)
+					params.Index = param.ExtraParam["idx"].(string)
+					params.DefaultTimeRange = param.ExtraParam["time_range"].(string)
+					params.TimeRangeFrom = param.ExtraParam["from_time"].(string)
+					params.TimeRangeTo = param.ExtraParam["to_time"].(string)
+					params.GroupBy = param.ExtraParam["group_by"].(string)
+
+					result, _ := service.GetMetricsService(c.InfluxDBClient).GetAppCpuUsage(params)
+					c.Message <- result
 				}
-			case "memoryUsage" :
+
+			case "memoryUsage":
 				log.Println("[system] readMessage() cpuUsage command")
 				if param.Category == "iaas" {
 					instanceId := param.ExtraParam["instance_id"].(string)
@@ -176,8 +204,46 @@ func (c *Client) readMessage(r *http.Request) {
 
 					log.Printf("result : %v\n", resultList)
 					c.Message <- resultList
+				} else if param.Category == "paas" {
+					var params model.MetricsRequest
+					params.ServiceName = param.ExtraParam["guid"].(string)
+					params.Index = param.ExtraParam["idx"].(string)
+					params.DefaultTimeRange = param.ExtraParam["time_range"].(string)
+					params.TimeRangeFrom = param.ExtraParam["from_time"].(string)
+					params.TimeRangeTo = param.ExtraParam["to_time"].(string)
+					params.GroupBy = param.ExtraParam["group_by"].(string)
+
+					result, _ := service.GetMetricsService(c.InfluxDBClient).GetAppMemoryUsage(params)
+					c.Message <- result
 				}
 
+			case "diskUsage":
+				if param.Category == "iaas" {
+					instanceId := param.ExtraParam["instance_id"].(string)
+					hypervisorName := param.ExtraParam["host"].(string)
+					result, _ := service.GetZabbixService(c.ZabbixSession, c.OpenstackProvider).GetDiskUsage(instanceId, hypervisorName, r)
+
+					resultMap := make(map[string]interface{})
+					resultMap["label"] = "Disk"
+					resultMap["data"] = result
+
+					resultList := make([]interface{}, 1)
+					resultList[0] = resultMap
+
+					log.Printf("result : %v\n", resultList)
+					c.Message <- resultList
+				} else if param.Category == "paas" {
+					var params model.MetricsRequest
+					params.ServiceName = param.ExtraParam["guid"].(string)
+					params.Index = param.ExtraParam["idx"].(string)
+					params.DefaultTimeRange = param.ExtraParam["time_range"].(string)
+					params.TimeRangeFrom = param.ExtraParam["from_time"].(string)
+					params.TimeRangeTo = param.ExtraParam["to_time"].(string)
+					params.GroupBy = param.ExtraParam["group_by"].(string)
+
+					result, _ := service.GetMetricsService(c.InfluxDBClient).GetDiskUsage(params)
+					c.Message <- result
+				}
 			}
 		}
 	}
@@ -193,7 +259,13 @@ func (c *Client) writeMessage() {
 			message := <- c.Message  // Get data from Channel
 			log.Printf("Send message : %v / %v\n", c.MessageType, fmt.Sprintf("%v", message))
 
-			responseBytes, _ := json.Marshal(message)
+			var responseBytes []byte
+			if <-c.Command == "initialize" {
+				responseBytes = []byte(message.(string))
+			} else {
+				responseBytes, _ = json.Marshal(message)
+			}
+
 			if err := c.WebsocketClint.WriteMessage(c.MessageType, responseBytes); err != nil {
 				log.Println(err)
 				return
