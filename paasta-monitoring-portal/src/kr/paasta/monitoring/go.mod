@@ -41,11 +41,11 @@ require (
 	github.com/racker/perigee v0.1.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
