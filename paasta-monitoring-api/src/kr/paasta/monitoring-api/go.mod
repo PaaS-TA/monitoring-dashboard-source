@@ -13,7 +13,7 @@ require (
 	github.com/gophercloud/gophercloud v0.25.0
 	github.com/influxdata/influxdb1-client v0.0.0-20220302092344-a9ab5670611c
 	github.com/joho/godotenv v1.4.0
-	github.com/labstack/echo/v4 v4.8.0
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/labstack/gommon v0.3.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/swaggo/echo-swagger v1.3.4
